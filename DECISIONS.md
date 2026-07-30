@@ -1,0 +1,47 @@
+# DECISIONS.md
+
+Assumption log per the build spec §1.4: when the spec is silent, the boring,
+reversible option is chosen and recorded here. Notes the spec explicitly asked
+to carry live here too.
+
+## Notes for the founders (carried from the spec)
+
+- **2026-07-30 — Partnership money flow (§2, spec-mandated note):** the operating
+  company is hers (Romanian SRL); Scott is paid a monthly platform/services fee
+  invoiced by his own entity to her company (cross-border B2B; nothing in writing
+  yet). Under the micro-enterprise regime her company pays 1% tax on REVENUE, so
+  the fee does not reduce her tax; it only moves cash. An EU cross-border B2B
+  service fee typically reverse-charges VAT. **Accountant confirms both.** The fee
+  amount lives in Settings and shows as a cost line in the Simulator.
+- **2026-07-30 — Part-time floor value (§4):** using 1,513.75 lei/month
+  (35% × 4,325). One research pass computed 1,444 on a reduced base; accountant to
+  confirm. Exposed in the Simulator's constants drawer.
+
+## Build decisions
+
+- **2026-07-30 — Autonomous session, plan approval:** built in a remote
+  Claude Code session with no live user to approve the plan mid-run. The §1
+  process contract was adapted: the plan was produced first, logged, and executed
+  phase-by-phase with one commit per phase, so each phase's stop-point summary is
+  reviewable in the final report and in git history.
+- **2026-07-30 — Vercel deploy step:** this environment has no Vercel
+  credentials, so deploys cannot be triggered from here. The repo is
+  Vercel-ready (no writable-filesystem assumptions in prod paths; Turso/R2
+  env-gated). Connecting the GitHub repo to Vercel is a one-time manual step,
+  documented in README.
+- **2026-07-30 — Open gate when SCARA_PASSCODE unset:** acceptance script #1
+  requires a fresh clone to run with `npm i && npm run seed && npm run dev` and
+  nothing else, so the passcode middleware only engages when SCARA_PASSCODE is
+  set. Production (Vercel) must set it; README says so.
+- **2026-07-30 — Fixture inconsistency in §5.2 (labour per building):** deriving
+  strictly from §4 constants, labour = 13.0 h × (4,418 ÷ 166.667 ÷ 0.82 =
+  32.3268 lei/h) = **420.25 lei**, direct 515.25, margin 3,050.75 (85.55%). The
+  fixture table's 420.33/515.33/3,050.67 cannot be reproduced from the stated
+  constants by any rounding order (it implies employer cost ≈ 4,418.9 lei). Per
+  §1.6 the constants are the source of truth, so the implementation derives
+  exactly and the unit tests assert the derived values, with the fixture-table
+  values noted in the test file. Every other §5.2 fixture reproduces exactly.
+- **2026-07-30 — Pinned scenario storage:** localStorage in Phase 1 per §10;
+  kept on localStorage after Phase 2 too (single-device founders' tool; boring
+  and reversible — a `scenarios` table can be added later without migration
+  pain).
