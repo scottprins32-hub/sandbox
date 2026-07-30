@@ -1,0 +1,30 @@
+// getCurrentOrg — the multi-tenant seam's resolver (§3). Today it returns the
+// single seeded org; later, real auth resolves the org from the session. No
+// org-switching UI exists on purpose (see docs/FRANCHISE_LATER.md).
+
+import { asc } from "drizzle-orm";
+import { getDb, schema } from "./db";
+
+export interface CurrentOrg {
+  id: string;
+  name: string;
+  cui: string;
+  localeDefault: string;
+}
+
+export interface OrgSettingsJson {
+  ronPerEur?: number;
+  partTimeFloorBani?: number;
+  platformFeeBani?: number;
+  [key: string]: unknown;
+}
+
+export async function getCurrentOrg(): Promise<CurrentOrg> {
+  const db = getDb();
+  const rows = await db.select().from(schema.orgs).orderBy(asc(schema.orgs.createdAt)).limit(1);
+  const org = rows[0];
+  if (!org) {
+    throw new Error("No org found. Run `npm run seed` to load the demo world.");
+  }
+  return { id: org.id, name: org.name, cui: org.cui, localeDefault: org.localeDefault };
+}

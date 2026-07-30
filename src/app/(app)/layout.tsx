@@ -10,12 +10,27 @@ export const metadata: Metadata = {
   description: "Building-services operations platform",
 };
 
-// Cleaner identities join this list in Phase 2, read from the DB.
+// Cleaner identities come from the DB; before the seed exists the switcher
+// falls back to admin/ops only.
 async function roleOptions(): Promise<RoleOption[]> {
-  return [
+  const base: RoleOption[] = [
     { value: "admin", label: en.roles.admin },
     { value: "ops", label: en.roles.ops },
   ];
+  try {
+    const { getCurrentOrg } = await import("@/server/org");
+    const { listActiveCleaners } = await import("@/server/repo/cleaners");
+    const org = await getCurrentOrg();
+    for (const c of await listActiveCleaners(org.id)) {
+      base.push({
+        value: `cleaner:${c.userId}`,
+        label: `${en.roles.cleanerPrefix}: ${c.name}`,
+      });
+    }
+  } catch {
+    // No database yet (fresh clone before `npm run seed`).
+  }
+  return base;
 }
 
 const NAV = [
