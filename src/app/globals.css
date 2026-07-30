@@ -40,6 +40,12 @@ html {
   font-variant-numeric: tabular-nums;
 }
 
+/* Editorial display face for the public page. */
+.font-display {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  letter-spacing: -0.015em;
+}
+
 /* Native range inputs, styled quietly (the Simulator lives on these). */
 input[type="range"] {
   appearance: none;

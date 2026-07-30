@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /$
+Disallow: /sim
+Disallow: /ops
+Disallow: /portal
+Disallow: /atlas
+Disallow: /gate
+Disallow: /api/

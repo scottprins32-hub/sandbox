@@ -41,6 +41,17 @@ to carry live here too.
   §1.6 the constants are the source of truth, so the implementation derives
   exactly and the unit tests assert the derived values, with the fixture-table
   values noted in the test file. Every other §5.2 fixture reproduces exactly.
+- **2026-07-30 — Franchise-seams audit (§9, Phase 4):** all 59 exported repo
+  functions across 14 modules take `orgId: string` and filter on it (verified
+  by grep + per-file count); every `.from(schema.*)` read carries an org
+  condition; `src/server/repo/repo.test.ts` asserts a cross-org read by id
+  returns null; file keys are namespaced `{org_id}/...`; `orgs` supports
+  multiple rows; org identity (name/CUI) drives the proces-verbal. The 5-step
+  multi-city path is docs/FRANCHISE_LATER.md, deliberately unbuilt.
+- **2026-07-30 — Public page copy, em-dash:** the spec's hero sub-line contained
+  an em-dash; house design rules ban it in visible copy, so it was restructured
+  with a comma, meaning unchanged. The §8-mandated seed client name
+  "Proprietar privat — 4 clădiri" was kept verbatim (spec data, not copy).
 - **2026-07-30 — Pinned scenario storage:** localStorage in Phase 1 per §10;
   kept on localStorage after Phase 2 too (single-device founders' tool; boring
   and reversible — a `scenarios` table can be added later without migration
