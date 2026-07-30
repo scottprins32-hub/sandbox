@@ -1,0 +1,23 @@
+# deps / build
+node_modules/
+.next/
+out/
+next-env.d.ts
+
+# local data (dev SQLite DB + uploaded files)
+.data/
+data/uploads/
+
+# env
+.env
+.env.local
+.env*.local
+
+# test artifacts
+playwright-report/
+test-results/
+coverage/
+
+# misc
+.DS_Store
+*.tsbuildinfo
