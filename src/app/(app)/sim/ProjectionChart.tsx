@@ -115,7 +115,7 @@ export function ProjectionChart({
   return (
     <div className="h-80 w-full" role="img" aria-label="24-month revenue, cost and profit projection">
       <ResponsiveContainer>
-        <ComposedChart data={data} margin={{ top: 8, right: 8, left: 4, bottom: 0 }} barGap={0}>
+        <ComposedChart data={data} margin={{ top: 24, right: 8, left: 4, bottom: 0 }} barGap={0}>
           <XAxis
             dataKey="name"
             interval={2}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Ops — Scara" };
+export const metadata: Metadata = { title: "Ops · Scara" };
 
 // Placeholder until Phase 2 builds the Today screen (§7.2).
 export default function OpsPage() {

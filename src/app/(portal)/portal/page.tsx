@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Scara — Portal" };
+export const metadata: Metadata = { title: "Portal · Scara" };
 
 // Placeholder until Phase 3 builds the cleaner portal (§8, Romanian).
 export default function PortalPage() {

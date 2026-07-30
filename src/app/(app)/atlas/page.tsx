@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ATLAS_LAST_UPDATED, COMMUNES } from "./atlasData";
 
-export const metadata: Metadata = { title: "Atlas — Scara" };
+export const metadata: Metadata = { title: "Atlas · Scara" };
 
 // Atlas Cut 1 (§6b): commune cards from baked constants. Cut 2 (field notebook,
 // document shelf, quoted-pipeline stat row) arrives with the database in Phase 2.
@@ -9,7 +9,7 @@ export default function AtlasPage() {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-xl font-semibold tracking-tight">Atlas — the Giroc belt</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Atlas: the Giroc belt</h1>
         <p className="text-xs text-ink-faint">
           Last updated {ATLAS_LAST_UPDATED} · curated monthly from public sources
         </p>

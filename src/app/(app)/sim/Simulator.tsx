@@ -156,7 +156,7 @@ export function Simulator() {
   function copySummary() {
     const r = results;
     const lines = [
-      `Scara scenario — ${new Date().toISOString().slice(0, 10)}`,
+      `Scara scenario, ${new Date().toISOString().slice(0, 10)}`,
       `Price/building: ${fmtLei(state.priceBani)} lei (${fmtEur(state.priceBani, state.ronPerEur)}), ${(state.priceBani / PRICING.MARKET_PRICE_3FLOOR_2X).toFixed(1)}x market`,
       `Buildings: ${state.buildings} now, +${state.growthPerMonth}/month`,
       `Service: ${state.hoursPerVisit}h x ${state.visitsPerWeek}/week`,
@@ -413,7 +413,7 @@ export function Simulator() {
         />
       </Section>
 
-      <Section title="VAT — crossing the wall" defaultOpen={false}>
+      <Section title="VAT: crossing the wall" defaultOpen={false}>
         <label className="flex items-center justify-between py-1.5 text-sm">
           <span className="text-ink-soft">VAT-registered</span>
           <input
