@@ -52,6 +52,13 @@ export default async function ProtocolsPage({
         </div>
       </div>
 
+      {buildings.length === 0 && (
+        <div className="mt-4 rounded-xl bg-surface p-6 text-center shadow-card">
+          <p className="text-sm text-ink-soft">
+            No active buildings yet, so nothing to protocol. Add a building first.
+          </p>
+        </div>
+      )}
       <ul className="mt-4 space-y-2">
         {buildings.map((b) => {
           const visits = monthVisits.filter(
