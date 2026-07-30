@@ -339,6 +339,31 @@ export const prospects = sqliteTable(
   (t) => [index("prospects_org_idx").on(t.orgId)]
 );
 
+// Commercial offers (ofertă de preț) sent to prospects. Not a fiscal document
+// (§9 DO-NOT-BUILD #4); this records what was quoted so the pipeline is honest.
+export const offers = sqliteTable(
+  "offers",
+  {
+    id: id(),
+    orgId: orgId(),
+    prospectId: text("prospect_id"),
+    clientName: text("client_name").notNull(),
+    buildingLabel: text("building_label").notNull(),
+    address: text("address").notNull().default(""),
+    floors: integer("floors").notNull().default(3),
+    apartments: integer("apartments").notNull().default(11),
+    residents: integer("residents").notNull().default(24),
+    visitsPerWeek: integer("visits_per_week").notNull().default(2),
+    hoursPerVisit: real("hours_per_visit").notNull().default(1.5),
+    priceBani: integer("price_bani").notNull(),
+    validUntil: text("valid_until").notNull(), // YYYY-MM-DD
+    pdfFileKey: text("pdf_file_key").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("offers_org_idx").on(t.orgId)]
+);
+
 export const documents = sqliteTable(
   "documents",
   {

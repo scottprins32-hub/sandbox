@@ -16,6 +16,10 @@ export interface OrgSettingsJson {
   ronPerEur?: number;
   partTimeFloorBani?: number;
   platformFeeBani?: number;
+  /** Drives the TVA line on the ofertă. Micro-enterprise default is false. */
+  vatRegistered?: boolean;
+  /** Phone/email printed on the ofertă. */
+  contactLine?: string;
   [key: string]: unknown;
 }
 

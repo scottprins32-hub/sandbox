@@ -17,6 +17,24 @@ to carry live here too.
   (35% × 4,325). One research pass computed 1,444 on a reduced base; accountant to
   confirm. Exposed in the Simulator's constants drawer.
 
+## Sales findings the founders should read
+
+- **2026-07-31 — The published competitor rate is below our direct cost.**
+  Building the offer generator surfaced this and it changes the pitch. A
+  competitor's published list price for a 3-floor block interpolates to ~325
+  lei/month. Scara's *direct* cost for that same block at 2 visits/week is
+  515.25 lei (labour 420.25 + consumables 50 + travel 45). Nobody serves a
+  block twice a week, on declared wages, for 325 lei. Whoever quotes that is
+  either cleaning far less often or not declaring the labour, which in Timiș
+  (Romania's #1 county for undeclared-work enforcement, 40,000 lei per person)
+  is the association's risk, not just theirs. The offer screen says this in
+  plain language whenever it applies, because it is the argument for the price.
+- **2026-07-31 — Do not take 3,566 lei into a competitive pitch.** That number
+  is what a captive landlord pays (5.1x the researched 700 lei market rate for
+  a 3-floor block at 2x/week). The offer builder flags any quote above 2x
+  market, per the §6 guardrail. For a fresh association, the tool's recommended
+  opening price is max(1.5 x direct cost, market rate).
+
 ## Build decisions
 
 - **2026-07-30 — Autonomous session, plan approval:** built in a remote
@@ -52,6 +70,18 @@ to carry live here too.
   an em-dash; house design rules ban it in visible copy, so it was restructured
   with a comma, meaning unchanged. The §8-mandated seed client name
   "Proprietar privat — 4 clădiri" was kept verbatim (spec data, not copy).
+- **2026-07-31 — Ofertă is not an invoice (§9 DO-NOT-BUILD #4):** the offer PDF
+  is a commercial proposal. It carries no invoice series, no fiscal VAT
+  breakdown and no payment instructions, and it states on its face that it is
+  not a factură fiscală. Invoicing stays in dedicated e-Factura tools.
+- **2026-07-31 — Sample proces-verbal is watermarked MODEL:** a specimen handed
+  to a prospect must never be mistakable for a record of work delivered, so it
+  carries a diagonal MODEL watermark, a caption saying it does not attest to
+  services performed, and obviously placeholder names.
+- **2026-07-31 — Seed guarantees a route today:** recurring visits fall on
+  Mon/Thu, so the demo world looked empty when opened on other weekdays (found
+  when the session date rolled to a Friday and two e2e specs broke). The seed
+  now backfills today's route on any weekday.
 - **2026-07-30 — Pinned scenario storage:** localStorage in Phase 1 per §10;
   kept on localStorage after Phase 2 too (single-device founders' tool; boring
   and reversible — a `scenarios` table can be added later without migration

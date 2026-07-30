@@ -126,6 +126,14 @@ export default async function AtlasPage() {
                             <p className="mt-1 text-xs leading-relaxed text-ink-soft">{p.notes}</p>
                           )}
                           <div className="mt-2 flex flex-wrap gap-1.5">
+                            {stage !== "won" && stage !== "lost" && (
+                              <a
+                                href={`/ops/offers?prospect=${p.id}`}
+                                className="rounded-md border border-moss px-2 py-1 text-xs font-medium text-moss-deep"
+                              >
+                                Ofertă
+                              </a>
+                            )}
                             {stage !== "spotted" && stage !== "won" && (
                               <MoveButton
                                 id={p.id}

@@ -3,6 +3,7 @@ import Link from "next/link";
 const OPS_NAV = [
   { href: "/ops", label: "Today" },
   { href: "/ops/buildings", label: "Buildings" },
+  { href: "/ops/offers", label: "Offers" },
   { href: "/ops/protocols", label: "Protocols" },
   { href: "/ops/payroll", label: "Payroll" },
   { href: "/ops/leads", label: "Leads" },

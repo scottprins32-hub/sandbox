@@ -3,6 +3,7 @@
 // re-seeding is deterministic.
 
 import { encode } from "jpeg-js";
+import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "../server/db";
 import { getStorage } from "../server/storage";
 import { generateWeekVisits } from "../server/repo/visits";
@@ -47,6 +48,7 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     schema.expenses,
     schema.protocols,
     schema.leads,
+    schema.offers,
     schema.prospects,
     schema.documents,
     schema.contractBuildings,
@@ -265,8 +267,28 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     }
   }
 
-  // This week's visits (today's route included), scheduled.
+  // This week's visits, scheduled.
   await generateWeekVisits(orgId, today);
+
+  // The Mon/Thu pattern leaves today empty on other weekdays, which makes the
+  // demo world look dead if you open it on a Friday. Guarantee a route today.
+  const todaysVisits = await db
+    .select()
+    .from(schema.visits)
+    .where(and(eq(schema.visits.orgId, orgId), eq(schema.visits.scheduledDate, today)));
+  if (todaysVisits.length === 0) {
+    for (const [bi, b] of buildingRows.entries()) {
+      await db.insert(schema.visits).values({
+        orgId,
+        buildingId: b.id,
+        cleanerId: (bi % 2 === 0 ? ioana! : vasile!).id,
+        type: "recurring",
+        scheduledDate: today,
+        window: "am",
+        status: "scheduled",
+      });
+    }
+  }
 
   // A one-off open offer with a bonus (claimable in the Portal).
   await db.insert(schema.visits).values({

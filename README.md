@@ -24,6 +24,7 @@ Open http://localhost:3000:
 | `/sim` | Simulator — sliders for price/buildings/team, VAT gauge, 24-month chart | English |
 | `/atlas` | Commune cards, prospect notebook, document shelf | English |
 | `/ops` | Today (Route / Money / Problems), buildings, visits, protocols, payroll, leads | English |
+| `/ops/offers` | Build a priced ofertă for one building, generate the Romanian PDF | English UI, Romanian PDF |
 | `/portal` | Cleaner portal. Demo login: phone `0721111111`, PIN `1111` (Ioana) | Romanian |
 
 The header's role switcher simulates identities (Scott/admin, Adina/ops, or a
@@ -39,6 +40,24 @@ cleaner) — there is no real auth in v1, by design.
 | `npm run test` | Vitest: finance fixtures (spec §5) + repo org-scoping tests |
 | `npm run e2e` | Playwright smoke flows (build first: `npm run build`) |
 | `npm run db:migrate` | apply migrations to whatever DB the env points at |
+
+## Selling with it
+
+`/ops/offers` is the sales screen. Enter a building's floors, apartments and
+residents, and it prices the quote live against three reference points: your
+own direct cost, the like-for-like market rate, and the Fântânii contract. It
+blocks nothing, but it says plainly when a price is below cost, under the
+recommended floor, or more than 2x market (which is fine with a captive
+landlord and loses the room with an association).
+
+Generating an offer produces a one-page Romanian PDF and records what you
+quoted. If you started from an Atlas prospect, that prospect moves to
+**quoted** automatically, so the pipeline never drifts from reality.
+
+Hand the **sample proces-verbal** over with every offer. It is on the same
+screen, watermarked MODEL, and it is the clearest way to show what "curățenie
+cu dovadă" actually means. Read the sales findings at the top of
+`DECISIONS.md` before your first association meeting.
 
 ## Stack and layout
 

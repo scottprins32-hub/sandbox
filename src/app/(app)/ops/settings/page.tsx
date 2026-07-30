@@ -34,6 +34,29 @@ export default async function SettingsPage() {
             className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
           />
         </label>
+        <label className="block text-sm">
+          <span className="text-ink-soft">Contact line (printed on offers)</span>
+          <input
+            name="contactLine"
+            defaultValue={settings.contactLine ?? ""}
+            placeholder="0722 000 000 · contact@scara.ro"
+            className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+          />
+        </label>
+        <label className="flex items-center justify-between py-1 text-sm">
+          <span className="text-ink-soft">
+            Registered for VAT
+            <span className="block text-xs text-ink-faint">
+              Drives the TVA line on the ofertă. Off while under the 395,000 lei threshold.
+            </span>
+          </span>
+          <input
+            type="checkbox"
+            name="vatRegistered"
+            defaultChecked={settings.vatRegistered === true}
+            className="h-5 w-5 shrink-0 accent-[#2c523c]"
+          />
+        </label>
 
         <h2 className="pt-2 text-sm font-semibold">Constants overrides</h2>
         <div className="grid grid-cols-2 gap-3">

@@ -4,7 +4,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { PDFDocument, rgb } from "pdf-lib";
+import { degrees, PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { formatInTimeZone } from "date-fns-tz";
 import { APP_TZ, monthNameRo } from "@/lib/dates";
@@ -21,6 +21,12 @@ export interface ProtocolData {
   visitsPerWeek: number;
   photoCount: number;
   issuesResolved: number; // omit line when 0
+  /**
+   * Specimen for sales use. A sample protocol must never be mistakable for a
+   * record of work actually delivered, so it is watermarked and captioned as a
+   * model. Real protocols generated from visit data leave this false.
+   */
+  sample?: boolean;
 }
 
 const FONT_DIR = path.join(process.cwd(), "src", "assets", "fonts");
@@ -56,6 +62,24 @@ export async function renderProtocolPdf(data: ProtocolData): Promise<Uint8Array>
   };
 
   const { luna, an } = monthNameRo(data.monthKey);
+
+  if (data.sample) {
+    // Diagonal watermark across the page, plus an explicit caption below.
+    page.drawText("MODEL", {
+      x: 118,
+      y: 380,
+      size: 110,
+      font: bold,
+      color: rgb(0.85, 0.84, 0.8),
+      rotate: degrees(32),
+    });
+    write("MODEL DE DOCUMENT (nu atestă servicii prestate)", {
+      bold: true,
+      size: 10,
+      center: true,
+      gapAfter: 12,
+    });
+  }
 
   write("PROCES-VERBAL DE RECEPȚIE A SERVICIILOR DE CURĂȚENIE", {
     bold: true,

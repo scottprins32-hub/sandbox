@@ -236,6 +236,31 @@ export async function convertProspectAction(prospectId: string) {
   redirect(`/ops/buildings/${building.id}`);
 }
 
+export async function generateOfferAction(formData: FormData) {
+  const org = await getCurrentOrg();
+  const { generateOffer } = await import("@/server/offerService");
+  const num = (key: string, fallback: number) => {
+    const v = Number(formData.get(key));
+    return Number.isFinite(v) && v > 0 ? v : fallback;
+  };
+  const offer = await generateOffer(org.id, {
+    prospectId: String(formData.get("prospectId") ?? "") || null,
+    clientName: String(formData.get("clientName") ?? "").trim() || "Beneficiar",
+    buildingLabel: String(formData.get("buildingLabel") ?? "").trim() || "Imobil",
+    address: String(formData.get("address") ?? "").trim(),
+    floors: num("floors", 3),
+    apartments: num("apartments", 11),
+    residents: num("residents", 24),
+    visitsPerWeek: num("visitsPerWeek", 2),
+    hoursPerVisit: num("hoursPerVisit", 1.5),
+    priceBani: Math.round(num("priceLei", 0) * 100),
+    validDays: num("validDays", 30),
+  });
+  revalidatePath("/ops/offers");
+  revalidatePath("/atlas");
+  redirect(`/ops/offers?generated=${offer.id}`);
+}
+
 export async function updateSettingsAction(formData: FormData) {
   const org = await getCurrentOrg();
   await updateOrgIdentity(org.id, {
@@ -248,6 +273,8 @@ export async function updateSettingsAction(formData: FormData) {
       Math.round(Number(formData.get("partTimeFloorLei") ?? 0) * 100) || undefined,
     platformFeeBani:
       Math.round(Number(formData.get("platformFeeLei") ?? 0) * 100) || undefined,
+    vatRegistered: formData.get("vatRegistered") === "on",
+    contactLine: String(formData.get("contactLine") ?? "").trim() || undefined,
   });
   revalidatePath("/ops/settings");
 }
