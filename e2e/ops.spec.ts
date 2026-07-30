@@ -34,7 +34,6 @@ test("ops: building, week generation, visit with photo, protocol", async ({ page
   });
 
   // Tick the first checklist item (server-action form buttons).
-  const checklist = page.locator("section, div").filter({ hasText: "Checklist" });
   const firstItem = page.locator("li form button").first();
   if (await firstItem.isVisible()) await firstItem.click();
 
