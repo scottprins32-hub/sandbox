@@ -24,6 +24,7 @@ export const en = {
     sim: "Simulator",
     atlas: "Atlas",
     ops: "Ops",
+    compliance: "Obligations",
     portal: "Portal",
     settings: "Settings",
   },

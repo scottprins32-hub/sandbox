@@ -37,6 +37,7 @@ const NAV = [
   { href: "/sim", label: en.nav.sim },
   { href: "/atlas", label: en.nav.atlas },
   { href: "/ops", label: en.nav.ops },
+  { href: "/compliance", label: en.nav.compliance },
   { href: "/portal", label: en.nav.portal },
 ];
 
