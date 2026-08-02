@@ -46,9 +46,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const role = cookieStore.get("scara_role")?.value ?? "admin";
   const options = await roleOptions();
 
+  // A production deployment with no passcode is publicly readable, including
+  // the Simulator's margins. Fail loudly rather than silently.
+  const ungatedInProduction =
+    process.env.NODE_ENV === "production" && !process.env.SCARA_PASSCODE;
+
   return (
     <html lang="en">
       <body>
+        {ungatedInProduction && (
+          <div className="bg-danger px-4 py-2 text-center text-sm text-paper">
+            <strong>This deployment has no passcode.</strong> Anyone with the URL can read
+            your margins and client data. Set <code>SCARA_PASSCODE</code> in the hosting
+            environment and redeploy.
+          </div>
+        )}
         <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-2.5">
             <Link href="/sim" className="flex items-center gap-2 font-semibold tracking-tight">

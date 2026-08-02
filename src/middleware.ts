@@ -4,10 +4,20 @@ import { NextRequest, NextResponse } from "next/server";
 // and static assets. Everything else is gated by the shared passcode (§3: no real
 // auth in v1). If SCARA_PASSCODE is unset the gate is open, so a fresh clone runs
 // with `npm i && npm run dev` and nothing else (acceptance script #1).
-const PUBLIC_PATHS = ["/", "/gate", "/api/gate", "/api/leads", "/robots.txt"];
+const PUBLIC_PATHS = [
+  "/",
+  "/gate",
+  "/api/gate",
+  "/api/leads",
+  "/api/health",
+  "/robots.txt",
+];
 
 export function middleware(request: NextRequest) {
   const passcode = process.env.SCARA_PASSCODE;
+  // Unset OR empty string both leave the app open. An empty value is easy to
+  // create by accident in a hosting dashboard, so treat it the same as unset
+  // and let /api/health and the banner report it.
   if (!passcode) return NextResponse.next();
 
   const { pathname } = request.nextUrl;
