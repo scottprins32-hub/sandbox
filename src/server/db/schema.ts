@@ -90,6 +90,12 @@ export const buildings = sqliteTable(
       .notNull()
       .default("active"),
     notes: text("notes"),
+    // Compliance flags (add-on §4): drive which obligations apply. Additive
+    // columns on an existing table, see DECISIONS.md.
+    hasGas: integer("has_gas", { mode: "boolean" }).notNull().default(false),
+    hasLift: integer("has_lift", { mode: "boolean" }).notNull().default(false),
+    hasPlayground: integer("has_playground", { mode: "boolean" }).notNull().default(false),
+    hasBasement: integer("has_basement", { mode: "boolean" }).notNull().default(false),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -337,6 +343,131 @@ export const prospects = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [index("prospects_org_idx").on(t.orgId)]
+);
+
+// ---------------------------------------------------------------------------
+// Compliance layer (add-on §4). Org-scoped like everything else.
+// ---------------------------------------------------------------------------
+
+export const contractors = sqliteTable(
+  "contractors",
+  {
+    id: id(),
+    orgId: orgId(),
+    name: text("name").notNull(),
+    /** Matches an obligation category. */
+    trade: text("trade").notNull(),
+    phone: text("phone"),
+    email: text("email"),
+    /** e.g. 'DSP + DSVSA, nr. ...'. Empty is a flag on the Problems tab. */
+    authorisationNote: text("authorisation_note"),
+    rating: integer("rating"),
+    notes: text("notes"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("contractors_org_idx").on(t.orgId)]
+);
+
+export const buildingObligations = sqliteTable(
+  "building_obligations",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    /** Key into the static catalogue in src/lib/compliance. */
+    obligationKey: text("obligation_key").notNull(),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    lastDoneAt: text("last_done_at"), // YYYY-MM-DD
+    nextDueAt: text("next_due_at"), // YYYY-MM-DD, derived and cached
+    responsible: text("responsible", { enum: ["us", "client", "third_party"] })
+      .notNull()
+      .default("us"),
+    contractorId: text("contractor_id"),
+    notes: text("notes"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("building_obligations_org_idx").on(t.orgId),
+    index("building_obligations_building_idx").on(t.buildingId),
+  ]
+);
+
+export const complianceEvents = sqliteTable(
+  "compliance_events",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingObligationId: text("building_obligation_id").notNull(),
+    kind: text("kind", { enum: ["scheduled", "done", "skipped", "blocked"] }).notNull(),
+    occurredAt: text("occurred_at").notNull(), // YYYY-MM-DD
+    performedBy: text("performed_by", { enum: ["scara", "contractor", "client"] })
+      .notNull()
+      .default("scara"),
+    contractorId: text("contractor_id"),
+    costBani: integer("cost_bani"),
+    documentFileKey: text("document_file_key"),
+    photoKeys: text("photo_keys"), // JSON array
+    note: text("note"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("compliance_events_org_idx").on(t.orgId),
+    index("compliance_events_bo_idx").on(t.buildingObligationId),
+  ]
+);
+
+// --------------------------- Service lines (add-on §7) ---------------------
+
+export const serviceLines = sqliteTable(
+  "service_lines",
+  {
+    id: id(),
+    orgId: orgId(),
+    key: text("key").notNull(),
+    nameRo: text("name_ro").notNull(),
+    nameEn: text("name_en").notNull(),
+    unit: text("unit", {
+      enum: [
+        "per_building_month",
+        "per_visit",
+        "per_bin_clean",
+        "per_season",
+        "per_report",
+        "per_apartment_month",
+        "per_job",
+      ],
+    }).notNull(),
+    defaultPriceBani: integer("default_price_bani").notNull(),
+    costModel: text("cost_model"), // JSON
+    active: integer("active", { mode: "boolean" }).notNull().default(true),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("service_lines_org_idx").on(t.orgId)]
+);
+
+export const buildingServices = sqliteTable(
+  "building_services",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    serviceLineId: text("service_line_id").notNull(),
+    priceBani: integer("price_bani").notNull(),
+    active: integer("active", { mode: "boolean" }).notNull().default(true),
+    startedAt: text("started_at"),
+    endedAt: text("ended_at"),
+    note: text("note"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("building_services_org_idx").on(t.orgId),
+    index("building_services_building_idx").on(t.buildingId),
+  ]
 );
 
 // Commercial offers (ofertă de preț) sent to prospects. Not a fiscal document

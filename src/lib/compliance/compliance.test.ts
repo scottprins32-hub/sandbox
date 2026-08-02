@@ -253,4 +253,25 @@ describe("maximum statutory exposure", () => {
     expect(top[0]!.obligation.key).toBe("deseuri_sortare");
     expect(top[1]!.obligation.key).toBe("lift_rsvti");
   });
+
+  it("deduplicates across buildings and counts the instances", () => {
+    // The same obligation uncovered in three buildings is one named risk,
+    // not three list entries.
+    const sorting = OBLIGATION_BY_KEY["deseuri_sortare"]!;
+    const lighting = OBLIGATION_BY_KEY["psi_iluminat_siguranta"]!;
+    const top = largestExposures(
+      [
+        { obligation: sorting, lastDoneDate: null },
+        { obligation: sorting, lastDoneDate: null },
+        { obligation: sorting, lastDoneDate: null },
+        { obligation: lighting, lastDoneDate: null },
+      ],
+      2,
+      now
+    );
+    expect(top).toHaveLength(2);
+    expect(top[0]!.obligation.key).toBe("deseuri_sortare");
+    expect(top[0]!.buildings).toBe(3);
+    expect(top[1]!.buildings).toBe(1);
+  });
 });

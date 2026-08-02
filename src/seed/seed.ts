@@ -8,6 +8,8 @@ import { getDb, schema } from "../server/db";
 import { getStorage } from "../server/storage";
 import { generateWeekVisits } from "../server/repo/visits";
 import { todayYmd, weekDays } from "../lib/dates";
+import { applicableObligations, nextDueDate, OBLIGATION_BY_KEY } from "../lib/compliance";
+import { SERVICE_LINES, SERVICE_LINE_BY_KEY } from "../lib/compliance/services";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -46,6 +48,11 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     schema.visits,
     schema.issues,
     schema.expenses,
+    schema.complianceEvents,
+    schema.buildingObligations,
+    schema.contractors,
+    schema.buildingServices,
+    schema.serviceLines,
     schema.protocols,
     schema.leads,
     schema.offers,
@@ -163,6 +170,11 @@ export async function seedDemo(): Promise<{ orgId: string }> {
         hoursPerVisit: 1.5,
         checklistTemplateId: template!.id,
         status: "active" as const,
+        // Fântânii blocks: gas and a basement, no lift, no playground.
+        hasGas: true,
+        hasBasement: true,
+        hasLift: false,
+        hasPlayground: false,
       }))
     )
     .returning();
@@ -184,6 +196,123 @@ export async function seedDemo(): Promise<{ orgId: string }> {
   await db.insert(schema.contractBuildings).values(
     buildingRows.map((b) => ({ orgId, contractId: contract!.id, buildingId: b.id }))
   );
+
+  // Service catalogue and the core line on every building (add-on §7).
+  const seededLines = await db
+    .insert(schema.serviceLines)
+    .values(
+      SERVICE_LINES.map((s) => ({
+        orgId,
+        key: s.key,
+        nameRo: s.nameRo,
+        nameEn: s.nameEn,
+        unit: s.unit,
+        defaultPriceBani: s.defaultPriceBani,
+        active: true,
+      }))
+    )
+    .returning();
+  const lineByKey = new Map(seededLines.map((l) => [l.key, l]));
+
+  for (const b of buildingRows) {
+    // The existing single price becomes the core cleaning line.
+    await db.insert(schema.buildingServices).values({
+      orgId,
+      buildingId: b.id,
+      serviceLineId: lineByKey.get("curatenie_scara")!.id,
+      priceBani: b.priceBani,
+      active: true,
+      startedAt: "2026-07-01",
+    });
+  }
+  // One building already buys the compliance bundle, so the Money tab has a split.
+  for (const key of ["tur_control", "calendar_conformitate"]) {
+    await db.insert(schema.buildingServices).values({
+      orgId,
+      buildingId: buildingRows[0]!.id,
+      serviceLineId: lineByKey.get(key)!.id,
+      priceBani: SERVICE_LINE_BY_KEY[key]!.defaultPriceBani,
+      active: true,
+      startedAt: "2026-07-01",
+    });
+  }
+
+  // Contractors: one properly attested, one missing its authorisation on purpose
+  // so the Problems tab has something real to flag.
+  const [dddFirm] = await db
+    .insert(schema.contractors)
+    .values([
+      {
+        orgId,
+        name: "Deratizare Vest SRL",
+        trade: "ddd",
+        phone: "0256 100 200",
+        authorisationNote: "Aviz DSP Timiș nr. 4412/2025",
+      },
+      {
+        orgId,
+        name: "Electro Verificări SRL",
+        trade: "electrical",
+        phone: "0256 300 400",
+        authorisationNote: null,
+      },
+    ])
+    .returning();
+
+  // Compliance calendar per building, seeded from the catalogue by flags.
+  for (const b of buildingRows) {
+    const rows = applicableObligations({
+      hasGas: true,
+      hasBasement: true,
+      hasLift: false,
+      hasPlayground: false,
+    }).map((o) => ({
+      orgId,
+      buildingId: b.id,
+      obligationKey: o.key,
+      enabled: true,
+      lastDoneAt: null as string | null,
+      nextDueAt: null as string | null,
+      responsible: (o.performerRequirement === "us" ? "us" : "third_party") as
+        | "us"
+        | "client"
+        | "third_party",
+      contractorId: o.category === "ddd" ? dddFirm!.id : null,
+    }));
+    await db.insert(schema.buildingObligations).values(rows);
+  }
+
+  // Give the first building a partly-covered record so the exposure number is
+  // a real number rather than the whole catalogue.
+  const firstBuildingObligations = await db
+    .select()
+    .from(schema.buildingObligations)
+    .where(
+      and(
+        eq(schema.buildingObligations.orgId, orgId),
+        eq(schema.buildingObligations.buildingId, buildingRows[0]!.id)
+      )
+    );
+  for (const key of ["psi_iluminat_siguranta", "deseuri_platforma", "ddd_deratizare"]) {
+    const row = firstBuildingObligations.find((r) => r.obligationKey === key);
+    if (!row) continue;
+    const doneOn = "2026-06-15";
+    await db.insert(schema.complianceEvents).values({
+      orgId,
+      buildingObligationId: row.id,
+      kind: "done",
+      occurredAt: doneOn,
+      performedBy: key === "ddd_deratizare" ? "contractor" : "scara",
+      contractorId: key === "ddd_deratizare" ? dddFirm!.id : null,
+    });
+    await db
+      .update(schema.buildingObligations)
+      .set({
+        lastDoneAt: doneOn,
+        nextDueAt: nextDueDate(OBLIGATION_BY_KEY[key]!, doneOn, doneOn),
+      })
+      .where(eq(schema.buildingObligations.id, row.id));
+  }
 
   // Prospect (Atlas field notebook)
   await db.insert(schema.prospects).values({

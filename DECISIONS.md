@@ -35,6 +35,41 @@ to carry live here too.
   market, per the §6 guardrail. For a fresh association, the tool's recommended
   opening price is max(1.5 x direct cost, market rate).
 
+## Compliance layer (add-on)
+
+- **2026-08-02 — The catalogue holds 26 records, not 24.** The add-on's Section A
+  definition of done says "24 records present", but its own tables specify 26
+  (3 DDD + 6 fire + 3 gas + 3 structure + 6 waste + 5 conditional). Per the rule
+  that the legal data is research output and must not be "improved", all 26 are
+  entered verbatim and the test asserts 26. No record was dropped to match a
+  count.
+- **2026-08-02 — DDD cadence set to the stricter quarterly.** The table gives
+  "3/year national; Timișoara requires quarterly" and the verification note says
+  to apply the strictest until legal confirmation, so `ddd_dezinsectie` encodes
+  4/year with both figures in `sourceNote` and the note preserved.
+- **2026-08-02 — Performer inferred for five records, flagged as inferred.** The
+  conditional table (lift, PRAM, playground, lead inventory) gives no performer
+  column. Where an authorisation is named in the statute (ISCIR, authorised
+  electrical lab) the record is `authorised_third_party`; `plumb_inventar` is
+  `us` because the cited text requires only inventory and reporting. Each says
+  so in `sourceNote` or `needsVerification` rather than presenting the inference
+  as research.
+- **2026-08-02 — Additive columns on `buildings`** (`has_gas`, `has_lift`,
+  `has_basement`, `has_playground`), permitted by add-on §1.2. They drive which
+  obligations apply. Existing rows default to false; the seed sets gas and
+  basement true for the Fântânii blocks.
+- **2026-08-02 — `igienizare`, never `dezinfecție`, for the bin service** (§2.2).
+  The service line is `igienizare_pubele`. `ddd_dezinfectie` in the catalogue is
+  the legal obligation itself, marked `authorised_third_party`: the company
+  coordinates it and never performs it.
+- **2026-08-02 — The compliance calendar defaults to one building.** Org-wide it
+  renders 23 obligations × every building (a 21,000px page). §4 describes it as
+  a per-building screen, so it opens on the first building with an explicit
+  "toate imobilele" option.
+- **2026-08-02 — Largest-exposure list deduplicates by obligation.** Across four
+  buildings the same uncovered obligation filled the widget with repeats of one
+  name; it now shows each named risk once with the count of buildings affected.
+
 ## Build decisions
 
 - **2026-07-30 — Autonomous session, plan approval:** built in a remote

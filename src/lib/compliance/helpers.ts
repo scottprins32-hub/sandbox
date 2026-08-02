@@ -161,18 +161,32 @@ export function maxExposureBani(
   }, 0);
 }
 
-/** The largest uncovered exposures by name, for the exposure widget. */
+/**
+ * The largest uncovered exposures by name, for the exposure widget.
+ * Deduplicated by obligation: across several buildings the same obligation
+ * would otherwise fill the list with repeats of one name. `buildings` says how
+ * many uncovered instances share that figure.
+ */
 export function largestExposures(
   entries: ExposureInput[],
   count = 2,
   now: string = todayYmd()
-): { obligation: Obligation; fineMaxBani: number }[] {
-  return entries
-    .filter((e) => {
-      const s = statusOf(e.obligation, e.lastDoneDate, now);
-      return (s === "overdue" || s === "unknown") && (e.obligation.fineMaxBani ?? 0) > 0;
-    })
-    .map((e) => ({ obligation: e.obligation, fineMaxBani: e.obligation.fineMaxBani! }))
+): { obligation: Obligation; fineMaxBani: number; buildings: number }[] {
+  const byKey = new Map<string, { obligation: Obligation; fineMaxBani: number; buildings: number }>();
+  for (const e of entries) {
+    const s = statusOf(e.obligation, e.lastDoneDate, now);
+    if (s !== "overdue" && s !== "unknown") continue;
+    if ((e.obligation.fineMaxBani ?? 0) <= 0) continue;
+    const found = byKey.get(e.obligation.key);
+    if (found) found.buildings += 1;
+    else
+      byKey.set(e.obligation.key, {
+        obligation: e.obligation,
+        fineMaxBani: e.obligation.fineMaxBani!,
+        buildings: 1,
+      });
+  }
+  return [...byKey.values()]
     .sort((a, b) => b.fineMaxBani - a.fineMaxBani)
     .slice(0, count);
 }

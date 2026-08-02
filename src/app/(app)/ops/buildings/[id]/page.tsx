@@ -10,8 +10,18 @@ import { getStorage } from "@/server/storage";
 import { buildingUnitEconomics } from "@/lib/finance";
 import { fmtLei, fmtLeiRound } from "@/lib/money";
 import { StatusChip } from "@/components/ops/StatusChip";
-import { updateBuildingAction } from "../../actions";
+import {
+  attachServiceAction,
+  detachServiceAction,
+  seedBuildingObligationsAction,
+  updateBuildingAction,
+} from "../../actions";
 import { BuildingForm } from "../BuildingForm";
+import { exposureFor } from "@/server/complianceService";
+import { ExposureWidget } from "@/components/ops/ExposureWidget";
+import { listBuildingServices, listServiceLines } from "@/server/repo/services";
+import { UNIT_LABEL_RO, type ServiceUnit } from "@/lib/compliance/services";
+import { listBuildingObligations } from "@/server/repo/compliance";
 
 export const metadata: Metadata = { title: "Building · Scara" };
 export const dynamic = "force-dynamic";
@@ -47,6 +57,22 @@ export default async function BuildingDetail({
     hoursPerVisit: building.hoursPerVisit,
     visitsPerWeek: building.visitsPerWeek,
   });
+
+  const [exposure, serviceLines, attached, obligationRows] = await Promise.all([
+    exposureFor(org.id, building.id),
+    listServiceLines(org.id),
+    listBuildingServices(org.id, building.id),
+    listBuildingObligations(org.id, building.id),
+  ]);
+  const lineById = new Map(serviceLines.map((l) => [l.id, l]));
+  const activeServices = attached.filter((s) => s.active);
+  const monthlyTotal = activeServices.reduce((sum, s) => {
+    const line = lineById.get(s.serviceLineId);
+    if (!line) return sum;
+    if (line.unit === "per_building_month") return sum + s.priceBani;
+    if (line.unit === "per_apartment_month") return sum + s.priceBani * building.apartments;
+    return sum; // per-job lines are not part of the recurring monthly total
+  }, 0);
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
@@ -90,6 +116,91 @@ export default async function BuildingDetail({
           </div>
         </dl>
         {building.notes && <p className="mt-2 text-sm text-ink-soft">{building.notes}</p>}
+      </div>
+
+      {/* Compliance (add-on §4) */}
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="rounded-xl bg-surface p-4 shadow-card">
+          <h2 className="text-sm font-semibold">Services</h2>
+          {activeServices.length === 0 ? (
+            <p className="mt-2 text-sm text-ink-soft">
+              Only the core cleaning price is set. Attach service lines to build a defensible
+              monthly total.
+            </p>
+          ) : (
+            <ul className="mt-2 divide-y divide-line">
+              {activeServices.map((s) => {
+                const line = lineById.get(s.serviceLineId);
+                return (
+                  <li key={s.id} className="flex items-center justify-between gap-3 py-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm">{line?.nameRo ?? "Serviciu"}</p>
+                      <p className="text-xs text-ink-faint">
+                        {UNIT_LABEL_RO[(line?.unit ?? "per_building_month") as ServiceUnit]}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="tnum text-sm">{fmtLeiRound(s.priceBani)} lei</span>
+                      <form action={detachServiceAction.bind(null, building.id, s.id)}>
+                        <button className="rounded-md border border-line px-2 py-0.5 text-xs text-ink-faint">
+                          scoate
+                        </button>
+                      </form>
+                    </div>
+                  </li>
+                );
+              })}
+              <li className="flex items-center justify-between gap-3 py-2">
+                <span className="text-sm font-medium">Recurring monthly total</span>
+                <span className="tnum text-sm font-semibold">
+                  {fmtLeiRound(monthlyTotal)} lei
+                </span>
+              </li>
+            </ul>
+          )}
+
+          <form
+            action={attachServiceAction.bind(null, building.id)}
+            className="mt-3 flex flex-wrap items-end gap-2 border-t border-line pt-3"
+          >
+            <label className="text-xs">
+              <span className="block text-ink-faint">Add service</span>
+              <select
+                name="serviceLineId"
+                className="mt-0.5 max-w-56 rounded-md border border-line bg-surface px-2 py-1.5 text-sm"
+              >
+                {serviceLines.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.nameRo} ({fmtLeiRound(l.defaultPriceBani)} lei)
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs">
+              <span className="block text-ink-faint">Price (lei)</span>
+              <input
+                name="priceLei"
+                type="number"
+                defaultValue={200}
+                className="mt-0.5 w-24 rounded-md border border-line bg-surface px-2 py-1.5 text-sm"
+              />
+            </label>
+            <button className="rounded-md bg-moss-deep px-3 py-1.5 text-sm font-medium text-paper">
+              Attach
+            </button>
+          </form>
+        </div>
+
+        <div className="space-y-2">
+          <ExposureWidget summary={exposure} buildingId={building.id} />
+          {obligationRows.length === 0 && (
+            <form action={seedBuildingObligationsAction.bind(null, building.id)}>
+              <button className="w-full rounded-xl border border-dashed border-line-strong bg-surface px-3 py-2.5 text-xs text-ink-soft hover:border-moss">
+                Load the legal obligations for this building
+              </button>
+            </form>
+          )}
+        </div>
       </div>
 
       <div className="rounded-xl bg-surface p-4 shadow-card">

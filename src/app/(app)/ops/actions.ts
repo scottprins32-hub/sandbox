@@ -108,7 +108,14 @@ export async function createBuildingAction(formData: FormData) {
       (String(formData.get("status") ?? "active") as "active" | "paused" | "prospect") ||
       "active",
     notes: String(formData.get("notes") ?? "") || null,
+    hasGas: formData.get("hasGas") === "on",
+    hasLift: formData.get("hasLift") === "on",
+    hasBasement: formData.get("hasBasement") === "on",
+    hasPlayground: formData.get("hasPlayground") === "on",
   });
+  // Seed the compliance calendar from the catalogue, filtered by the flags.
+  const { seedBuildingObligations } = await import("@/server/complianceService");
+  await seedBuildingObligations(org.id, building.id);
   redirect(`/ops/buildings/${building.id}`);
 }
 
@@ -128,6 +135,10 @@ export async function updateBuildingAction(buildingId: string, formData: FormDat
       (String(formData.get("status") ?? "active") as "active" | "paused" | "prospect") ||
       "active",
     notes: String(formData.get("notes") ?? "") || null,
+    hasGas: formData.get("hasGas") === "on",
+    hasLift: formData.get("hasLift") === "on",
+    hasBasement: formData.get("hasBasement") === "on",
+    hasPlayground: formData.get("hasPlayground") === "on",
   });
   revalidatePath(`/ops/buildings/${buildingId}`);
 }
@@ -233,7 +244,91 @@ export async function convertProspectAction(prospectId: string) {
     status: "won",
     convertedBuildingId: building.id,
   });
+  // Seed the compliance calendar from the catalogue, filtered by the flags.
+  const { seedBuildingObligations } = await import("@/server/complianceService");
+  await seedBuildingObligations(org.id, building.id);
   redirect(`/ops/buildings/${building.id}`);
+}
+
+// ---------------------------------------------------- compliance (add-on §4)
+
+export async function seedBuildingObligationsAction(buildingId: string) {
+  const org = await getCurrentOrg();
+  const { seedBuildingObligations } = await import("@/server/complianceService");
+  await seedBuildingObligations(org.id, buildingId);
+  revalidatePath("/ops/compliance");
+  revalidatePath(`/ops/buildings/${buildingId}`);
+}
+
+export async function markObligationDoneAction(
+  buildingObligationId: string,
+  formData: FormData
+) {
+  const org = await getCurrentOrg();
+  const { markObligationDone } = await import("@/server/complianceService");
+  const performedBy = String(formData.get("performedBy") ?? "scara");
+  await markObligationDone(org.id, buildingObligationId, {
+    performedBy:
+      performedBy === "contractor" || performedBy === "client" ? performedBy : "scara",
+  });
+  revalidatePath("/ops/compliance");
+  revalidatePath("/ops");
+}
+
+export async function scheduleObligationAction(
+  buildingObligationId: string,
+  formData: FormData
+) {
+  const org = await getCurrentOrg();
+  const date = String(formData.get("date") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  const { scheduleObligation } = await import("@/server/complianceService");
+  await scheduleObligation(org.id, buildingObligationId, {
+    occurredAt: date,
+    contractorId: String(formData.get("contractorId") ?? "") || null,
+  });
+  revalidatePath("/ops/compliance");
+}
+
+export async function createContractorAction(formData: FormData) {
+  const org = await getCurrentOrg();
+  const { createContractor } = await import("@/server/repo/compliance");
+  await createContractor(org.id, {
+    name: String(formData.get("name") ?? "").trim() || "Furnizor",
+    trade: String(formData.get("trade") ?? "ddd"),
+    phone: String(formData.get("phone") ?? "").trim() || null,
+    email: String(formData.get("email") ?? "").trim() || null,
+    authorisationNote: String(formData.get("authorisationNote") ?? "").trim() || null,
+    notes: String(formData.get("notes") ?? "").trim() || null,
+  });
+  revalidatePath("/ops/contractors");
+}
+
+// -------------------------------------------------- service lines (add-on §7)
+
+export async function attachServiceAction(buildingId: string, formData: FormData) {
+  const org = await getCurrentOrg();
+  const { attachBuildingService } = await import("@/server/repo/services");
+  const serviceLineId = String(formData.get("serviceLineId") ?? "");
+  if (!serviceLineId) return;
+  const priceLei = Number(formData.get("priceLei") ?? 0);
+  await attachBuildingService(org.id, {
+    buildingId,
+    serviceLineId,
+    priceBani: Math.round(priceLei * 100),
+    active: true,
+    startedAt: todayYmd(),
+  });
+  revalidatePath(`/ops/buildings/${buildingId}`);
+  revalidatePath("/ops");
+}
+
+export async function detachServiceAction(buildingId: string, id: string) {
+  const org = await getCurrentOrg();
+  const { setBuildingServiceActive } = await import("@/server/repo/services");
+  await setBuildingServiceActive(org.id, id, false);
+  revalidatePath(`/ops/buildings/${buildingId}`);
+  revalidatePath("/ops");
 }
 
 export async function generateOfferAction(formData: FormData) {

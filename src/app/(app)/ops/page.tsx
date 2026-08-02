@@ -22,6 +22,11 @@ import {
   setIssueStatusAction,
   markVisitMissedAction,
 } from "./actions";
+import { listBuildingObligations, listContractors } from "@/server/repo/compliance";
+import { decorate, exposureFor } from "@/server/complianceService";
+import { listBuildingServices, listServiceLines } from "@/server/repo/services";
+import { ExposureWidget } from "@/components/ops/ExposureWidget";
+import { RECURRING_UNITS, type ServiceUnit } from "@/lib/compliance/services";
 
 export const metadata: Metadata = { title: "Ops · Scara" };
 export const dynamic = "force-dynamic";
@@ -59,6 +64,43 @@ export default async function OpsToday({
   const buildingById = new Map(buildings.map((b) => [b.id, b]));
   const cleanerById = new Map(cleaners.map((c) => [c.id, c]));
 
+  // Compliance layer (add-on §4).
+  const [exposure, obligationRecords, contractors, serviceLines, buildingServices] =
+    await Promise.all([
+      exposureFor(org.id),
+      listBuildingObligations(org.id),
+      listContractors(org.id),
+      listServiceLines(org.id),
+      listBuildingServices(org.id),
+    ]);
+  const complianceRows = decorate(obligationRecords);
+  const overdueObligations = complianceRows.filter((r) => r.status === "overdue");
+  const dueNoContractor = complianceRows.filter(
+    (r) =>
+      r.status === "due_soon" &&
+      r.obligation.performerRequirement !== "us" &&
+      !r.record.contractorId
+  );
+  const unauthorisedContractors = contractors.filter(
+    (c) => !c.authorisationNote || c.authorisationNote.trim() === ""
+  );
+
+  // Revenue split by service line (add-on §7).
+  const lineById = new Map(serviceLines.map((l) => [l.id, l]));
+  const recurringByLine = new Map<string, number>();
+  for (const bs of buildingServices) {
+    if (!bs.active) continue;
+    const line = lineById.get(bs.serviceLineId);
+    if (!line || !RECURRING_UNITS.includes(line.unit as ServiceUnit)) continue;
+    const building = buildingById.get(bs.buildingId);
+    if (!building || building.status !== "active") continue;
+    const monthly =
+      line.unit === "per_apartment_month" ? bs.priceBani * building.apartments : bs.priceBani;
+    recurringByLine.set(line.nameRo, (recurringByLine.get(line.nameRo) ?? 0) + monthly);
+  }
+  const serviceLineRevenue = [...recurringByLine.entries()].sort((a, b) => b[1] - a[1]);
+  const serviceLineTotal = serviceLineRevenue.reduce((s, [, v]) => s + v, 0);
+
   // Money (§7.2): contracted recurring + turnover/one-off done this month.
   const activeBuildings = buildings.filter((b) => b.status === "active");
   const recurringMonthly = activeBuildings.reduce((sum, b) => sum + b.priceBani, 0);
@@ -82,7 +124,13 @@ export default async function OpsToday({
     (c) => c.nextIndexationDate && c.nextIndexationDate <= indexationSoon
   );
   const problemCount =
-    issues.length + missed.length + expiringProofs.length + indexingContracts.length;
+    issues.length +
+    missed.length +
+    expiringProofs.length +
+    indexingContracts.length +
+    overdueObligations.length +
+    dueNoContractor.length +
+    unauthorisedContractors.length;
 
   // Route: group today's visits by cleaner.
   const byCleaner = new Map<string, typeof todaysVisits>();
@@ -208,6 +256,30 @@ export default async function OpsToday({
               Turnover revenue counts toward the threshold too.
             </p>
           </div>
+
+          {serviceLineRevenue.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Recurring revenue by service line</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {serviceLineRevenue.map(([name, bani]) => (
+                  <li key={name} className="flex items-center justify-between gap-3 py-1.5">
+                    <span className="min-w-0 truncate text-sm">{name}</span>
+                    <span className="tnum shrink-0 text-sm font-medium">
+                      {fmtLeiRound(bani)} lei
+                    </span>
+                  </li>
+                ))}
+                <li className="flex items-center justify-between gap-3 py-1.5">
+                  <span className="text-sm font-medium">Total</span>
+                  <span className="tnum text-sm font-semibold">
+                    {fmtLeiRound(serviceLineTotal)} lei
+                  </span>
+                </li>
+              </ul>
+            </div>
+          )}
+
+          <ExposureWidget summary={exposure} />
         </section>
       )}
 
@@ -277,6 +349,65 @@ export default async function OpsToday({
                     <p className="text-sm">{c.name}</p>
                     <p className="text-xs text-warn">
                       Student proof expires {c.studentProofExpiry}. Ask for the new adeverință.
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {overdueObligations.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Obligații legale restante</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {overdueObligations.map((r) => (
+                  <li key={r.record.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm">{r.obligation.nameRo}</p>
+                      <p className="text-xs text-ink-faint">
+                        {buildingById.get(r.record.buildingId)?.label} · scadent {r.nextDue}
+                      </p>
+                    </div>
+                    <span className="tnum shrink-0 text-xs text-danger">
+                      {r.obligation.fineMaxBani
+                        ? `până la ${fmtLeiRound(r.obligation.fineMaxBani)} lei`
+                        : ""}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/ops/compliance?status=overdue" className="mt-2 inline-block text-xs text-moss underline">
+                Deschide calendarul
+              </Link>
+            </div>
+          )}
+
+          {dueNoContractor.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Scadente curând, fără furnizor</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {dueNoContractor.map((r) => (
+                  <li key={r.record.id} className="py-2.5">
+                    <p className="text-sm">{r.obligation.nameRo}</p>
+                    <p className="text-xs text-warn">
+                      {buildingById.get(r.record.buildingId)?.label} · scadent {r.nextDue} ·
+                      nimeni programat
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {unauthorisedContractors.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Furnizori fără autorizare consemnată</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {unauthorisedContractors.map((c) => (
+                  <li key={c.id} className="py-2.5">
+                    <p className="text-sm">{c.name}</p>
+                    <p className="text-xs text-warn">
+                      Cere numărul de atestat înainte de următoarea lucrare.
                     </p>
                   </li>
                 ))}

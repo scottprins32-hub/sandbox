@@ -92,6 +92,32 @@ export function BuildingForm({
           <option value="prospect">prospect</option>
         </select>
       </label>
+      {/* Compliance flags: these decide which legal obligations apply. */}
+      <fieldset className="sm:col-span-2">
+        <legend className="text-sm text-ink-soft">The building has</legend>
+        <div className="mt-1.5 flex flex-wrap gap-4">
+          {[
+            { name: "hasGas", label: "gas", on: building?.hasGas },
+            { name: "hasLift", label: "a lift", on: building?.hasLift },
+            { name: "hasBasement", label: "a basement", on: building?.hasBasement },
+            { name: "hasPlayground", label: "a playground", on: building?.hasPlayground },
+          ].map((f) => (
+            <label key={f.name} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name={f.name}
+                defaultChecked={f.on ?? false}
+                className="h-4 w-4 accent-[#2c523c]"
+              />
+              <span>{f.label}</span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-1 text-xs text-ink-faint">
+          These decide which legal obligations apply to the building.
+        </p>
+      </fieldset>
+
       <label className="block text-sm sm:col-span-2">
         <span className="text-ink-soft">Notes</span>
         <textarea
