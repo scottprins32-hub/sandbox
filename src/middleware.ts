@@ -14,13 +14,26 @@ const PUBLIC_PATHS = [
 ];
 
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Phone keyboards capitalise the first letter of a typed address, and Next
+  // routes are case-sensitive: "/SIM" 404s. That bites hardest right after
+  // the passcode, because the gate faithfully returns you to the path you
+  // asked for. Normalise page routes to lowercase before anything else.
+  // Never /api — file keys are case-sensitive (e.g. ...PROIECT-2026...pdf).
+  const lower = pathname.toLowerCase();
+  if (lower !== pathname && !pathname.startsWith("/api/")) {
+    const normalized = request.nextUrl.clone();
+    normalized.pathname = lower;
+    return NextResponse.redirect(normalized, 308);
+  }
+
   const passcode = process.env.SCARA_PASSCODE;
   // Unset OR empty string both leave the app open. An empty value is easy to
   // create by accident in a hosting dashboard, so treat it the same as unset
   // and let /api/health and the banner report it.
   if (!passcode) return NextResponse.next();
 
-  const { pathname } = request.nextUrl;
   if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next();
 
   const cookie = request.cookies.get("scara_pass")?.value;

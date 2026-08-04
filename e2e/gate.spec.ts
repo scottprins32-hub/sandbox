@@ -18,6 +18,23 @@ test("gate: the passcode form is server-rendered, not client-only", async ({ req
   expect(html).toContain('value="/sim"');
 });
 
+// A capitalised address (what a phone keyboard produces) must not 404. This
+// was reported from the field: /SIM accepted the passcode, then returned the
+// founder to /SIM, which is not a route.
+test("gate: capitalised paths normalise instead of 404ing", async ({ request }) => {
+  for (const [typed, expected] of [
+    ["/SIM", "/sim"],
+    ["/Sim", "/sim"],
+    ["/OPS/compliance", "/ops/compliance"],
+    ["/Portal", "/portal"],
+  ]) {
+    const res = await request.get(typed!, { maxRedirects: 0 });
+    expect(res.status(), `${typed} should redirect`).toBe(308);
+    const location = res.headers()["location"] ?? "";
+    expect(new URL(location, "http://localhost").pathname).toBe(expected);
+  }
+});
+
 test("gate: the form is visible and typeable in a browser", async ({ page }) => {
   await page.goto("/gate?next=%2Fsim");
   const input = page.locator('input[type="password"]');

@@ -141,6 +141,16 @@ to carry live here too.
 
 ## Fixes
 
+- **2026-08-04 — Page routes normalise to lowercase.** Reported as "after
+  entering the correct password I am rerouted to a 404". The Vercel runtime
+  logs told the whole story: `GET /SIM 307` → `POST /gate 303` (passcode
+  accepted) → `GET /SIM 404`. A phone keyboard capitalises the first letter of
+  a typed address, Next routes are case-sensitive, and the gate faithfully
+  returned the founder to the path they had asked for. Middleware now 308s any
+  mixed-case page path to its lowercase form, before the passcode check, so it
+  works signed in or out. `/api/*` is deliberately excluded: file keys are
+  case-sensitive and one of them is `raport-anual-PROIECT-{year}-{id}.pdf`.
+
 - **2026-08-04 — The passcode gate is server-rendered and works without
   JavaScript.** Reported as "on /sim I can't enter a password". The form read
   `useSearchParams()` inside a `<Suspense>` boundary with no fallback, so Next
