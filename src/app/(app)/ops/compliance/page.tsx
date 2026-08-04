@@ -5,8 +5,9 @@ import { listBuildings } from "@/server/repo/buildings";
 import { listBuildingObligations, listContractors } from "@/server/repo/compliance";
 import { decorate, exposureFor } from "@/server/complianceService";
 import {
-  CATEGORY_LABEL_RO,
-  PERFORMER_LABEL_RO,
+  CATEGORY_LABEL_EN,
+  PERFORMER_LABEL_EN,
+  STATUS_LABEL_EN,
   type ObligationStatus,
 } from "@/lib/compliance";
 import { fmtLeiRound } from "@/lib/money";
@@ -18,14 +19,14 @@ import {
   uploadObligationDocumentAction,
 } from "../actions";
 
-export const metadata: Metadata = { title: "Conformitate · Scara" };
+export const metadata: Metadata = { title: "Compliance · Scara" };
 export const dynamic = "force-dynamic";
 
-const STATUS_STYLE: Record<ObligationStatus, { tone: string; label: string }> = {
-  overdue: { tone: "bg-danger-wash text-danger", label: "restant" },
-  due_soon: { tone: "bg-warn-wash text-warn", label: "scadent curând" },
-  ok: { tone: "bg-moss-wash text-moss-deep", label: "în regulă" },
-  unknown: { tone: "bg-paper text-ink-soft border border-line", label: "neînregistrat" },
+const STATUS_TONE: Record<ObligationStatus, string> = {
+  overdue: "bg-danger-wash text-danger",
+  due_soon: "bg-warn-wash text-warn",
+  ok: "bg-moss-wash text-moss-deep",
+  unknown: "bg-paper text-ink-soft border border-line",
 };
 
 export default async function OpsCompliancePage({
@@ -68,9 +69,9 @@ export default async function OpsCompliancePage({
   return (
     <div className="mx-auto max-w-4xl">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-lg font-semibold tracking-tight">Calendar de conformitate</h1>
+        <h1 className="text-lg font-semibold tracking-tight">Compliance calendar</h1>
         <Link href="/ops/contractors" className="text-sm text-moss underline">
-          Furnizori
+          Contractors
         </Link>
       </div>
 
@@ -84,7 +85,7 @@ export default async function OpsCompliancePage({
                 !buildingId ? "bg-ink text-paper" : "border border-line bg-surface text-ink-soft"
               }`}
             >
-              toate imobilele
+              all buildings
             </Link>
             {buildings.map((b) => (
               <Link
@@ -108,7 +109,7 @@ export default async function OpsCompliancePage({
                 !sp.status ? "bg-ink text-paper" : "border border-line bg-surface text-ink-soft"
               }`}
             >
-              toate stările
+              all statuses
             </Link>
             {(["overdue", "due_soon", "unknown", "ok"] as ObligationStatus[]).map((s) => (
               <Link
@@ -120,7 +121,7 @@ export default async function OpsCompliancePage({
                     : "border border-line bg-surface text-ink-soft"
                 }`}
               >
-                {STATUS_STYLE[s].label}
+                {STATUS_LABEL_EN[s]}
               </Link>
             ))}
           </div>
@@ -131,8 +132,8 @@ export default async function OpsCompliancePage({
       {records.length === 0 && (
         <div className="mt-4 rounded-xl bg-surface p-6 text-center shadow-card">
           <p className="text-sm text-ink-soft">
-            Niciun imobil nu are încă obligații încărcate. Alege un imobil și încarcă
-            obligațiile din catalog, în funcție de dotările lui.
+            No building has its obligations loaded yet. Pick a building and load them from
+            the catalogue, filtered by what that building has.
           </p>
           {buildingId && (
             <form
@@ -140,7 +141,7 @@ export default async function OpsCompliancePage({
               className="mt-3"
             >
               <button className="rounded-md bg-moss-deep px-4 py-2 text-sm font-medium text-paper">
-                Încarcă obligațiile pentru {buildingById.get(buildingId)?.label}
+                Load the obligations for {buildingById.get(buildingId)?.label}
               </button>
             </form>
           )}
@@ -149,80 +150,81 @@ export default async function OpsCompliancePage({
 
       <ul className="mt-4 space-y-2">
         {rows.map(({ record, obligation, status, nextDue }) => {
-          const st = STATUS_STYLE[status];
           const contractor = contractors.find((c) => c.id === record.contractorId);
           const canWeDoIt = obligation.performerRequirement === "us";
+          const isContinuous =
+            obligation.cadence.kind === "continuous" || obligation.cadence.kind === "event";
           return (
             <li key={record.id} className="rounded-xl bg-surface p-4 shadow-card">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <h2 className="font-medium leading-snug">{obligation.nameRo}</h2>
+                  <h2 className="font-medium leading-snug">{obligation.nameEn}</h2>
                   <p className="text-xs text-ink-faint">
                     {buildingById.get(record.buildingId)?.label} ·{" "}
-                    {CATEGORY_LABEL_RO[obligation.category]}
+                    {CATEGORY_LABEL_EN[obligation.category]}
                   </p>
                 </div>
                 <span
-                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${st.tone}`}
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_TONE[status]}`}
                 >
-                  {st.label}
+                  {STATUS_LABEL_EN[status]}
                 </span>
               </div>
 
               <dl className="tnum mt-2 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
                 <div className="flex justify-between gap-3">
-                  <dt className="text-ink-faint">Scadent</dt>
-                  <dd>{nextDue ?? "permanent"}</dd>
+                  <dt className="text-ink-faint">Due</dt>
+                  <dd>{nextDue ?? (isContinuous ? "ongoing" : "not scheduled")}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-ink-faint">Ultima dată</dt>
-                  <dd>{record.lastDoneAt ?? "neînregistrat"}</dd>
+                  <dt className="text-ink-faint">Last done</dt>
+                  <dd>{record.lastDoneAt ?? "not recorded"}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-ink-faint">Sancțiune maximă</dt>
+                  <dt className="text-ink-faint">Maximum fine</dt>
                   <dd>
                     {obligation.fineMaxBani
                       ? `${fmtLeiRound(obligation.fineMaxBani)} lei`
-                      : "nespecificat"}
+                      : "unspecified"}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-ink-faint">Executant</dt>
+                  <dt className="text-ink-faint">Performed by</dt>
                   <dd className="text-right">
-                    {PERFORMER_LABEL_RO[obligation.performerRequirement]}
+                    {PERFORMER_LABEL_EN[obligation.performerRequirement]}
                   </dd>
                 </div>
               </dl>
 
               {contractor && (
-                <p className="mt-1.5 text-xs text-ink-soft">Furnizor: {contractor.name}</p>
+                <p className="mt-1.5 text-xs text-ink-soft">Contractor: {contractor.name}</p>
               )}
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {canWeDoIt ? (
                   <form action={markObligationDoneAction.bind(null, record.id)}>
                     <button className="rounded-md bg-moss-deep px-3 py-1.5 text-xs font-medium text-paper">
-                      Marchează efectuat
+                      Mark done
                     </button>
                   </form>
                 ) : (
                   <form action={markObligationDoneAction.bind(null, record.id)}>
                     <input type="hidden" name="performedBy" value="contractor" />
                     <button className="rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft">
-                      Consemnează execuția furnizorului
+                      Record the contractor&apos;s work
                     </button>
                   </form>
                 )}
                 <details className="inline-block">
                   <summary className="cursor-pointer rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft">
-                    Programează
+                    Schedule
                   </summary>
                   <form
                     action={scheduleObligationAction.bind(null, record.id)}
                     className="mt-2 flex flex-wrap items-end gap-2 rounded-lg border border-line p-2"
                   >
                     <label className="text-xs">
-                      <span className="block text-ink-faint">Data</span>
+                      <span className="block text-ink-faint">Date</span>
                       <input
                         type="date"
                         name="date"
@@ -231,12 +233,12 @@ export default async function OpsCompliancePage({
                       />
                     </label>
                     <label className="text-xs">
-                      <span className="block text-ink-faint">Furnizor</span>
+                      <span className="block text-ink-faint">Contractor</span>
                       <select
                         name="contractorId"
                         className="mt-0.5 rounded-md border border-line bg-surface px-2 py-1"
                       >
-                        <option value="">fără</option>
+                        <option value="">none</option>
                         {contractors.map((c) => (
                           <option key={c.id} value={c.id}>
                             {c.name}
@@ -245,13 +247,13 @@ export default async function OpsCompliancePage({
                       </select>
                     </label>
                     <button className="rounded-md bg-moss-deep px-3 py-1.5 text-xs font-medium text-paper">
-                      Salvează
+                      Save
                     </button>
                   </form>
                 </details>
                 <details className="inline-block">
                   <summary className="cursor-pointer rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft">
-                    Încarcă document
+                    Upload document
                   </summary>
                   <form
                     action={uploadObligationDocumentAction.bind(null, record.id)}
@@ -259,7 +261,7 @@ export default async function OpsCompliancePage({
                   >
                     <label className="text-xs">
                       <span className="block text-ink-faint">
-                        Certificat sau proces-verbal (PDF sau foto)
+                        Certificate or protocol (PDF or photo)
                       </span>
                       <input
                         type="file"
@@ -270,7 +272,7 @@ export default async function OpsCompliancePage({
                       />
                     </label>
                     <button className="rounded-md bg-moss-deep px-3 py-1.5 text-xs font-medium text-paper">
-                      Atașează
+                      Attach
                     </button>
                   </form>
                 </details>
@@ -278,12 +280,14 @@ export default async function OpsCompliancePage({
 
               {!canWeDoIt && (
                 <p className="mt-2 text-xs leading-relaxed text-warn">
-                  Nu poate fi executată de personalul nostru. O programăm, o însoțim și
-                  arhivăm documentul.
+                  Our staff may not perform this. We schedule it, escort it and file the
+                  document.
                 </p>
               )}
+              {/* The Romanian legal name and the citations travel together:
+                  both are what you quote to a contractor or an inspector. */}
               <p className="mt-2 border-t border-line pt-2 text-xs text-ink-faint">
-                {obligation.legalBasis.join(" · ")}
+                {obligation.nameRo} · {obligation.legalBasis.join(" · ")}
               </p>
             </li>
           );
@@ -291,8 +295,8 @@ export default async function OpsCompliancePage({
       </ul>
 
       <p className="mt-6 text-xs leading-relaxed text-ink-faint">
-        Datele legale sunt citate cu titlu de referință. Poziția juridică se confirmă cu un
-        avocat sau cu contabilul asociației.
+        Legal data is quoted for reference. Confirm the position for a specific building
+        with a lawyer or with the association&apos;s accountant.
       </p>
     </div>
   );

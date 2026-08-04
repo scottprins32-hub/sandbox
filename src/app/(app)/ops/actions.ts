@@ -298,7 +298,7 @@ export async function scheduleObligationAction(
 
 /**
  * Attach a certificate or proces-verbal to an obligation (add-on §4,
- * "Încarcă document"). The file lands on the latest event; when the
+ * "Upload document"). The file lands on the latest event; when the
  * obligation has no history yet, the upload records the execution too —
  * a certificate in hand is evidence the work happened.
  */

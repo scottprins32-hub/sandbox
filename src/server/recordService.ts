@@ -7,7 +7,9 @@ import {
   FINDING_CATEGORY_TO_ELEMENT,
   SCORE_BY_VALUE,
   STANDARD_ELEMENTS,
-  trendLabel,
+  trendKey,
+  TREND_LABEL_RO,
+  type TrendKey,
 } from "@/lib/compliance/elements";
 import { getBuilding } from "./repo/buildings";
 import {
@@ -49,8 +51,10 @@ export interface ElementStatus {
   latest: ElementAssessment | null;
   /** Latest score from the year before the latest assessment's year. */
   previousScore: number | null;
-  trend: string;
+  /** A key; the admin labels it in English, the annual report in Romanian. */
+  trend: TrendKey | null;
   scoreLabel: string | null;
+  scoreLabelEn: string | null;
 }
 
 /** Latest score and year-over-year trend per element. */
@@ -78,8 +82,9 @@ export function elementStatuses(
       element,
       latest,
       previousScore,
-      trend: latest ? trendLabel(latest.score, previousScore) : "neevaluat",
+      trend: latest ? trendKey(latest.score, previousScore) : null,
       scoreLabel: latest ? SCORE_BY_VALUE[latest.score]?.labelRo ?? null : null,
+      scoreLabelEn: latest ? SCORE_BY_VALUE[latest.score]?.labelEn ?? null : null,
     };
   });
 }
@@ -234,7 +239,8 @@ export async function buildAnnualReportData(
       name: s.element.nameRo,
       score: s.latest?.score ?? null,
       scoreLabel: s.scoreLabel,
-      trend: s.trend,
+      // The annual report is Romanian, whatever language the admin is in.
+      trend: s.trend ? TREND_LABEL_RO[s.trend] : "neevaluat",
       note: s.latest?.noteRo ?? null,
     })),
     findings: findings

@@ -5,7 +5,9 @@ import {
   SCORE_BY_VALUE,
   SCORE_SCALE,
   STANDARD_ELEMENTS,
-  trendLabel,
+  trendKey,
+  TREND_LABEL_EN,
+  TREND_LABEL_RO,
 } from "./elements";
 
 describe("building elements (add-on §6)", () => {
@@ -42,10 +44,25 @@ describe("building elements (add-on §6)", () => {
     }
   });
 
-  it("labels the year-over-year trend (lower score is better)", () => {
-    expect(trendLabel(2, 3)).toBe("îmbunătățit");
-    expect(trendLabel(4, 3)).toBe("în declin");
-    expect(trendLabel(3, 3)).toBe("stabil");
-    expect(trendLabel(3, null)).toBe("prima evaluare");
+  it("keys the year-over-year trend (lower score is better)", () => {
+    expect(trendKey(2, 3)).toBe("improved");
+    expect(trendKey(4, 3)).toBe("declined");
+    expect(trendKey(3, 3)).toBe("stable");
+    expect(trendKey(3, null)).toBe("first");
+  });
+
+  it("labels every trend key in both languages", () => {
+    for (const key of ["first", "improved", "declined", "stable"] as const) {
+      expect(TREND_LABEL_EN[key].length).toBeGreaterThan(2);
+      expect(TREND_LABEL_RO[key].length).toBeGreaterThan(2);
+    }
+  });
+
+  it("carries an English name and definition for every element and score", () => {
+    for (const e of STANDARD_ELEMENTS) expect(e.nameEn.length).toBeGreaterThan(2);
+    for (const s of SCORE_SCALE) {
+      expect(s.labelEn.length).toBeGreaterThan(2);
+      expect(s.definitionEn.length).toBeGreaterThan(10);
+    }
   });
 });

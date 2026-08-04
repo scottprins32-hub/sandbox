@@ -17,7 +17,11 @@ import {
   draftRecommendations,
   elementStatuses,
 } from "@/server/recordService";
-import { SCORE_SCALE } from "@/lib/compliance/elements";
+import {
+  ELEMENT_BY_KEY,
+  SCORE_SCALE,
+  TREND_LABEL_EN,
+} from "@/lib/compliance/elements";
 import { OBLIGATION_BY_KEY } from "@/lib/compliance";
 import { getStorage } from "@/server/storage";
 import {
@@ -30,13 +34,19 @@ import {
 export const metadata: Metadata = { title: "Building record · Scara" };
 export const dynamic = "force-dynamic";
 
+// Journal kinds: English in the admin, Romanian in the annual report.
 const KIND_LABEL: Record<string, string> = {
-  observatie: "observație",
-  interventie: "intervenție",
-  modificare: "modificare",
-  eveniment: "eveniment",
+  observatie: "observation",
+  interventie: "intervention",
+  modificare: "alteration",
+  eveniment: "event",
   document: "document",
 };
+
+/** Elements are seeded from our own catalogue, so an English name exists. */
+function elementNameEn(e: { key: string; nameRo: string }): string {
+  return ELEMENT_BY_KEY[e.key]?.nameEn ?? e.nameRo;
+}
 
 export default async function BuildingRecord({
   params,
@@ -108,7 +118,7 @@ export default async function BuildingRecord({
             {statuses.map((s) => (
               <li key={s.element.id} className="flex items-center justify-between gap-3 py-2">
                 <div className="min-w-0">
-                  <p className="truncate text-sm">{s.element.nameRo}</p>
+                  <p className="truncate text-sm">{elementNameEn(s.element)}</p>
                   {s.latest?.noteRo && (
                     <p className="truncate text-xs text-ink-faint">{s.latest.noteRo}</p>
                   )}
@@ -125,22 +135,22 @@ export default async function BuildingRecord({
                               : "bg-moss-wash text-moss-deep"
                         }`}
                       >
-                        {s.latest.score} · {s.scoreLabel}
+                        {s.latest.score} · {s.scoreLabelEn}
                       </span>
                       <span
                         className={
-                          s.trend === "în declin"
+                          s.trend === "declined"
                             ? "text-danger"
-                            : s.trend === "îmbunătățit"
+                            : s.trend === "improved"
                               ? "text-ok"
                               : "text-ink-faint"
                         }
                       >
-                        {s.trend}
+                        {s.trend ? TREND_LABEL_EN[s.trend] : "not assessed"}
                       </span>
                     </>
                   ) : (
-                    <span className="text-ink-faint">neevaluat</span>
+                    <span className="text-ink-faint">not assessed</span>
                   )}
                 </div>
               </li>
@@ -176,7 +186,7 @@ export default async function BuildingRecord({
                       >
                         {elements.map((e) => (
                           <option key={e.id} value={e.id}>
-                            {e.nameRo}
+                            {elementNameEn(e)}
                           </option>
                         ))}
                       </select>
@@ -190,7 +200,7 @@ export default async function BuildingRecord({
                       >
                         {SCORE_SCALE.map((s) => (
                           <option key={s.score} value={s.score}>
-                            {s.score} · {s.labelRo}
+                            {s.score} · {s.labelEn}
                           </option>
                         ))}
                       </select>
@@ -208,7 +218,9 @@ export default async function BuildingRecord({
 
       {/* Journal */}
       <div className="rounded-xl bg-surface p-4 shadow-card">
-        <h2 className="text-sm font-semibold">Jurnalul evenimentelor</h2>
+        <h2 className="text-sm font-semibold">
+          Events journal <span className="font-normal text-ink-faint">· Jurnalul evenimentelor</span>
+        </h2>
         {journal.length === 0 ? (
           <p className="mt-2 text-sm text-ink-soft">No entries yet.</p>
         ) : (
@@ -290,7 +302,7 @@ export default async function BuildingRecord({
           {certificates.map(({ event, obligationKey }) => (
             <li key={event.id} className="flex items-center justify-between gap-3 py-2">
               <span className="min-w-0 truncate">
-                {OBLIGATION_BY_KEY[obligationKey]?.nameRo ?? obligationKey} ·{" "}
+                {OBLIGATION_BY_KEY[obligationKey]?.nameEn ?? obligationKey} ·{" "}
                 {event.occurredAt}
               </span>
               <a

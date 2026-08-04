@@ -9,7 +9,7 @@ import { listCheckpoints } from "@/server/repo/walks";
 // The A4 QR sheet (add-on §5): one labelled code per checkpoint, printed,
 // laminated, stuck up. QR over NFC on purpose — zero hardware, reprintable.
 
-export const metadata: Metadata = { title: "Coduri QR · Scara" };
+export const metadata: Metadata = { title: "Checkpoint QR codes · Scara" };
 export const dynamic = "force-dynamic";
 
 export default async function CheckpointPrintSheet({

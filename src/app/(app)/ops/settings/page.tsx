@@ -46,7 +46,7 @@ export default async function SettingsPage() {
 
         <h2 className="pt-2 text-sm font-semibold">Document identity</h2>
         <p className="-mt-1 text-xs text-ink-faint">
-          Printed in the header and signature blocks of the proces-verbal and the ofertă.
+          Printed in the header and signature blocks of the monthly protocol and the offer.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm">
@@ -104,7 +104,7 @@ export default async function SettingsPage() {
           <span className="text-ink-soft">
             Registered for VAT
             <span className="block text-xs text-ink-faint">
-              Drives the TVA line on the ofertă. Off while under the 395,000 lei threshold.
+              Drives the VAT line on the offer. Off while under the 395,000 lei threshold.
             </span>
           </span>
           <input

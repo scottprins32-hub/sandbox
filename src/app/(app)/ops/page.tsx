@@ -391,13 +391,13 @@ export default async function OpsToday({
 
           {expiringProofs.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
-              <h2 className="text-sm font-semibold">Adeverință expiră</h2>
+              <h2 className="text-sm font-semibold">Student certificates expiring</h2>
               <ul className="mt-2 divide-y divide-line">
                 {expiringProofs.map((c) => (
                   <li key={c.id} className="py-2.5">
                     <p className="text-sm">{c.name}</p>
                     <p className="text-xs text-warn">
-                      Student proof expires {c.studentProofExpiry}. Ask for the new adeverință.
+                      Student proof expires {c.studentProofExpiry}. Ask for the new one.
                     </p>
                   </li>
                 ))}
@@ -407,7 +407,7 @@ export default async function OpsToday({
 
           {openFindings.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
-              <h2 className="text-sm font-semibold">Constatări din tururi de control</h2>
+              <h2 className="text-sm font-semibold">Control-walk findings</h2>
               <ul className="mt-2 divide-y divide-line">
                 {openFindings.map(({ finding, buildingId }) => (
                   <li key={finding.id} className="py-2.5">
@@ -426,11 +426,16 @@ export default async function OpsToday({
                           {new Date(finding.reportedAt).toISOString().slice(0, 10)}
                         </p>
                         {finding.severity === "urgent" && (
-                          <p className="mt-1 rounded-md bg-paper px-2 py-1 text-xs text-ink-soft">
-                            De transmis proprietarului: „{finding.descriptionRo}” —{" "}
-                            {buildingById.get(buildingId)?.label}. Fotografiile sunt în
-                            aplicație.
-                          </p>
+                          <>
+                            <p className="mt-1 text-xs text-ink-faint">
+                              To send to the owner (Romanian, ready to copy):
+                            </p>
+                            <p className="mt-0.5 rounded-md bg-paper px-2 py-1 text-xs text-ink-soft">
+                              „{finding.descriptionRo}” —{" "}
+                              {buildingById.get(buildingId)?.label}. Fotografiile sunt în
+                              aplicație.
+                            </p>
+                          </>
                         )}
                       </div>
                       <form
@@ -451,40 +456,40 @@ export default async function OpsToday({
 
           {overdueObligations.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
-              <h2 className="text-sm font-semibold">Obligații legale restante</h2>
+              <h2 className="text-sm font-semibold">Overdue legal obligations</h2>
               <ul className="mt-2 divide-y divide-line">
                 {overdueObligations.map((r) => (
                   <li key={r.record.id} className="flex items-center justify-between gap-3 py-2.5">
                     <div className="min-w-0">
-                      <p className="truncate text-sm">{r.obligation.nameRo}</p>
+                      <p className="truncate text-sm">{r.obligation.nameEn}</p>
                       <p className="text-xs text-ink-faint">
-                        {buildingById.get(r.record.buildingId)?.label} · scadent {r.nextDue}
+                        {buildingById.get(r.record.buildingId)?.label} · due {r.nextDue}
                       </p>
                     </div>
                     <span className="tnum shrink-0 text-xs text-danger">
                       {r.obligation.fineMaxBani
-                        ? `până la ${fmtLeiRound(r.obligation.fineMaxBani)} lei`
+                        ? `up to ${fmtLeiRound(r.obligation.fineMaxBani)} lei`
                         : ""}
                     </span>
                   </li>
                 ))}
               </ul>
               <Link href="/ops/compliance?status=overdue" className="mt-2 inline-block text-xs text-moss underline">
-                Deschide calendarul
+                Open the calendar
               </Link>
             </div>
           )}
 
           {dueNoContractor.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
-              <h2 className="text-sm font-semibold">Scadente curând, fără furnizor</h2>
+              <h2 className="text-sm font-semibold">Due soon, no contractor booked</h2>
               <ul className="mt-2 divide-y divide-line">
                 {dueNoContractor.map((r) => (
                   <li key={r.record.id} className="py-2.5">
-                    <p className="text-sm">{r.obligation.nameRo}</p>
+                    <p className="text-sm">{r.obligation.nameEn}</p>
                     <p className="text-xs text-warn">
-                      {buildingById.get(r.record.buildingId)?.label} · scadent {r.nextDue} ·
-                      nimeni programat
+                      {buildingById.get(r.record.buildingId)?.label} · due {r.nextDue} ·
+                      nobody scheduled
                     </p>
                   </li>
                 ))}
@@ -494,13 +499,13 @@ export default async function OpsToday({
 
           {unauthorisedContractors.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
-              <h2 className="text-sm font-semibold">Furnizori fără autorizare consemnată</h2>
+              <h2 className="text-sm font-semibold">Contractors with no authorisation on file</h2>
               <ul className="mt-2 divide-y divide-line">
                 {unauthorisedContractors.map((c) => (
                   <li key={c.id} className="py-2.5">
                     <p className="text-sm">{c.name}</p>
                     <p className="text-xs text-warn">
-                      Cere numărul de atestat înainte de următoarea lucrare.
+                      Ask for their authorisation number before the next job.
                     </p>
                   </li>
                 ))}

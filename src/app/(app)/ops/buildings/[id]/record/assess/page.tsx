@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentOrg } from "@/server/org";
 import { getBuilding } from "@/server/repo/buildings";
 import { listElements } from "@/server/repo/record";
-import { SCORE_SCALE } from "@/lib/compliance/elements";
+import { ELEMENT_BY_KEY, SCORE_SCALE } from "@/lib/compliance/elements";
 import { assessElementAction } from "../../../../actions";
 
 // Annual assessment mode (add-on §6): a guided walkthrough, one element per
@@ -51,14 +51,16 @@ export default async function AnnualAssess({
       </div>
 
       <div className="rounded-xl bg-surface p-4 shadow-card">
-        <h2 className="text-base font-semibold">{element.nameRo}</h2>
+        <h2 className="text-base font-semibold">
+          {ELEMENT_BY_KEY[element.key]?.nameEn ?? element.nameRo}
+        </h2>
         <form
           action={assessElementAction.bind(null, id, element.id)}
           className="mt-3 space-y-3"
         >
           <input type="hidden" name="nextStep" value={isLast ? "" : String(step + 1)} />
           <fieldset>
-            <legend className="text-xs text-ink-faint">Score (1 excelent … 6 foarte slab)</legend>
+            <legend className="text-xs text-ink-faint">Score (1 excellent … 6 very poor)</legend>
             <div className="mt-1.5 space-y-1.5">
               {SCORE_SCALE.map((s) => (
                 <label
@@ -74,16 +76,18 @@ export default async function AnnualAssess({
                   />
                   <span>
                     <span className="tnum font-medium">
-                      {s.score} · {s.labelRo}
+                      {s.score} · {s.labelEn}
                     </span>
-                    <span className="block text-xs text-ink-faint">{s.definitionRo}</span>
+                    <span className="block text-xs text-ink-faint">{s.definitionEn}</span>
                   </span>
                 </label>
               ))}
             </div>
           </fieldset>
           <label className="block text-xs">
-            <span className="text-ink-faint">Note (required, Romanian — lands on the report)</span>
+            <span className="text-ink-faint">
+              Note (required) — written in Romanian, it lands verbatim in the annual report
+            </span>
             <textarea
               name="note"
               rows={2}

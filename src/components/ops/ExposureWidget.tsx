@@ -18,7 +18,7 @@ export function ExposureWidget({
 
   return (
     <div className="rounded-xl bg-surface p-4 shadow-card">
-      <p className="text-xs text-ink-faint">Expunere maximă neacoperită</p>
+      <p className="text-xs text-ink-faint">Maximum uncovered exposure</p>
       <p
         className={`tnum font-display mt-1 text-2xl font-bold ${clean ? "text-ok" : "text-ink"}`}
       >
@@ -27,22 +27,22 @@ export function ExposureWidget({
 
       {summary.total === 0 ? (
         <p className="mt-1 text-xs text-ink-soft">
-          Nicio obligație înregistrată încă pentru acest imobil.
+          No obligations recorded for this building yet.
         </p>
       ) : (
         <p className="tnum mt-1 text-xs text-ink-soft">
-          {summary.covered} din {summary.total} obligații acoperite
+          {summary.covered} of {summary.total} obligations covered
         </p>
       )}
 
       {summary.largest.length > 0 && (
         <ul className="mt-2 space-y-0.5 border-t border-line pt-2 text-xs text-ink-soft">
           {summary.largest.map((l) => (
-            <li key={l.nameRo} className="tnum flex justify-between gap-3">
+            <li key={l.name} className="tnum flex justify-between gap-3">
               <span className="truncate">
-                {l.nameRo}
+                {l.name}
                 {l.buildings > 1 && (
-                  <span className="text-ink-faint"> · {l.buildings} imobile</span>
+                  <span className="text-ink-faint"> · {l.buildings} buildings</span>
                 )}
               </span>
               <span className="shrink-0">{fmtLeiRound(l.fineMaxBani)} lei</span>
@@ -52,10 +52,10 @@ export function ExposureWidget({
       )}
 
       <p className="mt-2 text-xs leading-relaxed text-ink-faint">
-        Valori maxime prevăzute de lege, cu titlu informativ.
+        Statutory maximums, for information only.
       </p>
       <Link href={href} className="mt-1 inline-block text-xs text-moss underline">
-        Vezi calendarul de conformitate
+        Open the compliance calendar
       </Link>
     </div>
   );

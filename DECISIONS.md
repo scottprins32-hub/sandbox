@@ -141,6 +141,26 @@ to carry live here too.
 
 ## Fixes
 
+- **2026-08-04 — The admin app is English again.** The compliance add-on was
+  written Romanian-first and leaked into the `(app)` routes, against the §0
+  language rule (English admin; Romanian Portal, public page and documents).
+  Every admin string is now English, driven off label maps so the two
+  languages cannot drift: `CATEGORY_LABEL_EN`, `STATUS_LABEL_EN`,
+  `PERFORMER_LABEL_EN`, `TREND_LABEL_EN`, plus `nameEn` on elements and
+  `labelEn`/`definitionEn` on the condition scale. `trendLabel` became
+  `trendKey` returning a key, so the admin renders English and the annual
+  report Romanian from one source.
+- **2026-08-04 — Four kinds of Romanian deliberately stay in the admin.**
+  (1) Data written by people — a tenant's issue, a cleaner's finding, a
+  contractor's name — is real content, not UI, and translating it would
+  misrepresent what the app stores. (2) Text destined for a Romanian reader:
+  the copy-paste owner message and the printed QR cards, both now under
+  English labels. (3) The Romanian legal name of each obligation, shown beside
+  its citations, because that is the term you quote to a contractor or an
+  inspector. (4) Catalogue research prose (`fineNote`, `salesNote`,
+  `needsVerification`), which §1.4 of the add-on forbids "improving" — the
+  labels around it are English.
+
 - **2026-08-04 — Page routes normalise to lowercase.** Reported as "after
   entering the correct password I am rerouted to a 404". The Vercel runtime
   logs told the whole story: `GET /SIM 307` → `POST /gate 303` (passcode

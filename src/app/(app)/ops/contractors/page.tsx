@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getCurrentOrg } from "@/server/org";
 import { listContractors, listComplianceEvents, listBuildingObligations } from "@/server/repo/compliance";
-import { CATEGORY_LABEL_RO, type ObligationCategory } from "@/lib/compliance";
+import { CATEGORY_LABEL_EN, type ObligationCategory } from "@/lib/compliance";
 import { createContractorAction } from "../actions";
 
-export const metadata: Metadata = { title: "Furnizori · Scara" };
+export const metadata: Metadata = { title: "Contractors · Scara" };
 export const dynamic = "force-dynamic";
 
-const TRADES = Object.keys(CATEGORY_LABEL_RO) as ObligationCategory[];
+const TRADES = Object.keys(CATEGORY_LABEL_EN) as ObligationCategory[];
 
 export default async function ContractorsPage() {
   const org = await getCurrentOrg();
@@ -33,16 +33,17 @@ export default async function ContractorsPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-lg font-semibold tracking-tight">Furnizori</h1>
+      <h1 className="text-lg font-semibold tracking-tight">Contractors</h1>
       <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-soft">
-        Firmele autorizate care execută ce noi nu avem voie să executăm: DDD, verificări de
-        gaze, ISCIR, PSI. Ținem evidența autorizării lor pentru că este apărarea asociației.
+        The authorised firms that do what we may not: pest control, gas checks, lift
+        inspections, fire safety. We keep their authorisation on file because that record is
+        the association&apos;s defence.
       </p>
 
       {contractors.length === 0 ? (
         <div className="mt-4 rounded-xl bg-surface p-6 text-center shadow-card">
           <p className="text-sm text-ink-soft">
-            Niciun furnizor înregistrat. Adaugă-i pe cei cu care lucrezi deja.
+            No contractors yet. Add the ones you already work with.
           </p>
         </div>
       ) : (
@@ -50,7 +51,7 @@ export default async function ContractorsPage() {
           {[...byTrade.entries()].map(([trade, list]) => (
             <section key={trade}>
               <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
-                {CATEGORY_LABEL_RO[trade as ObligationCategory] ?? trade}
+                {CATEGORY_LABEL_EN[trade as ObligationCategory] ?? trade}
               </h2>
               <ul className="mt-1.5 space-y-2">
                 {list.map((c) => {
@@ -61,21 +62,22 @@ export default async function ContractorsPage() {
                         <div className="min-w-0">
                           <p className="font-medium">{c.name}</p>
                           <p className="text-xs text-ink-faint">
-                            {[c.phone, c.email].filter(Boolean).join(" · ") || "fără contact"}
+                            {[c.phone, c.email].filter(Boolean).join(" · ") || "no contact details"}
                           </p>
                         </div>
                         <span className="tnum shrink-0 text-xs text-ink-soft">
-                          {s.completed} lucrări{s.last ? ` · ultima ${s.last}` : ""}
+                          {s.completed} {s.completed === 1 ? "job" : "jobs"}
+                          {s.last ? ` · last ${s.last}` : ""}
                         </span>
                       </div>
                       {c.authorisationNote ? (
                         <p className="mt-1.5 text-xs text-moss-deep">
-                          Autorizare: {c.authorisationNote}
+                          Authorisation: {c.authorisationNote}
                         </p>
                       ) : (
                         <p className="mt-1.5 text-xs text-warn">
-                          Fără autorizare consemnată. Cere numărul de atestat înainte de
-                          următoarea lucrare.
+                          No authorisation on file. Ask for their authorisation number
+                          before the next job.
                         </p>
                       )}
                       {c.notes && (
@@ -91,10 +93,10 @@ export default async function ContractorsPage() {
       )}
 
       <details className="mt-4 rounded-xl bg-surface p-4 shadow-card">
-        <summary className="cursor-pointer text-sm font-semibold">Adaugă furnizor</summary>
+        <summary className="cursor-pointer text-sm font-semibold">Add contractor</summary>
         <form action={createContractorAction} className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="text-ink-soft">Nume</span>
+            <span className="text-ink-soft">Name</span>
             <input
               name="name"
               required
@@ -102,20 +104,20 @@ export default async function ContractorsPage() {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-ink-soft">Domeniu</span>
+            <span className="text-ink-soft">Trade</span>
             <select
               name="trade"
               className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
             >
               {TRADES.map((t) => (
                 <option key={t} value={t}>
-                  {CATEGORY_LABEL_RO[t]}
+                  {CATEGORY_LABEL_EN[t]}
                 </option>
               ))}
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-ink-soft">Telefon</span>
+            <span className="text-ink-soft">Phone</span>
             <input
               name="phone"
               className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
@@ -129,7 +131,7 @@ export default async function ContractorsPage() {
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="text-ink-soft">Autorizare (ex. DSP + DSVSA, nr. ...)</span>
+            <span className="text-ink-soft">Authorisation (e.g. DSP + DSVSA, no. …)</span>
             <input
               name="authorisationNote"
               className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
@@ -137,7 +139,7 @@ export default async function ContractorsPage() {
           </label>
           <div className="sm:col-span-2">
             <button className="rounded-md bg-moss-deep px-4 py-2 text-sm font-medium text-paper">
-              Adaugă
+              Add
             </button>
           </div>
         </form>

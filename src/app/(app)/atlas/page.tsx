@@ -131,7 +131,7 @@ export default async function AtlasPage() {
                                 href={`/ops/offers?prospect=${p.id}`}
                                 className="rounded-md border border-moss px-2 py-1 text-xs font-medium text-moss-deep"
                               >
-                                Ofertă
+                                Offer
                               </a>
                             )}
                             {stage !== "spotted" && stage !== "won" && (

@@ -276,7 +276,7 @@ export function OfferBuilder({
         </div>
 
         <button className="mt-2 rounded-md bg-moss-deep px-4 py-2.5 text-sm font-medium text-paper">
-          Generate ofertă PDF
+          Generate offer PDF
         </button>
       </div>
 

@@ -12,7 +12,7 @@ test("offer builder prices honestly and generates a PDF from a prospect", async 
   const card = page
     .locator("div.rounded-lg.bg-surface", { hasText: "Complex Park Giroc" })
     .first();
-  await card.getByRole("link", { name: "Ofertă" }).click();
+  await card.getByRole("link", { name: "Offer" }).click();
   await expect(page.getByText("Prefilled from the Atlas prospect")).toBeVisible();
 
   // Guardrail: a price under direct cost must be called out, not silently sent.
@@ -30,7 +30,7 @@ test("offer builder prices honestly and generates a PDF from a prospect", async 
   await expect(page.getByText(/More than 2x the market rate/)).toBeHidden();
 
   await page.fill('input[name="clientName"]', "Asociația de proprietari Park 2");
-  await page.getByRole("button", { name: "Generate ofertă PDF" }).click();
+  await page.getByRole("button", { name: "Generate offer PDF" }).click();
 
   // The offer is recorded and downloadable.
   await expect(page.getByText("Offers sent")).toBeVisible();

@@ -42,7 +42,7 @@ test("control walk: all points verified, urgent finding reaches Ops Problems", a
     page.getByText("Bucată de tencuială desprinsă deasupra intrării E2E").first()
   ).toBeVisible();
   await expect(
-    page.getByText("De transmis proprietarului", { exact: false }).first()
+    page.getByText("To send to the owner", { exact: false }).first()
   ).toBeVisible();
 });
 

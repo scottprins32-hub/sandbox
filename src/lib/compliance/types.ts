@@ -89,3 +89,33 @@ export const CATEGORY_LABEL_RO: Record<ObligationCategory, string> = {
   playground: "Loc de joacă",
   electrical: "Instalații electrice",
 };
+
+/** The admin app is English (§0); documents and the Portal stay Romanian. */
+export const CATEGORY_LABEL_EN: Record<ObligationCategory, string> = {
+  ddd: "Pest control",
+  fire: "Fire safety",
+  gas: "Gas and flues",
+  structure: "Structure and technical book",
+  waste: "Waste and sanitation",
+  winter: "Winter service",
+  green: "Green space",
+  facade: "Facade",
+  water: "Water and basement",
+  lift: "Lift",
+  playground: "Playground",
+  electrical: "Electrical installations",
+};
+
+export const STATUS_LABEL_EN: Record<ObligationStatus, string> = {
+  overdue: "overdue",
+  due_soon: "due soon",
+  ok: "current",
+  unknown: "not recorded",
+};
+
+export const STATUS_LABEL_RO: Record<ObligationStatus, string> = {
+  overdue: "restant",
+  due_soon: "scadent curând",
+  ok: "în regulă",
+  unknown: "neînregistrat",
+};

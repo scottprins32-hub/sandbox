@@ -106,7 +106,8 @@ export interface ExposureSummary {
   totalBani: number;
   covered: number;
   total: number;
-  largest: { nameRo: string; fineMaxBani: number; buildings: number }[];
+  /** `name` is English — the widget lives in the admin app (§0). */
+  largest: { name: string; nameRo: string; fineMaxBani: number; buildings: number }[];
 }
 
 export async function exposureFor(
@@ -125,6 +126,7 @@ export async function exposureFor(
     covered,
     total: rows.length,
     largest: largestExposures(entries, 2, now).map((e) => ({
+      name: e.obligation.nameEn,
       nameRo: e.obligation.nameRo,
       fineMaxBani: e.fineMaxBani,
       buildings: e.buildings,
