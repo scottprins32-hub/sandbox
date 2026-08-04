@@ -421,6 +421,101 @@ export const complianceEvents = sqliteTable(
   ]
 );
 
+// ------------------- Control walks and checkpoints (add-on §5) -------------
+// The evidence product: documented rounds with negative findings recorded
+// ("Verificat, fără deficiențe"), imported from German inspection practice.
+
+export const checkpoints = sqliteTable(
+  "checkpoints",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    labelRo: text("label_ro").notNull(), // 'Subsol - zona centrală'
+    /** Short slug encoded in the printed QR. */
+    code: text("code").notNull(),
+    orderIndex: integer("order_index").notNull().default(0),
+    active: integer("active", { mode: "boolean" }).notNull().default(true),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("checkpoints_org_idx").on(t.orgId),
+    index("checkpoints_building_idx").on(t.buildingId),
+    index("checkpoints_code_idx").on(t.orgId, t.code),
+  ]
+);
+
+export const controlWalks = sqliteTable(
+  "control_walks",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    visitId: text("visit_id"),
+    cleanerId: text("cleaner_id").notNull(),
+    startedAt: integer("started_at").notNull(),
+    finishedAt: integer("finished_at"),
+    status: text("status", { enum: ["in_progress", "done"] })
+      .notNull()
+      .default("in_progress"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("control_walks_org_idx").on(t.orgId),
+    index("control_walks_building_idx").on(t.buildingId),
+  ]
+);
+
+export const walkCheckpoints = sqliteTable(
+  "walk_checkpoints",
+  {
+    id: id(),
+    orgId: orgId(),
+    controlWalkId: text("control_walk_id").notNull(),
+    checkpointId: text("checkpoint_id").notNull(),
+    /** Stamped server-side — client clocks are never trusted for evidence. */
+    scannedAt: integer("scanned_at").notNull(),
+    condition: text("condition", { enum: ["ok", "issue"] }).notNull(),
+    note: text("note"),
+    photoKeys: text("photo_keys"), // JSON array
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("walk_checkpoints_org_idx").on(t.orgId),
+    index("walk_checkpoints_walk_idx").on(t.controlWalkId),
+  ]
+);
+
+export const walkFindings = sqliteTable(
+  "walk_findings",
+  {
+    id: id(),
+    orgId: orgId(),
+    controlWalkId: text("control_walk_id").notNull(),
+    checkpointId: text("checkpoint_id"),
+    /** Matches obligation categories, plus 'other'. */
+    category: text("category").notNull(),
+    severity: text("severity", { enum: ["info", "attention", "urgent"] }).notNull(),
+    descriptionRo: text("description_ro").notNull(),
+    photoKeys: text("photo_keys"), // JSON array
+    reportedAt: integer("reported_at").notNull(),
+    reportedTo: text("reported_to", { enum: ["owner", "president", "none"] })
+      .notNull()
+      .default("none"),
+    resolvedAt: integer("resolved_at"),
+    resolutionNote: text("resolution_note"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("walk_findings_org_idx").on(t.orgId),
+    index("walk_findings_walk_idx").on(t.controlWalkId),
+  ]
+);
+
 // --------------------------- Service lines (add-on §7) ---------------------
 
 export const serviceLines = sqliteTable(

@@ -10,6 +10,7 @@ import { generateWeekVisits } from "../server/repo/visits";
 import { todayYmd, weekDays } from "../lib/dates";
 import { applicableObligations, nextDueDate, OBLIGATION_BY_KEY } from "../lib/compliance";
 import { SERVICE_LINES, SERVICE_LINE_BY_KEY } from "../lib/compliance/services";
+import { STANDARD_CHECKPOINTS } from "../server/walkService";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -48,6 +49,10 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     schema.visits,
     schema.issues,
     schema.expenses,
+    schema.walkFindings,
+    schema.walkCheckpoints,
+    schema.controlWalks,
+    schema.checkpoints,
     schema.complianceEvents,
     schema.buildingObligations,
     schema.contractors,
@@ -379,6 +384,7 @@ export async function seedDemo(): Promise<{ orgId: string }> {
   let photoHue = 0;
   let visitCount = 0;
   let missedBudget = Math.max(1, Math.round(historyDays.length * buildingRows.length * 0.1));
+  const b0DoneVisits: { id: string; startMs: number; finishMs: number }[] = [];
   for (const date of historyDays) {
     for (const [bi, b] of buildingRows.entries()) {
       const cleaner = bi % 2 === 0 ? ioana! : vasile!;
@@ -402,6 +408,9 @@ export async function seedDemo(): Promise<{ orgId: string }> {
         })
         .returning();
       visitCount++;
+      if (!missed && bi === 0) {
+        b0DoneVisits.push({ id: visit!.id, startMs, finishMs });
+      }
       if (!missed) {
         await db.insert(schema.visitItems).values(
           items.map((item) => ({
@@ -425,6 +434,120 @@ export async function seedDemo(): Promise<{ orgId: string }> {
         }
       }
     }
+  }
+
+  // Control-walk checkpoints for every building (add-on §5), codes org-unique
+  // so the printed QR resolves to its building.
+  const checkpointsByBuilding = new Map<string, { id: string; labelRo: string }[]>();
+  for (const b of buildingRows) {
+    const rows = await db
+      .insert(schema.checkpoints)
+      .values(
+        STANDARD_CHECKPOINTS.map((c, i) => ({
+          orgId,
+          buildingId: b.id,
+          labelRo: c.labelRo,
+          code: `${c.slug}-${b.id.slice(0, 8)}`,
+          orderIndex: i,
+        }))
+      )
+      .returning();
+    checkpointsByBuilding.set(
+      b.id,
+      rows.map((r) => ({ id: r.id, labelRo: r.labelRo }))
+    );
+  }
+
+  // Two documented walks on the first building's recent visits: one clean
+  // (seven ok rows — "Verificat, fără deficiențe"), one with two findings,
+  // the urgent one left unresolved so the Problems tab has a real row.
+  const b0Checkpoints = checkpointsByBuilding.get(buildingRows[0]!.id)!;
+  const walkVisits = b0DoneVisits.slice(-2);
+  if (walkVisits.length === 2) {
+    const [cleanVisit, findingVisit] = walkVisits as [
+      (typeof walkVisits)[0],
+      (typeof walkVisits)[0],
+    ];
+
+    const [cleanWalk] = await db
+      .insert(schema.controlWalks)
+      .values({
+        orgId,
+        buildingId: buildingRows[0]!.id,
+        visitId: cleanVisit.id,
+        cleanerId: ioana!.id,
+        startedAt: cleanVisit.finishMs - 20 * 60 * 1000,
+        finishedAt: cleanVisit.finishMs,
+        status: "done",
+      })
+      .returning();
+    await db.insert(schema.walkCheckpoints).values(
+      b0Checkpoints.map((c, i) => ({
+        orgId,
+        controlWalkId: cleanWalk!.id,
+        checkpointId: c.id,
+        scannedAt: cleanWalk!.startedAt + i * 2 * 60 * 1000,
+        condition: "ok" as const,
+      }))
+    );
+
+    const [findingWalk] = await db
+      .insert(schema.controlWalks)
+      .values({
+        orgId,
+        buildingId: buildingRows[0]!.id,
+        visitId: findingVisit.id,
+        cleanerId: ioana!.id,
+        startedAt: findingVisit.finishMs - 20 * 60 * 1000,
+        finishedAt: findingVisit.finishMs,
+        status: "done",
+      })
+      .returning();
+    const subsol = b0Checkpoints.find((c) => c.labelRo.startsWith("Subsol")) ?? b0Checkpoints[2]!;
+    const tablou =
+      b0Checkpoints.find((c) => c.labelRo.startsWith("Tablou")) ?? b0Checkpoints[5]!;
+    const walkPhotoKey = `${orgId}/walks/${findingWalk!.id}/constatare.jpg`;
+    await storage.put(walkPhotoKey, placeholderJpeg(photoHue++), "image/jpeg");
+    await db.insert(schema.walkCheckpoints).values(
+      b0Checkpoints.map((c, i) => ({
+        orgId,
+        controlWalkId: findingWalk!.id,
+        checkpointId: c.id,
+        scannedAt: findingWalk!.startedAt + i * 2 * 60 * 1000,
+        condition: (c.id === subsol.id || c.id === tablou.id ? "issue" : "ok") as
+          | "ok"
+          | "issue",
+        note:
+          c.id === subsol.id
+            ? "Urme de umezeală lângă coloana de apă"
+            : c.id === tablou.id
+              ? "Ușa tabloului electric nu se mai încuie"
+              : null,
+      }))
+    );
+    await db.insert(schema.walkFindings).values([
+      {
+        orgId,
+        controlWalkId: findingWalk!.id,
+        checkpointId: subsol.id,
+        category: "water",
+        severity: "attention" as const,
+        descriptionRo: "Urme de umezeală pe perete, lângă coloana comună de apă.",
+        reportedAt: findingWalk!.startedAt + 6 * 60 * 1000,
+        resolvedAt: findingWalk!.finishedAt! + 2 * DAY_MS,
+        resolutionNote: "Instalatorul asociației a strâns îmbinarea; uscat la revizită.",
+      },
+      {
+        orgId,
+        controlWalkId: findingWalk!.id,
+        checkpointId: tablou.id,
+        category: "electrical",
+        severity: "urgent" as const,
+        descriptionRo: "Ușa tabloului electric comun nu se mai încuie.",
+        photoKeys: JSON.stringify([walkPhotoKey]),
+        reportedAt: findingWalk!.startedAt + 12 * 60 * 1000,
+      },
+    ]);
   }
 
   // This week's visits, scheduled.

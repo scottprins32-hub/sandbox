@@ -21,7 +21,9 @@ import {
   generateThisWeekAction,
   setIssueStatusAction,
   markVisitMissedAction,
+  resolveFindingAction,
 } from "./actions";
+import { listOpenFindings } from "@/server/repo/walks";
 import {
   listBuildingObligations,
   listContractors,
@@ -79,6 +81,7 @@ export default async function OpsToday({
       listBuildingServices(org.id),
       listScheduledEventsOnDate(org.id, today),
     ]);
+  const openFindings = await listOpenFindings(org.id);
   const complianceRows = decorate(obligationRecords);
   // Treatments booked for today: coordination tasks, not cleaning jobs. The
   // crew escorts, photographs and files — it never performs these (§2.3).
@@ -154,7 +157,8 @@ export default async function OpsToday({
     indexingContracts.length +
     overdueObligations.length +
     dueNoContractor.length +
-    unauthorisedContractors.length;
+    unauthorisedContractors.length +
+    openFindings.length;
 
   // Route: group today's visits by cleaner.
   const byCleaner = new Map<string, typeof todaysVisits>();
@@ -395,6 +399,50 @@ export default async function OpsToday({
                     <p className="text-xs text-warn">
                       Student proof expires {c.studentProofExpiry}. Ask for the new adeverință.
                     </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {openFindings.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Constatări din tururi de control</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {openFindings.map(({ finding, buildingId }) => (
+                  <li key={finding.id} className="py-2.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm">
+                          {finding.severity === "urgent" && (
+                            <span className="mr-1.5 rounded-full bg-danger-wash px-2 py-0.5 text-xs font-medium text-danger">
+                              urgent
+                            </span>
+                          )}
+                          {finding.descriptionRo}
+                        </p>
+                        <p className="text-xs text-ink-faint">
+                          {buildingById.get(buildingId)?.label} ·{" "}
+                          {new Date(finding.reportedAt).toISOString().slice(0, 10)}
+                        </p>
+                        {finding.severity === "urgent" && (
+                          <p className="mt-1 rounded-md bg-paper px-2 py-1 text-xs text-ink-soft">
+                            De transmis proprietarului: „{finding.descriptionRo}” —{" "}
+                            {buildingById.get(buildingId)?.label}. Fotografiile sunt în
+                            aplicație.
+                          </p>
+                        )}
+                      </div>
+                      <form
+                        action={resolveFindingAction.bind(null, finding.id)}
+                        className="shrink-0"
+                      >
+                        <input type="hidden" name="resolutionNote" value="" />
+                        <button className="rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft hover:border-moss">
+                          Resolve
+                        </button>
+                      </form>
+                    </div>
                   </li>
                 ))}
               </ul>

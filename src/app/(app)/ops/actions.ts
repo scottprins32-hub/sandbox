@@ -113,9 +113,12 @@ export async function createBuildingAction(formData: FormData) {
     hasBasement: formData.get("hasBasement") === "on",
     hasPlayground: formData.get("hasPlayground") === "on",
   });
-  // Seed the compliance calendar from the catalogue, filtered by the flags.
+  // Seed the compliance calendar from the catalogue, filtered by the flags,
+  // and the standard checkpoint set for control walks.
   const { seedBuildingObligations } = await import("@/server/complianceService");
   await seedBuildingObligations(org.id, building.id);
+  const { seedCheckpoints } = await import("@/server/walkService");
+  await seedCheckpoints(org.id, building.id);
   redirect(`/ops/buildings/${building.id}`);
 }
 
@@ -244,9 +247,12 @@ export async function convertProspectAction(prospectId: string) {
     status: "won",
     convertedBuildingId: building.id,
   });
-  // Seed the compliance calendar from the catalogue, filtered by the flags.
+  // Seed the compliance calendar from the catalogue, filtered by the flags,
+  // and the standard checkpoint set for control walks.
   const { seedBuildingObligations } = await import("@/server/complianceService");
   await seedBuildingObligations(org.id, building.id);
+  const { seedCheckpoints } = await import("@/server/walkService");
+  await seedCheckpoints(org.id, building.id);
   redirect(`/ops/buildings/${building.id}`);
 }
 
@@ -341,6 +347,26 @@ export async function createContractorAction(formData: FormData) {
     notes: String(formData.get("notes") ?? "").trim() || null,
   });
   revalidatePath("/ops/contractors");
+}
+
+// ------------------------------------------------- control walks (add-on §5)
+
+export async function seedCheckpointsAction(buildingId: string) {
+  const org = await getCurrentOrg();
+  const { seedCheckpoints } = await import("@/server/walkService");
+  await seedCheckpoints(org.id, buildingId);
+  revalidatePath(`/ops/buildings/${buildingId}`);
+}
+
+export async function resolveFindingAction(findingId: string, formData: FormData) {
+  const org = await getCurrentOrg();
+  const { resolveFinding } = await import("@/server/repo/walks");
+  await resolveFinding(
+    org.id,
+    findingId,
+    String(formData.get("resolutionNote") ?? "").trim() || null
+  );
+  revalidatePath("/ops");
 }
 
 // -------------------------------------------------- service lines (add-on §7)

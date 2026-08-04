@@ -14,8 +14,10 @@ import {
   attachServiceAction,
   detachServiceAction,
   seedBuildingObligationsAction,
+  seedCheckpointsAction,
   updateBuildingAction,
 } from "../../actions";
+import { listCheckpoints } from "@/server/repo/walks";
 import { BuildingForm } from "../BuildingForm";
 import { exposureFor } from "@/server/complianceService";
 import { ExposureWidget } from "@/components/ops/ExposureWidget";
@@ -59,13 +61,15 @@ export default async function BuildingDetail({
     visitsPerWeek: building.visitsPerWeek,
   });
 
-  const [exposure, serviceLines, attached, obligationRows, certificates] = await Promise.all([
-    exposureFor(org.id, building.id),
-    listServiceLines(org.id),
-    listBuildingServices(org.id, building.id),
-    listBuildingObligations(org.id, building.id),
-    listObligationDocuments(org.id, building.id),
-  ]);
+  const [exposure, serviceLines, attached, obligationRows, certificates, checkpoints] =
+    await Promise.all([
+      exposureFor(org.id, building.id),
+      listServiceLines(org.id),
+      listBuildingServices(org.id, building.id),
+      listBuildingObligations(org.id, building.id),
+      listObligationDocuments(org.id, building.id),
+      listCheckpoints(org.id, building.id),
+    ]);
   const lineById = new Map(serviceLines.map((l) => [l.id, l]));
   const activeServices = attached.filter((s) => s.active);
   const monthlyTotal = activeServices.reduce((sum, s) => {
@@ -201,6 +205,20 @@ export default async function BuildingDetail({
                 Load the legal obligations for this building
               </button>
             </form>
+          )}
+          {checkpoints.length === 0 ? (
+            <form action={seedCheckpointsAction.bind(null, building.id)}>
+              <button className="w-full rounded-xl border border-dashed border-line-strong bg-surface px-3 py-2.5 text-xs text-ink-soft hover:border-moss">
+                Load the standard control-walk checkpoints
+              </button>
+            </form>
+          ) : (
+            <Link
+              href={`/ops/buildings/${building.id}/checkpoints/print`}
+              className="block rounded-xl border border-line bg-surface px-3 py-2.5 text-center text-xs text-ink-soft hover:border-moss"
+            >
+              Print the checkpoint QR sheet ({checkpoints.length})
+            </Link>
           )}
         </div>
       </div>

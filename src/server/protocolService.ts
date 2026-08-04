@@ -11,10 +11,36 @@ import { listIssuesForBuilding } from "./repo/issues";
 import { listCleaners } from "./repo/cleaners";
 import { listTemplateItems } from "./repo/checklists";
 import { getOrgSettings } from "./repo/settings";
+import { listBuildingObligations } from "./repo/compliance";
+import { listBuildingServices, listServiceLines } from "./repo/services";
 import { nextProtocolNumber, upsertProtocol, type Protocol } from "./repo/protocols";
-import { renderProtocolPdf, type ProtocolData, type VisitRow } from "./pdf/protocol";
+import { decorate, exposureFor } from "./complianceService";
+import { walkSummaryForMonth } from "./walkService";
+import {
+  renderProtocolPdf,
+  type AnnexPhoto,
+  type ProtocolData,
+  type VisitRow,
+} from "./pdf/protocol";
 import { getStorage } from "./storage";
 import { getCurrentOrg } from "./org";
+
+const STATUS_LABEL_RO: Record<string, string> = {
+  overdue: "restant",
+  due_soon: "scadent curând",
+  ok: "în regulă",
+  unknown: "neînregistrat",
+};
+
+/** Compact performer labels for the report's table column. */
+const PERFORMER_SHORT_RO: Record<string, string> = {
+  us: "executăm noi",
+  authorised_third_party: "firmă autorizată",
+  qualified_signatory: "semnatar calificat",
+};
+
+/** The annex stays a bounded document even in a photo-heavy month. */
+const ANNEX_PHOTO_CAP = 40;
 
 function roDate(ymd: string): string {
   const [y, m, d] = ymd.split("-");
@@ -96,6 +122,115 @@ export async function buildProtocolData(
     }
   }
 
+  // ---- Raport lunar de control data (add-on §5). With no walks in the
+  // month, everything below stays undefined and the plain proces-verbal
+  // renders exactly as before.
+  const walkSummary = await walkSummaryForMonth(orgId, buildingId, monthKey);
+  const isRaport = walkSummary.walks.length > 0;
+
+  let raport: Partial<ProtocolData> = {};
+  if (isRaport) {
+    const [obligationRows, exposure, lines, attached] = await Promise.all([
+      listBuildingObligations(orgId, buildingId),
+      exposureFor(orgId, buildingId),
+      listServiceLines(orgId),
+      listBuildingServices(orgId, buildingId),
+    ]);
+    const decorated = decorate(obligationRows);
+    const lineById = new Map(lines.map((l) => [l.id, l]));
+    const serviceLinesActive = [
+      "Curățenie casa scării",
+      ...attached
+        .filter((s) => s.active)
+        .map((s) => lineById.get(s.serviceLineId)?.nameRo)
+        .filter((n): n is string => Boolean(n) && n !== "Curățenie casa scării"),
+    ];
+
+    const recommendations: string[] = [];
+    for (const r of decorated) {
+      if (recommendations.length >= 8) break;
+      if (r.status === "overdue") {
+        recommendations.push(`Recuperați „${r.obligation.nameRo}” — scadența a trecut.`);
+      } else if (r.status === "due_soon" && r.nextDue) {
+        recommendations.push(
+          `Programați „${r.obligation.nameRo}” până la ${roDate(r.nextDue)}.`
+        );
+      }
+    }
+    for (const f of walkSummary.findings) {
+      if (recommendations.length >= 8) break;
+      if (!f.finding.resolvedAt) {
+        recommendations.push(
+          `Urmăriți constatarea din ${f.date}: ${f.finding.descriptionRo}`
+        );
+      }
+    }
+
+    // Photo annex: the month's photographs with timestamp and label.
+    const storage = getStorage();
+    const annexSources: { key: string; caption: string }[] = [];
+    const kindRo = { before: "înainte", after: "după", issue: "problemă" } as const;
+    for (const p of photos) {
+      annexSources.push({
+        key: p.fileKey,
+        caption: `Vizită · ${formatInTimeZone(new Date(p.takenAt), APP_TZ, "dd.MM.yyyy HH:mm")} · ${kindRo[p.kind]}`,
+      });
+    }
+    for (const wc of walkSummary.walkCheckpoints) {
+      const keys = wc.photoKeys ? (JSON.parse(wc.photoKeys) as string[]) : [];
+      const label = walkSummary.checkpointById.get(wc.checkpointId)?.labelRo ?? "Punct de control";
+      for (const key of keys) {
+        annexSources.push({
+          key,
+          caption: `${label} · ${formatInTimeZone(new Date(wc.scannedAt), APP_TZ, "dd.MM.yyyy HH:mm")}`,
+        });
+      }
+    }
+    for (const f of walkSummary.findings) {
+      const keys = f.finding.photoKeys ? (JSON.parse(f.finding.photoKeys) as string[]) : [];
+      for (const key of keys) {
+        annexSources.push({
+          key,
+          caption: `Constatare · ${f.checkpointLabel ?? "general"} · ${f.date}`,
+        });
+      }
+    }
+    const annexPhotos: AnnexPhoto[] = [];
+    for (const s of annexSources.slice(0, ANNEX_PHOTO_CAP)) {
+      if (!s.key.endsWith(".jpg") && !s.key.endsWith(".jpeg")) continue;
+      const file = await storage.get(s.key);
+      if (file) annexPhotos.push({ jpg: file.data, caption: s.caption });
+    }
+
+    raport = {
+      serviceLinesActive,
+      walks: walkSummary.walks.map((w) => ({
+        date: w.date,
+        time: w.time,
+        points: w.points,
+        findings: w.findings,
+      })),
+      findings: walkSummary.findings.map((f) => ({
+        date: f.date,
+        checkpointLabel: f.checkpointLabel,
+        severity: f.finding.severity,
+        description: f.finding.descriptionRo,
+        photoCount: f.photoCount,
+      })),
+      obligations: decorated.map((r) => ({
+        name: r.obligation.nameRo,
+        due: r.nextDue,
+        statusLabel: STATUS_LABEL_RO[r.status] ?? r.status,
+        performer:
+          PERFORMER_SHORT_RO[r.obligation.performerRequirement] ??
+          r.obligation.performerRequirement,
+      })),
+      exposureBani: exposure.totalBani,
+      recommendations,
+      annexPhotos,
+    };
+  }
+
   return {
     org: {
       name: org.name,
@@ -122,6 +257,7 @@ export async function buildProtocolData(
     vatRegistered: settings.vatRegistered === true,
     iban: settings.iban,
     issuesResolved,
+    ...raport,
   };
 }
 

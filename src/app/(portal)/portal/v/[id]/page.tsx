@@ -11,6 +11,7 @@ import {
 } from "@/server/repo/visits";
 import { getBuilding } from "@/server/repo/buildings";
 import { listTemplateItems } from "@/server/repo/checklists";
+import { getWalkForVisit, listCheckpoints } from "@/server/repo/walks";
 import { ro } from "@/lib/i18n/ro";
 import { VisitFlow, type FlowItem } from "./VisitFlow";
 
@@ -49,6 +50,26 @@ export default async function PortalVisit({ params }: { params: Promise<{ id: st
     done: vi.done,
   }));
 
+  // The control walk rides on a normal visit (add-on §5).
+  const [checkpoints, walk] = visit.buildingId
+    ? await Promise.all([
+        listCheckpoints(org.id, visit.buildingId),
+        getWalkForVisit(org.id, visit.id),
+      ])
+    : [[], null];
+  const walkEntry =
+    checkpoints.length > 0 ? (
+      <Link
+        href={`/portal/v/${visit.id}/tur`}
+        className="mt-4 flex items-center justify-between rounded-xl bg-surface p-4 shadow-card"
+      >
+        <span className="text-base font-semibold">{ro.portal.walk.open}</span>
+        <span className="text-sm text-ink-soft">
+          {walk?.status === "done" ? `${ro.portal.walk.finished} ✓` : "→"}
+        </span>
+      </Link>
+    ) : null;
+
   return (
     <div>
       <Link href="/portal" className="text-sm text-ink-faint">
@@ -72,6 +93,8 @@ export default async function PortalVisit({ params }: { params: Promise<{ id: st
           photoCount={photos.length}
         />
       </div>
+
+      {walkEntry}
     </div>
   );
 }
