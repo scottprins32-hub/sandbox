@@ -309,13 +309,22 @@ export async function uploadObligationDocumentAction(
   const org = await getCurrentOrg();
   const file = formData.get("file");
   if (!(file instanceof Blob) || file.size === 0) return;
+
+  // Validate the obligation org-scoped before its id goes anywhere near a
+  // storage key, and so the performer can be derived from the catalogue.
+  const { getBuildingObligation, latestEventFor, setEventDocument } = await import(
+    "@/server/repo/compliance"
+  );
+  const record = await getBuildingObligation(org.id, buildingObligationId);
+  if (!record) return;
+
   const name = "name" in file ? String((file as File).name) : "";
   const ext = name.toLowerCase().endsWith(".pdf")
     ? "pdf"
     : name.toLowerCase().endsWith(".png")
       ? "png"
       : "jpg";
-  const key = `${org.id}/compliance/${buildingObligationId}/${crypto.randomUUID()}.${ext}`;
+  const key = `${org.id}/compliance/${record.id}/${crypto.randomUUID()}.${ext}`;
   const { getStorage } = await import("@/server/storage");
   await getStorage().put(
     key,
@@ -323,13 +332,22 @@ export async function uploadObligationDocumentAction(
     ext === "pdf" ? "application/pdf" : ext === "png" ? "image/png" : "image/jpeg"
   );
 
-  const { latestEventFor, setEventDocument } = await import("@/server/repo/compliance");
-  const latest = await latestEventFor(org.id, buildingObligationId);
+  // Attach to the latest *done* event. With no execution on record, the
+  // certificate itself is evidence the work happened — but who performed it
+  // comes from the catalogue, never a default: an authorised_third_party
+  // obligation must never be recorded as executed by Scara (hard rule 3).
+  const latest = await latestEventFor(org.id, record.id, "done");
   if (latest) {
     await setEventDocument(org.id, latest.id, key);
   } else {
     const { markObligationDone } = await import("@/server/complianceService");
-    await markObligationDone(org.id, buildingObligationId, { documentFileKey: key });
+    const { OBLIGATION_BY_KEY } = await import("@/lib/compliance");
+    const requirement = OBLIGATION_BY_KEY[record.obligationKey]?.performerRequirement;
+    await markObligationDone(org.id, record.id, {
+      documentFileKey: key,
+      performedBy: requirement === "us" ? "scara" : "contractor",
+      contractorId: record.contractorId,
+    });
   }
   revalidatePath("/ops/compliance");
   revalidatePath("/ops");
@@ -385,6 +403,15 @@ export async function assessElementAction(
   formData: FormData
 ) {
   const org = await getCurrentOrg();
+  // Both ids must resolve org-scoped before either reaches a storage key or
+  // an insert — action arguments are client-controlled.
+  const { getBuilding } = await import("@/server/repo/buildings");
+  const building = await getBuilding(org.id, buildingId);
+  if (!building) return;
+  const { createAssessment, listElements } = await import("@/server/repo/record");
+  const element = (await listElements(org.id, building.id)).find((e) => e.id === elementId);
+  if (!element) return;
+
   const score = Number(formData.get("score"));
   const note = String(formData.get("note") ?? "").trim();
   if (!Number.isInteger(score) || score < 1 || score > 6 || !note) return;
@@ -392,15 +419,14 @@ export async function assessElementAction(
   let photoKeys: string | null = null;
   const file = formData.get("photo");
   if (file instanceof Blob && file.size > 0) {
-    const key = `${org.id}/record/${buildingId}/${crypto.randomUUID()}.jpg`;
+    const key = `${org.id}/record/${building.id}/${crypto.randomUUID()}.jpg`;
     const { getStorage } = await import("@/server/storage");
     await getStorage().put(key, new Uint8Array(await file.arrayBuffer()), "image/jpeg");
     photoKeys = JSON.stringify([key]);
   }
 
-  const { createAssessment } = await import("@/server/repo/record");
   await createAssessment(org.id, {
-    buildingElementId: elementId,
+    buildingElementId: element.id,
     assessedAt: todayYmd(),
     assessedBy: "Ops",
     score,
@@ -408,12 +434,16 @@ export async function assessElementAction(
     photoKeys,
     source: "annual",
   });
-  revalidatePath(`/ops/buildings/${buildingId}/record`);
+  revalidatePath(`/ops/buildings/${building.id}/record`);
 
-  const next = Number(formData.get("nextStep"));
-  if (Number.isInteger(next) && next >= 0) {
-    redirect(`/ops/buildings/${buildingId}/record/assess?e=${next}`);
+  // Empty nextStep means the walkthrough is over — land on the record page,
+  // not back on element zero (Number("") is 0).
+  const nextRaw = String(formData.get("nextStep") ?? "");
+  const next = Number(nextRaw);
+  if (nextRaw !== "" && Number.isInteger(next) && next >= 0) {
+    redirect(`/ops/buildings/${building.id}/record/assess?e=${next}`);
   }
+  redirect(`/ops/buildings/${building.id}/record`);
 }
 
 /** One-tap promote: walk finding → element assessment + journal entry. */

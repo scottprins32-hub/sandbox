@@ -107,11 +107,18 @@ export async function renderAnnualReportPdf(data: AnnualReportData): Promise<Uin
 
   // ---- Identification ----------------------------------------------------
   const regim = data.floors > 1 ? `P+${data.floors - 1}` : "P";
+  // Romanian numeral agreement: "de" before the noun for 20+, except
+  // compounds ending 01-19 ("un tur", "19 tururi", "20 de tururi").
+  const n = data.walksCount;
+  const rem = n % 100;
+  const needsDe = n >= 20 && (rem === 0 || rem >= 20);
+  const walksPhrase =
+    n === 1 ? "un tur de control" : `${n}${needsDe ? " de" : ""} tururi de control`;
   const idLines = [
     `Imobil: ${data.buildingLabel}${data.address ? `, ${data.address}` : ""}`,
     `Regim de înălțime: ${regim}    Nr. apartamente: ${data.apartments}`,
     `Perioada observată: ${data.periodStart} - ${data.periodEnd}`,
-    `Întocmit de: ${data.org.name}, pe baza observațiilor din ${data.walksCount} tururi de control`,
+    `Întocmit de: ${data.org.name}, pe baza observațiilor din ${walksPhrase}`,
   ];
   for (const line of idLines) {
     breakPage(14);

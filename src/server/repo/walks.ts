@@ -31,6 +31,14 @@ export async function listCheckpoints(
   return rows.sort((a, b) => a.orderIndex - b.orderIndex);
 }
 
+export async function getCheckpoint(orgId: string, id: string): Promise<Checkpoint | null> {
+  const rows = await getDb()
+    .select()
+    .from(schema.checkpoints)
+    .where(and(eq(schema.checkpoints.orgId, orgId), eq(schema.checkpoints.id, id)));
+  return rows[0] ?? null;
+}
+
 export async function getCheckpointByCode(
   orgId: string,
   code: string
@@ -186,11 +194,17 @@ export async function listWalkCheckpoints(
     );
 }
 
+/**
+ * Append a photo to a checkpoint row of THIS walk. The walk id is part of the
+ * predicate: the caller's authorization is on the walk, so a row from another
+ * walk must never be reachable through it. Returns false when no row matched.
+ */
 export async function appendWalkCheckpointPhoto(
   orgId: string,
+  controlWalkId: string,
   walkCheckpointId: string,
   fileKey: string
-): Promise<void> {
+): Promise<boolean> {
   const db = getDb();
   const rows = await db
     .select()
@@ -198,16 +212,18 @@ export async function appendWalkCheckpointPhoto(
     .where(
       and(
         eq(schema.walkCheckpoints.orgId, orgId),
+        eq(schema.walkCheckpoints.controlWalkId, controlWalkId),
         eq(schema.walkCheckpoints.id, walkCheckpointId)
       )
     );
   const row = rows[0];
-  if (!row) return;
+  if (!row) return false;
   const keys = row.photoKeys ? (JSON.parse(row.photoKeys) as string[]) : [];
   await db
     .update(schema.walkCheckpoints)
     .set({ photoKeys: JSON.stringify([...keys, fileKey]) })
     .where(eq(schema.walkCheckpoints.id, row.id));
+  return true;
 }
 
 // ---------------------------------------------------------------- findings
@@ -299,21 +315,30 @@ export async function resolveFinding(
     .where(and(eq(schema.walkFindings.orgId, orgId), eq(schema.walkFindings.id, id)));
 }
 
+/** Same walk-scoped discipline as appendWalkCheckpointPhoto. */
 export async function appendFindingPhoto(
   orgId: string,
+  controlWalkId: string,
   findingId: string,
   fileKey: string
-): Promise<void> {
+): Promise<boolean> {
   const db = getDb();
   const rows = await db
     .select()
     .from(schema.walkFindings)
-    .where(and(eq(schema.walkFindings.orgId, orgId), eq(schema.walkFindings.id, findingId)));
+    .where(
+      and(
+        eq(schema.walkFindings.orgId, orgId),
+        eq(schema.walkFindings.controlWalkId, controlWalkId),
+        eq(schema.walkFindings.id, findingId)
+      )
+    );
   const row = rows[0];
-  if (!row) return;
+  if (!row) return false;
   const keys = row.photoKeys ? (JSON.parse(row.photoKeys) as string[]) : [];
   await db
     .update(schema.walkFindings)
     .set({ photoKeys: JSON.stringify([...keys, fileKey]) })
     .where(eq(schema.walkFindings.id, row.id));
+  return true;
 }

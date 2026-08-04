@@ -219,7 +219,15 @@ export async function buildProtocolData(
       })),
       obligations: decorated.map((r) => ({
         name: r.obligation.nameRo,
-        due: r.nextDue,
+        // "permanent" only for genuinely continuous duties; a periodic
+        // obligation with no record has no due date yet, and saying
+        // "permanent" on a signed document would be false.
+        dueLabel: r.nextDue
+          ? roDate(r.nextDue)
+          : r.obligation.cadence.kind === "continuous" ||
+              r.obligation.cadence.kind === "event"
+            ? "permanent"
+            : "nestabilit",
         statusLabel: STATUS_LABEL_RO[r.status] ?? r.status,
         performer:
           PERFORMER_SHORT_RO[r.obligation.performerRequirement] ??

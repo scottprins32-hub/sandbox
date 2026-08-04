@@ -114,7 +114,8 @@ export async function listScheduledEventsOnDate(
 
 export async function latestEventFor(
   orgId: string,
-  buildingObligationId: string
+  buildingObligationId: string,
+  kind?: "scheduled" | "done" | "skipped" | "blocked"
 ): Promise<ComplianceEvent | null> {
   const rows = await getDb()
     .select()
@@ -122,7 +123,8 @@ export async function latestEventFor(
     .where(
       and(
         eq(schema.complianceEvents.orgId, orgId),
-        eq(schema.complianceEvents.buildingObligationId, buildingObligationId)
+        eq(schema.complianceEvents.buildingObligationId, buildingObligationId),
+        ...(kind ? [eq(schema.complianceEvents.kind, kind)] : [])
       )
     )
     .orderBy(desc(schema.complianceEvents.occurredAt))

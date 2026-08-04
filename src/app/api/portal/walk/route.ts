@@ -6,6 +6,7 @@ import {
   createFinding,
   ensureWalk,
   finishWalk,
+  getCheckpoint,
   getWalk,
   recordWalkCheckpoint,
 } from "@/server/repo/walks";
@@ -53,6 +54,15 @@ export async function POST(request: NextRequest) {
   }
   if (walk.cleanerId !== cleaner.id) {
     return NextResponse.json({ ok: false }, { status: 403 });
+  }
+
+  // A checkpoint referenced by any op must exist in this org and belong to
+  // the walk's building — evidence rows never point at foreign checkpoints.
+  if (body.checkpointId) {
+    const cp = await getCheckpoint(org.id, body.checkpointId);
+    if (!cp || cp.buildingId !== walk.buildingId) {
+      return NextResponse.json({ ok: false }, { status: 404 });
+    }
   }
 
   if (body.op === "checkpoint") {

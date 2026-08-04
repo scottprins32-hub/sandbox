@@ -24,22 +24,35 @@ function contentTypeFor(key: string): string {
   return "application/octet-stream";
 }
 
+/** Defense in depth: a key must resolve inside DISK_ROOT, whatever it holds. */
+function safePath(key: string): string {
+  const file = path.resolve(DISK_ROOT, key);
+  if (!file.startsWith(path.resolve(DISK_ROOT) + path.sep)) {
+    throw new Error("Invalid storage key");
+  }
+  return file;
+}
+
 const diskStorage: Storage = {
   async put(key, data) {
-    const file = path.join(DISK_ROOT, key);
+    const file = safePath(key);
     await fs.mkdir(path.dirname(file), { recursive: true });
     await fs.writeFile(file, data);
   },
   async get(key) {
     try {
-      const data = await fs.readFile(path.join(DISK_ROOT, key));
+      const data = await fs.readFile(safePath(key));
       return { data: new Uint8Array(data), contentType: contentTypeFor(key) };
     } catch {
       return null;
     }
   },
   async delete(key) {
-    await fs.rm(path.join(DISK_ROOT, key), { force: true });
+    try {
+      await fs.rm(safePath(key), { force: true });
+    } catch {
+      // Deleting an invalid key is a no-op, not an error path.
+    }
   },
   url(key) {
     return `/api/files/${key}`;

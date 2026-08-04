@@ -31,9 +31,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 404 });
   }
 
-  const key = `${org.id}/walks/${walkId}/${crypto.randomUUID()}.jpg`;
+  // The target row must belong to the walk the cleaner is authorized on —
+  // never let one walk's credentials write onto another walk's evidence.
+  const key = `${org.id}/walks/${walk.id}/${crypto.randomUUID()}.jpg`;
   await getStorage().put(key, new Uint8Array(await file.arrayBuffer()), "image/jpeg");
-  if (findingId) await appendFindingPhoto(org.id, findingId, key);
-  else await appendWalkCheckpointPhoto(org.id, walkCheckpointId, key);
+  const attached = findingId
+    ? await appendFindingPhoto(org.id, walk.id, findingId, key)
+    : await appendWalkCheckpointPhoto(org.id, walk.id, walkCheckpointId, key);
+  if (!attached) {
+    await getStorage().delete(key);
+    return NextResponse.json({ ok: false }, { status: 404 });
+  }
   return NextResponse.json({ ok: true });
 }

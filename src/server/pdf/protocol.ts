@@ -50,7 +50,8 @@ export interface FindingReportRow {
 
 export interface ObligationReportRow {
   name: string;
-  due: string | null; // YYYY-MM-DD
+  /** Pre-formatted: a dd.MM.yyyy date, "permanent", or "nestabilit". */
+  dueLabel: string;
   statusLabel: string;
   performer: string;
 }
@@ -388,7 +389,7 @@ export async function renderProtocolPdf(data: ProtocolData): Promise<Uint8Array>
         breakPage(18);
         const name = wrapText(fonts.text, o.name, 8.5, 236)[0] ?? o.name;
         page.drawText(name, { x: MARGIN, y, size: 8.5, font: fonts.text, color: COLORS.ink });
-        page.drawText(o.due ? roDateShort(o.due) : "permanent", {
+        page.drawText(o.dueLabel, {
           x: MARGIN + 244, y, size: 8.5, font: fonts.text, color: COLORS.ink2,
         });
         page.drawText(o.statusLabel, {
@@ -552,10 +553,6 @@ export async function renderProtocolPdf(data: ProtocolData): Promise<Uint8Array>
   return doc.save();
 }
 
-function roDateShort(ymd: string): string {
-  const [y, m, d] = ymd.split("-");
-  return `${d}.${m}.${y}`;
-}
 
 function microWidth(font: PDFFont, text: string, size: number): number {
   let w = 0;
