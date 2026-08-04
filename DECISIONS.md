@@ -70,6 +70,30 @@ to carry live here too.
   buildings the same uncovered obligation filled the widget with repeats of one
   name; it now shows each named risk once with the count of buildings affected.
 
+## Design system (uploaded Procesverbal_Scara.html)
+
+- **2026-08-04 — Tokens extracted and applied everywhere.** Ink #1E1B15, paper
+  #F7F5F0, green #2E6B4F / deep #1F4A37, lines #E2DED4 / #CFC9BB, rust #9C3B25,
+  amber #7C5A17; Instrument Sans (text) + Space Grotesk (display numbers).
+  Documents implement the template in `src/server/pdf/theme.ts`; the web app's
+  CSS palette was aligned to the same values. The app UI keeps the system font
+  stack (hermetic builds); the design fonts ship inside the PDFs.
+- **2026-08-04 — Ligatures disabled in PDFs.** pdf-lib mis-advances
+  multi-codepoint glyphs: every "fi" ("Verificat", "Beneficiarul") rendered
+  broken with two independent Instrument Sans builds. `liga/rlig/calt` are
+  disabled at embed time; verified clean rendering and text extraction.
+- **2026-08-04 — Photo annex wording kept honest.** The template's footer says
+  photos are "anexate acestui document"; generated protocols do not embed the
+  photos, so the footer states they are available in the app instead. The
+  template's "Recuperată" status is not rendered either — the data model has no
+  recovery link between visits, and inventing one on a signed document would be
+  false. Missed-then-recovered shows as one Ratată row plus the recovery
+  sentence in Observații.
+- **2026-08-04 — Space Grotesk source.** The @expo-google-fonts build fails
+  fontkit parsing; the bundled TTFs come from the typeface's official 2.0.0
+  release instead. Instrument Sans comes from fonts.gstatic.com statics (full
+  Romanian diacritic coverage verified in the test suite's generated PDFs).
+
 ## Build decisions
 
 - **2026-07-30 — Autonomous session, plan approval:** built in a remote
