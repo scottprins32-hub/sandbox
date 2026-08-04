@@ -22,8 +22,13 @@ import {
   setIssueStatusAction,
   markVisitMissedAction,
 } from "./actions";
-import { listBuildingObligations, listContractors } from "@/server/repo/compliance";
+import {
+  listBuildingObligations,
+  listContractors,
+  listScheduledEventsOnDate,
+} from "@/server/repo/compliance";
 import { decorate, exposureFor } from "@/server/complianceService";
+import { OBLIGATION_BY_KEY } from "@/lib/compliance";
 import { listBuildingServices, listServiceLines } from "@/server/repo/services";
 import { ExposureWidget } from "@/components/ops/ExposureWidget";
 import { RECURRING_UNITS, type ServiceUnit } from "@/lib/compliance/services";
@@ -65,15 +70,34 @@ export default async function OpsToday({
   const cleanerById = new Map(cleaners.map((c) => [c.id, c]));
 
   // Compliance layer (add-on §4).
-  const [exposure, obligationRecords, contractors, serviceLines, buildingServices] =
+  const [exposure, obligationRecords, contractors, serviceLines, buildingServices, todaysTreatments] =
     await Promise.all([
       exposureFor(org.id),
       listBuildingObligations(org.id),
       listContractors(org.id),
       listServiceLines(org.id),
       listBuildingServices(org.id),
+      listScheduledEventsOnDate(org.id, today),
     ]);
   const complianceRows = decorate(obligationRecords);
+  // Treatments booked for today: coordination tasks, not cleaning jobs. The
+  // crew escorts, photographs and files — it never performs these (§2.3).
+  const obligationById = new Map(obligationRecords.map((r) => [r.id, r]));
+  const contractorById = new Map(contractors.map((c) => [c.id, c]));
+  const coordination = todaysTreatments.flatMap((e) => {
+    const record = obligationById.get(e.buildingObligationId);
+    const obligation = record ? OBLIGATION_BY_KEY[record.obligationKey] : undefined;
+    if (!record || !obligation) return [];
+    return [
+      {
+        id: e.id,
+        name: obligation.nameRo,
+        building: buildingById.get(record.buildingId)?.label ?? "…",
+        contractor: e.contractorId ? contractorById.get(e.contractorId)?.name : undefined,
+        note: e.note,
+      },
+    ];
+  });
   const overdueObligations = complianceRows.filter((r) => r.status === "overdue");
   const dueNoContractor = complianceRows.filter(
     (r) =>
@@ -173,6 +197,27 @@ export default async function OpsToday({
 
       {tab === "route" && (
         <section className="mt-4 space-y-4">
+          {coordination.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">Coordination today</h2>
+              <ul className="mt-2 divide-y divide-line">
+                {coordination.map((c) => (
+                  <li key={c.id} className="py-2.5">
+                    <p className="text-sm font-medium">{c.name}</p>
+                    <p className="text-xs text-ink-soft">
+                      {c.building}
+                      {c.contractor ? ` · ${c.contractor}` : " · no contractor booked"}
+                      {c.note ? ` · ${c.note}` : ""}
+                    </p>
+                    <p className="mt-0.5 text-xs text-ink-faint">
+                      Escort, photograph, file the document. Performed by the contractor,
+                      not by us.
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {todaysVisits.length === 0 && (
             <div className="rounded-xl bg-surface p-6 text-center shadow-card">
               <p className="text-sm text-ink-soft">No visits scheduled for today.</p>

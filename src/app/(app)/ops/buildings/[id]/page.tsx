@@ -21,7 +21,8 @@ import { exposureFor } from "@/server/complianceService";
 import { ExposureWidget } from "@/components/ops/ExposureWidget";
 import { listBuildingServices, listServiceLines } from "@/server/repo/services";
 import { UNIT_LABEL_RO, type ServiceUnit } from "@/lib/compliance/services";
-import { listBuildingObligations } from "@/server/repo/compliance";
+import { listBuildingObligations, listObligationDocuments } from "@/server/repo/compliance";
+import { OBLIGATION_BY_KEY } from "@/lib/compliance";
 
 export const metadata: Metadata = { title: "Building · Scara" };
 export const dynamic = "force-dynamic";
@@ -58,11 +59,12 @@ export default async function BuildingDetail({
     visitsPerWeek: building.visitsPerWeek,
   });
 
-  const [exposure, serviceLines, attached, obligationRows] = await Promise.all([
+  const [exposure, serviceLines, attached, obligationRows, certificates] = await Promise.all([
     exposureFor(org.id, building.id),
     listServiceLines(org.id),
     listBuildingServices(org.id, building.id),
     listBuildingObligations(org.id, building.id),
+    listObligationDocuments(org.id, building.id),
   ]);
   const lineById = new Map(serviceLines.map((l) => [l.id, l]));
   const activeServices = attached.filter((s) => s.active);
@@ -256,6 +258,30 @@ export default async function BuildingDetail({
           </ul>
         )}
       </div>
+
+      {certificates.length > 0 && (
+        <div className="rounded-xl bg-surface p-4 shadow-card">
+          <h2 className="text-sm font-semibold">Compliance documents</h2>
+          <ul className="mt-2 divide-y divide-line">
+            {certificates.map(({ event, obligationKey }) => (
+              <li key={event.id} className="flex items-center justify-between gap-3 py-2.5">
+                <div className="min-w-0">
+                  <p className="truncate text-sm">
+                    {OBLIGATION_BY_KEY[obligationKey]?.nameRo ?? obligationKey}
+                  </p>
+                  <p className="tnum text-xs text-ink-faint">{event.occurredAt}</p>
+                </div>
+                <a
+                  href={getStorage().url(event.documentFileKey!)}
+                  className="shrink-0 text-xs text-moss underline"
+                >
+                  Document
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="rounded-xl bg-surface p-4 shadow-card">
         <h2 className="text-sm font-semibold">Protocol history</h2>

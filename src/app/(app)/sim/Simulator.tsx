@@ -26,6 +26,7 @@ import { VatGauge } from "@/components/VatGauge";
 import { NumberField, Section, Segmented, SliderRow, Stepper } from "./controls";
 import { ProjectionChart } from "./ProjectionChart";
 import {
+  ATTACHABLE_LINES,
   computeResults,
   CURRENT_KEY,
   DEFAULT_STATE,
@@ -34,9 +35,17 @@ import {
   planFromState,
   saveState,
   studentSavingsBani,
+  type AttachableLine,
   type CityPreset,
   type SimState,
 } from "./simState";
+import { SERVICE_LINE_BY_KEY } from "@/lib/compliance/services";
+
+const ATTACH_LABEL: Record<AttachableLine, string> = {
+  tur_control: "Control walk + monthly report",
+  calendar_conformitate: "Compliance calendar",
+  spatiu_verde: "Green space",
+};
 
 const PRESET_FLAVOR: Record<CityPreset, string> = {
   giroc: `Giroc: pop. ${MARKET.GIROC.population.toLocaleString("en-US")}, +65% in a decade, ${MARKET.GIROC.projectsPerYear} residential projects/yr, ~${MARKET.GIROC.blocksEst[0]}-${MARKET.GIROC.blocksEst[1]} blocks.`,
@@ -164,6 +173,11 @@ export function Simulator() {
       state.turnoversPerWeek > 0
         ? `Turnovers: ${state.turnoversPerWeek}/week @ ${fmtLei(state.turnoverPriceBani)} lei`
         : null,
+      r.extraPerBuildingBani > 0
+        ? `Service mix: +${fmtLei(r.extraPerBuildingBani)} lei/building blended (${ATTACHABLE_LINES.filter((k) => state.attach[k] > 0)
+            .map((k) => `${ATTACH_LABEL[k]} ${state.attach[k]}%`)
+            .join(", ")})`
+        : null,
       `Monthly profit now: ${fmtLeiRound(r.now.profitBani)} lei (${fmtEur(r.now.profitBani, state.ronPerEur)})`,
       `Profit at month 12: ${fmtLeiRound(r.at12.profitBani)} lei`,
       `Cleaners needed now: ${r.now.cleanersNeeded}`,
@@ -251,6 +265,35 @@ export function Simulator() {
             </p>
           )}
         </SliderRow>
+      </Section>
+
+      <Section title="Service mix">
+        {ATTACHABLE_LINES.map((key) => (
+          <SliderRow
+            key={key}
+            label={`${ATTACH_LABEL[key]} (${fmtLeiRound(SERVICE_LINE_BY_KEY[key]!.defaultPriceBani)} lei)`}
+            value={state.attach[key]}
+            min={0}
+            max={100}
+            step={5}
+            onChange={(v) => set("attach", { ...state.attach, [key]: v })}
+            format={(v) => `${v}%`}
+          />
+        ))}
+        <p className="text-xs leading-relaxed text-ink-faint">
+          Attach rate: the share of buildings that buy the line on top of core cleaning.
+          Revenue only — the walk rides on a normal visit and coordination time sits in
+          overhead.
+        </p>
+        {results.extraPerBuildingBani > 0 && (
+          <p className="tnum mt-1 text-xs text-ink-soft">
+            Blended: {fmtLeiRound(state.priceBani)} +{" "}
+            {fmtLeiRound(results.extraPerBuildingBani)} ={" "}
+            {fmtLeiRound(results.blendedPriceBani)} lei/building · VAT ceiling{" "}
+            {results.vatCeiling.toFixed(1)} buildings (core only:{" "}
+            {results.vatCeilingCoreOnly.toFixed(1)})
+          </p>
+        )}
       </Section>
 
       <Section title="Growth">

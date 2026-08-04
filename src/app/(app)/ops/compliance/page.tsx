@@ -15,6 +15,7 @@ import {
   markObligationDoneAction,
   scheduleObligationAction,
   seedBuildingObligationsAction,
+  uploadObligationDocumentAction,
 } from "../actions";
 
 export const metadata: Metadata = { title: "Conformitate · Scara" };
@@ -245,6 +246,31 @@ export default async function OpsCompliancePage({
                     </label>
                     <button className="rounded-md bg-moss-deep px-3 py-1.5 text-xs font-medium text-paper">
                       Salvează
+                    </button>
+                  </form>
+                </details>
+                <details className="inline-block">
+                  <summary className="cursor-pointer rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft">
+                    Încarcă document
+                  </summary>
+                  <form
+                    action={uploadObligationDocumentAction.bind(null, record.id)}
+                    className="mt-2 flex flex-wrap items-end gap-2 rounded-lg border border-line p-2"
+                  >
+                    <label className="text-xs">
+                      <span className="block text-ink-faint">
+                        Certificat sau proces-verbal (PDF sau foto)
+                      </span>
+                      <input
+                        type="file"
+                        name="file"
+                        required
+                        accept="application/pdf,image/jpeg,image/png"
+                        className="mt-0.5 text-xs"
+                      />
+                    </label>
+                    <button className="rounded-md bg-moss-deep px-3 py-1.5 text-xs font-medium text-paper">
+                      Atașează
                     </button>
                   </form>
                 </details>

@@ -327,6 +327,24 @@ export async function seedDemo(): Promise<{ orgId: string }> {
       .where(eq(schema.buildingObligations.id, row.id));
   }
 
+  // A DDD treatment booked for today, so the Today route's coordination card
+  // has a real row (add-on §4 definition of done: scheduled treatment appears
+  // on the day).
+  const dddToday = firstBuildingObligations.find(
+    (r) => r.obligationKey === "ddd_dezinsectie"
+  );
+  if (dddToday) {
+    await db.insert(schema.complianceEvents).values({
+      orgId,
+      buildingObligationId: dddToday.id,
+      kind: "scheduled",
+      occurredAt: todayYmd(),
+      performedBy: "contractor",
+      contractorId: dddFirm!.id,
+      note: "Tratament de dezinsecție, accesul prin subsol",
+    });
+  }
+
   // Prospect (Atlas field notebook)
   await db.insert(schema.prospects).values({
     orgId,

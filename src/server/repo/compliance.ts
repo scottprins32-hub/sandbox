@@ -92,6 +92,74 @@ export async function createComplianceEvent(
   return rows[0]!;
 }
 
+/**
+ * Treatments booked for a given day — the Today route's coordination list
+ * (add-on §4: a scheduled DDD appears on the day as a task to escort).
+ */
+export async function listScheduledEventsOnDate(
+  orgId: string,
+  ymd: string
+): Promise<ComplianceEvent[]> {
+  return getDb()
+    .select()
+    .from(schema.complianceEvents)
+    .where(
+      and(
+        eq(schema.complianceEvents.orgId, orgId),
+        eq(schema.complianceEvents.kind, "scheduled"),
+        eq(schema.complianceEvents.occurredAt, ymd)
+      )
+    );
+}
+
+export async function latestEventFor(
+  orgId: string,
+  buildingObligationId: string
+): Promise<ComplianceEvent | null> {
+  const rows = await getDb()
+    .select()
+    .from(schema.complianceEvents)
+    .where(
+      and(
+        eq(schema.complianceEvents.orgId, orgId),
+        eq(schema.complianceEvents.buildingObligationId, buildingObligationId)
+      )
+    )
+    .orderBy(desc(schema.complianceEvents.occurredAt))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function setEventDocument(
+  orgId: string,
+  eventId: string,
+  documentFileKey: string
+): Promise<void> {
+  await getDb()
+    .update(schema.complianceEvents)
+    .set({ documentFileKey })
+    .where(
+      and(eq(schema.complianceEvents.orgId, orgId), eq(schema.complianceEvents.id, eventId))
+    );
+}
+
+/** Certificates and protocols filed against a building's obligations. */
+export async function listObligationDocuments(
+  orgId: string,
+  buildingId: string
+): Promise<{ event: ComplianceEvent; obligationKey: string }[]> {
+  const obligations = await listBuildingObligations(orgId, buildingId);
+  if (obligations.length === 0) return [];
+  const keyById = new Map(obligations.map((o) => [o.id, o.obligationKey]));
+  const events = await listComplianceEvents(
+    orgId,
+    obligations.map((o) => o.id)
+  );
+  return events
+    .filter((e) => e.documentFileKey)
+    .map((event) => ({ event, obligationKey: keyById.get(event.buildingObligationId)! }));
+}
+
 // ------------------------------------------------------------------ contractors
 
 export async function listContractors(orgId: string): Promise<Contractor[]> {

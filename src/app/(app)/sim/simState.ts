@@ -9,6 +9,7 @@ import {
   SERVICE,
   TARGETS,
 } from "@/lib/constants";
+import { SERVICE_LINE_BY_KEY } from "@/lib/compliance/services";
 import {
   buildingUnitEconomics,
   cleanerCapacityBuildings,
@@ -27,6 +28,18 @@ import {
 export type CityPreset = "giroc" | "dumbravita" | "custom";
 export type VatStrategy = "reprice" | "absorb";
 
+// Attachable compliance lines (add-on §7): recurring per-building services a
+// fraction of buildings buy on top of core cleaning. Attach rate is that
+// fraction. Per-apartment and per-job lines are excluded — their monthly value
+// depends on data the Simulator does not model.
+export const ATTACHABLE_LINES = [
+  "tur_control",
+  "calendar_conformitate",
+  "spatiu_verde",
+] as const;
+export type AttachableLine = (typeof ATTACHABLE_LINES)[number];
+export type AttachRates = Record<AttachableLine, number>; // percent, 0-100
+
 export interface SimState {
   priceBani: number;
   buildings: number;
@@ -44,6 +57,7 @@ export interface SimState {
   vatRegistered: boolean;
   vatStrategy: VatStrategy;
   preset: CityPreset;
+  attach: AttachRates;
 }
 
 // Defaults per §6: the locked "permanent core + student bench" strategy.
@@ -64,6 +78,7 @@ export const DEFAULT_STATE: SimState = {
   vatRegistered: false,
   vatStrategy: "reprice",
   preset: "giroc",
+  attach: { tur_control: 0, calendar_conformitate: 0, spatiu_verde: 0 },
 };
 
 export const CURRENT_KEY = "scara.sim.current";
@@ -74,7 +89,12 @@ export function loadState(key: string): SimState | null {
   try {
     const raw = window.localStorage.getItem(key);
     if (!raw) return null;
-    return { ...DEFAULT_STATE, ...(JSON.parse(raw) as Partial<SimState>) };
+    const parsed = JSON.parse(raw) as Partial<SimState>;
+    return {
+      ...DEFAULT_STATE,
+      ...parsed,
+      attach: { ...DEFAULT_STATE.attach, ...(parsed.attach ?? {}) },
+    };
   } catch {
     return null;
   }
@@ -93,17 +113,32 @@ export interface SimResults {
   at12: MonthRow;
   capacityBuildings: number;
   vatCeiling: number;
+  /** VAT ceiling if the buildings bought only core cleaning. */
+  vatCeilingCoreOnly: number;
   microCeiling: number;
   /** Month index where profit first crosses the €2,000 target, or -1. */
   worthItMonth: number;
   worthItLineBani: number;
   dividendNetBani: number;
   blendedCostPerHourBani: number | null;
+  /** Attach-rate-weighted service revenue per building (add-on §7). */
+  extraPerBuildingBani: number;
+  blendedPriceBani: number;
+}
+
+/** Attach-rate-weighted average service revenue per building, in bani. */
+export function attachExtraPerBuildingBani(attach: AttachRates): number {
+  let extra = 0;
+  for (const key of ATTACHABLE_LINES) {
+    const rate = Math.max(0, Math.min(100, attach[key] ?? 0));
+    extra += (rate / 100) * (SERVICE_LINE_BY_KEY[key]?.defaultPriceBani ?? 0);
+  }
+  return Math.round(extra);
 }
 
 export function planFromState(state: SimState, vat?: { strategy: VatStrategy }): ProjectionPlan {
   return {
-    pricePerBuildingBani: state.priceBani,
+    pricePerBuildingBani: state.priceBani + attachExtraPerBuildingBani(state.attach),
     startBuildings: state.buildings,
     growthPerMonth: state.growthPerMonth,
     hoursPerVisit: state.hoursPerVisit,
@@ -146,18 +181,24 @@ export function computeResults(state: SimState): SimResults {
     state.partTimeFloorBani
   );
 
+  const extraPerBuildingBani = attachExtraPerBuildingBani(state.attach);
+  const blendedPriceBani = state.priceBani + extraPerBuildingBani;
+
   return {
     unit,
     rows,
     now,
     at12,
     capacityBuildings: cleanerCapacityBuildings(state.hoursPerVisit, state.visitsPerWeek),
-    vatCeiling: vatCeilingBuildings(state.priceBani),
-    microCeiling: microCeilingBuildings(state.priceBani),
+    vatCeiling: vatCeilingBuildings(blendedPriceBani),
+    vatCeilingCoreOnly: vatCeilingBuildings(state.priceBani),
+    microCeiling: microCeilingBuildings(blendedPriceBani),
     worthItMonth,
     worthItLineBani,
     dividendNetBani: Math.round(Math.max(0, now.profitBani) * 0.84),
     blendedCostPerHourBani: mixHours > 0 ? mixCost / mixHours : null,
+    extraPerBuildingBani,
+    blendedPriceBani,
   };
 }
 

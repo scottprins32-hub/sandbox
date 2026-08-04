@@ -290,6 +290,45 @@ export async function scheduleObligationAction(
   revalidatePath("/ops/compliance");
 }
 
+/**
+ * Attach a certificate or proces-verbal to an obligation (add-on §4,
+ * "Încarcă document"). The file lands on the latest event; when the
+ * obligation has no history yet, the upload records the execution too —
+ * a certificate in hand is evidence the work happened.
+ */
+export async function uploadObligationDocumentAction(
+  buildingObligationId: string,
+  formData: FormData
+) {
+  const org = await getCurrentOrg();
+  const file = formData.get("file");
+  if (!(file instanceof Blob) || file.size === 0) return;
+  const name = "name" in file ? String((file as File).name) : "";
+  const ext = name.toLowerCase().endsWith(".pdf")
+    ? "pdf"
+    : name.toLowerCase().endsWith(".png")
+      ? "png"
+      : "jpg";
+  const key = `${org.id}/compliance/${buildingObligationId}/${crypto.randomUUID()}.${ext}`;
+  const { getStorage } = await import("@/server/storage");
+  await getStorage().put(
+    key,
+    new Uint8Array(await file.arrayBuffer()),
+    ext === "pdf" ? "application/pdf" : ext === "png" ? "image/png" : "image/jpeg"
+  );
+
+  const { latestEventFor, setEventDocument } = await import("@/server/repo/compliance");
+  const latest = await latestEventFor(org.id, buildingObligationId);
+  if (latest) {
+    await setEventDocument(org.id, latest.id, key);
+  } else {
+    const { markObligationDone } = await import("@/server/complianceService");
+    await markObligationDone(org.id, buildingObligationId, { documentFileKey: key });
+  }
+  revalidatePath("/ops/compliance");
+  revalidatePath("/ops");
+}
+
 export async function createContractorAction(formData: FormData) {
   const org = await getCurrentOrg();
   const { createContractor } = await import("@/server/repo/compliance");
