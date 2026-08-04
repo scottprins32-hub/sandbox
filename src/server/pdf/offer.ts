@@ -222,7 +222,6 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
           ],
         ] as [string, string][])
       : []),
-    ["O lună gratuită dacă nu suntem la nivel", "Dacă nu respectăm programul promis, luna aceea nu se plătește."],
     ["Personal angajat legal", "Contracte de muncă în regulă, nu muncă la negru. Fără risc pentru asociație."],
   ];
   for (const [title, body] of promises) {

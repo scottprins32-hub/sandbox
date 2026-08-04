@@ -139,6 +139,16 @@ to carry live here too.
   obligation, labelled as informational statutory maximums (§2.6), never a
   prediction.
 
+## Founder overrides of the spec
+
+- **2026-08-04 — The free-month guarantee is removed, at the founder's
+  request.** The original spec (§9) mandated three public-page promises, the
+  third being "o lună gratuită dacă nu suntem la nivel". It is gone from the
+  public page and from the ofertă's "Ce primiți" list. Nothing else referenced
+  it, so no contract or document text needed changing. The public page now
+  carries two promises (dated photos, signed monthly proces-verbal); both are
+  things the product actually produces, which was the point of that section.
+
 ## Build decisions
 
 - **2026-07-30 — Autonomous session, plan approval:** built in a remote

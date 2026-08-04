@@ -12,10 +12,6 @@ const PROMISES = [
     title: "Proces-verbal lunar semnat",
     body: "La sfârșitul fiecărei luni primiți un proces-verbal de recepție cu vizitele programate, cele efectuate și fotografiile atașate.",
   },
-  {
-    title: "O lună gratuită dacă nu suntem la nivel",
-    body: "Dacă într-o lună nu ne ținem de programul promis, luna aceea nu se plătește. Simplu.",
-  },
 ];
 
 export default function PublicHome() {
