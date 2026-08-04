@@ -139,6 +139,20 @@ to carry live here too.
   obligation, labelled as informational statutory maximums (§2.6), never a
   prediction.
 
+## Fixes
+
+- **2026-08-04 — The passcode gate is server-rendered and works without
+  JavaScript.** Reported as "on /sim I can't enter a password". The form read
+  `useSearchParams()` inside a `<Suspense>` boundary with no fallback, so Next
+  excluded it from the server HTML entirely: `curl /gate` returned zero
+  `<form>` elements and the input appeared only after the client chunk
+  hydrated. On a slow phone the page was a heading and nothing else. It is now
+  a plain server-rendered form posting to a server action — verified working
+  with JavaScript disabled. The `next` parameter is validated server-side
+  (`//evil.com` and absolute URLs fall back to `/sim`), closing an open
+  redirect the client version also had. `e2e/gate.spec.ts` asserts on the raw
+  HTML so a client-only regression fails the suite.
+
 ## Founder overrides of the spec
 
 - **2026-08-04 — The free-month guarantee is removed, at the founder's
