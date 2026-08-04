@@ -1,20 +1,33 @@
-// The ofertă de preț PDF — Romanian, because the audience is Romanian (§0).
-// This is a commercial offer, NOT a fiscal invoice: no invoice series, no
-// fiscal VAT breakdown, no payment instructions. Invoicing stays out of Scara
-// (§9 DO-NOT-BUILD #4).
+// The ofertă de preț PDF, set in the Scara document design system (theme.ts):
+// same header, footer, micro-labels and type as the proces-verbal, so the
+// sales pack reads as one family. Still a commercial offer, NOT a fiscal
+// invoice (§9 DO-NOT-BUILD #4).
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import { PDFDocument, rgb, type PDFFont, type PDFPage } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
+import { PDFDocument, type PDFPage } from "pdf-lib";
 import { formatInTimeZone } from "date-fns-tz";
 import { APP_TZ } from "@/lib/dates";
+import {
+  A4,
+  COLORS,
+  CONTENT_W,
+  drawDocFooter,
+  drawDocHeader,
+  drawMicroLabel,
+  embedDocFonts,
+  MARGIN,
+  rule,
+  wrapText,
+  type OrgIdentity,
+} from "./theme";
 
 export interface OfferPdfData {
   orgName: string;
   cui: string;
   vatRegistered: boolean;
   contactLine: string;
+  /** Extended identity for the themed header; optional, falls back to name+cui. */
+  identity?: Partial<OrgIdentity>;
+  representative?: string;
   clientName: string;
   buildingLabel: string;
   address: string;
@@ -32,10 +45,6 @@ export interface OfferPdfData {
   validUntil: string;
 }
 
-const FONT_DIR = path.join(process.cwd(), "src", "assets", "fonts");
-const A4: [number, number] = [595.28, 841.89];
-const MARGIN = 56;
-
 function lei(bani: number): string {
   const value = bani / 100;
   return `${value.toLocaleString("ro-RO", {
@@ -51,182 +60,168 @@ function roDate(ymd: string): string {
 
 export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit);
-  const regular = await doc.embedFont(
-    await fs.readFile(path.join(FONT_DIR, "Inter_400Regular.ttf")),
-    { subset: false }
-  );
-  const bold = await doc.embedFont(
-    await fs.readFile(path.join(FONT_DIR, "Inter_700Bold.ttf")),
-    { subset: false }
-  );
+  const fonts = await embedDocFonts(doc);
 
-  let page: PDFPage = doc.addPage(A4);
-  const ink = rgb(0.13, 0.13, 0.11);
-  const soft = rgb(0.34, 0.33, 0.31);
-  const moss = rgb(0.17, 0.32, 0.24);
-  let y = A4[1] - 64;
+  const pages: PDFPage[] = [doc.addPage(A4)];
+  let page = pages[0]!;
+  const paintPaper = (p: PDFPage) =>
+    p.drawRectangle({ x: 0, y: 0, width: A4[0], height: A4[1], color: COLORS.white });
+  paintPaper(page);
 
-  const ensureRoom = (needed: number) => {
-    if (y - needed < 64) {
-      page = doc.addPage(A4);
-      y = A4[1] - 64;
-    }
+  const org: OrgIdentity = {
+    name: data.orgName,
+    cui: data.cui,
+    regCom: data.identity?.regCom,
+    address: data.identity?.address,
+    email: data.identity?.email,
+    phone: data.identity?.phone,
+  };
+  let y = drawDocHeader(page, fonts, org);
+
+  const breakPage = (needed: number) => {
+    if (y - needed >= 64) return;
+    page = doc.addPage(A4);
+    pages.push(page);
+    paintPaper(page);
+    y = A4[1] - 64;
   };
 
-  const write = (
-    text: string,
-    opts?: {
-      font?: PDFFont;
-      size?: number;
-      gapAfter?: number;
-      color?: ReturnType<typeof rgb>;
-      center?: boolean;
-      x?: number;
-    }
-  ) => {
-    const font = opts?.font ?? regular;
-    const size = opts?.size ?? 10.5;
-    ensureRoom(size + 6);
-    const x = opts?.center
-      ? (A4[0] - font.widthOfTextAtSize(text, size)) / 2
-      : (opts?.x ?? MARGIN);
-    page.drawText(text, { x, y, size, font, color: opts?.color ?? ink });
-    y -= size + (opts?.gapAfter ?? 6);
+  const micro = (label: string) => {
+    breakPage(30);
+    drawMicroLabel(page, fonts.semibold, label, MARGIN, y);
+    y -= 15;
   };
 
-  const rule = (gap = 12) => {
-    ensureRoom(gap + 2);
-    page.drawLine({
-      start: { x: MARGIN, y: y + 4 },
-      end: { x: A4[0] - MARGIN, y: y + 4 },
-      thickness: 0.6,
-      color: rgb(0.89, 0.88, 0.85),
-    });
-    y -= gap;
-  };
-
-  /** Label left, value right-aligned on the same baseline. */
-  const row = (label: string, value: string, opts?: { strong?: boolean }) => {
-    const size = opts?.strong ? 12 : 10.5;
-    const valueFont = opts?.strong ? bold : regular;
-    ensureRoom(size + 6);
-    page.drawText(label, { x: MARGIN, y, size, font: regular, color: soft });
-    const w = valueFont.widthOfTextAtSize(value, size);
-    page.drawText(value, {
-      x: A4[0] - MARGIN - w,
-      y,
-      size,
-      font: valueFont,
-      color: opts?.strong ? moss : ink,
-    });
-    y -= size + 6;
-  };
-
-  // Header
-  write("OFERTĂ DE PREȚ", { font: bold, size: 20, gapAfter: 4 });
-  write("Servicii de curățenie pentru casa scării", { size: 11, color: soft, gapAfter: 14 });
-
-  write(`Prestator: ${data.orgName}, ${data.cui}`, { size: 10 });
-  if (data.contactLine) write(`Contact: ${data.contactLine}`, { size: 10, color: soft });
-  write(
-    `Data: ${formatInTimeZone(new Date(), APP_TZ, "dd.MM.yyyy")}   Valabilă până la: ${roDate(data.validUntil)}`,
-    { size: 10, color: soft, gapAfter: 16 }
-  );
-
-  rule();
-  write("Pentru", { font: bold, size: 12, gapAfter: 8 });
-  write(`Beneficiar: ${data.clientName}`, { size: 10.5 });
-  write(`Imobil: ${data.buildingLabel}${data.address ? `, ${data.address}` : ""}`, {
-    size: 10.5,
+  // ---- Title -------------------------------------------------------------
+  page.drawText("OFERTĂ DE PREȚ", {
+    x: MARGIN, y, size: 17, font: fonts.bold, color: COLORS.ink,
   });
-  write(
+  y -= 16;
+  page.drawText(
+    `Servicii de curățenie pentru casa scării · Data: ${formatInTimeZone(new Date(), APP_TZ, "dd.MM.yyyy")} · Valabilă până la: ${roDate(data.validUntil)}`,
+    { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 }
+  );
+  y -= 14;
+  rule(page, y); y -= 18;
+
+  // ---- For whom ----------------------------------------------------------
+  micro("Pentru");
+  page.drawText(data.clientName, { x: MARGIN, y, size: 10.5, font: fonts.semibold, color: COLORS.ink });
+  y -= 13;
+  page.drawText(`Imobil: ${data.buildingLabel}${data.address ? `, ${data.address}` : ""}`, {
+    x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink,
+  });
+  y -= 12;
+  page.drawText(
     `${data.floors} etaje · ${data.apartments} apartamente · ${data.residents} locatari`,
-    { size: 10, color: soft, gapAfter: 16 }
+    { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink3 }
   );
+  y -= 14;
+  rule(page, y); y -= 18;
 
-  // Scope
-  rule();
-  write("Ce includem", { font: bold, size: 12, gapAfter: 8 });
-  write(
-    `Curățenie de ${data.visitsPerWeek} ori pe săptămână, aproximativ ${String(
-      data.hoursPerVisit
-    ).replace(".", ",")} ore pe vizită:`,
-    { size: 10.5, color: soft, gapAfter: 8 }
+  // ---- Scope, two numbered columns ---------------------------------------
+  micro("Ce includem");
+  page.drawText(
+    `Curățenie de ${data.visitsPerWeek} ori pe săptămână, aproximativ ${String(data.hoursPerVisit).replace(".", ",")} ore pe vizită:`,
+    { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 }
   );
-  for (const line of data.scope) {
-    write(`•  ${line}`, { size: 10.5, gapAfter: 4 });
-  }
-  y -= 10;
+  y -= 16;
+  const half = Math.ceil(data.scope.length / 2);
+  const startY = y;
+  data.scope.forEach((line, i) => {
+    const col = i < half ? 0 : 1;
+    const ax = MARGIN + (col === 0 ? 0 : CONTENT_W / 2 + 8);
+    const ay = startY - (i % half) * 15;
+    page.drawText(`${i + 1}. ${line}`, { x: ax, y: ay, size: 9.5, font: fonts.text, color: COLORS.ink });
+  });
+  y = startY - half * 15 - 8;
+  rule(page, y); y -= 18;
 
-  // Price
-  rule();
-  write("Preț", { font: bold, size: 12, gapAfter: 10 });
-  row("Total pe lună", lei(data.priceBani), { strong: true });
-  row("Pe apartament, pe lună", lei(data.perApartmentBani));
-  row("Pe locatar, pe lună", lei(data.perPersonBani));
-  write(
+  // ---- Price -------------------------------------------------------------
+  micro("Preț");
+  const priceRow = (label: string, value: string, strong = false) => {
+    const font = strong ? fonts.display : fonts.text;
+    const size = strong ? 16 : 10;
+    page.drawText(label, {
+      x: MARGIN, y: y - (strong ? 3 : 0), size: 10,
+      font: fonts.text, color: COLORS.ink2,
+    });
+    const w = font.widthOfTextAtSize(value, size);
+    page.drawText(value, {
+      x: A4[0] - MARGIN - w, y: y - (strong ? 4 : 0), size, font,
+      color: strong ? COLORS.greenDeep : COLORS.ink,
+    });
+    y -= strong ? 24 : 16;
+  };
+  priceRow("Total pe lună", lei(data.priceBani), true);
+  priceRow("Pe apartament, pe lună", lei(data.perApartmentBani));
+  priceRow("Pe locatar, pe lună", lei(data.perPersonBani));
+  page.drawText(
     data.vatRegistered
       ? "Prețurile nu includ TVA."
       : "Prestatorul nu este înregistrat în scopuri de TVA. Prețul de mai sus este prețul final.",
-    { size: 9.5, color: soft, gapAfter: 16 }
+    { x: MARGIN, y, size: 8.5, font: fonts.text, color: COLORS.ink3 }
   );
+  y -= 14;
+  rule(page, y); y -= 18;
 
-  // The differentiator: proof
-  rule();
-  write("Ce primiți în plus față de o firmă obișnuită", { font: bold, size: 12, gapAfter: 10 });
+  // ---- The differentiator ------------------------------------------------
+  micro("Ce primiți în plus față de o firmă obișnuită");
   const promises: [string, string][] = [
-    [
-      "Fotografii datate la fiecare vizită",
-      "Fiecare curățenie e documentată în aplicație, cu ora și data.",
-    ],
-    [
-      "Proces-verbal lunar semnat",
-      "La final de lună primiți un document cu vizitele programate și cele efectuate.",
-    ],
-    [
-      "O lună gratuită dacă nu suntem la nivel",
-      "Dacă nu respectăm programul promis, luna aceea nu se plătește.",
-    ],
-    [
-      "Personal angajat legal",
-      "Contracte de muncă în regulă, nu muncă la negru. Fără risc pentru asociație.",
-    ],
+    ["Fotografii datate la fiecare vizită", "Fiecare curățenie e documentată în aplicație, cu ora și data."],
+    ["Proces-verbal lunar semnat", "La final de lună primiți un document cu vizitele programate și cele efectuate."],
+    ["O lună gratuită dacă nu suntem la nivel", "Dacă nu respectăm programul promis, luna aceea nu se plătește."],
+    ["Personal angajat legal", "Contracte de muncă în regulă, nu muncă la negru. Fără risc pentru asociație."],
   ];
   for (const [title, body] of promises) {
-    write(title, { font: bold, size: 10.5, gapAfter: 3 });
-    write(body, { size: 10, color: soft, gapAfter: 7 });
+    breakPage(26);
+    page.drawText(title, { x: MARGIN, y, size: 9.5, font: fonts.semibold, color: COLORS.ink });
+    y -= 12;
+    page.drawText(body, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink2 });
+    y -= 15;
   }
+  y -= 3;
+  rule(page, y); y -= 18;
 
-  y -= 2;
-  rule(10);
-  write("Contract", { font: bold, size: 12, gapAfter: 7 });
-  write(
+  // ---- Contract ----------------------------------------------------------
+  micro("Contract");
+  for (const line of wrapText(
+    fonts.text,
     "Durată 12 luni, cu preaviz de 60 de zile. Prețul se poate indexa cu salariul minim.",
-    { size: 10.5, color: soft, gapAfter: 22 }
-  );
-
-  // Closing block, drawn directly. write() re-checks the bottom margin on every
-  // line, which orphans the fine print onto a second page when the block starts
-  // near the foot. Reserve once against a tighter foot margin, then draw both
-  // lines unconditionally so signatures and disclaimer always stay together.
-  const CLOSING_HEIGHT = 34;
-  const FOOT_MARGIN = 44;
-  if (y - CLOSING_HEIGHT < FOOT_MARGIN) {
-    page = doc.addPage(A4);
-    y = A4[1] - 64;
+    9.5,
+    CONTENT_W
+  )) {
+    page.drawText(line, { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 });
+    y -= 13;
   }
-  page.drawText("Prestator: ____________________          Beneficiar: ____________________", {
-    x: MARGIN,
-    y,
-    size: 10.5,
-    font: regular,
-    color: ink,
+  y -= 16;
+
+  // ---- Signatures, drawn as one block ------------------------------------
+  breakPage(70);
+  const colB = MARGIN + CONTENT_W / 2 + 8;
+  const sigColW = CONTENT_W / 2 - 12;
+  rule(page, y, COLORS.ink, 1, MARGIN, MARGIN + sigColW);
+  rule(page, y, COLORS.ink, 1, colB, colB + sigColW);
+  y -= 14;
+  drawMicroLabel(page, fonts.semibold, "Prestator", MARGIN, y);
+  drawMicroLabel(page, fonts.semibold, "Beneficiar", colB, y);
+  y -= 14;
+  page.drawText(data.representative ?? data.orgName, {
+    x: MARGIN, y, size: 10, font: fonts.text, color: COLORS.ink,
   });
-  y -= 22;
-  page.drawText(
-    "Prezentul document este o ofertă comercială și nu constituie factură fiscală.",
-    { x: MARGIN, y, size: 8.5, font: regular, color: soft }
+  page.drawText(data.clientName, { x: colB, y, size: 10, font: fonts.text, color: COLORS.ink });
+  y -= 20;
+  page.drawText("Semnătura și data", { x: MARGIN, y, size: 8.5, font: fonts.text, color: COLORS.ink3 });
+  page.drawText("Semnătura și data", { x: colB, y, size: 8.5, font: fonts.text, color: COLORS.ink3 });
+
+  pages.forEach((p, i) =>
+    drawDocFooter(
+      p,
+      fonts,
+      "Prezentul document este o ofertă comercială și nu constituie factură fiscală.",
+      i + 1,
+      pages.length
+    )
   );
 
   return doc.save();

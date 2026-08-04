@@ -43,6 +43,63 @@ export default async function SettingsPage() {
             className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
           />
         </label>
+
+        <h2 className="pt-2 text-sm font-semibold">Document identity</h2>
+        <p className="-mt-1 text-xs text-ink-faint">
+          Printed in the header and signature blocks of the proces-verbal and the ofertă.
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block text-sm">
+            <span className="text-ink-soft">Address</span>
+            <input
+              name="address"
+              defaultValue={settings.address ?? ""}
+              placeholder="Str. …, Giroc, jud. Timiș"
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">Nr. Reg. Com.</span>
+            <input
+              name="regCom"
+              defaultValue={settings.regCom ?? ""}
+              placeholder="J35/0000/2026"
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">Email</span>
+            <input
+              name="email"
+              defaultValue={settings.email ?? ""}
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">Phone</span>
+            <input
+              name="phone"
+              defaultValue={settings.phone ?? ""}
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">IBAN (payment line on documents)</span>
+            <input
+              name="iban"
+              defaultValue={settings.iban ?? ""}
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">Representative (signs as prestator)</span>
+            <input
+              name="representative"
+              defaultValue={settings.representative ?? ""}
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+        </div>
         <label className="flex items-center justify-between py-1 text-sm">
           <span className="text-ink-soft">
             Registered for VAT
@@ -54,7 +111,7 @@ export default async function SettingsPage() {
             type="checkbox"
             name="vatRegistered"
             defaultChecked={settings.vatRegistered === true}
-            className="h-5 w-5 shrink-0 accent-[#2c523c]"
+            className="h-5 w-5 shrink-0 accent-[#1F4A37]"
           />
         </label>
 

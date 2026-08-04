@@ -21,9 +21,27 @@ export async function listProtocolsForBuilding(
     .orderBy(desc(schema.protocols.month));
 }
 
+/**
+ * Sequential document number per org. A regenerated protocol keeps its number;
+ * a new building+month takes max+1.
+ */
+export async function nextProtocolNumber(
+  orgId: string,
+  buildingId: string,
+  month: string
+): Promise<number> {
+  const all = await getDb()
+    .select()
+    .from(schema.protocols)
+    .where(eq(schema.protocols.orgId, orgId));
+  const existing = all.find((p) => p.buildingId === buildingId && p.month === month);
+  if (existing?.number) return existing.number;
+  return Math.max(0, ...all.map((p) => p.number ?? 0)) + 1;
+}
+
 export async function upsertProtocol(
   orgId: string,
-  data: { buildingId: string; month: string; pdfFileKey: string }
+  data: { buildingId: string; month: string; pdfFileKey: string; number?: number }
 ): Promise<Protocol> {
   const db = getDb();
   const existing = await db
@@ -39,9 +57,13 @@ export async function upsertProtocol(
   if (existing[0]) {
     await db
       .update(schema.protocols)
-      .set({ pdfFileKey: data.pdfFileKey, generatedAt: Date.now() })
+      .set({
+        pdfFileKey: data.pdfFileKey,
+        generatedAt: Date.now(),
+        number: data.number ?? existing[0].number,
+      })
       .where(eq(schema.protocols.id, existing[0].id));
-    return { ...existing[0], pdfFileKey: data.pdfFileKey };
+    return { ...existing[0], pdfFileKey: data.pdfFileKey, number: data.number ?? existing[0].number };
   }
   const rows = await db
     .insert(schema.protocols)

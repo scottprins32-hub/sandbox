@@ -117,7 +117,7 @@ export default async function NewVisitPage() {
         </label>
 
         <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="openOffer" className="h-4 w-4 accent-[#2c523c]" />
+          <input type="checkbox" name="openOffer" className="h-4 w-4 accent-[#1F4A37]" />
           <span className="text-ink-soft">
             Open offer: let cleaners claim it in the Portal (you confirm the claim)
           </span>

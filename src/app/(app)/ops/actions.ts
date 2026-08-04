@@ -370,6 +370,12 @@ export async function updateSettingsAction(formData: FormData) {
       Math.round(Number(formData.get("platformFeeLei") ?? 0) * 100) || undefined,
     vatRegistered: formData.get("vatRegistered") === "on",
     contactLine: String(formData.get("contactLine") ?? "").trim() || undefined,
+    address: String(formData.get("address") ?? "").trim() || undefined,
+    regCom: String(formData.get("regCom") ?? "").trim() || undefined,
+    email: String(formData.get("email") ?? "").trim() || undefined,
+    phone: String(formData.get("phone") ?? "").trim() || undefined,
+    iban: String(formData.get("iban") ?? "").trim() || undefined,
+    representative: String(formData.get("representative") ?? "").trim() || undefined,
   });
   revalidatePath("/ops/settings");
 }

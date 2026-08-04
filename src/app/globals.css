@@ -6,21 +6,22 @@
   never decoration.
 */
 @theme {
-  --color-paper: #f6f5f1;
-  --color-surface: #fefefd;
-  --color-ink: #21201c;
-  --color-ink-soft: #57554e;
-  --color-ink-faint: #8b887e;
-  --color-line: #e3e1d8;
-  --color-line-strong: #cfccc0;
-  --color-moss: #3d6b50;
-  --color-moss-deep: #2c523c;
-  --color-moss-wash: #e9f0ea;
-  --color-ok: #3d6b50;
-  --color-warn: #a1720e;
-  --color-warn-wash: #f7edd6;
-  --color-danger: #a8443c;
-  --color-danger-wash: #f6e4e1;
+  /* Aligned to the approved Scara document design system (theme.ts). */
+  --color-paper: #f7f5f0;
+  --color-surface: #fffefb;
+  --color-ink: #1e1b15;
+  --color-ink-soft: #6b665a;
+  --color-ink-faint: #9a9488;
+  --color-line: #e2ded4;
+  --color-line-strong: #cfc9bb;
+  --color-moss: #2e6b4f;
+  --color-moss-deep: #1f4a37;
+  --color-moss-wash: #eef4f0;
+  --color-ok: #2e6b4f;
+  --color-warn: #7c5a17;
+  --color-warn-wash: #f7efdd;
+  --color-danger: #9c3b25;
+  --color-danger-wash: #f6e7e2;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;

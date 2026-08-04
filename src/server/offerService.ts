@@ -72,6 +72,13 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
     cui: org.cui,
     vatRegistered: settings.vatRegistered === true,
     contactLine: typeof settings.contactLine === "string" ? settings.contactLine : "",
+    identity: {
+      regCom: settings.regCom,
+      address: settings.address,
+      email: settings.email,
+      phone: settings.phone,
+    },
+    representative: settings.representative,
     clientName: req.clientName,
     buildingLabel: req.buildingLabel,
     address: req.address ?? "",
@@ -132,17 +139,49 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
  */
 export async function renderSampleProtocol(): Promise<Uint8Array> {
   const org = await getCurrentOrg();
+  const { getOrgSettings } = await import("./repo/settings");
+  const settings = await getOrgSettings(org.id);
+  const monthKey = todayYmd().slice(0, 7);
+  const mm = monthKey.slice(5, 7);
+  const yyyy = monthKey.slice(0, 4);
+  // Obviously-specimen content: placeholder names, plausible record shape.
   return renderProtocolPdf({
-    orgName: org.name,
-    cui: org.cui,
+    org: {
+      name: org.name,
+      cui: org.cui,
+      regCom: settings.regCom,
+      address: settings.address,
+      email: settings.email,
+      phone: settings.phone,
+    },
+    representative: settings.representative,
     clientName: "Asociația de proprietari (exemplu)",
     buildingLabel: "Bloc exemplu, scara 1",
     address: "Giroc, Timiș",
-    monthKey: todayYmd().slice(0, 7),
+    monthKey,
     scheduled: 9,
-    done: 9,
+    done: 8,
+    missed: 1,
     visitsPerWeek: 2,
     photoCount: 24,
+    visits: [
+      { date: `02.${mm}.${yyyy}`, interval: "07:00 - 08:30", operator: "Exemplu I.", photoCount: 3, status: "efectuata" },
+      { date: `06.${mm}.${yyyy}`, interval: "07:05 - 08:25", operator: "Exemplu I.", photoCount: 3, status: "efectuata" },
+      { date: `09.${mm}.${yyyy}`, interval: "07:00 - 08:40", operator: "Exemplu V.", photoCount: 4, status: "efectuata" },
+      { date: `13.${mm}.${yyyy}`, interval: "07:10 - 08:30", operator: "Exemplu I.", photoCount: 3, status: "efectuata" },
+      { date: `16.${mm}.${yyyy}`, interval: null, operator: null, photoCount: 0, status: "ratata" },
+      { date: `17.${mm}.${yyyy}`, interval: "07:00 - 08:55", operator: "Exemplu I.", photoCount: 4, status: "efectuata" },
+      { date: `20.${mm}.${yyyy}`, interval: "07:00 - 08:20", operator: "Exemplu V.", photoCount: 3, status: "efectuata" },
+      { date: `24.${mm}.${yyyy}`, interval: "07:00 - 08:30", operator: "Exemplu I.", photoCount: 2, status: "efectuata" },
+      { date: `30.${mm}.${yyyy}`, interval: "07:00 - 08:30", operator: "Exemplu I.", photoCount: 2, status: "efectuata" },
+    ],
+    activities: DEFAULT_SCOPE,
+    observations: [
+      `Vizita din 16.${mm}.${yyyy} nu a fost efectuată din cauza accesului blocat; a fost recuperată pe 17.${mm}.${yyyy}, cu acordul președintelui asociației.`,
+    ],
+    priceBani: 1250_00,
+    vatRegistered: settings.vatRegistered === true,
+    iban: settings.iban,
     issuesResolved: 1,
     sample: true,
   });

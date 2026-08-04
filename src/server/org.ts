@@ -20,6 +20,14 @@ export interface OrgSettingsJson {
   vatRegistered?: boolean;
   /** Phone/email printed on the ofertă. */
   contactLine?: string;
+  // Document identity (design-system header + signature blocks).
+  address?: string;
+  regCom?: string; // J35/0000/2026
+  email?: string;
+  phone?: string;
+  iban?: string;
+  /** Who signs for the prestator, e.g. "Adina Pop". */
+  representative?: string;
   [key: string]: unknown;
 }
 

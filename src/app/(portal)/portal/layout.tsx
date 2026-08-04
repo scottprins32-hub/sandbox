@@ -18,7 +18,7 @@ export default async function PortalShell({ children }: { children: React.ReactN
               <path
                 d="M8 24h6v-5h5v-5h5V9"
                 fill="none"
-                stroke="#f6f5f1"
+                stroke="#F7F5F0"
                 strokeWidth="2.6"
                 strokeLinecap="round"
                 strokeLinejoin="round"

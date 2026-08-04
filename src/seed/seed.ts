@@ -78,7 +78,20 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     .values({ name: "Scara Demo SRL", cui: "CUI RO00000000", localeDefault: "en" })
     .returning();
   const orgId = org!.id;
-  await db.insert(schema.orgSettings).values({ orgId, json: "{}" });
+  // Demo document identity (obviously placeholder values), so generated
+  // proces-verbal and ofertă PDFs render the full design-system header.
+  await db.insert(schema.orgSettings).values({
+    orgId,
+    json: JSON.stringify({
+      address: "Giroc, jud. Timiș",
+      regCom: "J35/0000/2026",
+      email: "salut@scara.ro",
+      phone: "0756 000 000",
+      iban: "RO00 XXXX 0000 0000 0000 0000",
+      representative: "Adina Pop",
+      contactLine: "0756 000 000 · salut@scara.ro",
+    }),
+  });
 
   // Users
   const [, , ioanaUser, vasileUser] = await db

@@ -107,7 +107,7 @@ export function BuildingForm({
                 type="checkbox"
                 name={f.name}
                 defaultChecked={f.on ?? false}
-                className="h-4 w-4 accent-[#2c523c]"
+                className="h-4 w-4 accent-[#1F4A37]"
               />
               <span>{f.label}</span>
             </label>

@@ -420,7 +420,7 @@ export function Simulator() {
             type="checkbox"
             checked={state.vatRegistered}
             onChange={(e) => set("vatRegistered", e.target.checked)}
-            className="h-5 w-5 accent-[#2c523c]"
+            className="h-5 w-5 accent-[#1F4A37]"
           />
         </label>
         {state.vatRegistered && (

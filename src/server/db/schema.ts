@@ -285,6 +285,8 @@ export const protocols = sqliteTable(
     id: id(),
     orgId: orgId(),
     buildingId: text("building_id").notNull(),
+    /** Sequential document number per org ("Nr. 47"). Additive column. */
+    number: integer("number"),
     month: text("month").notNull(), // YYYY-MM
     pdfFileKey: text("pdf_file_key").notNull(),
     generatedAt: integer("generated_at").notNull(),
