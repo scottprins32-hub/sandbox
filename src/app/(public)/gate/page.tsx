@@ -7,6 +7,7 @@
 import type { Metadata } from "next";
 import { en } from "@/lib/i18n/en";
 import { submitPasscodeAction } from "./actions";
+import { SubmitButton } from "./SubmitButton";
 
 export const metadata: Metadata = { title: "Scara" };
 
@@ -36,13 +37,12 @@ export default async function GatePage({
           aria-invalid={wrong ? true : undefined}
           className="rounded-lg border border-line bg-surface px-4 py-3 text-base outline-none focus:border-moss"
         />
-        {wrong && <p className="text-sm text-danger">{en.gate.wrong}</p>}
-        <button
-          type="submit"
-          className="rounded-lg bg-moss-deep px-4 py-3 font-medium text-paper"
-        >
-          {en.gate.submit}
-        </button>
+        {wrong && (
+          <p role="alert" className="text-sm text-danger">
+            {en.gate.wrong}
+          </p>
+        )}
+        <SubmitButton />
       </form>
     </main>
   );
