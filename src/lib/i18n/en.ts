@@ -25,6 +25,7 @@ export const en = {
     atlas: "Atlas",
     ops: "Ops",
     compliance: "Obligations",
+    services: "Services",
     portal: "Portal",
     settings: "Settings",
   },

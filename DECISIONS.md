@@ -139,6 +139,30 @@ to carry live here too.
   obligation, labelled as informational statutory maximums (§2.6), never a
   prediction.
 
+## Growth add-on (add-on 2)
+
+- **2026-08-04 — The base package takes 109 minutes a visit, not 90.** The task
+  catalogue's every-visit tasks for a standard 3-floor walk-up (no lift) sum to
+  109 minutes — **21% above the 1.5 h the finance module prices on**, just
+  outside the 20% band the add-on set as its alarm. The catalogue is the
+  audited data, so the number stands and the test prints it loudly on every
+  run. This is a real decision for the founders, not a rounding error: either
+  trim the base package, or raise `hoursPerVisit`, which raises labour cost and
+  therefore the price floor (labour is derived, not assumed — see the §5.2
+  note). Nothing was silently adjusted to make the assumption hold.
+- **2026-08-04 — `uniqueVsMarket()` returns 23 tasks, not "roughly a dozen".**
+  The add-on's §5 predicts about twelve; applying its own rule
+  (`competitorCoverage <= 2`) to its own audit tables yields 23. The data wins
+  over the summary, as with the 24-vs-26 obligations count. Every task §5 names
+  is present except lift doors on each floor, which the audit itself puts at 3
+  firms, above the threshold. The offer lists all 23 — a longer list of things
+  no competitor publishes is a stronger section, not a weaker one.
+- **2026-08-04 — `appliesIf` added to the task type.** The add-on's type block
+  omits it but its own lift table says "appliesIf the building has one" and
+  `tasksForPackage(buildingFlags)` must filter by has_lift / has_basement /
+  has_green. Four values: `has_lift`, `has_basement`, `has_green`,
+  `has_parking`.
+
 ## Fixes
 
 - **2026-08-04 — The admin app is English again.** The compliance add-on was

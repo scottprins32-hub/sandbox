@@ -39,6 +39,7 @@ const NAV = [
   { href: "/atlas", label: en.nav.atlas },
   { href: "/ops", label: en.nav.ops },
   { href: "/compliance", label: en.nav.compliance },
+  { href: "/services", label: en.nav.services },
   { href: "/portal", label: en.nav.portal },
 ];
 
