@@ -23,8 +23,11 @@
   --color-danger: #9c3b25;
   --color-danger-wash: #f6e7e2;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  /* Instrument Sans (text) + Space Grotesk (display), loaded via
+     next/font/local in src/app/fonts.ts — same faces the PDFs embed. */
+  --font-sans: var(--font-instrument), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-sans);
 
   --shadow-card: 0 1px 2px rgb(33 32 28 / 0.05), 0 0 0 1px rgb(33 32 28 / 0.04);
 }
@@ -41,10 +44,19 @@ html {
   font-variant-numeric: tabular-nums;
 }
 
-/* Editorial display face for the public page. */
+/* Display face (Space Grotesk) for headlines and big numbers. */
 .font-display {
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  letter-spacing: -0.015em;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Letter-spaced uppercase micro-label, the section marker of the system. */
+.micro {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
 }
 
 /* Native range inputs, styled quietly (the Simulator lives on these). */

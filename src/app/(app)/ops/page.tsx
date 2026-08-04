@@ -224,7 +224,7 @@ export default async function OpsToday({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-surface p-4 shadow-card">
               <p className="text-xs text-ink-faint">Contracted recurring</p>
-              <p className="tnum mt-1 text-xl font-semibold">
+              <p className="tnum font-display mt-1 text-xl font-bold">
                 {fmtLeiRound(recurringMonthly)} lei
               </p>
               <p className="text-xs text-ink-soft">
@@ -233,15 +233,15 @@ export default async function OpsToday({
             </div>
             <div className="rounded-xl bg-surface p-4 shadow-card">
               <p className="text-xs text-ink-faint">Turnover and one-off, done MTD</p>
-              <p className="tnum mt-1 text-xl font-semibold">{fmtLeiRound(turnoverDone)} lei</p>
+              <p className="tnum font-display mt-1 text-xl font-bold">{fmtLeiRound(turnoverDone)} lei</p>
             </div>
             <div className="rounded-xl bg-surface p-4 shadow-card">
               <p className="text-xs text-ink-faint">Expenses MTD</p>
-              <p className="tnum mt-1 text-xl font-semibold">{fmtLeiRound(expensesMtd)} lei</p>
+              <p className="tnum font-display mt-1 text-xl font-bold">{fmtLeiRound(expensesMtd)} lei</p>
             </div>
             <div className="rounded-xl bg-surface p-4 shadow-card">
               <p className="text-xs text-ink-faint">Unsigned protocols</p>
-              <p className="tnum mt-1 text-xl font-semibold">{unsigned}</p>
+              <p className="tnum font-display mt-1 text-xl font-bold">{unsigned}</p>
               <Link href="/ops/protocols" className="text-xs text-moss underline">
                 Protocols
               </Link>

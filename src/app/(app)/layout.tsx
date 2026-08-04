@@ -2,6 +2,7 @@ import "../globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { fontVars } from "../fonts";
 import { RoleSwitcher, type RoleOption } from "@/components/RoleSwitcher";
 import { en } from "@/lib/i18n/en";
 
@@ -52,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     process.env.NODE_ENV === "production" && !process.env.SCARA_PASSCODE;
 
   return (
-    <html lang="en">
+    <html lang="en" className={fontVars}>
       <body>
         {ungatedInProduction && (
           <div className="bg-danger px-4 py-2 text-center text-sm text-paper">

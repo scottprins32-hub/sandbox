@@ -58,7 +58,7 @@ function Tile({
   return (
     <div className="rounded-xl bg-surface p-4 shadow-card">
       <p className="text-xs text-ink-faint">{label}</p>
-      <p className="tnum mt-1 text-xl font-semibold leading-tight">{value}</p>
+      <p className="tnum font-display mt-1 text-xl font-bold leading-tight">{value}</p>
       {sub && <p className="tnum mt-0.5 text-xs text-ink-soft">{sub}</p>}
       {delta && <p className="tnum mt-0.5 text-xs text-ink-faint">{delta}</p>}
     </div>

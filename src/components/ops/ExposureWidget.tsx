@@ -20,7 +20,7 @@ export function ExposureWidget({
     <div className="rounded-xl bg-surface p-4 shadow-card">
       <p className="text-xs text-ink-faint">Expunere maximă neacoperită</p>
       <p
-        className={`tnum mt-1 text-2xl font-semibold ${clean ? "text-ok" : "text-ink"}`}
+        className={`tnum font-display mt-1 text-2xl font-bold ${clean ? "text-ok" : "text-ink"}`}
       >
         {fmtLeiRound(summary.totalBani)} lei
       </p>

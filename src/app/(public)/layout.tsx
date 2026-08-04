@@ -1,5 +1,6 @@
 import "../globals.css";
 import type { Metadata } from "next";
+import { fontVars } from "../fonts";
 
 export const metadata: Metadata = {
   title: "Scara · Curățenie cu dovadă",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro">
+    <html lang="ro" className={fontVars}>
       <body>{children}</body>
     </html>
   );

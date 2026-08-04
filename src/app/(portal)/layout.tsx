@@ -1,10 +1,11 @@
 import "../globals.css";
+import { fontVars } from "../fonts";
 
 // The cleaner portal is Romanian-first (§0 language rule) and phone-first: no
 // admin chrome, its own root so <html lang="ro">.
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro">
+    <html lang="ro" className={fontVars}>
       <body>{children}</body>
     </html>
   );
