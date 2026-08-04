@@ -150,6 +150,22 @@ to carry live here too.
   `labelEn`/`definitionEn` on the condition scale. `trendLabel` became
   `trendKey` returning a key, so the admin renders English and the annual
   report Romanian from one source.
+- **2026-08-04 — The catalogue's research notes are English too**, at the
+  founder's request, superseding the "keep the research prose Romanian" call
+  above. All 57 `fineNote` / `salesNote` / `needsVerification` / `sourceNote`
+  strings were translated. Citations, act names, fine ranges, dates and
+  deadlines are carried over verbatim, and every hedge kept its force
+  ("De confirmat" → "To be confirmed", "Surse contradictorii" → "Sources
+  conflict"). Verified mechanically (no number or citation lost against the
+  pre-translation file) and by three independent reviewers, which caught three
+  real errors: "la maximum 3 ani" had become "at most every 3 years", reversing
+  a mandatory maximum interval into a permissive frequency cap; `proces-verbal`
+  had become "protocol", which in English reads as a procedure rather than the
+  signed record of work done; and `buletin` had become "certificate",
+  overstating what an emergency-lighting test produces. All three are fixed.
+  The notes are admin-only — the type now says so, because piping them into a
+  Romanian client document would print English at a client.
+
 - **2026-08-04 — Four kinds of Romanian deliberately stay in the admin.**
   (1) Data written by people — a tenant's issue, a cleaner's finding, a
   contractor's name — is real content, not UI, and translating it would

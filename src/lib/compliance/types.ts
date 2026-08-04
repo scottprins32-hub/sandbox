@@ -47,7 +47,12 @@ export type Obligation = {
   typicalCostMinBani?: number; // market cost to comply
   typicalCostMaxBani?: number;
   appliesIf?: AppliesIf;
-  salesNote?: string; // one line for the offer document
+  /**
+   * The research notes below are English: they are read in the admin app, not
+   * printed. Anything that reaches a client document needs a Romanian
+   * counterpart first — do not pipe these straight into a PDF.
+   */
+  salesNote?: string; // the angle to take when selling this obligation
   needsVerification?: string; // preserve research uncertainty honestly
   sourceNote: string; // where the number came from
 };

@@ -261,7 +261,7 @@ export default async function OpsCompliancePage({
                   >
                     <label className="text-xs">
                       <span className="block text-ink-faint">
-                        Certificate or protocol (PDF or photo)
+                        Certificate or service record (PDF or photo)
                       </span>
                       <input
                         type="file"

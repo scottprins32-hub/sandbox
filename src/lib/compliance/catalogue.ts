@@ -45,10 +45,10 @@ export const OBLIGATIONS: Obligation[] = [
     typicalCostMaxBani: 450_00,
     appliesIf: "always",
     salesNote:
-      "Coordonăm și programăm; execuția este făcută de firmă atestată DSP. Primiți procesul-verbal și fișele de securitate la dosar.",
+      "We coordinate and schedule it; the work itself is done by a DSP-accredited firm. You get the signed service record (proces-verbal) and the safety data sheets on file.",
     needsVerification: DDD_VERIFICATION,
     sourceNote:
-      "Ordin ANRSC 97/2025 art. 94(1)(c) prevede 3 intervenții pe an la nivel național; HCL Timișoara 393/2023 art. 68(2)(a) cere trimestrial. Cadența înregistrată este cea trimestrială, mai strictă. Cost de piață 300-450 lei pe intervenție.",
+      "Ordin ANRSC 97/2025 art. 94(1)(c) provides for 3 treatments a year nationally; HCL Timișoara 393/2023 art. 68(2)(a) requires quarterly. The cadence recorded here is the quarterly one, the stricter of the two. Market cost 300-450 lei per treatment.",
   },
   {
     key: "ddd_deratizare",
@@ -67,7 +67,7 @@ export const OBLIGATIONS: Obligation[] = [
     appliesIf: "always",
     needsVerification: DDD_VERIFICATION,
     sourceNote:
-      "Ordin ANRSC 97/2025 art. 95(b) și HCL 393/2023 art. 69(a). Cost de piață identic cu dezinsecția, 300-450 lei pe intervenție.",
+      "Ordin ANRSC 97/2025 art. 95(b) and HCL 393/2023 art. 69(a). Market cost identical to insect control, 300-450 lei per treatment.",
   },
   {
     key: "ddd_dezinfectie",
@@ -86,7 +86,7 @@ export const OBLIGATIONS: Obligation[] = [
     appliesIf: "always",
     needsVerification: DDD_VERIFICATION,
     sourceNote:
-      "Ordin ANRSC 97/2025 art. 96. Cost de piață identic cu celelalte intervenții DDD, 300-450 lei.",
+      "Ordin ANRSC 97/2025 art. 96. Market cost identical to the other pest-control treatments, 300-450 lei.",
   },
 
   // ------------------------------------------------------- Fire safety (6)
@@ -101,14 +101,14 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: 5000_00,
     fineMaxBani: 25000_00,
-    fineNote: "Aplicată de ISU.",
+    fineNote: "Applied by ISU.",
     typicalCostMinBani: 200_00,
     typicalCostMaxBani: 500_00,
     appliesIf: "always",
     salesNote:
-      "Test de 200-500 lei care acoperă o expunere de până la 25.000 lei. Îl programăm, asistăm și arhivăm buletinul.",
+      "A 200-500 lei test covering an exposure of up to 25,000 lei. We schedule it, attend it and file the test report.",
     sourceNote:
-      "Normativ P118-3. Banda de amendă ISU 5.000-25.000 lei și costul de piață 200-500 lei provin din cercetare.",
+      "Normativ P118-3. The ISU fine range of 5,000-25,000 lei and the market cost of 200-500 lei both come from the research.",
   },
   {
     key: "psi_stingatoare",
@@ -122,10 +122,10 @@ export const OBLIGATIONS: Obligation[] = [
     fineMinBani: null,
     fineMaxBani: null,
     fineNote:
-      "Sancțiuni conform Legii 307/2006; textul citat nu prevede o bandă distinctă. Reîncărcarea se face la maximum 3 ani.",
+      "Penalties under Legea 307/2006; the cited text gives no distinct range. Recharging at intervals of no more than 3 years.",
     appliesIf: "always",
     sourceNote:
-      "OMAI 138/2015 art. 11 și art. 13: verificare anuală, reîncărcare la maximum 3 ani. Sancțiuni conform Legii 307/2006.",
+      "OMAI 138/2015 art. 11 and art. 13: annual inspection, recharging at intervals of no more than 3 years. Penalties under Legea 307/2006.",
   },
   {
     key: "psi_hidranti",
@@ -138,12 +138,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Sancțiuni conform Legii 307/2006.",
+    fineNote: "Penalties under Legea 307/2006.",
     appliesIf: "always",
     needsVerification:
-      "Cadența semestrială provine din practica de piață, nu dintr-un text normativ identificat. De confirmat.",
+      "The six-month cadence comes from market practice, not from an identified statutory text. To be confirmed.",
     sourceNote:
-      "Frecvența la 6 luni este practică de piață, consemnată ca atare în cercetare. Sancțiuni conform Legii 307/2006.",
+      "The 6-month frequency is market practice, recorded as such in the research. Penalties under Legea 307/2006.",
   },
   {
     key: "psi_control_periodic",
@@ -156,12 +156,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "us",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Administratorul este expus personal.",
+    fineNote: "The administrator is personally exposed.",
     appliesIf: "always",
     salesNote:
-      "Observăm și raportăm trimestrial în scris către președinte, exact cum cere legea de la administrator.",
+      "We observe and report in writing to the president every quarter, exactly as the law requires of the administrator.",
     sourceNote:
-      "Legea 196/2018 art. 66(1)(p). Obligație de observare și raportare, fără autorizare specială.",
+      "Legea 196/2018 art. 66(1)(p). An observation and reporting duty, with no special authorisation needed.",
   },
   {
     key: "psi_registru_control",
@@ -174,9 +174,9 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "us",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Sancțiuni conform Legii 307/2006.",
+    fineNote: "Penalties under Legea 307/2006.",
     appliesIf: "always",
-    sourceNote: "OMAI 163/2007 art. 142. Obligație de ținere a registrului, stare continuă.",
+    sourceNote: "OMAI 163/2007 art. 142. A duty to keep the register; an ongoing state.",
   },
   {
     key: "psi_cai_evacuare",
@@ -190,10 +190,10 @@ export const OBLIGATIONS: Obligation[] = [
     fineMinBani: 5000_00,
     fineMaxBani: 20000_00,
     fineNote:
-      "5.000-10.000 lei pentru blocarea căilor de evacuare; 10.000-20.000 lei pentru uși de evacuare încuiate.",
+      "5,000-10,000 lei for blocking escape routes; 10,000-20,000 lei for locked escape doors.",
     appliesIf: "always",
     sourceNote:
-      "Legea 196/2018 art. 66(1)(p) și OMAI 163/2007. Două benzi distincte de amendă: blocare 5.000-10.000 lei, uși încuiate 10.000-20.000 lei.",
+      "Legea 196/2018 art. 66(1)(p) and OMAI 163/2007. Two distinct fine ranges: blocking 5,000-10,000 lei, locked doors 10,000-20,000 lei.",
   },
 
   // -------------------------------------------------------------- Gas (3)
@@ -208,14 +208,14 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: 2000_00,
     fineMaxBani: 25000_00,
-    fineNote: "Plus sistarea furnizării.",
+    fineNote: "Plus suspension of supply.",
     typicalCostMinBani: 150_00,
     typicalCostMaxBani: 250_00,
     appliesIf: "has_gas",
     salesNote:
-      "Blocajul real nu e tehnicianul, ci faptul că nimeni nu e acasă. Noi programăm, deschidem și însoțim.",
+      "The real bottleneck is not the technician, it is that nobody is home. We schedule it, open up and escort.",
     sourceNote:
-      "ANRE Ordin 179/2015. Amendă 2.000-25.000 lei plus sistarea furnizării; cost de piață 150-250 lei pe apartament.",
+      "ANRE Ordin 179/2015. Fine 2,000-25,000 lei plus suspension of supply; market cost 150-250 lei per apartment.",
   },
   {
     key: "gaz_revizie",
@@ -228,12 +228,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: 2000_00,
     fineMaxBani: 25000_00,
-    fineNote: "Plus sistarea furnizării.",
+    fineNote: "Plus suspension of supply.",
     typicalCostMinBani: 200_00,
     typicalCostMaxBani: 600_00,
     appliesIf: "has_gas",
     sourceNote:
-      "ANRE Ordin 179/2015, la 10 ani. Aceeași bandă de amendă ca verificarea; cost de piață 200-600 lei.",
+      "ANRE Ordin 179/2015, every 10 years. The same fine range as the check; market cost 200-600 lei.",
   },
   {
     key: "cos_fum",
@@ -246,10 +246,10 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Sancțiuni conform HG 537/2007.",
+    fineNote: "Penalties under HG 537/2007.",
     appliesIf: "has_gas",
     sourceNote:
-      "Doar 142 firme autorizate de coșerit la nivel național; unele județe nu au niciuna.",
+      "Only 142 authorised chimney-sweep firms nationally; some counties have none at all.",
   },
 
   // -------------------------------------------------------- Structure (3)
@@ -267,14 +267,14 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "qualified_signatory",
     fineMinBani: 5000_00,
     fineMaxBani: 10000_00,
-    fineNote: "Legea 10/1995 art. 36.II.h, aplicată de ISC.",
+    fineNote: "Legea 10/1995 art. 36.II.h, applied by ISC.",
     appliesIf: "always",
     salesNote:
-      "Obligație anuală pe toată durata de existență a clădirii. Normativul P130 a fost rescris în iunie 2025 și încurajează explicit documentarea foto. Aproape nicio asociație nu o îndeplinește.",
+      "An annual obligation for the whole life of the building. Normativ P130 was rewritten in June 2025 and explicitly encourages photographic documentation. Almost no association complies with it.",
     needsVerification:
-      "Textul P130-2025 nu a fost obținut integral. Frecvența, calificarea semnatarului și formatul raportului se confirmă înainte de vânzare.",
+      "The full text of P130-2025 was not obtained. The frequency, the signatory's qualification and the report format must be confirmed before selling this.",
     sourceNote:
-      "Legea 10/1995 art. 27 și Normativ P130-2025 (Ordin MDLPA 770/2025, publicat 19 iunie 2025). Amenda 5.000-10.000 lei se aplică de ISC conform art. 36.II.h.",
+      "Legea 10/1995 art. 27 and Normativ P130-2025 (Ordin MDLPA 770/2025, published 19 June 2025). The 5,000-10,000 lei fine is applied by ISC under art. 36.II.h.",
   },
   {
     key: "carte_tehnica",
@@ -292,9 +292,9 @@ export const OBLIGATIONS: Obligation[] = [
     fineMinBani: 5000_00,
     fineMaxBani: 10000_00,
     appliesIf: "always",
-    salesNote: "Dacă lipsește, Legea 196/2018 art. 8 obligă asociația să o reconstituie.",
+    salesNote: "If it is missing, Legea 196/2018 art. 8 obliges the association to reconstruct it.",
     sourceNote:
-      "Legea 10/1995 art. 27(b) și art. 36.II.g; obligația de reconstituire vine din Legea 196/2018 art. 8.",
+      "Legea 10/1995 art. 27(b) and art. 36.II.g; the duty to reconstruct comes from Legea 196/2018 art. 8.",
   },
   {
     key: "subsol_apa",
@@ -309,7 +309,7 @@ export const OBLIGATIONS: Obligation[] = [
     fineMaxBani: 5000_00,
     appliesIf: "has_basement",
     sourceNote:
-      "HG 857/2011 art. 12(b). Se aplică imobilelor cu subsol; amendă 2.500-5.000 lei.",
+      "HG 857/2011 art. 12(b). Applies to buildings with a basement; fine 2,500-5,000 lei.",
   },
 
   // ------------------------------------------ Waste and local sanitation (6)
@@ -331,9 +331,9 @@ export const OBLIGATIONS: Obligation[] = [
     fineMaxBani: 2500_00,
     appliesIf: "always",
     salesNote:
-      "Poliția Locală Timișoara a aplicat 158 de sancțiuni asociațiilor în 2026, peste 172.000 lei, inclusiv 2.500 lei exact pentru acest motiv. La Giroc, asociații au fost sancționate în aprilie 2026.",
+      "Poliția Locală Timișoara issued 158 penalties to associations in 2026, over 172,000 lei, including 2,500 lei for exactly this. In Giroc, associations were penalised in April 2026.",
     sourceNote:
-      "HCL Timișoara 117/2024 art. 1(1)(j),(k), HCL 393/2023 art. 82 și HCL Giroc 166/2025. Se aplică în ambele piețe ale companiei.",
+      "HCL Timișoara 117/2024 art. 1(1)(j),(k), HCL 393/2023 art. 82 and HCL Giroc 166/2025. Applies in both of the company's markets.",
   },
   {
     key: "deseuri_sortare",
@@ -347,10 +347,10 @@ export const OBLIGATIONS: Obligation[] = [
     fineMinBani: 20000_00,
     fineMaxBani: 60000_00,
     fineNote:
-      "Persoane juridice. În plus, RETIM facturează dublul tarifului în luna cu sortare incorectă.",
+      "Legal entities. In addition, RETIM bills double the tariff for a month with incorrect sorting.",
     appliesIf: "always",
     sourceNote:
-      "OUG 92/2021 și Legea 101/2006 art. 28¹⁴(5). Banda 20.000-60.000 lei este pentru persoane juridice; penalizarea RETIM de dublare a tarifului este contractuală.",
+      "OUG 92/2021 and Legea 101/2006 art. 28¹⁴(5). The 20,000-60,000 lei range is for legal entities; RETIM's tariff-doubling penalty is contractual.",
   },
   {
     key: "trotuar_curatenie",
@@ -365,9 +365,9 @@ export const OBLIGATIONS: Obligation[] = [
     fineMaxBani: 2500_00,
     appliesIf: "always",
     salesNote:
-      "Obligație națională nouă, introdusă prin Ordinul ANRSC 97/2025. Multe asociații nu o cunosc încă.",
+      "A new national obligation, introduced by Ordin ANRSC 97/2025. Many associations are not yet aware of it.",
     sourceNote:
-      "Ordin ANRSC 97/2025 art. 106(p). Consemnată în cercetare ca obligație națională nouă.",
+      "Ordin ANRSC 97/2025 art. 106(p). Recorded in the research as a new national obligation.",
   },
   {
     key: "zapada_gheata",
@@ -380,12 +380,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "us",
     fineMinBani: 1500_00,
     fineMaxBani: 2500_00,
-    fineNote: "Persoane juridice.",
+    fineNote: "Legal entities.",
     appliesIf: "always",
     needsVerification:
-      "Anexa adoptată a HCL 117/2024 și anexa HCL Giroc 166/2025 nu au fost obținute integral; benzile de amendă pentru persoane fizice vs juridice diferă între surse.",
+      "The adopted annex to HCL 117/2024 and the annex to HCL Giroc 166/2025 were not obtained in full; the fine ranges for individuals versus legal entities differ between sources.",
     sourceNote:
-      "HCL 393/2023 art. 82(r) și HCL 117/2024 art. 1(1)(h),(i). Obligație declanșată de eveniment meteo, în practică în sezonul noiembrie-martie.",
+      "HCL 393/2023 art. 82(r) and HCL 117/2024 art. 1(1)(h),(i). Triggered by a weather event, in practice during the November-March season.",
   },
   {
     key: "spatiu_verde",
@@ -400,7 +400,7 @@ export const OBLIGATIONS: Obligation[] = [
     fineMaxBani: 2500_00,
     appliesIf: "always",
     sourceNote:
-      "HCL 117/2024 art. 9(1)(d),(e),(o). Sezon de întreținere aprilie-octombrie.",
+      "HCL 117/2024 art. 9(1)(d),(e),(o). Maintenance season April-October.",
   },
   {
     key: "fatada_siguranta",
@@ -413,10 +413,10 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "us",
     fineMinBani: 1500_00,
     fineMaxBani: 2500_00,
-    fineNote: "Caz real consemnat: 4.000 lei.",
+    fineNote: "A real case on record: 4,000 lei.",
     appliesIf: "always",
     sourceNote:
-      "HCL 117/2024 art. 1(1)(a),(d). Banda uzuală 1.500-2.500 lei; cercetarea a consemnat un caz real de 4.000 lei.",
+      "HCL 117/2024 art. 1(1)(a),(d). The usual range is 1,500-2,500 lei; the research recorded a real case of 4,000 lei.",
   },
 
   // ------------------------------------------------ Conditional obligations (5)
@@ -431,12 +431,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: 2000_00,
     fineMaxBani: 15000_00,
-    fineNote: "Separat, lipsa operatorului RSVTI se sancționează cu 30.000-40.000 lei.",
+    fineNote: "Separately, having no RSVTI operator carries a 30,000-40,000 lei penalty.",
     appliesIf: "has_lift",
     needsVerification:
-      "Surse contradictorii: verificare la 2 ani vs revizie generală anuală. Se confirmă cu ISCIR Timiș.",
+      "Sources conflict: a check every 2 years versus an annual general overhaul. To be confirmed with ISCIR Timiș.",
     sourceNote:
-      "Legea 64/2008 și PT R 2-2010. Executantul autorizat este dedus din cerința de atestare ISCIR.",
+      "Legea 64/2008 and PT R 2-2010. The authorised performer is inferred from the ISCIR accreditation requirement.",
   },
   {
     key: "lift_rsvti",
@@ -451,9 +451,9 @@ export const OBLIGATIONS: Obligation[] = [
     fineMaxBani: 40000_00,
     appliesIf: "has_lift",
     salesNote:
-      "Cea mai mare amendă unitară din tot calendarul. Verificăm dacă asociația are operator desemnat.",
+      "The largest single fine in the whole calendar. We check whether the association has a designated operator.",
     sourceNote:
-      "Legea 64/2008 art. 14-15. Operatorul RSVTI trebuie să fie atestat, deci nu poate fi personal Scara.",
+      "Legea 64/2008 art. 14-15. The RSVTI operator must be accredited, so it cannot be Scara staff.",
   },
   {
     key: "pram",
@@ -467,9 +467,9 @@ export const OBLIGATIONS: Obligation[] = [
     fineMinBani: null,
     fineMaxBani: null,
     appliesIf: "always",
-    needsVerification: "A se confirma dacă I7-2011 a fost înlocuit.",
+    needsVerification: "To be confirmed whether I7-2011 has been superseded.",
     sourceNote:
-      "Normativ I7-2011 și Ordin ANRE 45/2016. Măsurătoarea cere laborator autorizat, deci executant terț.",
+      "Normativ I7-2011 and Ordin ANRE 45/2016. The measurement requires an authorised laboratory, hence a third-party performer.",
   },
   {
     key: "loc_joaca",
@@ -482,10 +482,10 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "authorised_third_party",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Suspendarea utilizării și răspundere în caz de accident.",
+    fineNote: "Suspension of use, and liability in the event of an accident.",
     appliesIf: "has_playground",
     sourceNote:
-      "HG 435/2010 și SR EN 1176/1177. Inspecția principală anuală cere organism competent, deci executant terț.",
+      "HG 435/2010 and SR EN 1176/1177. The annual main inspection requires a competent body, hence a third-party performer.",
   },
   {
     key: "plumb_inventar",
@@ -498,12 +498,12 @@ export const OBLIGATIONS: Obligation[] = [
     performerRequirement: "us",
     fineMinBani: null,
     fineMaxBani: null,
-    fineNote: "Nespecificat în textul citat.",
+    fineNote: "Not specified in the cited text.",
     appliesIf: "always",
     needsVerification:
-      "Executantul nu este precizat în textul citat. Am consemnat 'us' pentru că este o activitate de inventariere și raportare, fără atestare cerută explicit. De confirmat.",
+      "The performer is not stated in the cited text. We recorded 'us' because this is an inventory and reporting activity with no accreditation explicitly required. To be confirmed.",
     sourceNote:
-      "OG 7/2023 art. 10(3), termen 31 decembrie 2027. Sancțiunea nu este specificată în textul consultat.",
+      "OG 7/2023 art. 10(3), deadline 31 December 2027. The penalty is not specified in the text consulted.",
   },
 ];
 
