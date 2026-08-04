@@ -76,8 +76,13 @@ to carry live here too.
   #F7F5F0, green #2E6B4F / deep #1F4A37, lines #E2DED4 / #CFC9BB, rust #9C3B25,
   amber #7C5A17; Instrument Sans (text) + Space Grotesk (display numbers).
   Documents implement the template in `src/server/pdf/theme.ts`; the web app's
-  CSS palette was aligned to the same values. The app UI keeps the system font
-  stack (hermetic builds); the design fonts ship inside the PDFs.
+  CSS palette was aligned to the same values.
+- **2026-08-04 — The website ships the design typefaces too** (superseding the
+  earlier system-font-stack note, at the founder's request). Instrument Sans
+  and Space Grotesk load via `next/font/local` from the same TTFs the PDFs
+  embed — still hermetic, no network fetch at build time. Space Grotesk
+  carries display headlines and the big stat numbers, matching the template's
+  stat boxes.
 - **2026-08-04 — Ligatures disabled in PDFs.** pdf-lib mis-advances
   multi-codepoint glyphs: every "fi" ("Verificat", "Beneficiarul") rendered
   broken with two independent Instrument Sans builds. `liga/rlig/calt` are
@@ -93,6 +98,46 @@ to carry live here too.
   fontkit parsing; the bundled TTFs come from the typeface's official 2.0.0
   release instead. Instrument Sans comes from fonts.gstatic.com statics (full
   Romanian diacritic coverage verified in the test suite's generated PDFs).
+
+## Compliance layer, phases 8-9
+
+- **2026-08-04 — Walk evidence is stamped server-side.** Every checkpoint scan
+  and finding gets the server's clock (§5: never trust client clocks). A
+  mutation replayed from the offline queue is stamped when it lands — the
+  honest time for a record that says "this reached us". Walk and finding ids
+  are client-generated so replays are idempotent, never duplicated.
+- **2026-08-04 — QR codes deep-link; in-app scanning is the phone camera.**
+  The printed code encodes `/portal/tur?c={code}`; the native camera opens it
+  and the app drops the cleaner into the right walk. No in-app camera-decode
+  library — the walk screen lists every checkpoint as a tappable row, which is
+  also the required camera-fails fallback, so hardware never blocks the record.
+- **2026-08-04 — The monthly document upgrades itself.** With control walks in
+  the month it renders as Raport lunar de control și întreținere (sections
+  1-5, photo annex, the §5 disclaimer footer); with none it stays the plain
+  proces-verbal, so buildings that only buy cleaning see no change. The photo
+  annex is capped at 40 photos to keep the file bounded; visits and walks
+  beyond the cap remain in the app.
+- **2026-08-04 — `annual_reports` table added.** The add-on's schema list has
+  no home for generated annual PDFs; the document shelf needs them per
+  building-year. Additive table (building_id, year, pdf_file_key), one row per
+  building-year, regeneration replaces the file.
+- **2026-08-04 — Certificate upload records execution when there is none.**
+  "Încarcă document" attaches the file to the obligation's most recent event.
+  With no history at all it records the execution too (a certificate in hand
+  is evidence the work happened) — that moves last-done and next-due exactly
+  like Marchează efectuat.
+- **2026-08-04 — Simulator attach rates model revenue only.** The three
+  recurring per-building lines (control walk, compliance calendar, green
+  space) carry no marginal cost model: the walk rides on a normal cleaning
+  visit and coordination time sits in overhead, and inventing a cost model the
+  research does not give would be false precision. The caption says so.
+  Per-apartment and per-job lines are excluded — their monthly value depends
+  on data the Simulator does not model.
+- **2026-08-04 — Offer exposure sums the whole applicable subset.** A prospect
+  has no compliance history in our system, so "Expunere maximă conform legii"
+  on the ofertă is the sum of statutory maximums for every applicable
+  obligation, labelled as informational statutory maximums (§2.6), never a
+  prediction.
 
 ## Build decisions
 
