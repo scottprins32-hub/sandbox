@@ -194,6 +194,51 @@ export function OfferBuilder({
           <TextField label="Offer valid (days)" name="validDays" type="number" defaultValue={30} />
         </div>
 
+        <h2 className="pt-2 text-sm font-semibold">Compliance sections (add-on)</h2>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="withCompliance" defaultChecked className="h-4 w-4 accent-[#1F4A37]" />
+          <span className="text-ink-soft">
+            Include the building&apos;s legal obligations, the statutory exposure sum and the
+            honest boundaries section
+          </span>
+        </label>
+        <div className="grid gap-1.5 pl-6 sm:grid-cols-2">
+          {(
+            [
+              ["hasGas", "Gas installation"],
+              ["hasLift", "Lift"],
+              ["hasBasement", "Basement"],
+              ["hasPlayground", "Playground"],
+            ] as const
+          ).map(([name, label]) => (
+            <label key={name} className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name={name} className="h-4 w-4 accent-[#1F4A37]" />
+              <span className="text-ink-soft">{label}</span>
+            </label>
+          ))}
+        </div>
+        <div className="grid gap-1.5 pl-6 sm:grid-cols-2">
+          {(
+            [
+              ["tur_control", "Control walk + monthly report (200 lei/mo)"],
+              ["calendar_conformitate", "Compliance calendar (300 lei/mo)"],
+              ["raport_anual", "Annual monitoring report (1.500 lei/report)"],
+              ["serviciu_iarna", "Winter service (1.800 lei/season)"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="extraService"
+                value={key}
+                defaultChecked={key === "tur_control" || key === "calendar_conformitate"}
+                className="h-4 w-4 accent-[#1F4A37]"
+              />
+              <span className="text-ink-soft">{label}</span>
+            </label>
+          ))}
+        </div>
+
         <h2 className="pt-2 text-sm font-semibold">The price</h2>
         <Field
           label="Price per month (lei)"

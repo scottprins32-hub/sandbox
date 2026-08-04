@@ -43,6 +43,18 @@ export interface OfferPdfData {
   scope: string[];
   /** YYYY-MM-DD */
   validUntil: string;
+  /**
+   * Compliance sections (add-on §8): the applicable obligations subset with
+   * citations and fine ranges, the summed statutory exposure, the selected
+   * service lines and the honest boundaries list. The section that sells.
+   */
+  compliance?: {
+    serviceLines: { name: string; unitLabel: string; priceBani: number }[];
+    /** Core cleaning + recurring lines, per month. */
+    monthlyTotalBani: number;
+    obligations: { name: string; cadence: string; fineRange: string; citation: string }[];
+    exposureBani: number;
+  };
 }
 
 function lei(bani: number): string {
@@ -137,6 +149,34 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   y = startY - half * 15 - 8;
   rule(page, y); y -= 18;
 
+  // ---- Selected service lines (add-on §8, "Ce oferim") -------------------
+  if (data.compliance && data.compliance.serviceLines.length > 0) {
+    micro("Servicii incluse în ofertă");
+    for (const s of data.compliance.serviceLines) {
+      breakPage(18);
+      page.drawText(s.name, { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink });
+      const price = `${lei(s.priceBani)} ${s.unitLabel}`;
+      const pw = fonts.text.widthOfTextAtSize(price, 9);
+      page.drawText(price, {
+        x: A4[0] - MARGIN - pw, y, size: 9, font: fonts.text, color: COLORS.ink2,
+      });
+      y -= 8;
+      rule(page, y, COLORS.line, 0.4);
+      y -= 12;
+    }
+    breakPage(20);
+    page.drawText("Total lunar cu serviciile recurente incluse", {
+      x: MARGIN, y, size: 9.5, font: fonts.medium, color: COLORS.ink,
+    });
+    const tot = lei(data.compliance.monthlyTotalBani);
+    const tw = fonts.display.widthOfTextAtSize(tot, 12);
+    page.drawText(tot, {
+      x: A4[0] - MARGIN - tw, y: y - 1, size: 12, font: fonts.display, color: COLORS.greenDeep,
+    });
+    y -= 18;
+    rule(page, y); y -= 18;
+  }
+
   // ---- Price -------------------------------------------------------------
   micro("Preț");
   const priceRow = (label: string, value: string, strong = false) => {
@@ -166,10 +206,22 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   rule(page, y); y -= 18;
 
   // ---- The differentiator ------------------------------------------------
-  micro("Ce primiți în plus față de o firmă obișnuită");
+  micro(data.compliance ? "Ce primiți lunar" : "Ce primiți în plus față de o firmă obișnuită");
   const promises: [string, string][] = [
     ["Fotografii datate la fiecare vizită", "Fiecare curățenie e documentată în aplicație, cu ora și data."],
     ["Proces-verbal lunar semnat", "La final de lună primiți un document cu vizitele programate și cele efectuate."],
+    ...(data.compliance
+      ? ([
+          [
+            "Raport lunar de control și întreținere",
+            "Tururi documentate pe puncte de control, cu constatări consemnate și anexă foto.",
+          ],
+          [
+            "Calendarul obligațiilor legale, la zi",
+            "Vedeți oricând ce este scadent, cine are voie să execute și ce documente există la dosar.",
+          ],
+        ] as [string, string][])
+      : []),
     ["O lună gratuită dacă nu suntem la nivel", "Dacă nu respectăm programul promis, luna aceea nu se plătește."],
     ["Personal angajat legal", "Contracte de muncă în regulă, nu muncă la negru. Fără risc pentru asociație."],
   ];
@@ -182,6 +234,85 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   }
   y -= 3;
   rule(page, y); y -= 18;
+
+  // ---- Compliance sections (add-on §8) -----------------------------------
+  if (data.compliance) {
+    // The applicable obligations, with citations — the section that sells.
+    micro("Obligațiile legale ale imobilului dumneavoastră");
+    for (const line of wrapText(
+      fonts.text,
+      "Conform datelor despre imobil, legislația în vigoare prevede următoarele obligații pentru asociație sau proprietar:",
+      9,
+      CONTENT_W
+    )) {
+      breakPage(13);
+      page.drawText(line, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink2 });
+      y -= 12;
+    }
+    y -= 4;
+    for (const o of data.compliance.obligations) {
+      breakPage(34);
+      const name = wrapText(fonts.semibold, o.name, 9.5, CONTENT_W - 130)[0] ?? o.name;
+      page.drawText(name, { x: MARGIN, y, size: 9.5, font: fonts.semibold, color: COLORS.ink });
+      const right = o.cadence;
+      const rw = fonts.text.widthOfTextAtSize(right, 8.5);
+      page.drawText(right, {
+        x: A4[0] - MARGIN - rw, y, size: 8.5, font: fonts.text, color: COLORS.ink2,
+      });
+      y -= 11;
+      page.drawText(`Sancțiune: ${o.fineRange} · ${o.citation}`, {
+        x: MARGIN, y, size: 7.5, font: fonts.text, color: COLORS.ink3,
+      });
+      y -= 8;
+      rule(page, y, COLORS.line, 0.4);
+      y -= 11;
+    }
+    y -= 4;
+
+    // The summed statutory maximum — labelled, never a prediction (§2.6).
+    breakPage(56);
+    micro("Expunerea maximă la sancțiuni");
+    page.drawText("Expunere maximă conform legii", {
+      x: MARGIN, y: y - 4, size: 10, font: fonts.text, color: COLORS.ink2,
+    });
+    const ex = lei(data.compliance.exposureBani);
+    const exw = fonts.display.widthOfTextAtSize(ex, 16);
+    page.drawText(ex, {
+      x: A4[0] - MARGIN - exw, y: y - 5, size: 16, font: fonts.display, color: COLORS.ink,
+    });
+    y -= 22;
+    for (const line of wrapText(
+      fonts.text,
+      "Suma valorilor maxime prevăzute de lege pentru obligațiile aplicabile imobilului, cu titlu informativ. Nu este o predicție și nu înlocuiește o opinie juridică.",
+      8,
+      CONTENT_W
+    )) {
+      breakPage(12);
+      page.drawText(line, { x: MARGIN, y, size: 8, font: fonts.text, color: COLORS.ink3 });
+      y -= 11;
+    }
+    y -= 6;
+    rule(page, y); y -= 18;
+
+    // Honest boundaries — a trust move, and legally protective (add-on §8.5).
+    micro("Ce nu facem");
+    const boundaries = [
+      "Tratamentele DDD (dezinsecție, dezinfecție, deratizare) sunt executate exclusiv de parteneri atestați DSP. Noi le programăm, le însoțim și arhivăm documentele.",
+      "Verificările tehnice (gaze, ascensor, PRAM, coșuri de fum) sunt efectuate de firme autorizate. Noi ținem calendarul și dosarul.",
+      "Raportul anual de urmărire a comportării în timp se predă ca proiect și necesită semnătura persoanei responsabile desemnate.",
+      "Nu oferim consultanță juridică; datele legale sunt citate cu titlu de referință, iar poziția juridică se confirmă cu un avocat sau cu contabilul asociației.",
+    ];
+    boundaries.forEach((b, i) => {
+      for (const line of wrapText(fonts.text, `${i + 1}. ${b}`, 9, CONTENT_W)) {
+        breakPage(13);
+        page.drawText(line, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink });
+        y -= 12;
+      }
+      y -= 3;
+    });
+    y -= 5;
+    rule(page, y); y -= 18;
+  }
 
   // ---- Contract ----------------------------------------------------------
   micro("Contract");

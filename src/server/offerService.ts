@@ -4,6 +4,9 @@
 
 import { priceOffer } from "@/lib/finance";
 import { todayYmd } from "@/lib/dates";
+import { applicableObligations, type BuildingFlags, type Obligation } from "@/lib/compliance";
+import { SERVICE_LINE_BY_KEY, UNIT_LABEL_RO } from "@/lib/compliance/services";
+import { fmtLeiRound } from "@/lib/money";
 import { getCurrentOrg } from "./org";
 import { getOrgSettings } from "./repo/settings";
 import { listTemplates, listTemplateItems } from "./repo/checklists";
@@ -26,7 +29,43 @@ export interface OfferRequest {
   priceBani: number;
   /** Days the offer stays valid. */
   validDays?: number;
+  /**
+   * Building facts for the compliance sections (add-on §8). When present the
+   * offer carries the applicable obligations subset, the summed statutory
+   * exposure and the honest boundaries list.
+   */
+  flags?: BuildingFlags;
+  /** Extra service-line keys included in the offer, priced at catalogue default. */
+  extraServiceKeys?: string[];
 }
+
+const cadenceRo = (o: Obligation): string => {
+  const c = o.cadence;
+  switch (c.kind) {
+    case "fixed":
+      return c.perYear === 1 ? "o dată pe an" : `de ${c.perYear} ori pe an`;
+    case "months":
+      return c.every === 1 ? "lunar" : `la ${c.every} luni`;
+    case "years":
+      return c.every === 1 ? "anual" : `la ${c.every} ani`;
+    case "continuous":
+      return "permanent";
+    case "seasonal":
+      return `sezonier, lunile ${c.fromMonth}-${c.toMonth}`;
+    case "event":
+      return "la eveniment";
+    case "once":
+      return `o singură dată, până la ${c.byDate.split("-").reverse().join(".")}`;
+  }
+};
+
+const fineRangeRo = (o: Obligation): string => {
+  if (o.fineMinBani === null && o.fineMaxBani === null) return "nespecificată";
+  if (o.fineMinBani !== null && o.fineMaxBani !== null) {
+    return `${fmtLeiRound(o.fineMinBani)} - ${fmtLeiRound(o.fineMaxBani)} lei`;
+  }
+  return `${fmtLeiRound((o.fineMaxBani ?? o.fineMinBani)!)} lei`;
+};
 
 /** Fallback scope if the org has no checklist template yet. */
 const DEFAULT_SCOPE = [
@@ -67,6 +106,46 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
 
   const validUntil = addDays(todayYmd(), req.validDays ?? 30);
 
+  // Compliance sections (add-on §8): obligations subset by the building's
+  // facts, summed statutory maximums, the selected service lines.
+  let compliance: Parameters<typeof renderOfferPdf>[0]["compliance"];
+  if (req.flags) {
+    const obligations = applicableObligations(req.flags);
+    const extras = (req.extraServiceKeys ?? [])
+      .map((key) => SERVICE_LINE_BY_KEY[key])
+      .filter((s): s is NonNullable<typeof s> => Boolean(s));
+    const serviceLines = [
+      {
+        name: "Curățenie casa scării",
+        unitLabel: UNIT_LABEL_RO.per_building_month,
+        priceBani: req.priceBani,
+      },
+      ...extras.map((s) => ({
+        name: s.nameRo,
+        unitLabel: UNIT_LABEL_RO[s.unit],
+        priceBani: s.defaultPriceBani,
+      })),
+    ];
+    const monthlyTotalBani =
+      req.priceBani +
+      extras.reduce((sum, s) => {
+        if (s.unit === "per_building_month") return sum + s.defaultPriceBani;
+        if (s.unit === "per_apartment_month") return sum + s.defaultPriceBani * req.apartments;
+        return sum;
+      }, 0);
+    compliance = {
+      serviceLines,
+      monthlyTotalBani,
+      obligations: obligations.map((o) => ({
+        name: o.nameRo,
+        cadence: cadenceRo(o),
+        fineRange: fineRangeRo(o),
+        citation: o.legalBasis.join(" · "),
+      })),
+      exposureBani: obligations.reduce((sum, o) => sum + (o.fineMaxBani ?? 0), 0),
+    };
+  }
+
   const pdf = await renderOfferPdf({
     orgName: org.name,
     cui: org.cui,
@@ -92,6 +171,7 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
     perPersonBani: pricing.perPersonBani,
     scope: await scopeLines(orgId),
     validUntil,
+    compliance,
   });
 
   const offer = await createOffer(orgId, {

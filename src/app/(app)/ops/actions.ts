@@ -369,6 +369,113 @@ export async function resolveFindingAction(findingId: string, formData: FormData
   revalidatePath("/ops");
 }
 
+// ---------------------------------------------- building record (add-on §6)
+
+export async function seedElementsAction(buildingId: string) {
+  const org = await getCurrentOrg();
+  const { seedElements } = await import("@/server/recordService");
+  await seedElements(org.id, buildingId);
+  revalidatePath(`/ops/buildings/${buildingId}/record`);
+}
+
+/** One element scored in the guided annual walkthrough. */
+export async function assessElementAction(
+  buildingId: string,
+  elementId: string,
+  formData: FormData
+) {
+  const org = await getCurrentOrg();
+  const score = Number(formData.get("score"));
+  const note = String(formData.get("note") ?? "").trim();
+  if (!Number.isInteger(score) || score < 1 || score > 6 || !note) return;
+
+  let photoKeys: string | null = null;
+  const file = formData.get("photo");
+  if (file instanceof Blob && file.size > 0) {
+    const key = `${org.id}/record/${buildingId}/${crypto.randomUUID()}.jpg`;
+    const { getStorage } = await import("@/server/storage");
+    await getStorage().put(key, new Uint8Array(await file.arrayBuffer()), "image/jpeg");
+    photoKeys = JSON.stringify([key]);
+  }
+
+  const { createAssessment } = await import("@/server/repo/record");
+  await createAssessment(org.id, {
+    buildingElementId: elementId,
+    assessedAt: todayYmd(),
+    assessedBy: "Ops",
+    score,
+    noteRo: note,
+    photoKeys,
+    source: "annual",
+  });
+  revalidatePath(`/ops/buildings/${buildingId}/record`);
+
+  const next = Number(formData.get("nextStep"));
+  if (Number.isInteger(next) && next >= 0) {
+    redirect(`/ops/buildings/${buildingId}/record/assess?e=${next}`);
+  }
+}
+
+/** One-tap promote: walk finding → element assessment + journal entry. */
+export async function promoteFindingAction(
+  buildingId: string,
+  findingId: string,
+  formData: FormData
+) {
+  const org = await getCurrentOrg();
+  const elementId = String(formData.get("elementId") ?? "");
+  const score = Number(formData.get("score"));
+  if (!elementId || !Number.isInteger(score) || score < 1 || score > 6) return;
+  const { getDb, schema } = await import("@/server/db");
+  const { and, eq } = await import("drizzle-orm");
+  const rows = await getDb()
+    .select()
+    .from(schema.walkFindings)
+    .where(and(eq(schema.walkFindings.orgId, org.id), eq(schema.walkFindings.id, findingId)));
+  const finding = rows[0];
+  if (!finding) return;
+  const { promoteFinding } = await import("@/server/recordService");
+  await promoteFinding(org.id, buildingId, finding, {
+    elementId,
+    score,
+    assessedBy: "Ops",
+  });
+  revalidatePath(`/ops/buildings/${buildingId}/record`);
+}
+
+export async function addJournalEntryAction(buildingId: string, formData: FormData) {
+  const org = await getCurrentOrg();
+  const description = String(formData.get("description") ?? "").trim();
+  if (!description) return;
+  const kindRaw = String(formData.get("kind") ?? "observatie");
+  const kind = (
+    ["observatie", "interventie", "modificare", "eveniment", "document"].includes(kindRaw)
+      ? kindRaw
+      : "observatie"
+  ) as "observatie" | "interventie" | "modificare" | "eveniment" | "document";
+  const { createJournalEntry } = await import("@/server/repo/record");
+  await createJournalEntry(org.id, {
+    buildingId,
+    occurredAt: String(formData.get("date") ?? "") || todayYmd(),
+    kind,
+    descriptionRo: description,
+  });
+  revalidatePath(`/ops/buildings/${buildingId}/record`);
+}
+
+export async function generateAnnualReportAction(buildingId: string, formData: FormData) {
+  const org = await getCurrentOrg();
+  const year = Number(formData.get("year"));
+  if (!Number.isInteger(year) || year < 2020 || year > 2100) return;
+  const recommendations = String(formData.get("recommendations") ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const { generateAnnualReport } = await import("@/server/recordService");
+  await generateAnnualReport(org.id, buildingId, { year, recommendations });
+  revalidatePath(`/ops/buildings/${buildingId}/record`);
+}
+
 // -------------------------------------------------- service lines (add-on §7)
 
 export async function attachServiceAction(buildingId: string, formData: FormData) {
@@ -415,6 +522,17 @@ export async function generateOfferAction(formData: FormData) {
     hoursPerVisit: num("hoursPerVisit", 1.5),
     priceBani: Math.round(num("priceLei", 0) * 100),
     validDays: num("validDays", 30),
+    // Compliance sections (add-on §8), on unless explicitly disabled.
+    flags:
+      formData.get("withCompliance") === "on"
+        ? {
+            hasGas: formData.get("hasGas") === "on",
+            hasLift: formData.get("hasLift") === "on",
+            hasBasement: formData.get("hasBasement") === "on",
+            hasPlayground: formData.get("hasPlayground") === "on",
+          }
+        : undefined,
+    extraServiceKeys: formData.getAll("extraService").map(String),
   });
   revalidatePath("/ops/offers");
   revalidatePath("/atlas");

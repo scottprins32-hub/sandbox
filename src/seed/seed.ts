@@ -11,6 +11,7 @@ import { todayYmd, weekDays } from "../lib/dates";
 import { applicableObligations, nextDueDate, OBLIGATION_BY_KEY } from "../lib/compliance";
 import { SERVICE_LINES, SERVICE_LINE_BY_KEY } from "../lib/compliance/services";
 import { STANDARD_CHECKPOINTS } from "../server/walkService";
+import { STANDARD_ELEMENTS } from "../lib/compliance/elements";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -53,6 +54,10 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     schema.walkCheckpoints,
     schema.controlWalks,
     schema.checkpoints,
+    schema.elementAssessments,
+    schema.buildingElements,
+    schema.journalEntries,
+    schema.annualReports,
     schema.complianceEvents,
     schema.buildingObligations,
     schema.contractors,
@@ -549,6 +554,81 @@ export async function seedDemo(): Promise<{ orgId: string }> {
       },
     ]);
   }
+
+  // Building record (add-on §6): the twelve elements per building, with two
+  // years of assessments on the first building so the trend column is real.
+  const elementIdByKey = new Map<string, string>();
+  for (const b of buildingRows) {
+    const rows = await db
+      .insert(schema.buildingElements)
+      .values(
+        STANDARD_ELEMENTS.map((e) => ({
+          orgId,
+          buildingId: b.id,
+          key: e.key,
+          nameRo: e.nameRo,
+          category: e.category,
+        }))
+      )
+      .returning();
+    if (b.id === buildingRows[0]!.id) {
+      for (const r of rows) elementIdByKey.set(r.key, r.id);
+    }
+  }
+  const priorScores: Record<string, number> = {
+    fundatie: 2, structura_pereti: 2, plansee: 2, acoperis: 3, fatada: 4,
+    tamplarie: 3, casa_scarii: 3, instalatie_electrica: 3, instalatie_sanitara: 3,
+    instalatie_gaze: 2, subsol_umiditate: 3, trotuar: 2,
+  };
+  const currentScores: Record<string, number> = {
+    ...priorScores,
+    casa_scarii: 2, // repainted — improved
+    subsol_umiditate: 4, // damp traces — declined
+  };
+  const assessmentNotes: Record<string, string> = {
+    fatada: "Tencuială degradată local pe fațada nordică; fără desprinderi active.",
+    subsol_umiditate: "Umezeală lângă coloana comună de apă; de urmărit după reparație.",
+    casa_scarii: "Zugrăvit integral în primăvară; stare bună.",
+  };
+  const lastYear = String(Number(today.slice(0, 4)) - 1);
+  for (const [key, id] of elementIdByKey) {
+    await db.insert(schema.elementAssessments).values([
+      {
+        orgId,
+        buildingElementId: id,
+        assessedAt: `${lastYear}-09-15`,
+        assessedBy: "Adina Pop",
+        score: priorScores[key]!,
+        noteRo: null,
+        source: "annual" as const,
+      },
+      {
+        orgId,
+        buildingElementId: id,
+        assessedAt: historyDays[0] ?? today,
+        assessedBy: "Adina Pop",
+        score: currentScores[key]!,
+        noteRo: assessmentNotes[key] ?? null,
+        source: "annual" as const,
+      },
+    ]);
+  }
+  await db.insert(schema.journalEntries).values([
+    {
+      orgId,
+      buildingId: buildingRows[0]!.id,
+      occurredAt: `${today.slice(0, 4)}-03-12`,
+      kind: "interventie" as const,
+      descriptionRo: "Înlocuit două corpuri de iluminat pe casa scării, etajele 1 și 2.",
+    },
+    {
+      orgId,
+      buildingId: buildingRows[0]!.id,
+      occurredAt: historyDays[0] ?? today,
+      kind: "observatie" as const,
+      descriptionRo: "Urme de umezeală pe peretele subsolului, lângă coloana comună de apă.",
+    },
+  ]);
 
   // This week's visits, scheduled.
   await generateWeekVisits(orgId, today);

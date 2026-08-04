@@ -206,6 +206,12 @@ export default async function BuildingDetail({
               </button>
             </form>
           )}
+          <Link
+            href={`/ops/buildings/${building.id}/record`}
+            className="block rounded-xl border border-line bg-surface px-3 py-2.5 text-center text-xs text-ink-soft hover:border-moss"
+          >
+            Building record · Cartea Tehnică
+          </Link>
           {checkpoints.length === 0 ? (
             <form action={seedCheckpointsAction.bind(null, building.id)}>
               <button className="w-full rounded-xl border border-dashed border-line-strong bg-surface px-3 py-2.5 text-xs text-ink-soft hover:border-moss">

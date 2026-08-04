@@ -516,6 +516,93 @@ export const walkFindings = sqliteTable(
   ]
 );
 
+// ------------- Building record and annual report (add-on §6) ---------------
+// Urmărirea comportării în timp: element scores, the events journal and the
+// generated annual PROIECT reports that feed the digital Cartea Tehnică.
+
+export const buildingElements = sqliteTable(
+  "building_elements",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    key: text("key").notNull(),
+    nameRo: text("name_ro").notNull(),
+    category: text("category", {
+      enum: ["structura", "invelitoare", "fatada", "instalatii", "finisaje", "exterior"],
+    }).notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("building_elements_org_idx").on(t.orgId),
+    index("building_elements_building_idx").on(t.buildingId),
+  ]
+);
+
+export const elementAssessments = sqliteTable(
+  "element_assessments",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingElementId: text("building_element_id").notNull(),
+    assessedAt: text("assessed_at").notNull(), // YYYY-MM-DD
+    assessedBy: text("assessed_by").notNull().default(""),
+    /** 1 Excelent … 6 Foarte slab (NEN 2767, adapted). */
+    score: integer("score").notNull(),
+    noteRo: text("note_ro"),
+    photoKeys: text("photo_keys"), // JSON array
+    source: text("source", { enum: ["walk", "annual"] }).notNull().default("annual"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("element_assessments_org_idx").on(t.orgId),
+    index("element_assessments_element_idx").on(t.buildingElementId),
+  ]
+);
+
+export const journalEntries = sqliteTable(
+  "journal_entries",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    occurredAt: text("occurred_at").notNull(), // YYYY-MM-DD
+    kind: text("kind", {
+      enum: ["observatie", "interventie", "modificare", "eveniment", "document"],
+    }).notNull(),
+    descriptionRo: text("description_ro").notNull(),
+    relatedType: text("related_type"),
+    relatedId: text("related_id"),
+    photoKeys: text("photo_keys"), // JSON array
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("journal_entries_org_idx").on(t.orgId),
+    index("journal_entries_building_idx").on(t.buildingId),
+  ]
+);
+
+export const annualReports = sqliteTable(
+  "annual_reports",
+  {
+    id: id(),
+    orgId: orgId(),
+    buildingId: text("building_id").notNull(),
+    year: integer("year").notNull(),
+    pdfFileKey: text("pdf_file_key").notNull(),
+    generatedAt: integer("generated_at").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("annual_reports_org_idx").on(t.orgId),
+    index("annual_reports_building_idx").on(t.buildingId),
+  ]
+);
+
 // --------------------------- Service lines (add-on §7) ---------------------
 
 export const serviceLines = sqliteTable(
