@@ -45,12 +45,21 @@ export function subscribe(listener: () => void): () => void {
  * A response that must NOT count as delivered:
  *  - a followed redirect: some interstitial answered with its own 200, not our
  *    API — the write never landed;
- *  - 401/403: the passcode session lapsed, retry after the next sign-in;
+ *  - 401/403: the session lapsed or the wrong cleaner is signed in on a
+ *    shared phone; retry after the next sign-in;
+ *  - 408/429: timeout or throttling, transient by definition;
  *  - 5xx: server trouble.
- * Only clean 2xx delivers; only non-auth 4xx is dropped as unfixable.
+ * Only clean 2xx delivers; only the remaining 4xx is dropped as unfixable.
  */
-function retryable(res: Response): boolean {
-  return res.redirected || res.status === 401 || res.status === 403 || res.status >= 500;
+export function retryable(res: Response): boolean {
+  return (
+    res.redirected ||
+    res.status === 401 ||
+    res.status === 403 ||
+    res.status === 408 ||
+    res.status === 429 ||
+    res.status >= 500
+  );
 }
 
 /** POST JSON; on network failure, queue for retry. Returns true if it landed now. */
@@ -75,9 +84,13 @@ export async function flush(): Promise<void> {
   if (flushing || typeof window === "undefined") return;
   flushing = true;
   try {
-    let queue = read();
-    while (queue.length > 0) {
-      const next = queue[0]!;
+    for (;;) {
+      // Re-read storage every iteration and remove by id, never by position
+      // from a snapshot: sendOrQueue() appends to localStorage while our
+      // fetch below is suspended, and writing a stale snapshot back would
+      // erase those items without a single send attempt.
+      const next = read()[0];
+      if (!next) break;
       try {
         const res = await fetch(next.url, {
           method: "POST",
@@ -91,8 +104,7 @@ export async function flush(): Promise<void> {
       } catch {
         break; // still offline
       }
-      queue = queue.slice(1);
-      write(queue);
+      write(read().filter((q) => q.id !== next.id));
     }
   } finally {
     flushing = false;

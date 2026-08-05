@@ -48,12 +48,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
-  // A route id, when given, must belong to this org.
+  // A route id that doesn't resolve in this org is discarded, never fatal.
+  // Route ids are minted per seed, so after a re-seed every queued capture
+  // carries a stale one — and losing the building over its grouping metadata
+  // is the one failure this module may not have. The capture lands routeless
+  // and shows up on the org-wide list instead of vanishing from the phone.
   let routeId: string | null = null;
   if (body.routeId) {
     const route = await getRoute(org.id, body.routeId);
-    if (!route) return NextResponse.json({ ok: false }, { status: 404 });
-    routeId = route.id;
+    routeId = route?.id ?? null;
   }
 
   const street = s(body.street, 120);

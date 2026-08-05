@@ -48,6 +48,26 @@ export default async function PublicBuildingPage({
   const view = await getPublicBuildingView(code);
   if (!view) notFound();
 
+  // Database down. The resident holds a code that is probably real — a 404
+  // would tell them the QR on their notice board is broken. Say what is
+  // actually true: come back in a few minutes.
+  if (view === "unavailable") {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center bg-paper px-6">
+        <div className="max-w-sm rounded-2xl bg-surface p-6 text-center shadow-card">
+          <p className="micro text-ink-faint">Starea scării</p>
+          <p className="mt-2 font-display text-2xl text-ink">
+            Pagina nu este disponibilă momentan.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Încercați din nou în câteva minute. Dacă aveți o sesizare urgentă,
+            sunați la numărul de pe avizier.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[100dvh] bg-paper">
       <header className="mx-auto max-w-xl px-6 pt-8">

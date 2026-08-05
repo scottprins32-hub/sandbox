@@ -19,8 +19,13 @@ export async function POST(request: NextRequest) {
   if (!body.visitId || !body.op) return NextResponse.json({ ok: false }, { status: 400 });
 
   const visit = await getVisit(org.id, body.visitId);
-  if (!visit || visit.cleanerId !== cleaner.id) {
-    return NextResponse.json({ ok: false }, { status: 404 });
+  if (!visit) return NextResponse.json({ ok: false }, { status: 404 });
+  // Wrong cleaner signed in is 403, not 404: on a shared phone, cleaner B
+  // logging in must not cause A's queued visit evidence to be dropped as
+  // poison. 403 makes the queue hold it until A signs back in, when the
+  // identical replay lands cleanly.
+  if (visit.cleanerId !== cleaner.id) {
+    return NextResponse.json({ ok: false }, { status: 403 });
   }
 
   if (body.op === "start") {

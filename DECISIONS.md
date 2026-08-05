@@ -281,12 +281,36 @@ to carry live here too.
   visit and building. Both queues now treat a followed redirect, a 401/403 and
   any 5xx as "hold and retry" — an item is deleted only on a clean 2xx from
   our own API, or a non-auth 4xx that will never heal.
-- **2026-08-05 — The resident page 404s when the database is down; it never
-  500s.** To the person in the hallway, a broken database and a wrong code
-  look identical — a page that does not resolve. The operator finds the truth
-  on the admin banner, not the resident on an error page. The issue form says
-  "încercați din nou în câteva minute" instead of crashing, and the public
-  lead API returns 503 so the form's retry message shows.
+- **2026-08-05 — The resident page distinguishes "no such page" from "not
+  right now"; it never 500s.** A wrong or disabled code 404s. A database
+  outage renders a small Romanian card — "Pagina nu este disponibilă
+  momentan" — because with the database down a real code and a fake one are
+  indistinguishable, and telling a resident the QR on their notice board is
+  a 404 is the worse failure. The issue form's write is guarded like its
+  read, and the public lead API returns 503 so the form's retry message
+  shows.
+- **2026-08-05 — Adversarial review of the degradation change confirmed ten
+  defects; all fixed.** The ones worth remembering: (1) the portal queue's
+  flush wrote back a stale snapshot of localStorage, erasing any mutation
+  queued while a send was in flight — it now re-reads per iteration and
+  removes by id, like the field queue always did; (2) both queues treated
+  429/408 as poison, so one Vercel rate-limit window would have drained and
+  deleted every queued capture — both are now held as transient, pinned by a
+  truth-table test (`queuePolicy.test.ts`); (3) the portal visit route
+  answered a wrong-cleaner session with 404, which the queues drop — on a
+  shared phone, B logging in would have deleted A's queued visit evidence;
+  ownership mismatches are now 403, which the queues hold; (4) a stale route
+  id (every re-seed mints new ones) 404'd the whole building capture and
+  cascaded into deleting its queued photos — the route id is now discarded
+  server-side and the capture lands routeless; (5) drizzle's libsql driver
+  wraps "no such table" in a DrizzleQueryError, so the "empty" verdict only
+  worked on the dev driver — the classifier now walks the cause chain; (6)
+  the cached "ok" verdict was immortal, so a database dying under a warm
+  instance kept the banner off and /api/health lying — it now expires after
+  30 s, and /api/health always probes fresh; (7) the layout's probe had no
+  timeout, so a blackholed endpoint would have stalled even the no-database
+  pages — 2.5 s cap, and the role switcher skips its own query when the
+  probe fails.
 
 - **2026-08-05 — Atlas's "Add prospect" creates at `vizitat`, not the schema
   default.** The schema defaults to `de_vizitat` because that is right for

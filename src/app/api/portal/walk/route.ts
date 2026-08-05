@@ -42,8 +42,14 @@ export async function POST(request: NextRequest) {
   let walk = await getWalk(org.id, body.walkId);
   if (!walk) {
     const visit = body.visitId ? await getVisit(org.id, body.visitId) : null;
-    if (!visit || visit.cleanerId !== cleaner.id || !visit.buildingId) {
+    if (!visit || !visit.buildingId) {
       return NextResponse.json({ ok: false }, { status: 404 });
+    }
+    // Another cleaner's session is 403 like the branch below: the queued walk
+    // evidence is fine, the phone is just signed in as someone else. A 404
+    // here would delete it from the offline queue.
+    if (visit.cleanerId !== cleaner.id) {
+      return NextResponse.json({ ok: false }, { status: 403 });
     }
     walk = await ensureWalk(org.id, {
       id: body.walkId,

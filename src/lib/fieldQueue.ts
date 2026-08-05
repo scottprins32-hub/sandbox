@@ -83,19 +83,23 @@ async function enqueue(item: QueuedItem): Promise<void> {
 
 /**
  * true = remove from the queue (delivered, or unfixable), false = keep and
- * retry. Three classes:
- *  - ok, and genuinely ours: delivered.
- *  - 401/403 or a redirect: the passcode session lapsed. The capture is fine;
- *    the phone isn't signed in. Hold it — it lands after the next login.
+ * retry. The classes:
+ *  - clean ok from our API: delivered.
+ *  - a followed redirect: some interstitial answered, not our API — hold.
+ *  - 401/403: the passcode session lapsed; the capture is fine, the phone
+ *    isn't signed in. Hold it — it lands after the next login.
+ *  - 408/429: timeouts and throttling (Vercel's rate limiting answers 429
+ *    platform-wide during an attack-challenge window) are transient by
+ *    definition. Hold — treating them as poison would let one throttling
+ *    event drain and delete the whole queue in a single flush pass.
  *  - other 4xx: malformed forever; drop rather than poison the queue.
- *  - 5xx / network: server or signal trouble; hold it.
+ *  - 5xx / network: server or signal trouble; hold.
  */
-function settle(res: Response): boolean {
-  // A followed redirect means some interstitial answered, not our API.
-  // Whatever it said, the write did not land.
+export function settle(res: Response): boolean {
   if (res.redirected) return false;
   if (res.ok) return true;
   if (res.status === 401 || res.status === 403) return false;
+  if (res.status === 408 || res.status === 429) return false;
   if (res.status < 500) return true;
   return false;
 }

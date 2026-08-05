@@ -64,15 +64,23 @@ export async function reportIssueAction(formData: FormData) {
   const raw = String(formData.get("categorie") ?? "altele");
   const contact = String(formData.get("contact") ?? "").trim();
 
-  await createIssue(building.orgId, {
-    buildingId: building.id,
-    source: "tenant",
-    category: (CATEGORIES.has(raw) ? raw : "altele") as IssueCategory,
-    description: description.slice(0, 2000),
-    // Optional and never asked for twice. A resident who leaves nothing here
-    // still gets their stairwell cleaned.
-    reporterContact: contact ? contact.slice(0, 120) : null,
-  });
+  // The write gets the same guard as the read: the lookup succeeding is no
+  // proof the insert will (read-only token, mid-request outage). The form
+  // works without JavaScript, so an unhandled throw here would hand the
+  // resident a raw error page and lose their report.
+  try {
+    await createIssue(building.orgId, {
+      buildingId: building.id,
+      source: "tenant",
+      category: (CATEGORIES.has(raw) ? raw : "altele") as IssueCategory,
+      description: description.slice(0, 2000),
+      // Optional and never asked for twice. A resident who leaves nothing
+      // here still gets their stairwell cleaned.
+      reporterContact: contact ? contact.slice(0, 120) : null,
+    });
+  } catch {
+    redirect(`${back}?eroare=indisponibil`);
+  }
 
   revalidatePath("/ops");
   redirect(`${back}?trimis=1`);

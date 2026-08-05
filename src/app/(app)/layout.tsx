@@ -13,12 +13,15 @@ export const metadata: Metadata = {
 };
 
 // Cleaner identities come from the DB; before the seed exists the switcher
-// falls back to admin/ops only.
-async function roleOptions(): Promise<RoleOption[]> {
+// falls back to admin/ops only. `dbOk` gates the lookup: dbStatus() has
+// already probed with a timeout, and repeating the query against a dead or
+// hanging database would stall every page render a second time.
+async function roleOptions(dbOk: boolean): Promise<RoleOption[]> {
   const base: RoleOption[] = [
     { value: "admin", label: en.roles.admin },
     { value: "ops", label: en.roles.ops },
   ];
+  if (!dbOk) return base;
   try {
     const { getCurrentOrg } = await import("@/server/org");
     const { listActiveCleaners } = await import("@/server/repo/cleaners");
@@ -86,8 +89,8 @@ const DB_BANNER: Record<string, { title: string; body: React.ReactNode }> = {
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const role = cookieStore.get("scara_role")?.value ?? "admin";
-  const options = await roleOptions();
   const db = await dbStatus();
+  const options = await roleOptions(db === "ok");
   const dbBanner = DB_BANNER[db];
 
   // A production deployment with no passcode is publicly readable, including

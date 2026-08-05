@@ -10,8 +10,9 @@ export async function GET() {
     ok: true,
     environment: process.env.NODE_ENV,
     // ok | unconfigured | unreachable | empty — so "why is Ops broken" is one
-    // curl instead of guesswork. Status only, never a URL or token.
-    database: await dbStatus(),
+    // curl instead of guesswork. Status only, never a URL or token. Always a
+    // fresh probe: a diagnostic that answers from cache diagnoses the cache.
+    database: await dbStatus({ fresh: true }),
     // true only when the variable is set AND non-empty. An empty-string value
     // is a real and easy mistake to make in the Vercel UI, and it leaves the
     // app wide open, so it is reported as not configured.

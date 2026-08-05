@@ -82,19 +82,26 @@ function nextVisitYmd(building: Building, booked: string[]): string | null {
   return null;
 }
 
+/**
+ * `null` = no such page (bad or disabled code) → 404. `"unavailable"` = the
+ * database is down or half-migrated → the page says "try again shortly".
+ * The distinction matters to the person in the hallway: a 404 on a code
+ * printed on the notice board reads as "this company's QR is fake", which is
+ * a worse outcome than admitting a hiccup. Never a 500 either way — the
+ * operator learns the truth from the admin banner, not the resident.
+ */
 export async function getPublicBuildingView(
   code: string
-): Promise<PublicBuildingView | null> {
-  // A resident with a QR code gets a page or a 404, never a 500. If the
-  // deployment's database is missing or down, that is the operator's problem
-  // to see (the admin layout says so loudly); to the person in the hallway
-  // the page simply does not resolve.
-  let building;
+): Promise<PublicBuildingView | "unavailable" | null> {
   try {
-    building = await getBuildingByPublicCode(code);
+    return await assembleView(code);
   } catch {
-    return null;
+    return "unavailable";
   }
+}
+
+async function assembleView(code: string): Promise<PublicBuildingView | null> {
+  const building = await getBuildingByPublicCode(code);
   if (!building) return null;
   const orgId = building.orgId;
 
