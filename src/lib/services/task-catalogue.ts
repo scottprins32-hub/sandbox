@@ -125,6 +125,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "medium",
     effortMinutes: 15,
+    gapNote:
+      "O singură firmă din 20. Contratreapta e la nivelul ochilor când urci — se vede mai bine decât treapta pe care calci.",
   },
   {
     key: "decapare_trepte",
@@ -136,6 +138,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "very_high",
     effortMinutes: 240,
+    gapNote:
+      "Doar 2 firme din 20. Fără decapare periodică, mopul depune strat peste strat până când pardoseala rămâne mată permanent.",
   },
 
   // ----------------------------------------------------------- balustrade
@@ -171,6 +175,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 0,
     visibilityToResident: "medium",
     effortMinutes: 15,
+    gapNote:
+      "Zero firme din 20. Ștergerea zilnică lasă un film gras pe care îl simți cu mâna; degresarea lunară e diferența dintre curat și curat la atingere.",
   },
   {
     key: "glafuri",
@@ -182,6 +188,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "medium",
     effortMinutes: 6,
+    gapNote:
+      "Doar 2 firme din 20. Glaful se vede din exterior și din interior, și adună praful cel mai repede din toată scara.",
   },
 
   // ------------------------------------------------------------------ lift
@@ -291,6 +299,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "high",
     effortMinutes: 15,
+    gapNote:
+      "O singură firmă din 20. Este suprafața pe care fiecare locatar o atinge zilnic și singura pe care o revendică drept a lui.",
   },
 
   // -------------------------------------------------------- mobilier scară
@@ -326,6 +336,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 0,
     visibilityToResident: "very_high",
     effortMinutes: 2,
+    gapNote:
+      "Zero firme din 20. Avizierul este singurul obiect din scară pe care îl citește toată lumea, iar anunțurile expirate îl fac să pară abandonat.",
   },
   {
     key: "panze_paianjen",
@@ -416,6 +428,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "very_high",
     effortMinutes: 3,
+    gapNote:
+      "O singură firmă din 20. Mirosul este prima impresie despre o scară și nu se rezolvă spălând mai des.",
   },
   {
     key: "banci_intrare",
@@ -427,6 +441,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "high",
     effortMinutes: 4,
+    gapNote:
+      "O singură firmă din 20. Băncile sunt folosite de vârstnicii blocului, adică exact de oamenii care votează la adunarea generală.",
   },
 
   // --------------------------------------------------------------- deșeuri
@@ -486,6 +502,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "very_high",
     effortMinutes: 15,
+    gapNote:
+      "Doar 2 firme din 20. O canapea abandonată lângă ghenă rămâne acolo săptămâni și devine subiectul următoarei adunări generale.",
   },
   {
     key: "platforma_gospodareasca",
@@ -534,6 +552,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "high",
     effortMinutes: 8,
+    gapNote:
+      "Doar 2 firme din 20. Este bucata de spațiu pe care fiecare locatar o parcurge de patru ori pe zi și pentru care nimeni nu se simte responsabil.",
   },
   {
     key: "litter_verde",
@@ -557,6 +577,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "high",
     effortMinutes: 25,
+    gapNote:
+      "Doar 2 firme din 20. Frunzele ude pe trepte exterioare sunt cea mai frecventă cauză de alunecare toamna.",
   },
   {
     key: "buruieni",
@@ -568,6 +590,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 0,
     visibilityToResident: "medium",
     effortMinutes: 20,
+    gapNote:
+      "Zero firme din 20 din contractele de scară. Buruienile de pe alei sunt primul lucru pe care îl vede un cumpărător care vine să viziteze un apartament.",
   },
   {
     key: "rigole",
@@ -592,6 +616,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 0,
     visibilityToResident: "medium",
     effortMinutes: 20,
+    gapNote:
+      "Zero firme din 20. Copertina se vede de jos, de fiecare dată când plouă, și nimeni nu urcă la ea decât dacă e trecută în contract.",
   },
 
   // -------------------------------------------------------- subsol și tehnic
@@ -617,6 +643,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 2,
     visibilityToResident: "low",
     effortMinutes: 40,
+    gapNote:
+      "Doar 2 firme din 20. Podul și uscătoria strâng depozitări neautorizate, care sunt sarcină de foc și sunt verificate la control ISU.",
   },
   {
     key: "spatii_tehnice",
@@ -628,6 +656,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "low",
     effortMinutes: 30,
+    gapNote:
+      "O singură firmă din 20. Centrala și contoarele sunt locul unde vine ISCIR sau distribuitorul de gaz, iar dezordinea acolo se plătește.",
   },
   {
     key: "parcare_subterana",
@@ -713,6 +743,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 1,
     visibilityToResident: "low",
     effortMinutes: 5,
+    gapNote:
+      "O singură firmă din 20. Este operațiunea care transformă curățenia în informație: cine trece de două ori pe săptămână prin toată scara vede defectul înaintea administratorului.",
   },
   {
     key: "raportare_defecte",
@@ -737,6 +769,8 @@ export const SERVICE_TASKS: ServiceTask[] = [
     competitorCoverage: 0,
     visibilityToResident: "high",
     effortMinutes: 3,
+    gapNote:
+      "Zero firme din 20. O plantă uscată la intrare spune despre bloc exact ce nu vreți să spună.",
   },
 ];
 

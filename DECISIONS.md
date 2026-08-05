@@ -239,6 +239,28 @@ to carry live here too.
   `generateCleanerNoticePdf()` returns null without it. The demo world seeds
   one cleaner who agreed and one who did not, because "no" is a normal
   permanent answer and not a setup step someone forgot.
+- **2026-08-05 — The offer's task table replaces the old scope list, it does
+  not sit beside it.** §D adds "Ce facem, și cât de des" — about 45 lines for a
+  standard building, where the twenty surveyed firms publish about 15. The
+  offer already had a numbered "Ce includem" fed by the org's checklist
+  template, which is a subset of the same catalogue. Two lists of "what we do"
+  in one document is how a document starts contradicting itself, so the
+  catalogue table wins and the old path stays only as a fallback for callers
+  that pass no building flags.
+- **2026-08-05 — Seventeen of the 23 market-gap tasks had no reason to print.**
+  §D says section 3 lists each gap "with its one-line reason", but only six
+  carried a `gapNote`; the rest would have been bare list items on the section
+  that is supposed to be the strongest argument in the document. All 17 written
+  and a test now fails if a gap task has no reason, or a reason under 30
+  characters.
+- **2026-08-05 — A client-facing offer shipped with two empty boxes in a legal
+  citation.** `Legea 101/2006 art. 28¹⁴(5)` used superscript digits that
+  Instrument Sans has no glyphs for, and pdf-lib draws a missing glyph without
+  complaining, so nothing in the render path could catch it. The citation is
+  now `art. 28^14 (5)`, and `src/server/pdf/glyphs.test.ts` checks every
+  obligation, task, service line and commitment string against the actual font
+  file — 176 cases. Confirmed to fail on the original text before being fixed.
+
 - **2026-08-05 — Atlas's "Add prospect" creates at `vizitat`, not the schema
   default.** The schema defaults to `de_vizitat` because that is right for
   field capture, but Atlas hides that column, so a card added from Atlas

@@ -55,6 +55,22 @@ export interface OfferPdfData {
     obligations: { name: string; cadence: string; fineRange: string; citation: string }[];
     exposureBani: number;
   };
+  /**
+   * Add-on 2 §D. The three sections that turn the offer from a price into an
+   * argument:
+   *  - `zones`: the full task table, grouped, with the frequency column. About
+   *    60 lines where the surveyed competitors publish about 15, which is the
+   *    entire point — a long list is the claim.
+   *  - `unique`: every task no more than two of twenty firms publish, each
+   *    with the reason it matters that they skip it.
+   *  - `commitments`: the §C4 response promises, verbatim. Promises about
+   *    speed, never a discount, a free period or a refund.
+   */
+  catalogue?: {
+    zones: { labelRo: string; rows: { nameRo: string; frequencyRo: string }[] }[];
+    unique: { nameRo: string; reasonRo: string }[];
+    commitments: string[];
+  };
 }
 
 function lei(bani: number): string {
@@ -131,23 +147,88 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   y -= 14;
   rule(page, y); y -= 18;
 
-  // ---- Scope, two numbered columns ---------------------------------------
-  micro("Ce includem");
-  page.drawText(
-    `Curățenie de ${data.visitsPerWeek} ori pe săptămână, aproximativ ${String(data.hoursPerVisit).replace(".", ",")} ore pe vizită:`,
-    { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 }
-  );
-  y -= 16;
-  const half = Math.ceil(data.scope.length / 2);
-  const startY = y;
-  data.scope.forEach((line, i) => {
-    const col = i < half ? 0 : 1;
-    const ax = MARGIN + (col === 0 ? 0 : CONTENT_W / 2 + 8);
-    const ay = startY - (i % half) * 15;
-    page.drawText(`${i + 1}. ${line}`, { x: ax, y: ay, size: 9.5, font: fonts.text, color: COLORS.ink });
-  });
-  y = startY - half * 15 - 8;
-  rule(page, y); y -= 18;
+  // ---- §2: what we do, and how often (add-on 2 §D) ------------------------
+  //
+  // The catalogue table replaces the old free-text scope list rather than
+  // sitting beside it. Two lists of "what we do" in one document is how a
+  // document starts contradicting itself, and the checklist template that fed
+  // the old one is a subset of this anyway.
+  if (data.catalogue) {
+    micro("Ce facem, și cât de des");
+    page.drawText(
+      `Curățenie de ${data.visitsPerWeek} ori pe săptămână, aproximativ ${String(data.hoursPerVisit).replace(".", ",")} ore pe vizită. Lista completă, pe zone:`,
+      { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 }
+    );
+    y -= 16;
+
+    const freqX = A4[0] - MARGIN - 92;
+    for (const zone of data.catalogue.zones) {
+      // Keep a zone heading with at least its first row.
+      breakPage(34);
+      page.drawText(zone.labelRo, {
+        x: MARGIN, y, size: 9, font: fonts.semibold, color: COLORS.greenDeep,
+      });
+      y -= 13;
+      for (const row of zone.rows) {
+        breakPage(15);
+        const name = wrapText(fonts.text, row.nameRo, 9, freqX - MARGIN - 10)[0] ?? row.nameRo;
+        page.drawText(name, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink });
+        page.drawText(row.frequencyRo, {
+          x: freqX, y, size: 8, font: fonts.text, color: COLORS.ink3,
+        });
+        y -= 12;
+      }
+      y -= 5;
+    }
+    y -= 3;
+    rule(page, y); y -= 18;
+  } else {
+    micro("Ce includem");
+    page.drawText(
+      `Curățenie de ${data.visitsPerWeek} ori pe săptămână, aproximativ ${String(data.hoursPerVisit).replace(".", ",")} ore pe vizită:`,
+      { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink2 }
+    );
+    y -= 16;
+    const half = Math.ceil(data.scope.length / 2);
+    const startY = y;
+    data.scope.forEach((line, i) => {
+      const col = i < half ? 0 : 1;
+      const ax = MARGIN + (col === 0 ? 0 : CONTENT_W / 2 + 8);
+      const ay = startY - (i % half) * 15;
+      page.drawText(`${i + 1}. ${line}`, { x: ax, y: ay, size: 9.5, font: fonts.text, color: COLORS.ink });
+    });
+    y = startY - half * 15 - 8;
+    rule(page, y); y -= 18;
+  }
+
+  // ---- §3: what we do beyond the market standard (add-on 2 §D) ------------
+  if (data.catalogue && data.catalogue.unique.length > 0) {
+    micro("Ce facem în plus față de standardul pieței");
+    for (const line of wrapText(
+      fonts.text,
+      `Am comparat lista noastră cu ce publică 20 de firme de curățenie din România. Următoarele ${data.catalogue.unique.length} operațiuni apar la cel mult două dintre ele:`,
+      9,
+      CONTENT_W
+    )) {
+      breakPage(13);
+      page.drawText(line, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink2 });
+      y -= 12;
+    }
+    y -= 6;
+    for (const u of data.catalogue.unique) {
+      const reason = wrapText(fonts.text, u.reasonRo, 8, CONTENT_W - 12);
+      breakPage(16 + reason.length * 10);
+      page.drawText(u.nameRo, { x: MARGIN, y, size: 9, font: fonts.semibold, color: COLORS.ink });
+      y -= 11;
+      for (const line of reason) {
+        page.drawText(line, { x: MARGIN + 12, y, size: 8, font: fonts.text, color: COLORS.ink3 });
+        y -= 10;
+      }
+      y -= 5;
+    }
+    y -= 3;
+    rule(page, y); y -= 18;
+  }
 
   // ---- Selected service lines (add-on §8, "Ce oferim") -------------------
   if (data.compliance && data.compliance.serviceLines.length > 0) {
@@ -233,6 +314,38 @@ export async function renderOfferPdf(data: OfferPdfData): Promise<Uint8Array> {
   }
   y -= 3;
   rule(page, y); y -= 18;
+
+  // ---- §6: our commitments (add-on 2 §C4, printed by §D) ------------------
+  //
+  // Promises about speed. Nothing here is free, discounted or refundable —
+  // that is the whole design: a response time costs nothing to publish and no
+  // Romanian competitor publishes one, while a guarantee costs money and
+  // invites the argument about whether it was earned.
+  if (data.catalogue && data.catalogue.commitments.length > 0) {
+    micro("Angajamentele noastre");
+    for (const line of wrapText(
+      fonts.text,
+      "Ne asumăm termene, nu reduceri. Fiecare angajament de mai jos este măsurat în aplicație și afișat pe pagina publică a imobilului, cu cifrele lunii curente.",
+      9,
+      CONTENT_W
+    )) {
+      breakPage(13);
+      page.drawText(line, { x: MARGIN, y, size: 9, font: fonts.text, color: COLORS.ink2 });
+      y -= 12;
+    }
+    y -= 6;
+    data.catalogue.commitments.forEach((c, i) => {
+      const lines = wrapText(fonts.text, `${i + 1}. ${c}`, 9.5, CONTENT_W);
+      breakPage(6 + lines.length * 13);
+      for (const line of lines) {
+        page.drawText(line, { x: MARGIN, y, size: 9.5, font: fonts.text, color: COLORS.ink });
+        y -= 13;
+      }
+      y -= 3;
+    });
+    y -= 5;
+    rule(page, y); y -= 18;
+  }
 
   // ---- Compliance sections (add-on §8) -----------------------------------
   if (data.compliance) {

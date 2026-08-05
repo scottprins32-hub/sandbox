@@ -167,6 +167,24 @@ describe("service task catalogue (add-on 2 §2)", () => {
     expect(withLift).toBeGreaterThan(walkUp);
   });
 
+  // §D section 3 prints every market gap "with its one-line reason". A row
+  // with no reason is a bare list item on the section that is supposed to be
+  // the strongest argument in the offer.
+  it("gives every market-gap task a reason to show in the offer", () => {
+    for (const t of uniqueVsMarket()) {
+      expect(t.gapNote, `${t.key} has no gapNote`).toBeTruthy();
+      expect(t.gapNote!.length).toBeGreaterThan(30);
+    }
+  });
+
+  // Romanian takes comma-below (ș ț), never cedilla (ş ţ) — §1.4. These
+  // strings are printed in the offer and posted in a hallway.
+  it("writes Romanian with comma-below diacritics, never cedillas", () => {
+    for (const t of SERVICE_TASKS) {
+      expect(`${t.nameRo} ${t.gapNote ?? ""}`, t.key).not.toMatch(/[şţŞŢ]/);
+    }
+  });
+
   // Inherited hard rule: dezinfecție is a licensed DDD activity. Naming a task
   // that way claims a certification we do not hold, on a sheet that hangs in a
   // public hallway. `igienizare` is what we actually do and may say.

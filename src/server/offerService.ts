@@ -1,11 +1,12 @@
 // Orchestrates offer generation: price it through the finance module, render
 // the Romanian PDF, store it, record what was quoted, and move the prospect to
-// 'quoted' so the Atlas pipeline stays true.
+// 'oferta_trimisa' so the Atlas pipeline stays true.
 
 import { priceOffer } from "@/lib/finance";
 import { todayYmd } from "@/lib/dates";
 import { applicableObligations, type BuildingFlags, type Obligation } from "@/lib/compliance";
 import { SERVICE_LINE_BY_KEY, UNIT_LABEL_RO } from "@/lib/compliance/services";
+import { offerCatalogue } from "@/lib/offerSections";
 import { fmtLeiRound } from "@/lib/money";
 import { getCurrentOrg } from "./org";
 import { getOrgSettings } from "./repo/settings";
@@ -146,6 +147,15 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
     };
   }
 
+  // Add-on 2 §D: the task table, the market gaps and the commitments.
+  const catalogue = offerCatalogue({
+    hasLift: req.flags?.hasLift ?? false,
+    hasBasement: req.flags?.hasBasement ?? false,
+    // Every block in the demo world has some green edge, and the catalogue's
+    // green tasks are cheap and visible, so they stay in the base package.
+    hasGreen: true,
+  });
+
   const pdf = await renderOfferPdf({
     orgName: org.name,
     cui: org.cui,
@@ -172,6 +182,7 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
     scope: await scopeLines(orgId),
     validUntil,
     compliance,
+    catalogue,
   });
 
   const offer = await createOffer(orgId, {

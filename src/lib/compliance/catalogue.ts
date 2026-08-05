@@ -341,7 +341,7 @@ export const OBLIGATIONS: Obligation[] = [
     nameEn: "Correct separate waste collection",
     category: "waste",
     cadence: { kind: "continuous" },
-    legalBasis: ["OUG 92/2021", "Legea 101/2006 art. 28¹⁴(5)"],
+    legalBasis: ["OUG 92/2021", "Legea 101/2006 art. 28^14 (5)"],
     scope: "national",
     performerRequirement: "us",
     fineMinBani: 20000_00,
@@ -350,7 +350,7 @@ export const OBLIGATIONS: Obligation[] = [
       "Legal entities. In addition, RETIM bills double the tariff for a month with incorrect sorting.",
     appliesIf: "always",
     sourceNote:
-      "OUG 92/2021 and Legea 101/2006 art. 28¹⁴(5). The 20,000-60,000 lei range is for legal entities; RETIM's tariff-doubling penalty is contractual.",
+      "OUG 92/2021 and Legea 101/2006 art. 28^14 (5). The 20,000-60,000 lei range is for legal entities; RETIM's tariff-doubling penalty is contractual.",
   },
   {
     key: "trotuar_curatenie",
