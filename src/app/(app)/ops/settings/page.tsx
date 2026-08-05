@@ -246,7 +246,7 @@ export default async function SettingsPage() {
         <p className="mt-1 text-xs leading-relaxed text-ink-faint">
           One shared passcode gates the app (SCARA_PASSCODE in the environment). Cleaners sign
           into the Portal with phone + 4-digit PIN. Real per-user auth is a later, deliberate
-          step (docs/FRANCHISE_LATER.md).
+          step (FRANCHISE_LATER.md).
         </p>
       </div>
 
