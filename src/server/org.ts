@@ -28,6 +28,9 @@ export interface OrgSettingsJson {
   iban?: string;
   /** Who signs for the prestator, e.g. "Adina Pop". */
   representative?: string;
+  /** Posted-schedule visit window (add-on 2 §C1), e.g. "07:00". */
+  visitWindowFrom?: string;
+  visitWindowTo?: string;
   [key: string]: unknown;
 }
 

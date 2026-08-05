@@ -212,6 +212,23 @@ export default async function BuildingDetail({
           >
             Building record · Cartea Tehnică
           </Link>
+          <div className="rounded-xl border border-line bg-surface p-3">
+            <p className="micro">For the notice board</p>
+            <a
+              href={`/ops/buildings/${building.id}/schedule`}
+              target="_blank"
+              className="mt-1.5 block text-xs text-moss underline"
+            >
+              Programul de întreținere (A4)
+            </a>
+            <a
+              href={`/ops/buildings/${building.id}/visit-cards?weeks=2`}
+              target="_blank"
+              className="mt-1 block text-xs text-moss underline"
+            >
+              Fișe de vizită, 2 weeks (4-up A4)
+            </a>
+          </div>
           {checkpoints.length === 0 ? (
             <form action={seedCheckpointsAction.bind(null, building.id)}>
               <button className="w-full rounded-xl border border-dashed border-line-strong bg-surface px-3 py-2.5 text-xs text-ink-soft hover:border-moss">

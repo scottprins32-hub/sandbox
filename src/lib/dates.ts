@@ -39,6 +39,32 @@ export function weekDays(ymd: string): string[] {
   });
 }
 
+/**
+ * Which weekdays a building is visited, by visits-per-week. Monday-based
+ * indices into weekDays(). Single source of truth: the visit generator books
+ * these days and the posted schedule (add-on 2 §C1) prints them, so a resident
+ * reading the wall sees the days that are actually in the diary.
+ */
+export const WEEK_PATTERNS: Record<number, number[]> = { 1: [0], 2: [0, 3], 3: [0, 2, 4] };
+
+export const WEEKDAY_RO = [
+  "luni",
+  "marți",
+  "miercuri",
+  "joi",
+  "vineri",
+  "sâmbătă",
+  "duminică",
+];
+
+/** "luni și joi" — the days line on the posted schedule. */
+export function visitDaysRo(visitsPerWeek: number): string {
+  const pattern = WEEK_PATTERNS[visitsPerWeek] ?? WEEK_PATTERNS[2]!;
+  const names = pattern.map((i) => WEEKDAY_RO[i]!);
+  if (names.length === 1) return names[0]!;
+  return `${names.slice(0, -1).join(", ")} și ${names[names.length - 1]}`;
+}
+
 /** All YYYY-MM-DD days of a YYYY-MM month. */
 export function monthDays(monthKey: string): string[] {
   const [y, m] = monthKey.split("-").map(Number);

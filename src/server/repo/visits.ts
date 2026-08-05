@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
 import { getDb, schema } from "../db";
-import { weekDays } from "@/lib/dates";
+import { weekDays, WEEK_PATTERNS } from "@/lib/dates";
 import { listBuildings } from "./buildings";
 import { listActiveCleaners } from "./cleaners";
 
@@ -135,8 +135,6 @@ export async function generateWeekVisits(
   const cleaners = await listActiveCleaners(orgId);
   const defaultCleaner = cleaners.find((c) => c.workerModel === "fulltime_min") ?? cleaners[0];
 
-  const PATTERNS: Record<number, number[]> = { 1: [0], 2: [0, 3], 3: [0, 2, 4] };
-
   const existing = await db
     .select()
     .from(schema.visits)
@@ -153,7 +151,7 @@ export async function generateWeekVisits(
   let created = 0;
   let skipped = 0;
   for (const b of buildings) {
-    const pattern = PATTERNS[b.visitsPerWeek] ?? PATTERNS[2]!;
+    const pattern = WEEK_PATTERNS[b.visitsPerWeek] ?? WEEK_PATTERNS[2]!;
     for (const dayIdx of pattern) {
       const date = days[dayIdx]!;
       if (seen.has(`${b.id}|${date}`)) {
