@@ -81,6 +81,25 @@ async function enqueue(item: QueuedItem): Promise<void> {
   void flush();
 }
 
+/**
+ * true = remove from the queue (delivered, or unfixable), false = keep and
+ * retry. Three classes:
+ *  - ok, and genuinely ours: delivered.
+ *  - 401/403 or a redirect: the passcode session lapsed. The capture is fine;
+ *    the phone isn't signed in. Hold it — it lands after the next login.
+ *  - other 4xx: malformed forever; drop rather than poison the queue.
+ *  - 5xx / network: server or signal trouble; hold it.
+ */
+function settle(res: Response): boolean {
+  // A followed redirect means some interstitial answered, not our API.
+  // Whatever it said, the write did not land.
+  if (res.redirected) return false;
+  if (res.ok) return true;
+  if (res.status === 401 || res.status === 403) return false;
+  if (res.status < 500) return true;
+  return false;
+}
+
 async function send(item: QueuedItem): Promise<boolean> {
   if (item.kind === "json") {
     const res = await fetch(item.url, {
@@ -88,16 +107,13 @@ async function send(item: QueuedItem): Promise<boolean> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(item.body),
     });
-    // 4xx will not heal by retrying; drop it rather than blocking the queue.
-    if (!res.ok && res.status < 500) return true;
-    return res.ok;
+    return settle(res);
   }
   const form = new FormData();
   for (const [k, v] of Object.entries(item.fields)) form.append(k, v);
   form.append("file", item.blob, item.filename);
   const res = await fetch(item.url, { method: "POST", body: form });
-  if (!res.ok && res.status < 500) return true;
-  return res.ok;
+  return settle(res);
 }
 
 let flushing = false;

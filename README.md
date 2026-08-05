@@ -111,6 +111,10 @@ Copy `.env.example` to `.env`. Everything is optional in dev:
 - `SCARA_PASSCODE` — the shared gate for all non-public routes. Unset = open
   (so a fresh clone runs); **set it in production**.
 - `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` — switch the DB to Turso.
+  **Required on Vercel**: serverless has no usable disk, so without these the
+  app refuses to fall back to SQLite and the admin screens show an amber
+  banner with these exact steps. `curl <site>/api/health` reports the
+  database status (`ok` / `unconfigured` / `unreachable` / `empty`).
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` —
   switch file storage to Cloudflare R2.
 

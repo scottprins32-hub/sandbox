@@ -46,6 +46,15 @@ export function middleware(request: NextRequest) {
   const cookie = request.cookies.get("scara_pass")?.value;
   if (cookie === passcode) return NextResponse.next();
 
+  // API calls get 401, never a redirect. `fetch` follows redirects silently,
+  // so a gated /api/* call bounced to /gate would come back as a 200 HTML
+  // page — and the offline queues would read that as "delivered" and delete
+  // a capture that never landed. A 401 is unambiguous and the queues hold
+  // the item until someone signs back in.
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ ok: false, reason: "passcode" }, { status: 401 });
+  }
+
   const gateUrl = request.nextUrl.clone();
   gateUrl.pathname = "/gate";
   gateUrl.search = `?next=${encodeURIComponent(pathname)}`;

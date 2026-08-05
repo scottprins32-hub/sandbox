@@ -156,6 +156,12 @@ export default async function PublicBuildingPage({
                   Prea multe sesizări trimise de pe acest dispozitiv. Încercați mai târziu.
                 </p>
               )}
+              {eroare === "indisponibil" && (
+                <p className="mt-3 text-sm text-rust">
+                  Nu am putut primi sesizarea acum. Încercați din nou în câteva minute sau
+                  sunați-ne.
+                </p>
+              )}
               <form action={reportIssueAction} className="mt-4 grid gap-4">
                 <input type="hidden" name="code" value={code} />
                 {/* Honeypot: invisible to humans, irresistible to bots. */}

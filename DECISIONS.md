@@ -261,6 +261,33 @@ to carry live here too.
   obligation, task, service line and commitment string against the actual font
   file — 176 cases. Confirmed to fail on the original text before being fixed.
 
+- **2026-08-05 — A deployment with no database now degrades into instructions,
+  not a crash.** Production had no Turso, so every data-backed screen died in
+  an error boundary whose message Next.js redacts — "Something broke", cause
+  invisible. Now: on Vercel with no `TURSO_DATABASE_URL`, `getDb()` throws a
+  sentence a person can act on instead of an EROFS from inside better-sqlite3
+  (which, on a host with a writable disk, would have silently created a
+  private empty database per instance — worse than crashing). A `dbStatus()`
+  helper answers ok / unconfigured / unreachable / empty; the admin layout
+  turns that into an amber banner with the exact fix, the error boundary
+  points at the banner, and `/api/health` reports the status so "why is Ops
+  broken" is one curl. Only the "ok" verdict is cached per process — failures
+  re-check every render, so the banner clears the moment the fix lands.
+- **2026-08-05 — Gated `/api/*` calls answer 401, never a redirect — this was
+  a silent data-loss bug.** The passcode middleware bounced unauthenticated
+  API calls to `/gate`; `fetch` follows redirects, so the offline queues saw
+  the gate's 200 HTML page and deleted the queued capture as "delivered". A
+  cleaner whose 90-day cookie expired mid-route would have lost every queued
+  visit and building. Both queues now treat a followed redirect, a 401/403 and
+  any 5xx as "hold and retry" — an item is deleted only on a clean 2xx from
+  our own API, or a non-auth 4xx that will never heal.
+- **2026-08-05 — The resident page 404s when the database is down; it never
+  500s.** To the person in the hallway, a broken database and a wrong code
+  look identical — a page that does not resolve. The operator finds the truth
+  on the admin banner, not the resident on an error page. The issue form says
+  "încercați din nou în câteva minute" instead of crashing, and the public
+  lead API returns 503 so the form's retry message shows.
+
 - **2026-08-05 — Atlas's "Add prospect" creates at `vizitat`, not the schema
   default.** The schema defaults to `de_vizitat` because that is right for
   field capture, but Atlas hides that column, so a card added from Atlas

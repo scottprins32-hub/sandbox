@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { fontVars } from "../fonts";
 import { RoleSwitcher, type RoleOption } from "@/components/RoleSwitcher";
+import { dbStatus } from "@/server/db/health";
 import { en } from "@/lib/i18n/en";
 
 export const metadata: Metadata = {
@@ -43,10 +44,51 @@ const NAV = [
   { href: "/portal", label: en.nav.portal },
 ];
 
+// What the admin sees when the deployment has no working database. The
+// database-backed screens (Ops, Portal, leads) crash into an error boundary
+// whose message production redacts, so THIS is the only place the real cause
+// and the exact fix can reach the person who can act on it.
+const DB_BANNER: Record<string, { title: string; body: React.ReactNode }> = {
+  unconfigured: {
+    title: "No database connected.",
+    body: (
+      <>
+        Simulator, Obligations and Services work; everything that stores data
+        (Ops, Portal, leads) will fail until it exists. Create a free Turso
+        database, set <code>TURSO_DATABASE_URL</code> and{" "}
+        <code>TURSO_AUTH_TOKEN</code> in the hosting environment, redeploy,
+        then run <code>npm run seed</code> against it once.
+      </>
+    ),
+  },
+  unreachable: {
+    title: "The database is not answering.",
+    body: (
+      <>
+        Check <code>TURSO_DATABASE_URL</code> and <code>TURSO_AUTH_TOKEN</code>{" "}
+        in the hosting environment — a typo or an expired token looks exactly
+        like this. Data-backed screens will fail until it responds.
+      </>
+    ),
+  },
+  empty: {
+    title: "The database is connected but empty.",
+    body: (
+      <>
+        Run{" "}
+        <code>TURSO_DATABASE_URL=… TURSO_AUTH_TOKEN=… npm run seed</code> from
+        the project folder once to create the tables and load the demo world.
+      </>
+    ),
+  },
+};
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const role = cookieStore.get("scara_role")?.value ?? "admin";
   const options = await roleOptions();
+  const db = await dbStatus();
+  const dbBanner = DB_BANNER[db];
 
   // A production deployment with no passcode is publicly readable, including
   // the Simulator's margins. Fail loudly rather than silently.
@@ -61,6 +103,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <strong>This deployment has no passcode.</strong> Anyone with the URL can read
             your margins and client data. Set <code>SCARA_PASSCODE</code> in the hosting
             environment and redeploy.
+          </div>
+        )}
+        {dbBanner && (
+          <div className="bg-warn px-4 py-2 text-center text-sm text-paper">
+            <strong>{dbBanner.title}</strong> {dbBanner.body}
           </div>
         )}
         <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">

@@ -85,7 +85,16 @@ function nextVisitYmd(building: Building, booked: string[]): string | null {
 export async function getPublicBuildingView(
   code: string
 ): Promise<PublicBuildingView | null> {
-  const building = await getBuildingByPublicCode(code);
+  // A resident with a QR code gets a page or a 404, never a 500. If the
+  // deployment's database is missing or down, that is the operator's problem
+  // to see (the admin layout says so loudly); to the person in the hallway
+  // the page simply does not resolve.
+  let building;
+  try {
+    building = await getBuildingByPublicCode(code);
+  } catch {
+    return null;
+  }
   if (!building) return null;
   const orgId = building.orgId;
 

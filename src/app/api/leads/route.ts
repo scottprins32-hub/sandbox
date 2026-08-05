@@ -44,16 +44,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
   }
 
-  const org = await getCurrentOrg();
-  await createLead(org.id, {
-    name: name.slice(0, 120),
-    phone: phone.slice(0, 40),
-    locality: (body.localitate ?? "").trim().slice(0, 80) || null,
-    buildingType: BUILDING_TYPES.has(body.tip ?? "")
-      ? (body.tip as "bloc" | "asociatie" | "birou" | "altele")
-      : null,
-    message: (body.mesaj ?? "").trim().slice(0, 2000) || null,
-    source: "public_page",
-  });
+  // 503, not a crash: the form tells the visitor to try again, and 5xx means
+  // "temporary" to anything that retries — a 500 error page tells a potential
+  // client the company's own website is broken.
+  try {
+    const org = await getCurrentOrg();
+    await createLead(org.id, {
+      name: name.slice(0, 120),
+      phone: phone.slice(0, 40),
+      locality: (body.localitate ?? "").trim().slice(0, 80) || null,
+      buildingType: BUILDING_TYPES.has(body.tip ?? "")
+        ? (body.tip as "bloc" | "asociatie" | "birou" | "altele")
+        : null,
+      message: (body.mesaj ?? "").trim().slice(0, 2000) || null,
+      source: "public_page",
+    });
+  } catch {
+    return NextResponse.json({ ok: false, reason: "db" }, { status: 503 });
+  }
   return NextResponse.json({ ok: true });
 }

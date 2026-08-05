@@ -50,7 +50,15 @@ export async function reportIssueAction(formData: FormData) {
   // The code is the authorisation: an unknown or switched-off page cannot
   // write. Resolving it again here means the form cannot be replayed against
   // a building whose page was taken down.
-  const building = await getBuildingByPublicCode(code);
+  let building;
+  try {
+    building = await getBuildingByPublicCode(code);
+  } catch {
+    // Database down. Tell the resident to try later — a raw 500 reads as
+    // "this company's thing is broken", which is the impression the whole
+    // page exists to prevent.
+    redirect(`${back}?eroare=indisponibil`);
+  }
   if (!building) redirect(back);
 
   const raw = String(formData.get("categorie") ?? "altele");

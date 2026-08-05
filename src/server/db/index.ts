@@ -23,7 +23,23 @@ declare global {
   var __scaraDb: Db | undefined;
 }
 
+/**
+ * On serverless (Vercel) the SQLite fallback is a trap, not a fallback: the
+ * filesystem is read-only, and even where it is writable each instance would
+ * get its own private, empty database that vanishes on the next deploy. So
+ * with no Turso URL configured there, fail with a sentence a person can act
+ * on — not an EROFS from deep inside a native module.
+ */
+export function dbUnconfiguredReason(): string | null {
+  if (process.env.TURSO_DATABASE_URL) return null;
+  if (!process.env.VERCEL) return null;
+  return "No database is configured: set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in the hosting environment and redeploy.";
+}
+
 function createDb(): Db {
+  const unconfigured = dbUnconfiguredReason();
+  if (unconfigured) throw new Error(unconfigured);
+
   const tursoUrl = process.env.TURSO_DATABASE_URL;
   if (tursoUrl) {
     // Lazy CJS loads keep the unused driver out of the running process.

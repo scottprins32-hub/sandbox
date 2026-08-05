@@ -41,6 +41,18 @@ export function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+/**
+ * A response that must NOT count as delivered:
+ *  - a followed redirect: some interstitial answered with its own 200, not our
+ *    API — the write never landed;
+ *  - 401/403: the passcode session lapsed, retry after the next sign-in;
+ *  - 5xx: server trouble.
+ * Only clean 2xx delivers; only non-auth 4xx is dropped as unfixable.
+ */
+function retryable(res: Response): boolean {
+  return res.redirected || res.status === 401 || res.status === 403 || res.status >= 500;
+}
+
 /** POST JSON; on network failure, queue for retry. Returns true if it landed now. */
 export async function sendOrQueue(url: string, body: unknown): Promise<boolean> {
   try {
@@ -49,9 +61,8 @@ export async function sendOrQueue(url: string, body: unknown): Promise<boolean> 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    if (res.ok) return true;
-    // Auth/validation failures won't heal by retrying; only queue server/network trouble.
-    if (res.status >= 500) throw new Error(String(res.status));
+    if (res.ok && !res.redirected) return true;
+    if (retryable(res)) throw new Error(String(res.status));
     return false;
   } catch {
     write([...read(), { id: crypto.randomUUID(), url, body }]);
@@ -73,7 +84,10 @@ export async function flush(): Promise<void> {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(next.body),
         });
-        if (!res.ok && res.status >= 500) break; // still down; try later
+        if (!res.ok || res.redirected) {
+          if (retryable(res)) break; // still down or signed out; try later
+          // Non-auth 4xx: unfixable, fall through and drop it.
+        }
       } catch {
         break; // still offline
       }
