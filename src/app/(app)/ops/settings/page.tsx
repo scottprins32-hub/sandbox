@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { getCurrentOrg } from "@/server/org";
 import { getOrgSettings } from "@/server/repo/settings";
 import { FX, LABOUR, TARGETS } from "@/lib/constants";
-import { reseedAction, updateSettingsAction } from "../actions";
+import { reseedAction, updateDataPolicyAction, updateSettingsAction } from "../actions";
+import { listProspects } from "@/server/repo/prospects";
+import {
+  INFORM_DEADLINE_DAYS,
+  RETENTION_REVIEW_MONTHS,
+} from "@/lib/prospecting/field-data";
 
 export const metadata: Metadata = { title: "Settings · Scara" };
 export const dynamic = "force-dynamic";
@@ -11,6 +16,13 @@ export default async function SettingsPage() {
   const org = await getCurrentOrg();
   const settings = await getOrgSettings(org.id);
   const isDev = process.env.NODE_ENV !== "production";
+
+  // Retention review (§3.4): surfaced, never auto-deleted.
+  const retentionMonths = settings.retentionMonths ?? RETENTION_REVIEW_MONTHS;
+  const cutoff = Date.now() - retentionMonths * 30 * 24 * 60 * 60 * 1000;
+  const retentionReview = (await listProspects(org.id)).filter(
+    (p) => p.status === "pierdut" && (p.lastTouchAt ?? p.updatedAt) < cutoff
+  );
 
   return (
     <div className="mx-auto max-w-xl space-y-4">
@@ -179,6 +191,54 @@ export default async function SettingsPage() {
           </button>
         </form>
       )}
-    </div>
+    
+      {/* Personal data (add-on 2 §3.4) */}
+      <div className="mt-4 rounded-xl bg-surface p-4 shadow-card">
+        <h2 className="text-sm font-semibold">Personal data</h2>
+        <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+          Field contacts come from entrance-hall notice boards, which Legea 196/2018
+          art. 57 lit. m) requires associations to post. GDPR art. 14 gives you{" "}
+          {INFORM_DEADLINE_DAYS} days to send an information notice; overdue ones appear
+          on the Problems tab. Contacts marked do-not-contact are permanently excluded
+          from every list and from this export.
+        </p>
+        <form action={updateDataPolicyAction} className="mt-3 space-y-3">
+          <label className="block text-sm">
+            <span className="text-ink-soft">Legitimate-interest note</span>
+            <textarea
+              name="legitimateInterestNote"
+              rows={3}
+              defaultValue={settings.legitimateInterestNote ?? ""}
+              placeholder="De ce prelucrăm datele de contact ale administratorilor și pe ce temei."
+              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-ink-soft">Retention period (months)</span>
+            <input
+              type="number"
+              name="retentionMonths"
+              defaultValue={settings.retentionMonths ?? RETENTION_REVIEW_MONTHS}
+              className="tnum mt-1 w-28 rounded-md border border-line bg-surface px-3 py-2"
+            />
+          </label>
+          <button className="rounded-md bg-moss-deep px-4 py-2 text-sm font-medium text-paper">
+            Save data policy
+          </button>
+        </form>
+        <div className="mt-3 border-t border-line pt-3">
+          <a href="/api/contacts-export" className="text-sm text-moss underline">
+            Export all stored contacts (CSV)
+          </a>
+          {retentionReview.length > 0 && (
+            <p className="mt-2 text-xs text-warn">
+              {retentionReview.length} lost prospects have had no contact for{" "}
+              {settings.retentionMonths ?? RETENTION_REVIEW_MONTHS} months. Review them —
+              nothing is deleted automatically.
+            </p>
+          )}
+        </div>
+      </div>
+</div>
   );
 }

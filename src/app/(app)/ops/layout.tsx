@@ -4,6 +4,7 @@ const OPS_NAV = [
   { href: "/ops", label: "Today" },
   { href: "/ops/buildings", label: "Buildings" },
   { href: "/ops/compliance", label: "Compliance" },
+  { href: "/ops/teren", label: "Field" },
   { href: "/ops/offers", label: "Offers" },
   { href: "/ops/protocols", label: "Protocols" },
   { href: "/ops/payroll", label: "Payroll" },

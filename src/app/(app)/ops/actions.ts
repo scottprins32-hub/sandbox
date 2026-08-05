@@ -212,13 +212,24 @@ export async function createProspectAction(formData: FormData) {
     quotedPriceBani: Math.round(Number(formData.get("quotedLei") ?? 0) * 100) || null,
     notes: String(formData.get("notes") ?? "") || null,
     spottedDate: todayYmd(),
+    // Atlas's notebook starts at "visited": you only have floors, apartments
+    // and the current cleaner once you have stood in front of the building.
+    // "de_vizitat" is the field screen's column and Atlas does not show it, so
+    // leaving the schema default here would file the card out of sight.
+    status: "vizitat",
   });
   revalidatePath("/atlas");
 }
 
 export async function setProspectStatusAction(
   prospectId: string,
-  status: "spotted" | "contacted" | "quoted" | "won" | "lost"
+  status:
+    | "de_vizitat"
+    | "vizitat"
+    | "contactat"
+    | "oferta_trimisa"
+    | "castigat"
+    | "pierdut"
 ) {
   const org = await getCurrentOrg();
   await updateProspect(org.id, prospectId, { status });
@@ -244,7 +255,7 @@ export async function convertProspectAction(prospectId: string) {
     notes: prospect.notes,
   });
   await updateProspect(org.id, prospectId, {
-    status: "won",
+    status: "castigat",
     convertedBuildingId: building.id,
   });
   // Seed the compliance calendar from the catalogue, filtered by the flags,
@@ -567,6 +578,72 @@ export async function generateOfferAction(formData: FormData) {
   revalidatePath("/ops/offers");
   revalidatePath("/atlas");
   redirect(`/ops/offers?generated=${offer.id}`);
+}
+
+// --------------------------------------------- field prospecting (add-on 2 §3)
+
+/** Load the five surveyed routes. Idempotent: only fills an empty table. */
+export async function seedRoutesAction() {
+  const org = await getCurrentOrg();
+  const { listRoutes, createRoutes } = await import("@/server/repo/prospecting");
+  if ((await listRoutes(org.id)).length > 0) return;
+  const { ROUTE_SEEDS } = await import("@/lib/prospecting/field-data");
+  await createRoutes(
+    org.id,
+    ROUTE_SEEDS.map((r) => ({
+      name: r.name,
+      description: r.description,
+      parkAtLabel: r.parkAtLabel,
+      parkAtLat: r.parkAtLat ?? null,
+      parkAtLng: r.parkAtLng ?? null,
+      estBuildings: r.estBuildings,
+      orderIndex: r.orderIndex,
+      notes: r.notes,
+    }))
+  );
+  revalidatePath("/ops/teren");
+}
+
+/** GDPR art. 14: the information notice went out (§3.4). */
+export async function markContactInformedAction(
+  contactId: string,
+  prospectId: string,
+  routeId: string
+) {
+  const org = await getCurrentOrg();
+  const { markContactInformed } = await import("@/server/repo/prospecting");
+  await markContactInformed(org.id, contactId);
+  revalidatePath(`/ops/teren/${routeId}/${prospectId}`);
+  revalidatePath("/ops");
+}
+
+/**
+ * Permanent suppression (§3.4). One tap, never overrideable from the UI: the
+ * repo filters these out of every list and export.
+ */
+export async function suppressContactAction(
+  contactId: string,
+  prospectId: string,
+  routeId: string
+) {
+  const org = await getCurrentOrg();
+  const { suppressContact } = await import("@/server/repo/prospecting");
+  await suppressContact(org.id, contactId);
+  revalidatePath(`/ops/teren/${routeId}/${prospectId}`);
+  revalidatePath("/ops");
+}
+
+/** The org's personal-data policy text and retention period (§3.4). */
+export async function updateDataPolicyAction(formData: FormData) {
+  const org = await getCurrentOrg();
+  const months = Number(formData.get("retentionMonths"));
+  await updateOrgSettings(org.id, {
+    legitimateInterestNote:
+      String(formData.get("legitimateInterestNote") ?? "").trim() || undefined,
+    retentionMonths:
+      Number.isInteger(months) && months > 0 && months <= 120 ? months : undefined,
+  });
+  revalidatePath("/ops/settings");
 }
 
 export async function updateSettingsAction(formData: FormData) {

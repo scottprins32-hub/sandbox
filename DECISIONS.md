@@ -162,6 +162,45 @@ to carry live here too.
   `tasksForPackage(buildingFlags)` must filter by has_lift / has_basement /
   has_green. Four values: `has_lift`, `has_basement`, `has_green`,
   `has_parking`.
+- **2026-08-05 — The prospect status enum was replaced, not extended.** Field
+  capture needs a "to visit" state that exists before anyone has spoken to the
+  building, so the original five (spotted / contacted / quoted / won / lost)
+  became six Romanian-keyed ones (`de_vizitat`, `vizitat`, `contactat`,
+  `oferta_trimisa`, `castigat`, `pierdut`). Migration `0006_prospecting.sql`
+  maps the old values across; no row is stranded. Atlas deliberately does
+  **not** show the `de_vizitat` column — that is the field screen's queue, and
+  Atlas is the pipeline after first contact.
+- **2026-08-05 — Field capture queues to IndexedDB, not localStorage.** The
+  Portal's existing queue (`src/lib/offlineQueue.ts`) stays as it is: it
+  carries JSON only and localStorage is enough. `src/lib/fieldQueue.ts` is a
+  second, separate queue because field capture also queues **photos**, and
+  blobs do not belong in localStorage's string store. It replays oldest-first
+  so a prospect always exists before the contacts and photos that reference
+  it, and ids are minted on the client so a replay updates rather than
+  duplicates. Two queues is the honest answer here; merging them would force
+  the Portal to carry IndexedDB it does not need.
+- **2026-08-05 — The capture screen never navigates while offline.** Saving a
+  building used to `router.push()` back to the route. With no signal that RSC
+  fetch fails and Chromium replaces the whole app with its own "No internet"
+  page — Georgia taps Save in a basement and the screen she was working in
+  disappears, which reads as lost work even though the capture is safely
+  queued. Now it navigates only when `navigator.onLine`, and otherwise shows
+  an in-place confirmation plus a "Următoarea clădire" reset. Found by the
+  e2e test, which is why that test does the offline capture for real rather
+  than mocking the network.
+- **2026-08-05 — Drizzle's generated migration for the prospects rebuild was
+  broken and is hand-patched.** SQLite cannot add the new columns in place, so
+  drizzle emits a table rebuild — but its `INSERT ... SELECT` selected the
+  *new* columns from the *old* table (`no such column: "route_id"`). The
+  INSERT now copies only the columns that existed before, and the status
+  mapping plus the `first_seen_at` / `last_touch_at` backfill are appended.
+  Do not regenerate `0006_prospecting.sql`; edit it.
+- **2026-08-05 — Atlas's "Add prospect" creates at `vizitat`, not the schema
+  default.** The schema defaults to `de_vizitat` because that is right for
+  field capture, but Atlas hides that column, so a card added from Atlas
+  vanished the moment it was saved. Atlas's form asks for floors, apartments
+  and the current cleaner — things you only know once you have stood in front
+  of the building — so `vizitat` is the truthful state for it.
 
 ## Fixes
 

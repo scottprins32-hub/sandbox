@@ -26,6 +26,7 @@ export const en = {
     ops: "Ops",
     compliance: "Obligations",
     services: "Services",
+    field: "Field",
     portal: "Portal",
     settings: "Settings",
   },

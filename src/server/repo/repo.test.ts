@@ -85,9 +85,9 @@ describe("repo layer org scoping", () => {
 
     const { createProspect, updateProspect, listProspects } = await import("./prospects");
     const p = await createProspect(org!.id, { label: "Bloc test", commune: "Giroc" });
-    await updateProspect(org!.id, p.id, { status: "quoted", quotedPriceBani: 90_000 });
+    await updateProspect(org!.id, p.id, { status: "oferta_trimisa", quotedPriceBani: 90_000 });
     const [stored] = await listProspects(org!.id);
-    expect(stored!.status).toBe("quoted");
+    expect(stored!.status).toBe("oferta_trimisa");
     expect(stored!.quotedPriceBani).toBe(90_000);
 
     const { createLead, setLeadStatus, listLeads } = await import("./leads");

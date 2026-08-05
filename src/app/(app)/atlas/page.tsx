@@ -16,7 +16,22 @@ import {
 export const metadata: Metadata = { title: "Atlas · Scara" };
 export const dynamic = "force-dynamic";
 
-const PIPELINE = ["spotted", "contacted", "quoted", "won", "lost"] as const;
+// The field-capture statuses (add-on 2 §3.1). "de_vizitat" lives on the
+// prospecting screen, not here — Atlas shows the pipeline after first contact.
+const PIPELINE = [
+  "vizitat",
+  "contactat",
+  "oferta_trimisa",
+  "castigat",
+  "pierdut",
+] as const;
+const PIPELINE_LABEL: Record<(typeof PIPELINE)[number], string> = {
+  vizitat: "visited",
+  contactat: "contacted",
+  oferta_trimisa: "offer sent",
+  castigat: "won",
+  pierdut: "lost",
+};
 
 // Atlas (§6b): Cut 1 commune cards + Cut 2 field notebook and document shelf.
 export default async function AtlasPage() {
@@ -39,7 +54,7 @@ export default async function AtlasPage() {
   }
 
   const quotedBani = prospects
-    .filter((p) => p.status === "quoted")
+    .filter((p) => p.status === "oferta_trimisa")
     .reduce((sum, p) => sum + (p.quotedPriceBani ?? 0), 0);
   const vatUsedIfWon = ((recurringMonthlyBani + quotedBani) * 12) / TAX.VAT_THRESHOLD_ANNUAL;
   const storage = getStorage();
@@ -101,7 +116,7 @@ export default async function AtlasPage() {
                 return (
                   <div key={stage} className="rounded-xl bg-paper">
                     <p className="px-1 pb-1 text-xs font-semibold uppercase tracking-wide text-ink-faint">
-                      {stage} <span className="tnum">({inStage.length})</span>
+                      {PIPELINE_LABEL[stage]} <span className="tnum">({inStage.length})</span>
                     </p>
                     <div className="space-y-2">
                       {inStage.map((p) => (
@@ -126,7 +141,7 @@ export default async function AtlasPage() {
                             <p className="mt-1 text-xs leading-relaxed text-ink-soft">{p.notes}</p>
                           )}
                           <div className="mt-2 flex flex-wrap gap-1.5">
-                            {stage !== "won" && stage !== "lost" && (
+                            {stage !== "castigat" && stage !== "pierdut" && (
                               <a
                                 href={`/ops/offers?prospect=${p.id}`}
                                 className="rounded-md border border-moss px-2 py-1 text-xs font-medium text-moss-deep"
@@ -134,22 +149,22 @@ export default async function AtlasPage() {
                                 Offer
                               </a>
                             )}
-                            {stage !== "spotted" && stage !== "won" && (
+                            {stage !== "vizitat" && stage !== "castigat" && (
                               <MoveButton
                                 id={p.id}
                                 to={PIPELINE[PIPELINE.indexOf(stage) - 1]!}
                                 label="←"
                               />
                             )}
-                            {stage === "spotted" && (
-                              <MoveButton id={p.id} to="contacted" label="Contacted →" />
+                            {stage === "vizitat" && (
+                              <MoveButton id={p.id} to="contactat" label="Contacted →" />
                             )}
-                            {stage === "contacted" && (
-                              <MoveButton id={p.id} to="quoted" label="Quoted →" />
+                            {stage === "contactat" && (
+                              <MoveButton id={p.id} to="oferta_trimisa" label="Offer sent →" />
                             )}
-                            {stage === "quoted" && (
+                            {stage === "oferta_trimisa" && (
                               <>
-                                <MoveButton id={p.id} to="lost" label="Lost" />
+                                <MoveButton id={p.id} to="pierdut" label="Lost" />
                                 {p.convertedBuildingId ? null : (
                                   <form action={convertProspectAction.bind(null, p.id)}>
                                     <button className="rounded-md bg-moss-deep px-2 py-1 text-xs font-medium text-paper">
@@ -159,8 +174,8 @@ export default async function AtlasPage() {
                                 )}
                               </>
                             )}
-                            {stage === "lost" && (
-                              <MoveButton id={p.id} to="contacted" label="Reopen" />
+                            {stage === "pierdut" && (
+                              <MoveButton id={p.id} to="contactat" label="Reopen" />
                             )}
                           </div>
                         </div>

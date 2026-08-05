@@ -13,7 +13,6 @@ import {
   A4,
   COLORS,
   CONTENT_W,
-  drawLogo,
   drawMicroLabel,
   embedDocFonts,
   MARGIN,

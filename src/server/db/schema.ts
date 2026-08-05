@@ -321,6 +321,26 @@ export const leads = sqliteTable(
   (t) => [index("leads_org_idx").on(t.orgId)]
 );
 
+// Walking routes for the field prospecting module (add-on 2 §3).
+export const routes = sqliteTable(
+  "routes",
+  {
+    id: id(),
+    orgId: orgId(),
+    name: text("name").notNull(),
+    description: text("description"),
+    parkAtLabel: text("park_at_label"),
+    parkAtLat: real("park_at_lat"),
+    parkAtLng: real("park_at_lng"),
+    estBuildings: integer("est_buildings"),
+    orderIndex: integer("order_index").notNull().default(0),
+    notes: text("notes"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("routes_org_idx").on(t.orgId)]
+);
+
 export const prospects = sqliteTable(
   "prospects",
   {
@@ -332,19 +352,133 @@ export const prospects = sqliteTable(
     apartmentsEst: integer("apartments_est"),
     currentCleaner: text("current_cleaner").notNull().default("unknown"), // unknown | none | a name
     contact: text("contact"),
+    /**
+     * Field-capture statuses (add-on 2 §3.1). Migration 0006 maps the original
+     * five (spotted/contacted/quoted/won/lost) onto these.
+     */
     status: text("status", {
-      enum: ["spotted", "contacted", "quoted", "won", "lost"],
+      enum: [
+        "de_vizitat",
+        "vizitat",
+        "contactat",
+        "oferta_trimisa",
+        "castigat",
+        "pierdut",
+      ],
     })
       .notNull()
-      .default("spotted"),
+      .default("de_vizitat"),
     quotedPriceBani: integer("quoted_price_bani"),
     notes: text("notes"),
     spottedDate: text("spotted_date"), // YYYY-MM-DD
     convertedBuildingId: text("converted_building_id"),
+    // --- field capture (add-on 2 §3.1), additive on the original table ---
+    routeId: text("route_id"),
+    street: text("street"),
+    number: text("number"),
+    lat: real("lat"),
+    lng: real("lng"),
+    entrances: integer("entrances"),
+    ownership: text("ownership", {
+      enum: ["asociatie", "proprietar_unic", "dezvoltator", "necunoscut"],
+    })
+      .notNull()
+      .default("necunoscut"),
+    access: text("access", { enum: ["deschis", "interfon", "poarta", "necunoscut"] })
+      .notNull()
+      .default("necunoscut"),
+    incumbent: text("incumbent", {
+      enum: ["niciunul", "femeie_serviciu", "firma", "necunoscut"],
+    })
+      .notNull()
+      .default("necunoscut"),
+    incumbentName: text("incumbent_name"),
+    /** 1-12, the month the general assembly meets (art. 47(1): Q1 by law). */
+    assemblyMonth: integer("assembly_month"),
+    firstSeenAt: integer("first_seen_at"),
+    lastTouchAt: integer("last_touch_at"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("prospects_org_idx").on(t.orgId)]
+  (t) => [
+    index("prospects_org_idx").on(t.orgId),
+    index("prospects_route_idx").on(t.routeId),
+  ]
+);
+
+/**
+ * Contacts read off the entrance-hall notice board, which Legea 196/2018
+ * art. 57 lit. m) requires the association to post. `informedAt` is the GDPR
+ * art. 14 duty (inform within one month); `doNotContact` is permanent.
+ */
+export const prospectContacts = sqliteTable(
+  "prospect_contacts",
+  {
+    id: id(),
+    orgId: orgId(),
+    prospectId: text("prospect_id").notNull(),
+    role: text("role", {
+      enum: ["administrator", "presedinte", "comitet", "proprietar", "dezvoltator"],
+    }).notNull(),
+    name: text("name").notNull(),
+    phone: text("phone"),
+    email: text("email"),
+    source: text("source", {
+      enum: ["avizier", "site_public", "recomandare", "ne_a_contactat"],
+    })
+      .notNull()
+      .default("avizier"),
+    consentNote: text("consent_note"),
+    informedAt: integer("informed_at"),
+    doNotContact: integer("do_not_contact", { mode: "boolean" }).notNull().default(false),
+    capturedAt: integer("captured_at").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("prospect_contacts_org_idx").on(t.orgId),
+    index("prospect_contacts_prospect_idx").on(t.prospectId),
+  ]
+);
+
+export const prospectPhotos = sqliteTable(
+  "prospect_photos",
+  {
+    id: id(),
+    orgId: orgId(),
+    prospectId: text("prospect_id").notNull(),
+    fileKey: text("file_key").notNull(),
+    kind: text("kind", {
+      enum: ["avizier", "pubele", "intrare", "scara", "exterior"],
+    }).notNull(),
+    takenAt: integer("taken_at").notNull(),
+    note: text("note"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("prospect_photos_org_idx").on(t.orgId),
+    index("prospect_photos_prospect_idx").on(t.prospectId),
+  ]
+);
+
+export const prospectEvents = sqliteTable(
+  "prospect_events",
+  {
+    id: id(),
+    orgId: orgId(),
+    prospectId: text("prospect_id").notNull(),
+    kind: text("kind", { enum: ["vizita", "apel", "oferta", "raspuns", "nota"] }).notNull(),
+    occurredAt: integer("occurred_at").notNull(),
+    summary: text("summary"),
+    outcome: text("outcome"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("prospect_events_org_idx").on(t.orgId),
+    index("prospect_events_prospect_idx").on(t.prospectId),
+  ]
 );
 
 // ---------------------------------------------------------------------------

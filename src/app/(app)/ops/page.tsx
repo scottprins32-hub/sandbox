@@ -24,6 +24,9 @@ import {
   resolveFindingAction,
 } from "./actions";
 import { listOpenFindings } from "@/server/repo/walks";
+import { listAllContacts } from "@/server/repo/prospecting";
+import { INFORM_DEADLINE_DAYS } from "@/lib/prospecting/field-data";
+import { markContactInformedAction } from "./actions";
 import {
   listBuildingObligations,
   listContractors,
@@ -82,6 +85,14 @@ export default async function OpsToday({
       listScheduledEventsOnDate(org.id, today),
     ]);
   const openFindings = await listOpenFindings(org.id);
+  // GDPR art. 14 (add-on 2 §3.4): a contact taken from a notice board must be
+  // informed within a month. Past that with no notice sent, it is a breach and
+  // it belongs on this tab, not buried in a settings page.
+  const allContacts = await listAllContacts(org.id);
+  const informDeadlineMs = INFORM_DEADLINE_DAYS * 24 * 60 * 60 * 1000;
+  const uninformedContacts = allContacts.filter(
+    (c) => !c.informedAt && Date.now() - c.capturedAt > informDeadlineMs
+  );
   const complianceRows = decorate(obligationRecords);
   // Treatments booked for today: coordination tasks, not cleaning jobs. The
   // crew escorts, photographs and files — it never performs these (§2.3).
@@ -158,7 +169,8 @@ export default async function OpsToday({
     overdueObligations.length +
     dueNoContractor.length +
     unauthorisedContractors.length +
-    openFindings.length;
+    openFindings.length +
+    uninformedContacts.length;
 
   // Route: group today's visits by cleaner.
   const byCleaner = new Map<string, typeof todaysVisits>();
@@ -399,6 +411,39 @@ export default async function OpsToday({
                     <p className="text-xs text-warn">
                       Student proof expires {c.studentProofExpiry}. Ask for the new one.
                     </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {uninformedContacts.length > 0 && (
+            <div className="rounded-xl bg-surface p-4 shadow-card">
+              <h2 className="text-sm font-semibold">
+                Contacts not yet informed (GDPR art. 14)
+              </h2>
+              <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                Data taken from a notice board must be acknowledged within{" "}
+                {INFORM_DEADLINE_DAYS} days. These are past that.
+              </p>
+              <ul className="mt-2 divide-y divide-line">
+                {uninformedContacts.map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm">{c.name}</p>
+                      <p className="text-xs text-danger">
+                        captured {new Date(c.capturedAt).toISOString().slice(0, 10)} · from
+                        the {c.source}
+                      </p>
+                    </div>
+                    <form
+                      action={markContactInformedAction.bind(null, c.id, c.prospectId, "")}
+                      className="shrink-0"
+                    >
+                      <button className="rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft hover:border-moss">
+                        Notice sent
+                      </button>
+                    </form>
                   </li>
                 ))}
               </ul>

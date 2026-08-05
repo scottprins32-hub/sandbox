@@ -14,13 +14,13 @@ test("atlas: commune cards, prospect pipeline to building", async ({ page }) => 
   await page.getByRole("button", { name: "Add to notebook" }).click();
   await expect(page.getByText("Bulevardul Sudului 12")).toBeVisible();
 
-  // Walk it: spotted → contacted → quoted → won (converts to building).
+  // Walk it: visited → contacted → offer sent → won (converts to building).
   // Scope every click to this prospect's card — the seed already has a card
-  // in the "quoted" column.
+  // in the "offer sent" column.
   const card = () =>
     page.locator("div.rounded-lg.bg-surface", { hasText: "Bulevardul Sudului 12" }).first();
   await card().getByRole("button", { name: "Contacted →" }).click();
-  await card().getByRole("button", { name: "Quoted →" }).click();
+  await card().getByRole("button", { name: "Offer sent →" }).click();
   await card().getByRole("button", { name: "Won → building" }).click();
   // Conversion redirects to the new Ops building page.
   await expect(page.getByRole("heading", { name: "Bulevardul Sudului 12" })).toBeVisible();

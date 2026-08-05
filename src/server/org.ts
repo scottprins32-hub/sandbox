@@ -31,6 +31,9 @@ export interface OrgSettingsJson {
   /** Posted-schedule visit window (add-on 2 §C1), e.g. "07:00". */
   visitWindowFrom?: string;
   visitWindowTo?: string;
+  /** Personal-data policy (add-on 2 §3.4). */
+  legitimateInterestNote?: string;
+  retentionMonths?: number;
   [key: string]: unknown;
 }
 

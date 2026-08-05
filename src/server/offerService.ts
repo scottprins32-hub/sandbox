@@ -201,9 +201,9 @@ export async function generateOffer(orgId: string, req: OfferRequest): Promise<O
   // Sending an offer means the prospect is quoted. Keep the pipeline honest.
   if (req.prospectId) {
     const prospect = await getProspect(orgId, req.prospectId);
-    if (prospect && prospect.status !== "won" && prospect.status !== "lost") {
+    if (prospect && prospect.status !== "castigat" && prospect.status !== "pierdut") {
       await updateProspect(orgId, req.prospectId, {
-        status: "quoted",
+        status: "oferta_trimisa",
         quotedPriceBani: req.priceBani,
       });
     }

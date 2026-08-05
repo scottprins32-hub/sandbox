@@ -12,6 +12,7 @@ import { applicableObligations, nextDueDate, OBLIGATION_BY_KEY } from "../lib/co
 import { SERVICE_LINES, SERVICE_LINE_BY_KEY } from "../lib/compliance/services";
 import { STANDARD_CHECKPOINTS } from "../server/walkService";
 import { STANDARD_ELEMENTS } from "../lib/compliance/elements";
+import { ROUTE_SEEDS } from "../lib/prospecting/field-data";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -66,7 +67,11 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     schema.protocols,
     schema.leads,
     schema.offers,
+    schema.prospectEvents,
+    schema.prospectPhotos,
+    schema.prospectContacts,
     schema.prospects,
+    schema.routes,
     schema.documents,
     schema.contractBuildings,
     schema.contracts,
@@ -355,19 +360,128 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     });
   }
 
-  // Prospect (Atlas field notebook)
-  await db.insert(schema.prospects).values({
+  // Field routes from the Giroc/Chișoda survey (add-on 2 §3.2).
+  const routeRows = await db
+    .insert(schema.routes)
+    .values(
+      ROUTE_SEEDS.map((r) => ({
+        orgId,
+        name: r.name,
+        description: r.description,
+        parkAtLabel: r.parkAtLabel,
+        parkAtLat: r.parkAtLat ?? null,
+        parkAtLng: r.parkAtLng ?? null,
+        estBuildings: r.estBuildings,
+        orderIndex: r.orderIndex,
+        notes: r.notes,
+      }))
+    )
+    .returning();
+  const route1 = routeRows.find((r) => r.orderIndex === 1)!;
+  const route2 = routeRows.find((r) => r.orderIndex === 2)!;
+
+  // Prospects captured on foot: one already quoted, plus two fresh captures
+  // that exercise the scorecard (one high priority, one gated developer stock).
+  const [quotedProspect, hotProspect] = await db
+    .insert(schema.prospects)
+    .values([
+      {
+        orgId,
+        routeId: route1.id,
+        label: "Complex Park Giroc — scara 2",
+        street: "Neptun",
+        number: "2",
+        commune: "Giroc",
+        floors: 4,
+        entrances: 1,
+        apartmentsEst: 16,
+        currentCleaner: "asociația, intern",
+        ownership: "asociatie" as const,
+        access: "interfon" as const,
+        incumbent: "femeie_serviciu" as const,
+        status: "oferta_trimisa" as const,
+        quotedPriceBani: 850_00,
+        notes: "Administrator deschis la ofertă; decizia la adunarea generală.",
+        spottedDate: todayYmd(),
+        assemblyMonth: 3,
+        firstSeenAt: Date.now() - 40 * DAY_MS,
+        lastTouchAt: Date.now() - 3 * DAY_MS,
+      },
+      {
+        orgId,
+        routeId: route2.id,
+        label: "Cucului 14",
+        street: "Cucului",
+        number: "14",
+        commune: "Giroc",
+        floors: 2,
+        entrances: 1,
+        apartmentsEst: 12,
+        ownership: "asociatie" as const,
+        access: "deschis" as const,
+        incumbent: "niciunul" as const,
+        status: "vizitat" as const,
+        notes: "Zona pubelelor neîngrijită. Avizier complet.",
+        assemblyMonth: 11,
+        firstSeenAt: Date.now() - 2 * DAY_MS,
+        lastTouchAt: Date.now() - 2 * DAY_MS,
+      },
+      {
+        orgId,
+        routeId: route1.id,
+        label: "Future Residence V",
+        street: "Speranței",
+        number: "11",
+        commune: "Giroc",
+        floors: 4,
+        entrances: 2,
+        apartmentsEst: 62,
+        ownership: "dezvoltator" as const,
+        access: "poarta" as const,
+        incumbent: "necunoscut" as const,
+        status: "de_vizitat" as const,
+        notes: "Barieră automatizată. De sunat dezvoltatorul, nu de bătut la ușă.",
+        firstSeenAt: Date.now() - DAY_MS,
+        lastTouchAt: Date.now() - DAY_MS,
+      },
+    ])
+    .returning();
+
+  // A bin photo makes the difference between "worth a knock" and "high
+  // priority" — and it is the sales document in this commune.
+  const binKey = `${orgId}/prospects/${hotProspect!.id}/pubele.jpg`;
+  await storage.put(binKey, placeholderJpeg(2), "image/jpeg");
+  await db.insert(schema.prospectPhotos).values({
     orgId,
-    label: "Complex Park Giroc — scara 2",
-    commune: "Giroc",
-    floors: 4,
-    apartmentsEst: 16,
-    currentCleaner: "asociația, intern",
-    status: "quoted",
-    quotedPriceBani: 850_00,
-    notes: "Administrator deschis la ofertă; decizia la adunarea generală.",
-    spottedDate: todayYmd(),
+    prospectId: hotProspect!.id,
+    fileKey: binKey,
+    kind: "pubele" as const,
+    takenAt: Date.now() - 2 * DAY_MS,
   });
+
+  // Contacts read off the avizier. One informed long ago, one captured 35 days
+  // back and never informed — that one must show up on Problems (§3.4).
+  await db.insert(schema.prospectContacts).values([
+    {
+      orgId,
+      prospectId: hotProspect!.id,
+      role: "administrator" as const,
+      name: "Administrator (de pe avizier)",
+      phone: "0256 000 111",
+      source: "avizier" as const,
+      capturedAt: Date.now() - 35 * DAY_MS,
+    },
+    {
+      orgId,
+      prospectId: quotedProspect!.id,
+      role: "presedinte" as const,
+      name: "Președinte (de pe avizier)",
+      phone: "0256 000 222",
+      source: "avizier" as const,
+      capturedAt: Date.now() - 40 * DAY_MS,
+      informedAt: Date.now() - 38 * DAY_MS,
+    },
+  ]);
 
   // Two weeks of history: visits Mon+Thu per building, ~90% done, photos.
   const today = todayYmd();
