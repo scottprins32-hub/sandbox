@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import { getCurrentOrg } from "@/server/org";
 import { getOrgSettings } from "@/server/repo/settings";
 import { FX, LABOUR, TARGETS } from "@/lib/constants";
-import { reseedAction, updateDataPolicyAction, updateSettingsAction } from "../actions";
+import {
+  reseedAction,
+  updateCleanerNoticeAction,
+  updateDataPolicyAction,
+  updateSettingsAction,
+} from "../actions";
 import { listProspects } from "@/server/repo/prospects";
+import { listCleaners } from "@/server/repo/cleaners";
 import {
   INFORM_DEADLINE_DAYS,
   RETENTION_REVIEW_MONTHS,
@@ -23,6 +29,8 @@ export default async function SettingsPage() {
   const retentionReview = (await listProspects(org.id)).filter(
     (p) => p.status === "pierdut" && (p.lastTouchAt ?? p.updatedAt) < cutoff
   );
+
+  const cleaners = await listCleaners(org.id);
 
   return (
     <div className="mx-auto max-w-xl space-y-4">
@@ -170,6 +178,68 @@ export default async function SettingsPage() {
           Save settings
         </button>
       </form>
+
+      {/* The named cleaner (add-on 2 §C3) */}
+      <div className="rounded-xl bg-surface p-4 shadow-card">
+        <h2 className="text-sm font-semibold">Îngrijitorul scării — notice board</h2>
+        <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+          A firm with 300 stairwells cannot put a name and a face on each one. You can.
+          Publishing a cleaner&rsquo;s first name and photo on a public board is{" "}
+          <strong>their decision, not yours</strong> — ask them, and leave the box unticked
+          until they say yes. The intro is two sentences, written by them, in Romanian.
+        </p>
+        <div className="mt-3 space-y-3">
+          {cleaners.map((c) => (
+            <form
+              key={c.id}
+              action={updateCleanerNoticeAction.bind(null, c.id)}
+              className="rounded-lg border border-line p-3"
+            >
+              <p className="text-sm font-medium">{c.name}</p>
+              <label className="mt-2 block text-xs">
+                <span className="text-ink-soft">Name on the notice</span>
+                <input
+                  name="displayName"
+                  defaultValue={c.displayName ?? ""}
+                  placeholder={c.name.trim().split(/\s+/)[0]}
+                  className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="mt-2 block text-xs">
+                <span className="text-ink-soft">Intro (Romanian, two sentences)</span>
+                <textarea
+                  name="introRo"
+                  rows={2}
+                  defaultValue={c.introRo ?? ""}
+                  className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm"
+                />
+                <span className="mt-1 block text-[11px] text-ink-faint">
+                  Don&rsquo;t name the days here — the sheet prints the real schedule
+                  underneath, and a repeated one goes stale the first time a building
+                  changes pattern.
+                </span>
+              </label>
+              <label className="mt-2 flex items-start gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  name="showOnNotice"
+                  defaultChecked={c.showOnNotice}
+                  className="mt-0.5"
+                />
+                <span className="text-ink-soft">
+                  {c.name.trim().split(/\s+/)[0]} has agreed to appear on the notice board.
+                </span>
+              </label>
+              <button className="mt-2 rounded-md border border-line px-3 py-1.5 text-xs">
+                Save
+              </button>
+            </form>
+          ))}
+          {cleaners.length === 0 && (
+            <p className="text-xs text-ink-faint">No cleaners yet.</p>
+          )}
+        </div>
+      </div>
 
       <div className="rounded-xl bg-surface p-4 shadow-card">
         <h2 className="text-sm font-semibold">Access</h2>

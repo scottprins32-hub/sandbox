@@ -18,11 +18,13 @@ import { VatGauge } from "@/components/VatGauge";
 import { StatusChip } from "@/components/ops/StatusChip";
 import { vatCeilingBuildings } from "@/lib/finance";
 import {
+  acknowledgeIssueAction,
   generateThisWeekAction,
   setIssueStatusAction,
   markVisitMissedAction,
   resolveFindingAction,
 } from "./actions";
+import { ISSUE_CATEGORY_EN } from "@/lib/issues";
 import { listOpenFindings } from "@/server/repo/walks";
 import { listAllContacts } from "@/server/repo/prospecting";
 import { INFORM_DEADLINE_DAYS } from "@/lib/prospecting/field-data";
@@ -355,6 +357,10 @@ export default async function OpsToday({
           {issues.length > 0 && (
             <div className="rounded-xl bg-surface p-4 shadow-card">
               <h2 className="text-sm font-semibold">Open issues</h2>
+              <p className="mt-0.5 text-xs text-ink-faint">
+                We publish &ldquo;confirmed within one working day&rdquo; on every building
+                page. Acknowledging here is what makes that number true.
+              </p>
               <ul className="mt-2 divide-y divide-line">
                 {issues.map((i) => (
                   <li key={i.id} className="flex items-center justify-between gap-3 py-2.5">
@@ -362,14 +368,29 @@ export default async function OpsToday({
                       <p className="truncate text-sm">{i.description}</p>
                       <p className="text-xs text-ink-faint">
                         {i.buildingId ? buildingById.get(i.buildingId)?.label : "General"} ·{" "}
-                        {i.source}
+                        {i.source} · {ISSUE_CATEGORY_EN[i.category]}
+                        {i.acknowledgedAt ? " · acknowledged" : ""}
                       </p>
+                      {i.reporterContact && (
+                        <p className="text-xs text-ink-faint">
+                          Reply to: {i.reporterContact}
+                        </p>
+                      )}
                     </div>
-                    <form action={setIssueStatusAction.bind(null, i.id, "done")}>
-                      <button className="rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft hover:border-moss">
-                        Resolve
-                      </button>
-                    </form>
+                    <div className="flex shrink-0 gap-1.5">
+                      {!i.acknowledgedAt && (
+                        <form action={acknowledgeIssueAction.bind(null, i.id)}>
+                          <button className="rounded-md border border-moss px-2.5 py-1 text-xs font-medium text-moss-deep">
+                            Acknowledge
+                          </button>
+                        </form>
+                      )}
+                      <form action={setIssueStatusAction.bind(null, i.id, "done")}>
+                        <button className="rounded-md border border-line px-2.5 py-1 text-xs text-ink-soft hover:border-moss">
+                          Resolve
+                        </button>
+                      </form>
+                    </div>
                   </li>
                 ))}
               </ul>

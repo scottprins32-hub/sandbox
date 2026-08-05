@@ -19,6 +19,7 @@ import {
   rule,
   wrapText,
 } from "./theme";
+import type { QrPath } from "./qr";
 
 export interface ScheduleGroup {
   labelRo: string;
@@ -41,7 +42,7 @@ export interface ScheduleData {
   phone: string;
   /** Only set when the building's public page is live, so no QR ever 404s. */
   publicUrl?: string;
-  qrSvgPath?: string;
+  qr?: QrPath;
 }
 
 export async function renderSchedulePdf(data: ScheduleData): Promise<Uint8Array> {
@@ -157,15 +158,15 @@ export async function renderSchedulePdf(data: ScheduleData): Promise<Uint8Array>
     x: MARGIN, y, size: 22, font: fonts.bold, color: COLORS.ink,
   });
 
-  if (data.qrSvgPath && data.publicUrl) {
+  if (data.qr && data.publicUrl) {
     const size = 92;
     const qx = A4[0] - MARGIN - size;
     const qy = y - 14;
-    page.drawSvgPath(data.qrSvgPath, {
+    page.drawSvgPath(data.qr.d, {
       x: qx,
       y: qy + size,
       color: COLORS.ink,
-      scale: size / 25,
+      scale: size / data.qr.modules,
     });
     page.drawText("Starea scării, oricând:", {
       x: qx - 4, y: qy - 12, size: 9.5, font: fonts.text, color: COLORS.ink2,

@@ -132,6 +132,16 @@ export async function seedDemo(): Promise<{ orgId: string }> {
         hoursPerDay: 4,
         studentProofExpiry: "2026-10-15",
         active: true,
+        // Consented to the notice board (§C3). Vasile has not, on purpose:
+        // the demo world has to show both answers, because "no" is a normal
+        // and permanent outcome, not a setup step someone forgot.
+        displayName: "Ioana",
+        // Deliberately says nothing about which days: the sheet prints the
+        // real schedule two lines below, and an intro that repeats it will
+        // contradict it the first time a building changes its pattern.
+        introRo:
+          "Mă ocup de scara dumneavoastră. Dacă vedeți ceva ce am scăpat, spuneți-mi direct — mă întorc și rezolv.",
+        showOnNotice: true,
       },
       {
         orgId,
@@ -782,12 +792,16 @@ export async function seedDemo(): Promise<{ orgId: string }> {
     bonusBani: 30_00,
   });
 
-  // Issues: one open (tenant), one resolved.
+  // Issues: one open (tenant), one resolved. The categories and timestamps
+  // matter now — they are what the published commitments (§C4) are counted
+  // from, so the demo world has to contain a promise that was kept and one
+  // still in flight.
   await db.insert(schema.issues).values([
     {
       orgId,
       buildingId: buildingRows[1]!.id,
       source: "tenant" as const,
+      category: "bec" as const,
       description: "bec ars etaj 2",
       status: "open" as const,
     },
@@ -795,8 +809,11 @@ export async function seedDemo(): Promise<{ orgId: string }> {
       orgId,
       buildingId: buildingRows[0]!.id,
       source: "cleaner" as const,
+      category: "defectiune" as const,
       description: "ușă intrare nu se închide bine",
+      photoFileKey: "demo/usa-intrare.jpg",
       status: "done" as const,
+      acknowledgedAt: Date.now() - 5 * DAY_MS,
       resolvedAt: Date.now() - 3 * DAY_MS,
     },
   ]);

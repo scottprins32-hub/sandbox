@@ -13,6 +13,12 @@ const PUBLIC_PATHS = [
   "/robots.txt",
 ];
 
+// Public by prefix rather than by exact path: the building status page (add-on
+// 2 §C5) is one route per building code, and a resident scanning a QR off a
+// notice board has no passcode and never will. The code is the authorisation,
+// and the page only resolves when the client has switched it on.
+const PUBLIC_PREFIXES = ["/b/"];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -35,6 +41,7 @@ export function middleware(request: NextRequest) {
   if (!passcode) return NextResponse.next();
 
   if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next();
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return NextResponse.next();
 
   const cookie = request.cookies.get("scara_pass")?.value;
   if (cookie === passcode) return NextResponse.next();

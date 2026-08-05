@@ -22,6 +22,28 @@ export async function getCleaner(orgId: string, id: string): Promise<Cleaner | n
   return rows[0] ?? null;
 }
 
+/**
+ * The named-cleaner notice (add-on 2 §C3). `showOnNotice` is the cleaner's
+ * consent to having their first name and photo on a public board, so it is a
+ * required argument rather than an optional patch field — there is no code
+ * path that sets the intro or photo and leaves consent to a default.
+ */
+export async function updateCleanerNotice(
+  orgId: string,
+  id: string,
+  data: {
+    displayName: string | null;
+    introRo: string | null;
+    photoKey?: string | null;
+    showOnNotice: boolean;
+  }
+): Promise<void> {
+  await getDb()
+    .update(schema.cleaners)
+    .set(data)
+    .where(and(eq(schema.cleaners.orgId, orgId), eq(schema.cleaners.id, id)));
+}
+
 export async function getCleanerByUserId(orgId: string, userId: string): Promise<Cleaner | null> {
   const rows = await getDb()
     .select()

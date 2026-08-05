@@ -10,6 +10,7 @@
 import { PDFDocument } from "pdf-lib";
 import { A4, COLORS, drawLogo, embedDocFonts, type DocFonts } from "./theme";
 import type { PDFPage } from "pdf-lib";
+import type { QrPath } from "./qr";
 
 export interface VisitCardData {
   orgName: string;
@@ -18,7 +19,7 @@ export interface VisitCardData {
   dates?: string[];
   /** How many blank cards when no dates are given. */
   count?: number;
-  qrSvgPath?: string;
+  qr?: QrPath;
 }
 
 /** A6: a quarter of A4, laid out 2 × 2. */
@@ -88,20 +89,20 @@ function drawCard(
     thickness: 0.5,
     color: COLORS.line,
   });
-  page.drawText("Ați observat ceva? Sunați-ne.", {
+  page.drawText(data.qr ? "Ați observat ceva? Scanați:" : "Ați observat ceva? Sunați-ne.", {
     x: left, y: footY, size: 9.5, font: fonts.text, color: COLORS.ink2,
   });
   page.drawText(data.orgName, {
     x: left, y: footY - 12, size: 8, font: fonts.text, color: COLORS.ink3,
   });
 
-  if (data.qrSvgPath) {
+  if (data.qr) {
     const size = 44;
-    page.drawSvgPath(data.qrSvgPath, {
+    page.drawSvgPath(data.qr.d, {
       x: x + CARD_W - pad - size,
       y: footY + size - 8,
       color: COLORS.ink,
-      scale: size / 25,
+      scale: size / data.qr.modules,
     });
   }
 }

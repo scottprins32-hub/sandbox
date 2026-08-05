@@ -18,6 +18,9 @@ import { getOrgSettings } from "./repo/settings";
 import { getCurrentOrg } from "./org";
 import { renderSchedulePdf, type ScheduleData, type ScheduleGroup } from "./pdf/schedule";
 import { renderVisitCardsPdf } from "./pdf/visitCard";
+import { renderCleanerNoticePdf } from "./pdf/cleanerNotice";
+import { publicBuildingUrl, qrPath } from "./pdf/qr";
+import { getStorage } from "./storage";
 
 /** Frequencies that belong on a wall sheet — the rest are event-driven. */
 const POSTED_FREQUENCIES = [
@@ -44,10 +47,7 @@ function flagsOfBuilding(b: { hasLift: boolean; hasBasement: boolean }): Package
 }
 
 /** The cleaner who actually works this building, by recent visit history. */
-async function usualCleanerFirstName(
-  orgId: string,
-  buildingId: string
-): Promise<string | undefined> {
+async function usualCleaner(orgId: string, buildingId: string) {
   const visits = await listVisitsForBuilding(orgId, buildingId);
   const counts = new Map<string, number>();
   for (const v of visits) {
@@ -55,14 +55,37 @@ async function usualCleanerFirstName(
     counts.set(v.cleanerId, (counts.get(v.cleanerId) ?? 0) + 1);
   }
   const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-  if (!top) return undefined;
-  const cleaner = (await listCleaners(orgId)).find((c) => c.id === top[0]);
-  return cleaner?.name.trim().split(/\s+/)[0];
+  if (!top) return null;
+  return (await listCleaners(orgId)).find((c) => c.id === top[0]) ?? null;
+}
+
+/**
+ * The cleaner whose name would go on this building's notice, whether or not
+ * they have consented — the Ops screen needs to know both, so it can show the
+ * consent state rather than silently hiding the sheet.
+ */
+export async function noticeCleanerFor(orgId: string, buildingId: string) {
+  return usualCleaner(orgId, buildingId);
+}
+
+/**
+ * The QR payload for a building's printables (§C5). Returns nothing when the
+ * client has not switched the public page on, so a printed code can never
+ * resolve to a 404 — a dead QR on a notice board is worse than no QR.
+ */
+async function publicQr(building: {
+  publicPageEnabled: boolean;
+  publicCode: string | null;
+}, baseUrl?: string) {
+  if (!baseUrl || !building.publicPageEnabled || !building.publicCode) return {};
+  const publicUrl = publicBuildingUrl(baseUrl, building.publicCode);
+  return { publicUrl, qr: qrPath(publicUrl) };
 }
 
 export async function buildScheduleData(
   orgId: string,
-  buildingId: string
+  buildingId: string,
+  baseUrl?: string
 ): Promise<ScheduleData> {
   const org = await getCurrentOrg();
   const settings = await getOrgSettings(orgId);
@@ -84,18 +107,68 @@ export async function buildScheduleData(
     daysRo: visitDaysRo(building.visitsPerWeek),
     windowFrom: settings.visitWindowFrom ?? "07:00",
     windowTo: settings.visitWindowTo ?? "09:00",
-    cleanerFirstName: await usualCleanerFirstName(orgId, buildingId),
+    cleanerFirstName: (await usualCleaner(orgId, buildingId))?.name
+      .trim()
+      .split(/\s+/)[0],
     groups,
     winterLine: WINTER_LINE,
     phone: settings.phone ?? "",
+    ...(await publicQr(building, baseUrl)),
   };
 }
 
 export async function generateSchedulePdf(
   orgId: string,
-  buildingId: string
+  buildingId: string,
+  baseUrl?: string
 ): Promise<Uint8Array> {
-  return renderSchedulePdf(await buildScheduleData(orgId, buildingId));
+  return renderSchedulePdf(await buildScheduleData(orgId, buildingId, baseUrl));
+}
+
+/**
+ * The named-cleaner notice (§C3). Returns null unless a cleaner who actually
+ * works this building has consented — the absence of a sheet is the correct
+ * output for "nobody agreed to be on the board", not an error and not a
+ * generic one with the payroll name filled in.
+ */
+export async function generateCleanerNoticePdf(
+  orgId: string,
+  buildingId: string
+): Promise<Uint8Array | null> {
+  const org = await getCurrentOrg();
+  const settings = await getOrgSettings(orgId);
+  const building = await getBuilding(orgId, buildingId);
+  if (!building) throw new Error("Building not found");
+
+  const cleaner = await usualCleaner(orgId, buildingId);
+  if (!cleaner || !cleaner.showOnNotice) return null;
+
+  return renderCleanerNoticePdf({
+    orgName: org.name,
+    buildingLabel: building.label,
+    displayName: cleaner.displayName?.trim() || cleaner.name.trim().split(/\s+/)[0]!,
+    introRo: cleaner.introRo?.trim() ?? "",
+    daysRo: visitDaysRo(building.visitsPerWeek),
+    windowFrom: settings.visitWindowFrom ?? "07:00",
+    windowTo: settings.visitWindowTo ?? "09:00",
+    photo: await noticePhoto(cleaner.photoKey),
+    phone: settings.phone ?? undefined,
+  });
+}
+
+async function noticePhoto(key: string | null) {
+  if (!key) return undefined;
+  try {
+    const file = await getStorage().get(key);
+    if (!file) return undefined;
+    return {
+      bytes: file.data,
+      type: file.contentType === "image/png" ? ("png" as const) : ("jpg" as const),
+    };
+  } catch {
+    // A missing photo must never stop the sheet: the name is most of the value.
+    return undefined;
+  }
 }
 
 /**
@@ -105,7 +178,8 @@ export async function generateSchedulePdf(
 export async function generateVisitCardsPdf(
   orgId: string,
   buildingId: string,
-  weeks = 2
+  weeks = 2,
+  baseUrl?: string
 ): Promise<Uint8Array> {
   const org = await getCurrentOrg();
   const building = await getBuilding(orgId, buildingId);
@@ -129,6 +203,7 @@ export async function generateVisitCardsPdf(
     orgName: org.name,
     buildingLabel: building.label,
     dates,
+    ...(await publicQr(building, baseUrl)),
   });
 }
 

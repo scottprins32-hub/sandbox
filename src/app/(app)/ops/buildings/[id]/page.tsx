@@ -15,8 +15,10 @@ import {
   detachServiceAction,
   seedBuildingObligationsAction,
   seedCheckpointsAction,
+  setPublicPageAction,
   updateBuildingAction,
 } from "../../actions";
+import { noticeCleanerFor } from "@/server/scheduleService";
 import { listCheckpoints } from "@/server/repo/walks";
 import { BuildingForm } from "../BuildingForm";
 import { exposureFor } from "@/server/complianceService";
@@ -39,10 +41,11 @@ export default async function BuildingDetail({
   const building = await getBuilding(org.id, id);
   if (!building) notFound();
 
-  const [visits, issues, protocols] = await Promise.all([
+  const [visits, issues, protocols, noticeCleaner] = await Promise.all([
     listVisitsForBuilding(org.id, id, 10),
     listIssuesForBuilding(org.id, id),
     listProtocolsForBuilding(org.id, id),
+    noticeCleanerFor(org.id, id),
   ]);
   const photos = await listPhotosForVisits(
     org.id,
@@ -228,6 +231,57 @@ export default async function BuildingDetail({
             >
               Fișe de vizită, 2 weeks (4-up A4)
             </a>
+            {noticeCleaner?.showOnNotice && (
+              <a
+                href={`/ops/buildings/${building.id}/cleaner-notice`}
+                target="_blank"
+                className="mt-1 block text-xs text-moss underline"
+              >
+                Îngrijitorul scării — {noticeCleaner.displayName || noticeCleaner.name} (A5)
+              </a>
+            )}
+            <p className="mt-2 text-[11px] leading-relaxed text-ink-faint">
+              {building.publicPageEnabled
+                ? "The QR on both sheets opens this building's status page."
+                : "Turn the status page on to put a working QR on these sheets."}
+            </p>
+          </div>
+
+          {/* Public status page (add-on 2 §C5) */}
+          <div className="rounded-xl border border-line bg-surface p-3">
+            <p className="micro">Resident status page</p>
+            {building.publicPageEnabled && building.publicCode ? (
+              <>
+                <a
+                  href={`/b/${building.publicCode.toLowerCase()}`}
+                  target="_blank"
+                  className="mt-1.5 block break-all text-xs text-moss underline"
+                >
+                  /b/{building.publicCode.toLowerCase()}
+                </a>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">
+                  Visit dates, the task frequencies and how our commitments held up
+                  this month. No resident names, apartment numbers or sums.
+                </p>
+                <form action={setPublicPageAction.bind(null, building.id, false)}>
+                  <button className="mt-2 text-xs text-ink-soft underline">
+                    Turn off
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">
+                  A public page for this building, with no login. The client decides:
+                  it stays off until they ask for it.
+                </p>
+                <form action={setPublicPageAction.bind(null, building.id, true)}>
+                  <button className="mt-2 rounded-lg border border-moss px-2.5 py-1.5 text-xs font-medium text-moss-deep">
+                    Turn on
+                  </button>
+                </form>
+              </>
+            )}
           </div>
           {checkpoints.length === 0 ? (
             <form action={seedCheckpointsAction.bind(null, building.id)}>

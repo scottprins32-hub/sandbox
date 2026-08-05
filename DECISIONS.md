@@ -195,6 +195,50 @@ to carry live here too.
   INSERT now copies only the columns that existed before, and the status
   mapping plus the `first_seen_at` / `last_touch_at` backfill are appended.
   Do not regenerate `0006_prospecting.sql`; edit it.
+- **2026-08-05 — The published commitments are counted, not asserted.** §C4
+  says the promises must be "measurable in the app", so `src/lib/commitments.ts`
+  makes each one declare how it is checked and the building page prints this
+  month's count beside it. Two consequences the founders should know about.
+  First, `issues` gained `category` and `acknowledgedAt`: "confirmed within one
+  working day" is about the *first reply*, which is a different event from
+  resolution, and the bulb and bulky-waste promises need to know what an issue
+  is about. Second, **`deszapezire_7` carries no score at all** — we do not log
+  snowfall, and a visit record cannot tell "cleared by 7:00" from "it did not
+  snow". Every other commitment would have been easy to score generously here;
+  that one is left blank on purpose, because a number nobody can derive is
+  worse than no number.
+- **2026-08-05 — Working-day deadlines ignore legal holidays, deliberately.**
+  Subtracting them would push every deadline later and make every published
+  score better. A self-published number should err against the publisher, so a
+  committee member checking by hand finds us early, never late.
+- **2026-08-05 — The QR code on the printables was drawing nothing.** The C1
+  and C2 sheets accepted a `qrSvgPath` that nothing generated yet, and the plan
+  was to pass `qrcode`'s own SVG output. That path is *stroked* — horizontal
+  segments at y+0.5 with an implicit width of 1 — and pdf-lib fills by default,
+  so it would have rendered blank; the hardcoded `scale: size / 25` was also
+  wrong for any payload longer than the one it was guessed from. `pdf/qr.ts`
+  now builds a filled, run-length-merged rectangle path and reports the real
+  module count. Verified by rasterising both sheets and decoding the codes back
+  to the building URL, not by looking at them.
+- **2026-08-05 — Two catalogue tasks claimed a certification we do not hold.**
+  "Dezinfectat balustrade…" and "Dezinfectat butoanele…" were being printed on
+  a sheet that hangs in a public hallway. Dezinfecție is a licensed DDD
+  activity; ours is `igienizare`. Both renamed, and a test now fails if the
+  word returns to any task name in either language.
+- **2026-08-05 — A public page is a data-protection surface, so its contents
+  are bounded by construction.** `/b/[code]` shows visit dates, the task
+  frequencies and the commitment scores. No resident names, no apartment
+  numbers, no sums, no interior photos — the e2e asserts the absence of prices
+  and apartment numbers rather than trusting the template. The code is eight
+  characters from an alphabet with no O/0, I/1, L or U/V, because it is typed
+  by hand as often as it is scanned; it is minted only when the client switches
+  the page on, and switching it off takes the URL down immediately.
+- **2026-08-05 — The cleaner's consent is a required argument, not a field.**
+  `updateCleanerNotice()` takes `showOnNotice` explicitly, so there is no code
+  path that writes an intro or a photo and leaves consent to a default.
+  `generateCleanerNoticePdf()` returns null without it. The demo world seeds
+  one cleaner who agreed and one who did not, because "no" is a normal
+  permanent answer and not a setup step someone forgot.
 - **2026-08-05 — Atlas's "Add prospect" creates at `vizitat`, not the schema
   default.** The schema defaults to `de_vizitat` because that is right for
   field capture, but Atlas hides that column, so a card added from Atlas

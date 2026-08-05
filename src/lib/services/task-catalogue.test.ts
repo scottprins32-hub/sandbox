@@ -166,4 +166,15 @@ describe("service task catalogue (add-on 2 §2)", () => {
     const withLift = totalMinutesPerVisit(tasksForPackage({ hasLift: true }));
     expect(withLift).toBeGreaterThan(walkUp);
   });
+
+  // Inherited hard rule: dezinfecție is a licensed DDD activity. Naming a task
+  // that way claims a certification we do not hold, on a sheet that hangs in a
+  // public hallway. `igienizare` is what we actually do and may say.
+  it("never names a task as dezinfecție", () => {
+    for (const t of SERVICE_TASKS) {
+      expect(`${t.key} ${t.nameRo} ${t.nameEn}`.toLowerCase()).not.toMatch(
+        /dezinfec|disinfect/
+      );
+    }
+  });
 });

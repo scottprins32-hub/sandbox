@@ -96,6 +96,16 @@ export const buildings = sqliteTable(
     hasLift: integer("has_lift", { mode: "boolean" }).notNull().default(false),
     hasPlayground: integer("has_playground", { mode: "boolean" }).notNull().default(false),
     hasBasement: integer("has_basement", { mode: "boolean" }).notNull().default(false),
+    /**
+     * Public building page (add-on 2 §C5). The code is short and unguessable
+     * rather than secret: it is printed on a notice board, so it protects
+     * against enumeration, not against a passer-by. Minted only when the page
+     * is switched on, so a disabled building has no URL to leak.
+     */
+    publicCode: text("public_code"),
+    publicPageEnabled: integer("public_page_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -148,6 +158,15 @@ export const cleaners = sqliteTable(
     hoursPerDay: real("hours_per_day").notNull().default(4),
     studentProofExpiry: text("student_proof_expiry"), // YYYY-MM-DD; adeverință renewal
     active: integer("active", { mode: "boolean" }).notNull().default(true),
+    /**
+     * The named-cleaner notice (add-on 2 §C3). `showOnNotice` defaults false
+     * and is the cleaner's own decision: publishing an employee's photo and
+     * first name on a public board is their call, not the employer's.
+     */
+    displayName: text("display_name"),
+    photoKey: text("photo_key"),
+    introRo: text("intro_ro"),
+    showOnNotice: integer("show_on_notice", { mode: "boolean" }).notNull().default(false),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -255,6 +274,20 @@ export const issues = sqliteTable(
       .notNull()
       .default("open"),
     resolvedAt: integer("resolved_at"),
+    /**
+     * Both columns exist so the C4 commitments can be measured instead of
+     * merely printed: the bulb and bulky-waste promises need to know what an
+     * issue is about, and "confirmed within one working day" needs a
+     * confirmation timestamp distinct from resolution.
+     */
+    category: text("category", {
+      enum: ["bec", "curatenie", "deseuri", "defectiune", "zapada", "altele"],
+    })
+      .notNull()
+      .default("altele"),
+    acknowledgedAt: integer("acknowledged_at"),
+    /** Only for tenant reports from the public page; optional, never required. */
+    reporterContact: text("reporter_contact"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

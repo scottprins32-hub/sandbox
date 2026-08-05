@@ -378,6 +378,44 @@ export async function createContractorAction(formData: FormData) {
   revalidatePath("/ops/contractors");
 }
 
+// ------------------------------- resident-facing surfaces (add-on 2 §C3, §C5)
+
+/**
+ * Switch a building's public status page on or off. The client decides, so
+ * this is never on by default and turning it off takes the URL down at once —
+ * the printed QR stops resolving rather than showing a stale page.
+ */
+export async function setPublicPageAction(buildingId: string, enabled: boolean) {
+  const org = await getCurrentOrg();
+  const { setPublicPageEnabled } = await import("@/server/repo/buildings");
+  await setPublicPageEnabled(org.id, buildingId, enabled);
+  revalidatePath(`/ops/buildings/${buildingId}`);
+}
+
+/**
+ * The named-cleaner notice (§C3). Consent is read from its own checkbox and
+ * passed explicitly: publishing an employee's first name and photo on a public
+ * board is their decision, and nothing here may default it to yes.
+ */
+export async function updateCleanerNoticeAction(cleanerId: string, formData: FormData) {
+  const org = await getCurrentOrg();
+  const { updateCleanerNotice } = await import("@/server/repo/cleaners");
+  await updateCleanerNotice(org.id, cleanerId, {
+    displayName: String(formData.get("displayName") ?? "").trim() || null,
+    introRo: String(formData.get("introRo") ?? "").trim().slice(0, 400) || null,
+    showOnNotice: formData.get("showOnNotice") === "on",
+  });
+  revalidatePath("/ops/settings");
+}
+
+/** "Seen, and we are on it" — the first half of the §C4 response commitment. */
+export async function acknowledgeIssueAction(issueId: string) {
+  const org = await getCurrentOrg();
+  const { acknowledgeIssue } = await import("@/server/repo/issues");
+  await acknowledgeIssue(org.id, issueId);
+  revalidatePath("/ops");
+}
+
 // ------------------------------------------------- control walks (add-on §5)
 
 export async function seedCheckpointsAction(buildingId: string) {
