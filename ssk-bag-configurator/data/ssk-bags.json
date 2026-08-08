@@ -1,0 +1,399 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "compiled": "2026-08-08",
+    "source": [
+      "SSK Japan catalogue pp. 108-111 (PROEDGE ORDER, bags + cases)",
+      "SSK Europe 'Custom Bags' PDF (CorelDRAW 2019, 4pp)",
+      "SSK Europe 'Stock Bags' PDF"
+    ],
+    "currency": "EUR",
+    "prices_include_vat": true,
+    "vat_note": "All EUR prices are SSK Europe retail incl. VAT/BTW. Japanese yen prices in the catalogue are SSK Japan MSRP and are NOT used.",
+    "minimum_order_quantity": 1,
+    "moq_note": "No MOQ on custom bags - a single bag can be ordered.",
+    "lead_time": "2-3 months, depending on total order quantity",
+    "stock_location": "Stock models are held in the SSK Europe warehouse. Custom models are made to order in Japan; no custom stock is held in the Netherlands.",
+    "order_process": "SSK Europe (Pim) records model + material + a per-part colour code in an Excel sheet and sends it to SSK Japan. There is no formal order form. The configurator's job is to emit that row correctly.",
+    "TODO": [
+      "Verify hex values against physical swatches - current values are eyeballed from print and WILL be slightly off",
+      "Confirm embroidery is priced per bag vs per order, and whether team volume reduces it",
+      "Confirm PEO-52BS carbon-look exception with Pim before quoting it",
+      "Request the source .cdr file - paths are likely already grouped per part"
+    ]
+  },
+
+  "materials": {
+    "E": {
+      "code": "E",
+      "name_en": "PVC Enamel",
+      "name_ja": "エナメル(PVC)",
+      "finish": "High-gloss shiny",
+      "description": "The classic baseball bag material. Stain resistant, hard wearing.",
+      "palette": "enamel"
+    },
+    "S": {
+      "code": "S",
+      "name_en": "PVC Synthetic Leather",
+      "name_ja": "合成皮革(PVC)",
+      "finish": "Fine-grain matte leather look",
+      "description": "Synthetic leather with a fine grain embossed surface. Distinctive subdued texture.",
+      "palette": "leather"
+    },
+    "P": {
+      "code": "P",
+      "name_en": "Synthetic Fibre",
+      "name_ja": "合成繊維",
+      "finish": "Coarse woven textile",
+      "description": "Heavy polyester woven from thick yarn. Large visible weave, very durable.",
+      "palette": "fibre"
+    }
+  },
+
+  "material_price_rule": "Material does NOT affect price. PEO-44BE, PEO-44BS and PEO-44BP are all the same EUR price. One price per model.",
+
+  "colors": {
+    "10": { "code": "10", "name_en": "White",      "name_ja": "ホワイト",  "hex": "#FFFFFF" },
+    "20": { "code": "20", "name_en": "Red",        "name_ja": "レッド",    "hex": "#D0202E" },
+    "22": { "code": "22", "name_en": "Maroon",     "name_ja": "エンジ",    "hex": "#8C2436" },
+    "30": { "code": "30", "name_en": "Yellow",     "name_ja": "イエロー",  "hex": "#F2D024" },
+    "35": { "code": "35", "name_en": "Orange",     "name_ja": "オレンジ",  "hex": "#EE7623" },
+    "38": { "code": "38", "name_en": "Gold",       "name_ja": "ゴールド",  "hex": "#C9A227" },
+    "50": { "code": "50", "name_en": "Green",      "name_ja": "グリーン",  "hex": "#1E7A3C" },
+    "63": { "code": "63", "name_en": "Dark Blue",  "name_ja": "Dブルー",   "hex": "#1F4E9C" },
+    "70": { "code": "70", "name_en": "Navy",       "name_ja": "ネイビー",  "hex": "#1B2A5E" },
+    "80": { "code": "80", "name_en": "Purple",     "name_ja": "パープル",  "hex": "#5B2D8E" },
+    "90": { "code": "90", "name_en": "Black",      "name_ja": "ブラック",  "hex": "#1A1A1A" },
+    "95": { "code": "95", "name_en": "Silver",     "name_ja": "シルバー",  "hex": "#C8CBCD" }
+  },
+
+  "palettes": {
+    "enamel":  { "label": "PVC Enamel body colours",        "colors": ["10","20","22","50","63","70","80","90","95"] },
+    "leather": { "label": "PVC Leather body colours",       "colors": ["10","22","63","70","90"] },
+    "fibre":   { "label": "Synthetic Fibre body colours",   "colors": ["10","20","22","50","63","70","80","90"] },
+    "accent":  { "label": "Accent / piping (always enamel)", "colors": ["10","20","22","50","63","70","80","90","95","30","35","38"] },
+    "accent2": { "label": "Edge wrap / restricted parts",    "colors": ["10","20","22","63","70","90"] },
+    "fixed_black": { "label": "Fixed - not selectable",      "colors": ["90"] }
+  },
+
+  "palette_notes": {
+    "accent": "Piping is always made from enamel material regardless of the bag's chosen material. This is the only place yellow (30), orange (35) and gold (38) are available - it is where club identity lives.",
+    "leather": "The synthetic leather palette is only 5 colours. Green, purple, red and silver are NOT available in leather. Warn the user when they switch material and lose a chosen colour."
+  },
+
+  "part_charts": {
+    "backpack": {
+      "applies_to": ["PEO-50B", "PEO-51B", "PEO-52B"],
+      "warning": "Letter assignments DIFFER from the shoulder chart. Here E = piping and F = zipper. On the shoulder chart F = piping and H = zipper. Do not share letter logic between charts.",
+      "parts": [
+        { "id": "A", "name_en": "Body",                        "name_ja": "本体",              "palette": "material" },
+        { "id": "B", "name_en": "Pocket",                      "name_ja": "ポケット",          "palette": "material" },
+        { "id": "C", "name_en": "Gusset 1 & side pocket",      "name_ja": "マチ1&サイドポケット", "palette": "material" },
+        { "id": "D", "name_en": "Gusset 2 & lower pocket gusset", "name_ja": "マチ2&下ポケットマチ", "palette": "accent2", "material_override": "carbon-look synthetic leather", "note": "This part is ALWAYS carbon-look leather regardless of the bag material, and is limited to 6 colours." },
+        { "id": "E", "name_en": "Piping",                      "name_ja": "パイピング",        "palette": "accent" },
+        { "id": "F", "name_en": "Zipper",                      "name_ja": "ファスナー",        "palette": "fixed_black", "locked": true },
+        { "id": "G", "name_en": "Edge wrap",                   "name_ja": "ヘリ巻き部分",      "palette": "accent2" }
+      ]
+    },
+
+    "shoulder": {
+      "applies_to": ["PEO-42B","PEO-43B","PEO-44B","PEO-45B","PEO-46B","PEO-53B","PEO-54B","PEO-55B","PEO-56B"],
+      "note": "Shoulder / middle / tote chart. Not every model uses every part - see each model's own part list.",
+      "parts": [
+        { "id": "A", "name_en": "Body",         "name_ja": "本体",         "palette": "material" },
+        { "id": "B", "name_en": "Pocket",       "name_ja": "ポケット",     "palette": "material" },
+        { "id": "C", "name_en": "Gusset 1",     "name_ja": "マチ1",        "palette": "material" },
+        { "id": "D", "name_en": "Gusset 2",     "name_ja": "マチ2",        "palette": "material" },
+        { "id": "E", "name_en": "Belt",         "name_ja": "ベルト",       "palette": "material", "note": "Underside of the belt is always black." },
+        { "id": "F", "name_en": "Piping",       "name_ja": "パイピング",   "palette": "accent" },
+        { "id": "G", "name_en": "Edge wrap",    "name_ja": "ヘリ巻き部分", "palette": "accent2" },
+        { "id": "H", "name_en": "Zipper",       "name_ja": "ファスナー",   "palette": "fixed_black", "locked": true },
+        { "id": "I", "name_en": "Back panel",   "name_ja": "背面",         "palette": "material" },
+        { "id": "J", "name_en": "Side pocket",  "name_ja": "サイドポケット", "palette": "material" }
+      ]
+    },
+
+    "case": {
+      "applies_to": ["PEO-37C","PEO-38C","PEO-39C","PEO-40C"],
+      "note": "Cases have the smallest part set - 5 colourable parts plus a fixed black zipper.",
+      "parts": [
+        { "id": "A",   "name_en": "Body",      "name_ja": "本体",         "palette": "material" },
+        { "id": "D",   "name_en": "Gusset",    "name_ja": "マチ",         "palette": "material" },
+        { "id": "E",   "name_en": "Belt",      "name_ja": "ベルト",       "palette": "material", "note": "Underside of the belt is always black." },
+        { "id": "F",   "name_en": "Piping",    "name_ja": "パイピング",   "palette": "accent" },
+        { "id": "G",   "name_en": "Edge wrap", "name_ja": "ヘリ巻き部分", "palette": "accent2" },
+        { "id": "ZIP", "name_en": "Zipper",    "name_ja": "ファスナー",   "palette": "fixed_black", "locked": true }
+      ]
+    }
+  },
+
+  "global_rules": [
+    "Zippers are black on every model and every chart. Never offer a colour choice.",
+    "Belt undersides are always black where a belt exists.",
+    "Piping is always enamel material, even on leather and fibre bags.",
+    "Switching material can invalidate an already-chosen colour - re-validate every part on material change and tell the user what changed.",
+    "Embroidery / marking cost is never included in the bag price."
+  ],
+
+  "models": [
+    {
+      "code": "PEO-52B", "name_en": "Backpack Small", "name_ja": "バックパック", "category": "backpack",
+      "chart": "backpack", "is_new": true,
+      "dims_cm": { "length": 31, "height": 52, "width": 21 }, "litres": 35,
+      "front_pocket_size_cm": { "h": 27, "w": 22 },
+      "price_eur": 124.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G"],
+      "features": ["Detachable front pocket"],
+      "exceptions": [
+        "PEO-52BS ONLY: part C becomes carbon-look synthetic leather and its colour must be chosen from the part D palette (accent2, 6 colours). Confirm with Pim before quoting."
+      ],
+      "vector_art": "page2",
+      "stock_twin": { "code": "EBA1016", "price_eur": 71.95, "dims_match": "exact", "delta_eur": 53.00 }
+    },
+    {
+      "code": "PEO-50B", "name_en": "Backpack Big", "name_ja": "バックパック", "category": "backpack",
+      "chart": "backpack", "is_new": false,
+      "dims_cm": { "length": 35, "height": 53, "width": 24 }, "litres": 42,
+      "front_pocket_size_cm": { "h": 25, "w": 27 },
+      "price_eur": 142.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G"],
+      "features": ["Detachable front pocket"],
+      "exceptions": [],
+      "vector_art": "page2",
+      "stock_twin": { "code": "EBA1014", "price_eur": 89.95, "dims_match": "exact", "delta_eur": 53.00 }
+    },
+    {
+      "code": "PEO-51B", "name_en": "Backpack (box style)", "name_ja": "バックパック", "category": "backpack",
+      "chart": "backpack", "is_new": false,
+      "dims_cm": { "length": 32, "height": 49, "width": 26.5 }, "litres": 40,
+      "front_pocket_size_cm": { "h": 31, "w": 25 },
+      "price_eur": 142.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G"],
+      "features": ["Detachable front pocket"],
+      "exceptions": [],
+      "vector_art": null,
+      "stock_twin": { "code": "EBA1015", "price_eur": 77.95, "dims_match": "exact", "delta_eur": 65.00 }
+    },
+    {
+      "code": "PEO-53B", "name_en": "Tote Bag S", "name_ja": "トートバッグ S", "category": "tote",
+      "chart": "shoulder", "is_new": true,
+      "dims_cm": { "length": 35, "height": 28, "width": 15 }, "litres": 15,
+      "price_eur": 107.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","G","H","I","J"],
+      "features": [],
+      "exceptions": ["No piping (part F) on tote models."],
+      "vector_art": null,
+      "stock_twin": null
+    },
+    {
+      "code": "PEO-54B", "name_en": "Tote Bag M", "name_ja": "トートバッグ M", "category": "tote",
+      "chart": "shoulder", "is_new": true,
+      "dims_cm": { "length": 38, "height": 36, "width": 17 }, "litres": 23,
+      "price_eur": 110.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","G","H","I","J"],
+      "features": [],
+      "exceptions": ["No piping (part F) on tote models."],
+      "vector_art": null,
+      "stock_twin": { "code": "EBA7250", "price_eur": 65.95, "dims_match": "approximate", "delta_eur": 45.00 }
+    },
+    {
+      "code": "PEO-55B", "name_en": "Tote Bag L", "name_ja": "トートバッグ L", "category": "tote",
+      "chart": "shoulder", "is_new": true,
+      "dims_cm": { "length": 40, "height": 39, "width": 19 }, "litres": 29,
+      "price_eur": 113.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","G","H","I","J"],
+      "features": [],
+      "exceptions": ["No piping (part F) on tote models."],
+      "vector_art": null,
+      "stock_twin": null
+    },
+    {
+      "code": "PEO-42B", "name_en": "Shoulder Bag L", "name_ja": "ショルダーバッグ L", "category": "shoulder",
+      "chart": "shoulder", "is_new": false,
+      "dims_cm": { "length": 48, "height": 35, "width": 25 }, "litres": 42,
+      "front_pocket_size_cm": { "h": 20, "w": 38 },
+      "price_eur": 112.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H"],
+      "features": ["Detachable front pocket"],
+      "exceptions": ["Belt underside is black.", "Catalogue notes a gold detail on this model."],
+      "vector_art": null,
+      "stock_twin": { "code": "EBA4012", "price_eur": 77.95, "dims_match": "exact", "delta_eur": 35.00 }
+    },
+    {
+      "code": "PEO-43B", "name_en": "Shoulder Bag M", "name_ja": "ショルダーバッグ M", "category": "shoulder",
+      "chart": "shoulder", "is_new": false,
+      "dims_cm": { "length": 47, "height": 34, "width": 23 }, "litres": 36,
+      "front_pocket_size_cm": { "h": 22, "w": 42 },
+      "price_eur": 77.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H"],
+      "features": ["Detachable front pocket"],
+      "exceptions": ["Shoulder belt is NOT detachable.", "Belt underside is black."],
+      "vector_art": null,
+      "stock_twin": { "code": "BA8000", "price_eur": 38.95, "dims_match": "exact", "delta_eur": 39.00 }
+    },
+    {
+      "code": "PEO-44B", "name_en": "Duffle Bag Big", "name_ja": "ミドルバッグ L", "category": "duffle",
+      "chart": "shoulder", "is_new": false,
+      "dims_cm": { "length": 60, "height": 33, "width": 28 }, "litres": 53,
+      "front_pocket_size_cm": { "h": 19, "w": 34 },
+      "price_eur": 129.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H"],
+      "features": ["Detachable front pocket"],
+      "exceptions": ["Belt underside is black."],
+      "vector_art": "page2",
+      "stock_twin": { "code": "BA4008", "price_eur": 59.95, "dims_match": "approximate", "delta_eur": 70.00 }
+    },
+    {
+      "code": "PEO-45B", "name_en": "Duffle Bag Small", "name_ja": "ミドルバッグ M", "category": "duffle",
+      "chart": "shoulder", "is_new": false,
+      "dims_cm": { "length": 55, "height": 30, "width": 25 }, "litres": 40,
+      "front_pocket_size_cm": { "h": 19, "w": 33 },
+      "price_eur": 113.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H"],
+      "features": ["Detachable front pocket"],
+      "exceptions": ["Belt underside is black."],
+      "vector_art": "page2",
+      "stock_twin": null
+    },
+    {
+      "code": "PEO-46B", "name_en": "Mini Shoulder Bag", "name_ja": "ミニショルダーバッグ", "category": "shoulder",
+      "chart": "shoulder", "is_new": false,
+      "dims_cm": { "length": 24, "height": 18, "width": 11 }, "litres": 4,
+      "front_pocket_size_cm": { "h": 12, "w": 23 },
+      "price_eur": 65.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H"],
+      "features": ["Detachable front pocket"],
+      "exceptions": [
+        "NO PROEDGE mark on this model.",
+        "Marking cost not included.",
+        "Poor value versus stock: 2.4x the stock equivalent. Do not lead with this model."
+      ],
+      "vector_art": null,
+      "stock_twin": { "code": "BA6100", "price_eur": 26.95, "dims_match": "approximate", "delta_eur": 39.00 }
+    },
+    {
+      "code": "PEO-56B", "name_en": "Shoulder Bag (New)", "name_ja": "ショルダーバッグ", "category": "shoulder",
+      "chart": "shoulder", "is_new": true,
+      "dims_cm": { "length": 43, "height": 36, "width": 21 }, "litres": 33,
+      "front_pocket_size_cm": { "h": 25, "w": 40 },
+      "price_eur": 193.95, "materials": ["E","S","P"], "parts": ["A","B","C","D","E","F","G","H","J"],
+      "features": [],
+      "exceptions": [
+        "Belt is BLACK ONLY - no colour choice.",
+        "Front pocket is NOT detachable (all other models' are).",
+        "NO PROEDGE mark on this model.",
+        "Marking cost not included."
+      ],
+      "vector_art": null,
+      "stock_twin": null
+    },
+    {
+      "code": "PEO-39C", "name_en": "Self-standing Bat Case (10 bats)", "name_ja": "自立式バットケース", "category": "case",
+      "chart": "case", "is_new": true,
+      "dims_cm": { "length": 94, "diameter": 25 }, "litres": null,
+      "front_pocket_size_cm": { "h": 17, "w": 29 },
+      "price_eur": 159.95, "materials": ["E","S","P"], "parts": ["A","D","E","F","G","ZIP"],
+      "features": ["Self-standing frame", "Detachable front pocket"],
+      "exceptions": [
+        "No patch / wappen can be applied to bat cases.",
+        "Marking cost not included.",
+        "Not a true twin of the stock bat cases - stock EBH5012 is a plain tube with no self-standing frame. Do not present the price gap as like-for-like."
+      ],
+      "catalogue_sample_colourway": { "A": "20", "D": "90", "E": "63", "F": "38", "G": "63" },
+      "vector_art": "page2",
+      "stock_twin": { "code": "EBH5012", "price_eur": 89.95, "dims_match": "different_construction", "delta_eur": 70.00 }
+    },
+    {
+      "code": "PEO-40C", "name_en": "Self-standing Bat Case (5 bats)", "name_ja": "自立式バットケース", "category": "case",
+      "chart": "case", "is_new": false,
+      "dims_cm": { "length": 96, "diameter": 20 }, "litres": null,
+      "front_pocket_size_cm": { "h": 11, "w": 22 },
+      "price_eur": 149.95, "materials": ["E","S","P"], "parts": ["A","D","E","F","G","ZIP"],
+      "features": ["Self-standing frame", "Detachable front pocket"],
+      "exceptions": [
+        "No patch / wappen can be applied to bat cases.",
+        "Marking cost not included."
+      ],
+      "catalogue_sample_colourway": { "A": "20", "D": "90", "E": "63", "F": "38", "G": "63" },
+      "vector_art": "page2",
+      "stock_twin": { "code": "BH5001", "price_eur": 47.95, "dims_match": "different_construction", "delta_eur": 102.00 }
+    },
+    {
+      "code": "PEO-38C", "name_en": "Ball Case", "name_ja": "ボールケース", "category": "case",
+      "chart": "case", "is_new": false,
+      "dims_cm": { "length": 40, "height": 32, "width": 31 }, "litres": null,
+      "front_pocket_size_cm": { "h": 17, "w": 23, "w_lower": 26 },
+      "price_eur": 124.95, "materials": ["E","S","P"], "parts": ["A","D","E","F","G","ZIP"],
+      "features": ["Detachable front pocket", "Holds 5 dozen hard/rubber balls", "Holds 2.5 dozen softballs"],
+      "exceptions": ["Shoulder pad and handle are always the same colour as the body (part A)."],
+      "catalogue_sample_colourway": { "A": "80", "D": "90", "E": "10", "F": "38", "G": "20" },
+      "vector_art": "page2",
+      "stock_twin": { "code": "EBH2012", "price_eur": 71.95, "dims_match": "exact", "delta_eur": 53.00 }
+    },
+    {
+      "code": "PEO-37C", "name_en": "Helmet & Catcher Gear Case (wheeled)", "name_ja": "ヘルメット兼キャッチャー用具ケース", "category": "case",
+      "chart": "case", "is_new": false,
+      "dims_cm": { "length": 82, "height": 38, "width": 38 }, "litres": null,
+      "front_pocket_size_cm": { "h": 20, "w_upper": 37, "w_lower": 42 },
+      "price_eur": 209.95, "materials": ["E","S","P"], "parts": ["A","D","E","F","G","ZIP"],
+      "features": ["Wheeled / castors", "Detachable front pocket", "Holds 2 sets of catcher's gear", "Holds 8 two-ear helmets"],
+      "exceptions": [
+        "Zipper pull is always the same colour as the gusset (part D).",
+        "Handle is always the same colour as the body (part A).",
+        "Marking cost not included."
+      ],
+      "catalogue_sample_colourway": { "A": "10", "D": "10", "E": "50", "F": "38" },
+      "vector_art": "page2",
+      "stock_twin": { "code": "EBH3012", "price_eur": 130.95, "dims_match": "approximate", "delta_eur": 79.00 }
+    }
+  ],
+
+  "stock_bags": [
+    { "code": "EBA1016", "name_en": "Backpack",        "price_eur": 71.95,  "dims_cm": {"length":31,"height":52,"width":21},   "litres": 35, "material": "Synthetic leather (PVC)", "colorways": ["9010","6310","2210","7010","2010","9090","7070"], "status": "current" },
+    { "code": "EBA1032", "name_en": "Backpack (removable front cover)", "price_eur": 86.95, "dims_cm": {"length":34,"height":57,"width":21}, "litres": 40, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["90"], "status": "current" },
+    { "code": "EBA1014", "name_en": "Backpack",        "price_eur": 89.95,  "dims_cm": {"length":35,"height":53,"width":24},   "litres": 42, "material": "Synthetic leather (PVC)", "colorways": ["22","63","70","90"], "status": "current" },
+    { "code": "EBA1015", "name_en": "Backpack",        "price_eur": 77.95,  "dims_cm": {"length":32,"height":49,"width":26.5}, "litres": 40, "material": "Synthetic leather (PVC)", "colorways": ["22","90","63","20","70"], "status": "current" },
+    { "code": "EBA2000", "name_en": "Backpack",        "price_eur": 77.95,  "dims_cm": {"length":34,"height":52,"width":24},   "litres": 40, "material": "Synthetic leather (PVC)", "colorways": ["2210","6310","7010","9010"], "status": "current" },
+    { "code": "EBA1012", "name_en": "Backpack",        "price_eur": 59.95,  "dims_cm": {"length":33,"height":50,"width":23},   "litres": 35, "material": "Synthetic leather (PVC)", "colorways": ["2210","7010","6310","9010","9090"], "status": "while_stocks_last" },
+    { "code": "BA1021",  "name_en": "Backpack",        "price_eur": 56.95,  "dims_cm": {"length":33,"height":50,"width":22},   "litres": 36, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["70","90","22","63"], "status": "current" },
+    { "code": "BA1020",  "name_en": "Backpack",        "price_eur": 50.95,  "dims_cm": {"length":33,"height":50,"width":22},   "litres": 38, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["63","90"], "status": "while_stocks_last" },
+    { "code": "BA1010",  "name_en": "Enamel Backpack", "price_eur": 50.95,  "dims_cm": {"length":30,"height":50,"width":21},   "litres": 34, "material": "Synthetic fibre x synthetic leather (PVC enamel)", "colorways": ["2238","6338","7020","9038"], "status": "current" },
+    { "code": "BA6250",  "name_en": "Backpack (nylon, high capacity)", "price_eur": 65.95, "dims_cm": {"length":34,"height":53,"width":28}, "litres": 50, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["22","63","70","90"], "status": "current" },
+    { "code": "BJ1022",  "name_en": "Junior Backpack", "price_eur": 40.95,  "dims_cm": {"length":29,"height":46,"width":18},   "litres": 30, "material": "Synthetic fibre", "colorways": ["70","90"], "status": "current" },
+    { "code": "BA4008",  "name_en": "Middle Bag",      "price_eur": 59.95,  "dims_cm": {"length":59.5,"height":31,"width":29}, "litres": 53, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["90","22","70","63"], "status": "current" },
+    { "code": "BA4007",  "name_en": "Middle Bag",      "price_eur": 52.95,  "dims_cm": {"length":50,"height":31,"width":33},   "litres": 53, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["70","63","90"], "status": "while_stocks_last" },
+    { "code": "EBA4012", "name_en": "Shoulder Bag",    "price_eur": 77.95,  "dims_cm": {"length":48,"height":35,"width":25},   "litres": 45, "material": "Synthetic leather", "colorways": ["2238","9038","6338","7038"], "status": "current" },
+    { "code": "BA8000",  "name_en": "Shoulder Bag",    "price_eur": 38.95,  "dims_cm": {"length":47,"height":34,"width":23},   "litres": 36, "material": "Synthetic leather (PVC enamel)", "colorways": ["90","70","22","63","9090","7010","1070","20","7038","9038"], "status": "current" },
+    { "code": "BA6100",  "name_en": "Mini Shoulder Bag","price_eur": 26.95, "dims_cm": {"length":26,"height":17,"width":12},   "litres": null, "material": "Synthetic fibre x synthetic leather", "colorways": ["2038","2238","6338","7038","9038","7070"], "status": "current" },
+    { "code": "EBA7250", "name_en": "Tote Bag",        "price_eur": 65.95,  "dims_cm": {"length":37,"height":35,"width":16},   "litres": 25, "material": "Synthetic leather", "colorways": ["90"], "status": "current" },
+    { "code": "BA6101",  "name_en": "Mini Tote Bag",   "price_eur": 34.95,  "dims_cm": {"length":22,"height":20,"width":16},   "litres": 5,  "material": "Canvas", "colorways": ["90","11"], "status": "current" },
+    { "code": "EBH2012", "name_en": "Ball Bag",        "price_eur": 71.95,  "dims_cm": {"length":40,"height":32,"width":31},   "litres": null, "material": "Synthetic leather (PVC)", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "BH2001",  "name_en": "Ball Bag (5 dozen)", "price_eur": 53.95, "dims_cm": {"length":40,"height":34,"width":32}, "litres": 40, "material": "Synthetic leather (PVC enamel)", "colorways": ["1020","1063","1070"], "status": "current" },
+    { "code": "BH2004",  "name_en": "Ball Bag (2-3 dozen)", "price_eur": 26.95, "dims_cm": {"length":35,"height":22,"width":26}, "litres": 16, "material": "Synthetic fibre", "colorways": ["90"], "status": "current" },
+    { "code": "EBH3012", "name_en": "Helmet / Catcher Bag (wheeled)", "price_eur": 130.95, "dims_cm": {"length":82,"height":36,"width":40}, "litres": 140, "material": "Synthetic leather", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "BH9001",  "name_en": "Helmet / Catcher Bag", "price_eur": 56.95, "dims_cm": {"length":78,"height":40,"width":36}, "litres": 125, "material": "Synthetic leather (PVC enamel)", "colorways": ["1020","1063","1070"], "status": "current" },
+    { "code": "BH9004",  "name_en": "Helmet / Catcher Bag", "price_eur": 47.95, "dims_cm": {"length":86,"height":39,"width":33}, "litres": 125, "material": "Synthetic fibre", "colorways": ["90"], "status": "current" },
+    { "code": "EBH5012", "name_en": "Bat Case (10 bats)", "price_eur": 89.95, "dims_cm": {"length":95,"diameter":24}, "litres": null, "material": "Synthetic leather", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "BH5001",  "name_en": "Bat Case (5-6 bats)", "price_eur": 47.95, "dims_cm": {"length":95,"diameter":18}, "litres": null, "material": "Synthetic leather (PVC enamel)", "colorways": ["1063","1020","1070"], "status": "current" },
+    { "code": "BH5004",  "name_en": "Bat Case (5-6 bats)", "price_eur": 35.95, "dims_cm": {"length":96,"diameter":17}, "litres": null, "material": "Synthetic fibre", "colorways": ["90"], "status": "current" },
+    { "code": "EBH5008", "name_en": "Bat Case (2-3 bats)", "price_eur": 44.95, "dims_cm": {"length":90,"height":15,"width":9}, "litres": null, "material": "Synthetic leather (PVC)", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "EBH5007", "name_en": "Bat Case (1 bat)", "price_eur": 32.95, "dims_cm": {"length":90,"diameter":9}, "litres": null, "material": "Synthetic leather (PVC)", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "BH3002",  "name_en": "Trolley",         "price_eur": 113.95, "dims_cm": {"length":40,"height":67,"width":30},   "litres": 82, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["63","70","90"], "status": "current" },
+    { "code": "BA8100",  "name_en": "Umpire Bag",      "price_eur": 47.95,  "dims_cm": {"length":54,"height":35,"width":27},   "litres": 58, "material": "Synthetic fibre", "colorways": ["90"], "status": "current" },
+    { "code": "EBA9012", "name_en": "Equipment Case",  "price_eur": 26.95,  "dims_cm": {"length":22,"height":34,"width":15},   "litres": null, "material": "Synthetic leather", "colorways": ["7010","9010"], "status": "current" },
+    { "code": "EBA9030F","name_en": "Knapsack",        "price_eur": 15.95,  "dims_cm": {"length":43,"height":50},              "litres": null, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["90"], "status": "current" },
+    { "code": "BA9029",  "name_en": "Cooler Bag (tote)", "price_eur": 26.95, "dims_cm": {"length":30,"height":27,"width":18}, "litres": 10, "material": "Synthetic fibre x synthetic leather (PVC)", "colorways": ["90"], "status": "current" },
+    { "code": "BH9921",  "name_en": "Multi Bag",       "price_eur": 5.95,   "dims_cm": {"length":30,"height":36,"width":17},   "litres": null, "material": "Synthetic fibre", "colorways": ["90"], "status": "current" }
+  ],
+
+  "embroidery": {
+    "currency": "EUR",
+    "note": "On top of the bag price. Assumed per bag - NOT yet confirmed with SSK Europe. Team volume pricing is likely lower.",
+    "confirmed": false,
+    "options": [
+      { "id": "logo",   "name_en": "Logo / flag embroidery", "price_eur": 20.00 },
+      { "id": "name",   "name_en": "Name / text embroidery", "price_eur": 10.00 },
+      { "id": "number", "name_en": "Number embroidery",      "price_eur": 5.00 }
+    ]
+  },
+
+  "order_string": {
+    "purpose": "This is the row SSK Europe types into the Excel sheet sent to SSK Japan. The configurator must emit it exactly.",
+    "format": "{MODEL}{MATERIAL} | {PART}:{COLOR_CODE} for each part in chart order | {EMBROIDERY}",
+    "example": "PEO-44BE | A:70 | B:10 | C:70 | D:70 | E:70 | F:38 | G:10 | H:90(fixed) | Logo + Name 'PRINS' + Number 25",
+    "rules": [
+      "Parts must appear in the chart's own letter order.",
+      "Locked parts (zippers) may be included marked (fixed) or omitted - confirm which Pim prefers.",
+      "Always include the material letter suffix on the model code."
+    ]
+  }
+}
