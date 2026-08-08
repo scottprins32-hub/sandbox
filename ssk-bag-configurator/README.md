@@ -25,8 +25,37 @@ CLAUDE.md                  domain rules — read before touching colour logic
 KICKOFF.md                 the three-stage brief
 data/ssk-bags.json         single source of truth (16 custom, 35 stock models)
 scripts/validate_data.py   integrity check for the above
+scripts/inspect_svg.py     structure probe — run this on the artwork first
 assets/README.md           the missing-artwork situation, in detail
 ```
+
+## First step once the artwork lands
+
+```bash
+python3 scripts/inspect_svg.py assets/page2-full.svg --emit-regions
+```
+
+The extractor cannot be written responsibly before this runs, because how it
+must work depends on what Corel emitted. The probe answers:
+
+- **Are the groups already named?** If Corel exported per-part groups, Stage 1
+  collapses from clustering to renaming. This is the single question worth
+  asking first, and it is why the `.cdr` is worth requesting in parallel.
+- **Are there ancestor transforms?** Then path `d` coordinates are not page
+  coordinates and every bounding box must go through the matrix stack.
+- **Clip paths or masks?** Those make a raw geometric bbox overstate the
+  visible extent.
+- **Flat fills or gradient references, and what carries the shading?** CLAUDE.md
+  requires highlights and shadows survive recolouring, so the base-fill vs
+  overlay split has to be readable from the fill data before any recolouring
+  strategy is chosen.
+- **Where is content on the page?** An occupancy map plus connected-component
+  clustering gives first-pass region boxes; `--emit-regions` writes them to
+  `assets/regions.candidate.json` for correction by hand.
+
+Stdlib only. Verified against a synthetic Corel-shaped fixture covering nested
+groups, `translate`/`matrix` ancestors, relative path commands, arcs, gradient
+fills, opacity overlays and label text.
 
 ## Validating the data
 
