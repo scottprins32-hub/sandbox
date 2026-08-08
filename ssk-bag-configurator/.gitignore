@@ -1,0 +1,8 @@
+# Generated — reproducible from source/ via scripts/extract_page2.py
+assets/
+
+# SSK Europe source PDFs (~17 MB), not redistributed
+source/
+
+__pycache__/
+*.pyc

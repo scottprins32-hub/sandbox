@@ -11,11 +11,24 @@ single source of truth, and `assets/page2-full.svg` for artwork.
 
 Work in three stages and **stop after each for my review**. Don't run ahead.
 
+## Stage 0 — Generate the artwork
+
+Nothing in `assets/` is committed. Run this first:
+
+```bash
+pip install pymupdf
+python scripts/extract_page2.py
+```
+
+It reads `source/SSK_Custom_Bags.pdf` and writes `assets/page2-full.svg` (~2.3 MB) plus
+seven region previews. Expect it to report **4,233 vector paths, 0 raster images** on page 2
+— if it warns about raster content or a low path count, stop and tell me, because the whole
+approach depends on that page being pure vector.
+
 ## Stage 1 — Asset extraction
 
-`assets/page2-full.svg` is a full-page SVG extracted from SSK's own CorelDRAW file. It
-contains seven bag illustrations as native vector paths (no raster). I need them split
-apart and their parts identified.
+`assets/page2-full.svg` is a full-page SVG from SSK's own CorelDRAW file, containing seven
+bag illustrations as native vector paths. I need them split apart and their parts identified.
 
 Write `scripts/extract_parts.py` that:
 
