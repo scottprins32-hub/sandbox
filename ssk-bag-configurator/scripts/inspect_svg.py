@@ -216,6 +216,16 @@ def local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1] if "}" in tag else tag
 
 
+# Subtrees that define reusable content rather than draw it. Their coordinates
+# belong to their own systems, so measuring them as page geometry produces
+# nonsense (pattern tiles in particular sit at wild offsets). They are still
+# counted for the structural report -- just never treated as page content.
+NON_RENDERED = {
+    "defs", "clipPath", "pattern", "mask", "marker", "symbol",
+    "linearGradient", "radialGradient",
+}
+
+
 class Shape:
     __slots__ = ("index", "tag", "bbox", "fill", "stroke", "opacity", "depth",
                  "group_path", "clipped", "cmds", "elem_id")
@@ -227,6 +237,16 @@ class Shape:
 
 def walk(root: ET.Element) -> tuple[list[Shape], dict]:
     shapes: list[Shape] = []
+
+    # <use> references content declared elsewhere (usually in <defs>) and does
+    # render, so its geometry counts. Index every id up front so it can be
+    # resolved during the walk.
+    by_id: dict[str, ET.Element] = {}
+    for el in root.iter():
+        eid = el.get("id")
+        if eid and eid not in by_id:
+            by_id[eid] = el
+
     stats = {
         "tags": Counter(),
         "depths": Counter(),
@@ -241,6 +261,10 @@ def walk(root: ET.Element) -> tuple[list[Shape], dict]:
         "images": 0,
         "unparsed_paths": 0,
         "arc_paths": 0,
+        "use_refs": 0,
+        "use_unresolved": 0,
+        "pattern_filled": 0,
+        "images_in_defs": 0,
     }
 
     def style_lookup(el: ET.Element, prop: str) -> str | None:
@@ -257,10 +281,14 @@ def walk(root: ET.Element) -> tuple[list[Shape], dict]:
         return None
 
     def recurse(el: ET.Element, matrix: tuple, depth: int, gpath: tuple,
-                inherited_fill: str | None, clipped: bool) -> None:
+                inherited_fill: str | None, clipped: bool,
+                in_defs: bool = False, use_chain: tuple = ()) -> None:
         tag = local(el.tag)
         stats["tags"][tag] += 1
         stats["depths"][depth] += 1
+
+        if tag in NON_RENDERED:
+            in_defs = True
 
         tf = el.get("transform")
         if tf:
@@ -285,6 +313,8 @@ def walk(root: ET.Element) -> tuple[list[Shape], dict]:
             stats["styles"] += 1
         elif tag == "image":
             stats["images"] += 1
+            if in_defs:
+                stats["images_in_defs"] += 1
         elif tag == "text":
             content = "".join(el.itertext()).strip()
             if content:
@@ -333,7 +363,7 @@ def walk(root: ET.Element) -> tuple[list[Shape], dict]:
             except ValueError:
                 pass
 
-        if pts:
+        if pts and not in_defs:
             tp = [apply(matrix, x, y) for x, y in pts]
             bb = bbox_of(tp)
             if bb:
@@ -345,8 +375,22 @@ def walk(root: ET.Element) -> tuple[list[Shape], dict]:
                     elem_id=el.get("id") or "",
                 ))
 
+        # <use> draws a copy of another element, so its geometry is page
+        # geometry even though the target usually lives in <defs>.
+        if tag == "use" and not in_defs:
+            stats["use_refs"] += 1
+            href = el.get("href") or el.get(f"{{{XLINK_NS}}}href") or ""
+            target = by_id.get(href.lstrip("#")) if href.startswith("#") else None
+            if target is None or href in use_chain:
+                stats["use_unresolved"] += 1
+            else:
+                ux, uy = float(el.get("x", 0) or 0), float(el.get("y", 0) or 0)
+                m = compose(matrix, (1.0, 0.0, 0.0, 1.0, ux, uy)) if (ux or uy) else matrix
+                recurse(target, m, depth + 1, gpath, fill, clipped,
+                        in_defs=False, use_chain=use_chain + (href,))
+
         for child in el:
-            recurse(child, matrix, depth + 1, gpath, fill, clipped)
+            recurse(child, matrix, depth + 1, gpath, fill, clipped, in_defs, use_chain)
 
     recurse(root, IDENTITY, 0, (), None, False)
     return shapes, stats
@@ -499,21 +543,40 @@ def main() -> int:
     for val, n in fills.most_common(25):
         print(f"  {val:28} {n}")
     grad = sum(st["gradient_defs"].values())
-    print(f"  gradient defs: {grad}  ({dict(st['gradient_defs'])})")
+    patterns = st["tags"].get("pattern", 0)
+    print(f"  gradient defs: {grad}   pattern defs: {patterns}")
     print(f"  shapes filled by url() reference: {st['gradient_fill_refs']}")
-    if grad or st["gradient_fill_refs"]:
-        print("  -> highlights/shadows are gradient-based. Recolour flat base fills")
-        print("     only and leave gradient/overlay shapes untouched (CLAUDE.md).")
+    if grad:
+        print("  -> some shading is gradient-based; recolour flat base fills only")
+        print("     and leave gradient shapes untouched (CLAUDE.md).")
+    if patterns:
+        print("  -> !! PATTERN fills present. If those patterns contain <image>")
+        print("     tiles, the areas they cover are RASTER and cannot be recoloured")
+        print("     by changing a fill. Those parts need a different treatment.")
     translucent = [s for s in shapes if s.opacity and s.opacity not in ("1", "1.0")]
     print(f"  shapes with opacity < 1: {len(translucent)} (likely shading overlays)")
+    print()
+
+    print("--- indirection ---")
+    print(f"  <use> on the page: {st['use_refs']} "
+          f"({st['use_unresolved']} unresolved)")
+    print(f"  clipPath defs: {st['tags'].get('clipPath', 0)}")
     print()
 
     print("--- text (to be stripped: prices and labels) ---")
     print(f"  {len(st['texts'])} text node(s)")
     for t in st["texts"][:40]:
         print(f"    {t!r}")
+    if not st["texts"]:
+        print("  none -- text was flattened to outlines on export (text_as_path=True).")
+        print("  The price/model labels are now ordinary paths and cannot be stripped")
+        print("  by element type. Re-export with text_as_path=False to strip them cleanly.")
     if st["images"]:
-        print(f"  !! {st['images']} <image> element(s) -- page is NOT pure vector")
+        page_images = st["images"] - st["images_in_defs"]
+        print(f"  !! {st['images']} <image> element(s): {st['images_in_defs']} inside "
+              f"pattern/defs, {page_images} drawn directly")
+        if st["images_in_defs"]:
+            print("     The in-defs ones are rasterised texture tiles -- see fills above.")
     print()
 
     regions = cluster(shapes)
