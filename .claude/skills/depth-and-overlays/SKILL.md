@@ -345,7 +345,7 @@ A CSS **interpolation hint** — a bare percentage between two colour stops — 
 
 Rasterise it once and never animate it — `feTurbulence` is expensive to generate, cheap to reuse.
 
-`references/text-over-imagery.md` has the scrim recipe library (bottom, top, corner, radial, edge-to-edge, dual-ended), the alpha-solver script for arbitrary scrim and text colours, and the CMS/user-upload pipeline.
+`references/text-over-imagery.md` has the full recipe library (bottom, top, dual-ended, side-anchored, radial, solid panel), the smoothstep factors for regenerating any of them at a different plateau, the alpha solver for arbitrary scrim and text colours, and the CMS/user-upload pipeline.
 
 ### 12. `backdrop-filter` panels: blur removes detail, not luminance — *craft*
 
@@ -369,7 +369,10 @@ The modern alternative to a scrim is a translucent panel that blurs what is behi
 
 /* User asked for less transparency. Honour it — but see the caveat below. */
 @media (prefers-reduced-transparency: reduce) {
-  .glass { background-color: var(--color-surface-inverse); backdrop-filter: none; }
+  .glass {
+    background-color: var(--color-surface-inverse);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
 }
 @media (forced-colors: active) {
   .glass { background-color: Canvas; color: CanvasText; border-color: CanvasText; }
@@ -492,4 +495,4 @@ Run against the screen or the PR diff.
 ## Further reading in this skill
 
 - `references/elevation-tokens.md` — read when setting up or migrating a project: complete light and dark token files for three system styles (flat/bordered, soft-shadow product, dark-first), the Tailwind v4 `@theme` version, a per-component elevation assignment table, a comparison against Material and Tailwind's default `shadow-*` scale, and a lint rule plus staged migration for a codebase already full of bespoke shadows.
-- `references/text-over-imagery.md` — read whenever text lands on a photo, video or gradient: the alpha-solver for arbitrary scrim and text colours with a runnable script, the scrim recipe library (bottom, top, corner, radial, dual-ended, side-anchored), responsive text-band geometry across aspect ratios, the CMS and user-upload pipeline (dominant-colour extraction, server-side luminance probing, editor focal points), video backgrounds and posters, and the loading/failure/forced-colors matrix.
+- `references/text-over-imagery.md` — read whenever text lands on a photo, video or gradient: the runnable alpha solver for arbitrary scrim and text colours, the scrim recipe library (bottom, top, dual-ended, side-anchored, radial, solid panel) with the smoothstep factors to regenerate any of them, responsive text-band geometry across aspect ratios, the CMS and user-upload pipeline (dominant-colour extraction, 99th-percentile luminance probing, editor focal points), video backgrounds and posters, and the loading / failure / forced-colors / print matrix.
