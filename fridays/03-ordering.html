@@ -409,7 +409,7 @@ p{margin:0}
           <p class="quote-note" id="fireNote">Quoted from the live rail, not an average.</p>
         </div>
 
-        <div class="cart" id="cart" aria-live="polite" aria-label="Your order"></div>
+        <div class="cart" id="cart" aria-label="Your order"></div>
 
         <div class="totals">
           <div class="trow"><span>Subtotal</span><span class="num" id="tSub">Cg 0</span></div>
@@ -865,10 +865,15 @@ document.addEventListener("click",e=>{
 
   const inc=e.target.closest("[data-inc]"), dec=e.target.closest("[data-dec]"),
         del=e.target.closest("[data-del]");
-  if(inc){ S.cart[+inc.dataset.inc].qty++; drawCart(); return; }
-  if(dec){ const i=+dec.dataset.dec;
-    S.cart[i].qty--; if(S.cart[i].qty<1) S.cart.splice(i,1); drawCart(); return; }
-  if(del){ S.cart.splice(+del.dataset.del,1); drawCart(); return; }
+  if(inc){ const it=S.cart[+inc.dataset.inc]; it.qty++; drawCart();
+    say(`${CUTS.find(c=>c.id===it.cut).en}, ${it.qty} on the ticket.`); return; }
+  if(dec){ const i=+dec.dataset.dec, it=S.cart[i];
+    it.qty--;
+    if(it.qty<1){ S.cart.splice(i,1); drawCart();
+      say(`${CUTS.find(c=>c.id===it.cut).en} removed.`); return; }
+    drawCart(); say(`${CUTS.find(c=>c.id===it.cut).en}, ${it.qty} on the ticket.`); return; }
+  if(del){ const it=S.cart.splice(+del.dataset.del,1)[0]; drawCart();
+    say(`${CUTS.find(c=>c.id===it.cut).en} removed.`); return; }
 });
 
 /* role="radio" promises one tab stop per group and arrow keys inside it. Adding
@@ -902,6 +907,11 @@ document.addEventListener("keydown",e=>{
 });
 
 let addedTimer=0;
+function say(html){
+  $("#added").innerHTML=`${IC.check}<span>${html}</span>`;
+  clearTimeout(addedTimer);
+  addedTimer=setTimeout(()=>{$("#added").textContent="";},6000);
+}
 $("#note").addEventListener("input",drawReadback);
 $("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; render();} });
 $("#next").addEventListener("click",()=>{
@@ -919,10 +929,8 @@ $("#next").addEventListener("click",()=>{
   // On a narrow screen the ticket is a long way below the builder, so say so
   // here as well as showing it there.
   const n=S.cart.reduce((a,b)=>a+b.qty,0);
-  $("#added").innerHTML=`${IC.check}<span>${added} added. ${n} item${n===1?"":"s"} on the ticket, ${money(
-    S.cart.reduce((t,it)=>t+it.price*it.qty,0))}.</span>`;
-  clearTimeout(addedTimer);
-  addedTimer=setTimeout(()=>{$("#added").textContent="";},6000);
+  say(`${added} added. ${n} item${n===1?"":"s"} on the ticket, ${money(
+    S.cart.reduce((t,it)=>t+it.price*it.qty,0))}.`);
 });
 $("#place").addEventListener("click",()=>{
   const n=S.cart.reduce((a,b)=>a+b.qty,0);
