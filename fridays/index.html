@@ -1799,6 +1799,10 @@ const cutAlt =c=> LANG==="pap"? c.en : c.pap;
 const fmtName=f=> LANG==="pap"? f.pap : LANG==="nl"? f.nl : f.en;
 const fmtSub =f=> f.sub[LANG] || f.sub.en;
 const subOf=o=> o.sub[LANG] || o.sub.en;
+/* Half the cuts and formats are spelled the same in both languages, and printing
+   Steak under Steak reads as a bug rather than as a translation. */
+const altSpan=(main,alt)=> String(alt).toLowerCase()===String(main).toLowerCase() ? ""
+  : `<span lang="${LANG==="pap"?"en":"pap"}">${alt}</span>`;
 const money=(v,cur=S.cur)=> cur==="usd" ? "USD "+(v/USD).toFixed(2) : "Cg "+v;
 const pair=v=>Array.isArray(v)? v[0]+" / "+v[1] : String(v);
 
@@ -1964,13 +1968,13 @@ function drawMatrix(){
         ${pair(v)}${Array.isArray(v)?'<u>'+tx("mx.small")+'</u>':""}</button></td>`;
     }).join("");
     return lead+`<tr><th class="rowh" scope="row"><span class="rowh-in">
-      <b>${cutName(c)}</b><span lang="${LANG==="pap"?"en":"pap"}">${cutAlt(c)}</span></span></th>${cells}</tr>`;
+      <b>${cutName(c)}</b>${altSpan(cutName(c),cutAlt(c))}</span></th>${cells}</tr>`;
   }).join("");
 }
 function drawMobile(){
   const nav=$("#mxPick"), list=$("#mxList");
   nav.innerHTML=CUTS.map(c=>`<button type="button" data-p="${c.id}"
-    aria-pressed="${c.id===S.pick}"><b>${cutName(c)}</b><span lang="${LANG==="pap"?"en":"pap"}">${cutAlt(c)}</span></button>`).join("");
+    aria-pressed="${c.id===S.pick}"><b>${cutName(c)}</b>${altSpan(cutName(c),cutAlt(c))}</button>`).join("");
   const c=cutOf(S.pick);
   list.innerHTML=FORMATS.map(f=>{
     const v=c.p[f.id], off=v==null;
@@ -2082,7 +2086,7 @@ function drawCuts(){
     out+=CUTS.filter(c=>c.tier===tr).map(c=>{
       const from=Math.min(...Object.values(c.p).flat().filter(v=>v!=null));
       return `<button class="opt" role="radio" data-cut="${c.id}" aria-checked="${c.id===S.cut}">
-        <b>${cutName(c)}</b><span lang="${LANG==="pap"?"en":"pap"}">${cutAlt(c)}</span>
+        <b>${cutName(c)}</b>${altSpan(cutName(c),cutAlt(c))}
         <u>${tx("o.from")} ${money(from)}</u></button>`;
     }).join("");
     out+="</div>";
@@ -2096,7 +2100,7 @@ function drawFmts(){
     return `<button class="opt" role="radio" data-fmt="${o.key}" ${off?"disabled":""}
       aria-checked="${o.key===S.fmt && !off}">
       <b>${fmtName(o.f)}${o.size?` <small>${sizeWord(o.size)}</small>`:""}</b>
-      <span lang="${LANG==="pap"?"en":"pap"}">${LANG==="pap"?o.f.en:o.f.pap}</span>
+      ${altSpan(fmtName(o.f), LANG==="pap"?o.f.en:o.f.pap)}
       <u>${off?tx("o.notserved"):money(o.price)}</u></button>`;
   }).join("");
   const missing=FORMATS.filter(f=>c.p[f.id]==null).map(f=>fmtName(f).toLowerCase());
@@ -2110,7 +2114,7 @@ function drawSides(){
       <b>${s.en}</b><span>${subOf(s)}</span>${s.d?`<u>${tx("o.plus")} ${money(s.d)}</u>`:""}</button>`).join("");
   $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && optOf(c,S.fmt)?.price!=null).map(c=>
     `<button class="opt" data-half="${c.id}" aria-pressed="${c.id===S.half}">
-      <b>${cutName(c)}</b><span lang="${LANG==="pap"?"en":"pap"}">${cutAlt(c)}</span>
+      <b>${cutName(c)}</b>${altSpan(cutName(c),cutAlt(c))}
       <u>${tx("o.plus")} ${money(HALF_ADD)}</u></button>`).join("")
     || `<p class="body" style="font-size:.86rem">${tx("o.nohalf")}</p>`;
 }

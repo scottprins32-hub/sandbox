@@ -773,6 +773,9 @@ function options(c){
   return out;
 }
 const optOf=(c,key)=>options(c).find(o=>o.key===key) || null;
+/* Steak is Steak in both languages, and printing it under itself reads as a bug. */
+const altSpan=(main,alt)=> String(alt).toLowerCase()===String(main).toLowerCase() ? ""
+  : `<span lang="pap">${alt}</span>`;
 const boxName=(cutId,key)=>{
   const o=optOf(cutOf(cutId),key);
   return o ? (o.size ? `${o.f.en.toLowerCase()} (${o.size})` : o.f.en.toLowerCase()) : key;
@@ -1061,7 +1064,7 @@ function orderBody(){
   if(o.step===0){
     pg=`<div class="grid2" role="radiogroup" aria-label="Which cut">${CUTS.map(x=>
       `<button class="chip" role="radio" data-cut="${x.id}" aria-checked="${x.id===o.cut}">
-        <b>${x.en}</b><span lang="pap">${x.pap}</span></button>`).join("")}</div>`;
+        <b>${x.en}</b>${altSpan(x.en,x.pap)}</button>`).join("")}</div>`;
   }else if(o.step===1){
     pg=`<div class="grid2" role="radiogroup" aria-label="How do you want it">${options(c).map(x=>
       `<button class="chip ${x.price==null?"off":""}" role="radio" data-box="${x.key}"
@@ -1085,7 +1088,7 @@ function orderBody(){
       ${o.halfOn?`<div class="grid2" style="margin-top:10px" role="radiogroup" aria-label="Second cut">
         ${CUTS.filter(x=>x.id!==o.cut && optOf(x,o.fmt)?.price!=null).map(x=>
           `<button class="chip" role="radio" data-half="${x.id}" aria-checked="${x.id===o.half}">
-            <b>${x.en}</b><span lang="pap">${x.pap}</span></button>`).join("")
+            <b>${x.en}</b>${altSpan(x.en,x.pap)}</button>`).join("")
         || `<p class="note">No second cut works in this box.</p>`}</div>`:""}`;
   }else{
     pg=`<div class="grid2" role="group" aria-label="Sauces">${SAUCES.map((s,i)=>
