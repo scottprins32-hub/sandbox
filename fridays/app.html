@@ -35,7 +35,10 @@
 [hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0; background:var(--page); color:var(--bone); font-family:var(--f-body);
-  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:clip}
+/* clip rather than hidden: hidden makes the body a scroll container, and a
+   sticky element then sticks to that rather than to the viewport, which is
+   why the phone scrolled away with the page. */
 body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(90% 55% at 50% -8%, rgba(226,82,27,.16), transparent 62%)}
 img{max-width:100%; display:block}
@@ -68,11 +71,15 @@ p{margin:0}
    comes first, because a sticky element taller than the viewport is a trap. */
 /* Three areas, not two, so that on a phone the device comes straight after the
    headline instead of behind two paragraphs and a list. */
-.stage{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:clamp(30px,5vw,80px);
-  grid-template-areas:"lead phone" "rest phone";
+.stage{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0 clamp(30px,5vw,80px);
+  grid-template-areas:"lead phone" "rest phone" "more phone";
   align-items:start; padding-top:clamp(34px,6vw,76px); padding-bottom:clamp(40px,6vw,80px)}
-.stage-lead{grid-area:lead} .stage-rest{grid-area:rest} .stage-phone{grid-area:phone}
-.stage-lead,.stage-rest,.stage-phone{min-width:0}
+.stage-lead{grid-area:lead} .stage-rest{grid-area:rest} .stage-more{grid-area:more}
+/* The phone's area has to span the full height of both text rows, or a sticky
+   child has nothing to slide inside: align-items:start would otherwise shrink
+   the area to the device's own height and the sticky would never engage. */
+.stage-phone{grid-area:phone; align-self:stretch}
+.stage-lead,.stage-rest,.stage-more,.stage-phone{min-width:0}
 .stage-rest{margin-top:16px}
 .crumb{display:flex; align-items:center; gap:10px; color:var(--smoke); font-size:.8rem;
   margin-bottom:24px}
@@ -100,6 +107,8 @@ p{margin:0}
 .way .go{margin-left:auto; color:var(--dim); font-size:.9rem; flex:none}
 
 .sec{padding-block:clamp(42px,5.2vw,82px)}
+.stage-more .sec{padding-block:clamp(38px,4.4vw,64px) 0}
+.stage-more .sec:first-child{padding-top:clamp(34px,4vw,56px)}
 .sec-head{margin-bottom:clamp(26px,3.4vw,46px); max-width:60ch}
 .sec-head .kicker{margin-bottom:12px}
 .sec-head h2{margin-bottom:16px}
@@ -107,7 +116,11 @@ p{margin:0}
 /* --------------------------------------------------------------- the plinth
    Every control that is not part of the product lives out here, so nothing fake
    ever appears inside the screen. */
-.plinth{width:330px; max-width:100%; margin-top:18px; display:grid; gap:12px}
+/* The sticky wrapper has to carry the same width contract as the device it
+   holds, or it sizes to the dish row's min-content and pushes past the viewport. */
+.stick{width:330px; max-width:100%; min-width:0}
+.plinth{width:330px; max-width:100%; margin-top:18px}
+.plinth-note{width:330px; max-width:100%; margin-top:12px}
 .dial{border:1px solid var(--line); border-radius:16px; background:var(--card); padding:13px 15px}
 .dial-top{display:flex; align-items:center; justify-content:space-between; gap:10px;
   margin-bottom:8px}
@@ -124,6 +137,7 @@ p{margin:0}
 .mini[aria-pressed="true"]{background:var(--amber); border-color:var(--amber); color:#241A05}
 .mini.live[aria-pressed="true"]{background:var(--leaf); border-color:var(--leaf); color:#15200C}
 .plinth-note{font-size:.74rem; color:var(--smoke); line-height:1.5}
+.stage-phone .plinth-note{width:330px; max-width:100%}
 .plinth-note b{color:var(--bone-2); font-weight:600}
 
 /* ------------------------------------------------------------ device frame */
@@ -454,10 +468,13 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
 .ft-in{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
 .ft a{color:var(--bone-2)} .ft a:hover{color:var(--amber)}
 
-@media (min-width:1081px) and (min-height:900px){ .stage-phone{position:sticky; top:22px} }
+@media (min-width:1081px) and (min-height:900px){ .stick{position:sticky; top:22px} }
 @media (max-width:1080px){
-  .stage{grid-template-columns:1fr; grid-template-areas:"lead" "phone" "rest"; gap:26px}
-  .stage-phone{justify-self:center; display:grid; justify-items:center}
+  .stage{grid-template-columns:1fr; grid-template-areas:"lead" "phone" "rest" "more"; gap:26px}
+  /* block rather than grid: a grid item is floored at its content's min-content
+     width, and the ticket's own type is wider than a 320px phone frame */
+  .stage-phone{display:block; width:100%}
+  .stick,.plinth-note{margin-inline:auto}
   .stage-rest{margin-top:0}
   .move{grid-template-columns:40px 1fr; gap:16px}
   .move .then{grid-column:2; margin-top:6px}
@@ -467,6 +484,7 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
    the screen growing: an inner scroller that fills the viewport swallows swipes. */
 @media (max-width:520px){
   :root{--scr-h:600px}
+  .stick{width:100%}
   .phone{width:100%; padding:8px; border-radius:34px}
   .screen{border-radius:27px}
   .plinth{width:100%}
@@ -519,6 +537,7 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
   </div>
 
   <div class="stage-phone">
+   <div class="stick">
     <div class="phone">
       <div class="screen">
         <div class="statusbar" aria-hidden="true">
@@ -546,13 +565,13 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
           <button class="mini" data-jump="1610" aria-pressed="false">02:50, last hour</button>
         </div>
       </div>
-      <p class="plinth-note">The phone runs on <b>Curacao time</b>, which never shifts for daylight saving. Left on Live it shows the truck as it is right now, which for most of the day is a cold grill, so the dial scrubs a night instead. Fire time, queue depth, the Trempan lane and the ticket all move with it.</p>
     </div>
+   </div>
+   <p class="plinth-note">The phone runs on <b>Curacao time</b>, which never shifts for daylight saving. Left on Live it shows the truck as it is right now, which for most of the day is a cold grill, so the dial scrubs a night instead. Fire time, queue depth, the Trempan lane and the ticket all move with it.</p>
   </div>
-</div>
 
+  <div class="stage-more">
 <section class="sec">
-  <div class="wrap">
     <div class="sec-head">
       <p class="kicker">The shape of it</p>
       <h2 class="h2">Three decisions<br>the rest follows from</h2>
@@ -583,11 +602,9 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
         <p class="then"><b>Why it matters</b>The truck's only real problem is that everyone arrives between 22:30 and 01:00. Loyalty that moves demand beats loyalty that stamps a card.</p>
       </div>
     </div>
-  </div>
 </section>
 
 <section class="sec">
-  <div class="wrap">
     <div class="sec-head">
       <p class="kicker">What changes</p>
       <h2 class="h2">Renting a platform,<br>or owning the counter</h2>
@@ -615,8 +632,9 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
       </div>
     </div>
     <p class="note" style="margin-top:18px; max-width:70ch">This prototype runs in English with the truck's own Papiamentu kept where the truck uses it: the greeting, the four questions, the words on the plate. The language switching itself is demonstrated on the website rather than duplicated here, because the Papiamentu still needs a native speaker's pass before any of it ships.</p>
-  </div>
 </section>
+  </div>
+</div>
 
 </main>
 
