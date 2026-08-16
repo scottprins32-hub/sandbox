@@ -317,7 +317,7 @@ p{margin:0}
   .phone{width:100%; padding:8px; border-radius:34px}
   .screen{border-radius:27px; height:auto}
   .view{overflow:visible; overscroll-behavior:auto; max-height:none}
-  .tabs{position:sticky; bottom:0}
+  .tabs{position:static}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;
@@ -325,6 +325,7 @@ p{margin:0}
 }
 </style>
 
+<main>
 <div class="wrap top">
   <p class="crumb"><a href="01-website.html">Fridays Baby Truck</a> {{ICON:caret-right}} <span>The app</span></p>
   <p class="kicker">Concept, native iOS and Android</p>
@@ -332,7 +333,6 @@ p{margin:0}
   <p class="lede">Fridays currently rides on a white-label of a shared island ordering platform. It works, but the brand is a skin on someone else's checkout, and the app answers the wrong question. Nobody opens a food app at half past eleven to browse. They open it to find out how long, and when to leave the house.</p>
 </div>
 
-<main>
 <section class="sec">
   <div class="wrap">
     <div class="sec-head">
@@ -446,6 +446,13 @@ function island(){
           h:+g("hour"), m:+g("minute"), mins:(+g("hour"))*60+(+g("minute"))};
 }
 const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+/* After midnight you are still inside last night's session, so the next Trempan
+   lane opens at 21:00 on the same calendar day, not tomorrow. */
+function nextLane(){
+  const t=island();
+  if(t.mins < 21*60) return {label:"Tonight's", day:DAYS[t.day]};
+  return {label:"Tomorrow's", day:DAYS[(t.day+1)%7]};
+}
 const pad=n=>String(n).padStart(2,"0");
 const clock=m=>{const x=((m%1440)+1440)%1440; return pad(Math.floor(x/60))+":"+pad(x%60);};
 const OPENS=21*60;
@@ -461,7 +468,7 @@ function fireState(){
   const h     = t.mins/60, hh = h<6 ? h+24 : h;
   const peak  = open ? Math.max(0, 1-Math.abs(hh-23.75)/3.4) : 0;
   return {open, late, closes: late ? CLOSE[(t.day+6)%7] : CLOSE[t.day],
-          queue: open? Math.round(1+peak*11):0, fire: open? Math.round(9+peak*29):12, t};
+          queue: open? Math.round(1+peak*14):0, fire: open? Math.round(9+peak*29):12, t};
 }
 
 /* ------------------------------------------------------------------ screens */
@@ -475,7 +482,7 @@ function statusbar(){
 function vTonight(){
   const s=fireState();
   return `<div class="appbar">
-      <div><h2>Bon nochi, Shanira</h2><span class="sub">${s.open?"the coals are lit":"the grill lights at 21:00"}</span></div>
+      <div><h2><span lang="pap">Bon nochi</span>, Shanira</h2><span class="sub">${s.open?"the coals are lit":"the grill lights at 21:00"}</span></div>
       <span class="avatar">SM</span>
     </div>
     <div class="card">
@@ -541,16 +548,16 @@ function vOrder(st){
   const opts=options(ci);
   const active=opts.find(o=>o.key===st.fmt && o.price!=null) || opts.find(o=>o.price!=null);
   const side=st.side??0, sauces=st.sauces||new Set([0]);
-  const answered=2+(st.side!=null?1:0)+(st.sauces?1:0);
-  const q=(a,b)=>`<p class="qline">${a}</p><p class="qsub">${b}</p>`;
-  return `<div class="appbar"><div><h2>Òrdena</h2>
+  const answered = 2 + (st.side!=null ? 1 : 0) + ((st.sauces && st.sauces.size) ? 1 : 0);
+  const q=(a,b)=>`<p class="qline" lang="pap">${a}</p><p class="qsub">${b}</p>`;
+  return `<div class="appbar"><div><h2 lang="pap">Òrdena</h2>
       <span class="sub">${answered} of 4 answered</span></div></div>
     <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=answered?"on":""}"></i>`).join("")}</div>
 
     ${q("Ki karni?","which cut")}
     <div class="grid2" data-set="cut" role="group" aria-label="Which cut">
       ${CUTS.map((c,i)=>`<button class="chip" aria-pressed="${i===ci}" data-i="${i}">
-        <b>${c.en}</b><span>${c.pap}</span></button>`).join("")}
+        <b>${c.en}</b><span lang="pap">${c.pap}</span></button>`).join("")}
     </div>
     <hr class="hr">
     ${q("Kon bo ke?","how do you want it")}
@@ -579,13 +586,49 @@ function vOrder(st){
     </div>`;
 }
 
-function vTicket(){
+/* The ticket now reads what the builder was left on, so the four questions are
+   not answered into a void. */
+function orderPlate(st){
+  const ci=st.cut??2, opts=options(ci);
+  const o=opts.find(x=>x.key===st.fmt && x.price!=null) || opts.find(x=>x.price!=null);
+  const bits=[SIDES[st.side??0][0].toLowerCase()];
+  [...(st.sauces||new Set([0]))].sort().forEach(i=>bits.push(SAUCES[i][0].toLowerCase()));
+  return {
+    name: `${CUTS[ci].en}, ${FMTS[o.i][0].toLowerCase()}${o.size?` (${o.size})`:""}`,
+    mods: "Ku "+bits.join(", ")+".",
+    price: o.price,
+  };
+}
+function vTicket(st){
   const s=fireState();
   const now=s.t.mins;
+  // A cold grill has no live ticket on it. Every other screen checks this; the
+  // one that shows a countdown was the one that did not.
+  if(!s.open){
+    return `<div class="appbar"><div><h2 lang="pap">Bo tiket</h2>
+        <span class="sub">nothing on the coals</span></div>
+        <span class="pill cool"><i></i>Closed</span></div>
+      <div class="card">
+        <div class="card-hd"><h3>No live ticket</h3></div>
+        <p class="note">The grill lights at 21:00 and orders placed now join the queue for
+        then. Your ticket appears here the moment the kitchen accepts it, with the fire
+        timeline and the minute to leave the house.</p>
+      </div>
+      <div class="card usual">
+        <div class="u-top">
+          <div><span class="note" style="letter-spacing:.12em; text-transform:uppercase; font-size:.6rem; font-weight:700">Bo usual</span>
+            <b class="u-name">Steak, regular</b>
+            <p class="u-mods">Ku sous, sin pika.</p></div>
+          <span class="u-price">21</span>
+        </div>
+        <button class="btn btn-hot" data-go="trempan">${ICONS.sun}Book a Trempan slot</button>
+      </div>`;
+  }
   const on=now+2, rest=now+s.fire-4, done=now+s.fire;
+  const plate=orderPlate(st);
   const DRIVE=8;                       // Punda to Caracasbaaiweg 216 at this hour
   const leave=Math.max(0,s.fire-DRIVE);
-  return `<div class="appbar"><div><h2>Bo tiket</h2><span class="sub">collection at the hatch</span></div>
+  return `<div class="appbar"><div><h2 lang="pap">Bo tiket</h2><span class="sub">collection at the hatch</span></div>
       <span class="pill warm"><i></i>On the coals</span></div>
     <div class="ticket">
       <div class="tk-top"><div class="tk-code">
@@ -599,7 +642,7 @@ function vTicket(){
           <div class="tl done"><span class="tl-dot">${ICONS.check}</span>
             <div><b>Ticket in</b><span>Paid, sent to the rail</span></div><time>${clock(now-1)}</time></div>
           <div class="tl live"><span class="tl-dot">${ICONS.fire}</span>
-            <div><b>On the coals</b><span>Steak, medium. Cooking now.</span></div><time>${clock(on)}</time></div>
+            <div><b>On the coals</b><span>${plate.name}. Cooking now.</span></div><time>${clock(on)}</time></div>
           <div class="tl"><span class="tl-dot">${ICONS.timer}</span>
             <div><b>Resting and boxed</b><span>Four minutes off the heat</span></div><time>${clock(rest)}</time></div>
           <div class="tl"><span class="tl-dot">${ICONS.storefront}</span>
@@ -611,11 +654,11 @@ function vTicket(){
       <div><b>Leave in ${leave} minutes</b><span>Eight minute drive from Punda at this hour</span></div></div>
     <div class="card">
       <div class="row"><span class="row-ic">${ICONS.bowl}</span>
-        <span class="rl"><b>Steak, regular</b><span>Ku sous, sin pika. Extra batata.</span></span><em>21</em></div>
+        <span class="rl"><b>${plate.name}</b><span lang="pap">${plate.mods}</span></span><em>${plate.price}</em></div>
       <div class="row"><span class="row-ic">${ICONS.drop}</span>
-        <span class="rl"><b>Juice lamunchi</b><span>Refreskante</span></span><em>5</em></div>
+        <span class="rl"><b>Juice lamunchi</b><span lang="pap">Refreskante</span></span><em>5</em></div>
       <div class="row"><span class="row-ic">${ICONS.money}</span>
-        <span class="rl"><b>Paid on the Maestro</b><span>Ending 4471</span></span><em>26</em></div>
+        <span class="rl"><b>Paid on the Maestro</b><span>Ending 4471</span></span><em>${plate.price+5}</em></div>
     </div>
     <button class="btn btn-line">${ICONS.pin}Open the driving route</button>`;
 }
@@ -624,16 +667,16 @@ function vTrempan(){
   const bars=[["21:00",24,"early"],["21:30",31,"early"],["22:00",46,"early"],["22:30",68,""],
               ["23:00",88,"peak"],["23:30",100,"peak"],["00:00",94,"peak"],["00:30",78,"peak"],
               ["01:00",58,""],["01:30",41,""],["02:00",27,""],["02:30",16,""]];
-  return `<div class="appbar"><div><h2>Trempan</h2><span class="sub">the early lane</span></div>
+  return `<div class="appbar"><div><h2 lang="pap">Trempan</h2><span class="sub">the early lane</span></div>
       <span class="pill amber">21:00 to 23:00</span></div>
     <div class="card">
       <div class="card-hd"><h3>When the truck is busy</h3></div>
-      <div class="chart">${bars.map(b=>`<div class="${b[2]}" style="height:${b[1]}%"></div>`).join("")}</div>
+      <div class="chart" role="img" aria-label="Queue depth through the night: shallow from 21:00 to about 22:30, deepest between 23:00 and 00:30, easing again after 01:00. Trempan slots cover the shallow stretch, 21:00 to 23:00.">${bars.map(b=>`<div class="${b[2]}" style="height:${b[1]}%"></div>`).join("")}</div>
       <div class="chart-x"><span>21:00</span><span>23:30</span><span>02:30</span></div>
-      <p class="note" style="margin-top:10px">The grill lights at 21:00 and the rail is empty for the first hour. Book a slot in the green stretch and the kitchen holds twelve minutes for you, because an empty grill costs them more than a discount does.</p>
+      <p class="note" style="margin-top:10px">The grill lights at 21:00 and the rail stays shallow until about 23:00. Book a slot in that window and the kitchen holds twelve minutes for you, because an empty grill costs them more than a discount does.</p>
     </div>
     <div class="card">
-      <div class="card-hd"><h3>Tomorrow's slots</h3><span class="note">${DAYS[(island().day+1)%7]}</span></div>
+      <div class="card-hd"><h3>${nextLane().label} slots</h3><span class="note">${nextLane().day}</span></div>
       <div class="slotgrid">
         <button aria-pressed="false">21:00</button><button aria-pressed="true">21:15</button>
         <button aria-pressed="false">21:30</button><button aria-pressed="false">21:45</button>
@@ -641,7 +684,7 @@ function vTrempan(){
         <button aria-pressed="false">22:30</button><button aria-pressed="false">22:45</button>
         <button disabled>23:00</button>
       </div>
-      <p class="note" style="margin-top:12px">Two slots gone already. Greyed times are full.</p>
+      <p class="note" style="margin-top:12px" id="slotNote">21:15 held. Twelve minutes guaranteed, Cg 2 off at the ticket. Greyed times are full.</p>
     </div>
     <div class="card">
       <div class="row"><span class="row-ic">${ICONS.seal}</span>
@@ -652,7 +695,7 @@ function vTrempan(){
 }
 
 function vAccount(){
-  return `<div class="appbar"><div><h2>Bo kuenta</h2><span class="sub">Shanira Martis</span></div>
+  return `<div class="appbar"><div><h2 lang="pap">Bo kuenta</h2><span class="sub">Shanira Martis</span></div>
       <span class="avatar">SM</span></div>
     <div class="card">
       <div class="card-hd"><h3>Saved usuals</h3><button class="btn btn-line btn-sm">${ICONS.note}Edit</button></div>
@@ -738,7 +781,13 @@ function phone(slot,idx){
     const tab=e.target.closest('[role="tab"]');
     if(tab){ show(tab.dataset.view); return; }
     const go=e.target.closest("[data-go]");
-    if(go){ show(go.dataset.go); return; }
+    if(go){
+      show(go.dataset.go);
+      // the button that was pressed is gone, so focus its destination tab
+      const tab=el.querySelector(`[role="tab"][data-view="${go.dataset.go}"]`);
+      if(tab) tab.focus({preventScroll:true});
+      return;
+    }
     const chip=e.target.closest(".chip:not(:disabled)");
     if(chip){
       const set=chip.parentElement.dataset.set, i=+chip.dataset.i;
@@ -759,8 +808,12 @@ function phone(slot,idx){
       return;
     }
     const s=e.target.closest(".slotgrid button:not(:disabled)");
-    if(s){ s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed","false"));
-      s.setAttribute("aria-pressed","true"); }
+    if(s){
+      s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed","false"));
+      s.setAttribute("aria-pressed","true");
+      const note=el.querySelector("#slotNote");
+      if(note) note.textContent=`${s.textContent.trim()} held. Twelve minutes guaranteed, Cg 2 off at the ticket. Greyed times are full.`;
+    }
   });
   // Arrow keys move between tabs, which is the half of the pattern a click
   // handler alone never gives you.

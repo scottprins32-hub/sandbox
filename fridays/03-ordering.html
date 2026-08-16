@@ -271,7 +271,7 @@ p{margin:0}
 
 /* The governor. Column widths are proportional to how much of a night the truck
    spends in each state, so the row carries data rather than being three boxes. */
-.gov{display:grid; grid-template-columns:5.5fr 3fr 1.9fr; gap:2px;
+.gov{display:grid; grid-template-columns:4.1fr 4.1fr 1.7fr; gap:2px;
   background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden}
 .gov>div{background:var(--card); padding:20px 22px 22px; min-width:0}
 .gov-bar{display:block; height:6px; border-radius:3px; margin-bottom:16px}
@@ -308,6 +308,7 @@ p{margin:0}
 }
 </style>
 
+<main>
 <div class="wrap top">
   <p class="crumb"><a href="01-website.html">Fridays Baby Truck</a> <svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg> <span>Ordering system</span></p>
   <p class="kicker">Concept, web and kiosk</p>
@@ -315,7 +316,6 @@ p{margin:0}
   <p class="lede">Today an order goes through a generic embedded widget that was never told what a trùk 'i pan is. It flattens a protein and format grid into a long list, quotes the same wait at eight in the evening and at midnight, and has no idea how deep the queue is. This is the version that knows.</p>
 </div>
 
-<main>
 <section class="sec">
   <div class="wrap">
     <div class="sec-head">
@@ -357,26 +357,26 @@ p{margin:0}
         <nav class="stepper" id="stepper" aria-label="Order steps"></nav>
 
         <div class="step" data-step="0">
-          <h3 class="q">Ki karni?</h3><p class="q-sub">which cut</p>
+          <h3 class="q" lang="pap">Ki karni?</h3><p class="q-sub">which cut</p>
           <div id="cuts" role="radiogroup" aria-label="Which cut"></div>
         </div>
 
         <div class="step" data-step="1" hidden>
-          <h3 class="q">Kon bo ke?</h3><p class="q-sub">how do you want it</p>
+          <h3 class="q" lang="pap">Kon bo ke?</h3><p class="q-sub">how do you want it</p>
           <div class="opts" id="fmts" role="radiogroup" aria-label="How do you want it"></div>
           <div class="hint"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M108,84a16,16,0,1,1,16,16A16,16,0,0,1,108,84Zm128,44A108,108,0,1,1,128,20,108.12,108.12,0,0,1,236,128Zm-24,0a84,84,0,1,0-84,84A84.09,84.09,0,0,0,212,128Zm-72,36.68V132a20,20,0,0,0-20-20,12,12,0,0,0-4,23.32V168a20,20,0,0,0,20,20,12,12,0,0,0,4-23.32Z"/></svg><p id="fmtHint">Greyed formats are ones the kitchen does not do with this cut. Better to know here than at the window.</p></div>
         </div>
 
         <div class="step" data-step="2" hidden>
-          <h3 class="q">Batata òf pan?</h3><p class="q-sub">fries or bread</p>
+          <h3 class="q" lang="pap">Batata òf pan?</h3><p class="q-sub">fries or bread</p>
           <div class="opts" id="sides" role="radiogroup" aria-label="Fries or bread"></div>
           <div class="grp-l">Mitar mitar</div>
           <p class="body" style="font-size:.86rem; margin-bottom:12px">Half and half. Two cuts on one plate, priced at the dearer of the two plus Cg 3 for the second grill pass. The single most requested thing at the window, and the one thing no ordering system on the island lets you do.</p>
-          <div class="opts" id="halves"></div>
+          <div class="opts" id="halves" role="group" aria-label="Mitar mitar, add a second cut"></div>
         </div>
 
         <div class="step" data-step="3" hidden>
-          <h3 class="q">Ku sous?</h3><p class="q-sub">with sauce</p>
+          <h3 class="q" lang="pap">Ku sous?</h3><p class="q-sub">with sauce</p>
           <div class="opts" id="sauces" role="group" aria-label="Sauces"></div>
           <div class="grp-l">How it comes off the grill</div>
           <div class="opts" id="prefs" role="group" aria-label="Preparation"></div>
@@ -392,7 +392,7 @@ p{margin:0}
         <div class="step-foot">
           <button class="btn btn-quiet" id="back"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228,128a12,12,0,0,1-12,12H69l51.52,51.51a12,12,0,0,1-17,17l-72-72a12,12,0,0,1,0-17l72-72a12,12,0,0,1,17,17L69,116H216A12,12,0,0,1,228,128Z"/></svg>Back</button>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
-            <span class="kicker" id="footPrice">Cg 21</span>
+            <span class="kicker" id="footPrice"></span>
             <button class="btn btn-hot" id="next">Next<svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></button>
           </div>
         </div>
@@ -412,13 +412,13 @@ p{margin:0}
         <div class="cart" id="cart" aria-label="Your order"></div>
 
         <div class="totals">
-          <div class="trow"><span>Subtotal</span><span class="num" id="tSub">Cg 0</span></div>
-          <div class="trow save" id="tSaveRow" hidden><span>Trempan credit</span><span class="num" id="tSave">-Cg 2</span></div>
-          <div class="trow"><span>Delivery</span><span class="num" id="tShip">Cg 0</span></div>
+          <div class="trow"><span>Subtotal</span><span class="num" id="tSub"></span></div>
+          <div class="trow save" id="tSaveRow" hidden><span>Trempan credit</span><span class="num" id="tSave"></span></div>
+          <div class="trow"><span>Delivery</span><span class="num" id="tShip"></span></div>
           <div class="trow big"><span>Total <span class="cur" role="group" aria-label="Currency">
             <button data-cur="cg" aria-pressed="true">Cg</button>
             <button data-cur="usd" aria-pressed="false">USD</button></span></span>
-            <b class="num" id="tTotal">Cg 0</b></div>
+            <b class="num" id="tTotal"></b></div>
         </div>
 
         <div class="side-foot">
@@ -427,12 +427,12 @@ p{margin:0}
             <div class="co-set" data-set="where" role="radiogroup" aria-label="Where">
               <button class="co-opt" role="radio" aria-checked="true" data-v="window"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M236,96a12,12,0,0,0-.44-3.3L221.2,42.51A20.08,20.08,0,0,0,202,28H54A20.08,20.08,0,0,0,34.8,42.51L20.46,92.7A12,12,0,0,0,20,96h0v16a43.94,43.94,0,0,0,16,33.92V216a12,12,0,0,0,12,12H208a12,12,0,0,0,12-12V145.92A43.94,43.94,0,0,0,236,112V96ZM57.05,52H199l9.14,32H47.91Zm91,56v4a20,20,0,0,1-40,0v-4ZM53,128.71A20,20,0,0,1,44,112v-4H84v4a20,20,0,0,1-20,20,19.76,19.76,0,0,1-9.07-2.2A11.54,11.54,0,0,0,53,128.71ZM196,204H60V155.81c1.32.12,2.65.19,4,.19a43.86,43.86,0,0,0,32-13.85,43.89,43.89,0,0,0,64,0A43.86,43.86,0,0,0,192,156c1.35,0,2.68-.07,4-.19Zm16-92a20,20,0,0,1-9,16.71,11.66,11.66,0,0,0-1.88,1.09A20,20,0,0,1,172,112v-4h40Z"/></svg><b>At the window</b><span>Hatch 2</span></button>
               <button class="co-opt" role="radio" aria-checked="false" data-v="table"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M164.38,181.1a52,52,0,1,0-72.76,0,75.89,75.89,0,0,0-30,28.89,12,12,0,0,0,20.78,12,53,53,0,0,1,91.22,0,12,12,0,1,0,20.78-12A75.89,75.89,0,0,0,164.38,181.1ZM100,144a28,28,0,1,1,28,28A28,28,0,0,1,100,144Zm147.21,9.59a12,12,0,0,1-16.81-2.39c-8.33-11.09-19.85-19.59-29.33-21.64a12,12,0,0,1-1.82-22.91,20,20,0,1,0-24.78-28.3,12,12,0,1,1-21-11.6,44,44,0,1,1,73.28,48.35,92.18,92.18,0,0,1,22.85,21.69A12,12,0,0,1,247.21,153.59Zm-192.28-24c-9.48,2.05-21,10.55-29.33,21.65A12,12,0,0,1,6.41,136.79,92.37,92.37,0,0,1,29.26,115.1a44,44,0,1,1,73.28-48.35,12,12,0,1,1-21,11.6,20,20,0,1,0-24.78,28.3,12,12,0,0,1-1.82,22.91Z"/></svg><b>Sit at the truck</b><span>Terrace</span></button>
-              <button class="co-opt" role="radio" aria-checked="false" data-v="delivery"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,112c-.57,0-1.13,0-1.69,0l-3.5-11.8c1.71-.15,3.44-.24,5.19-.24a12,12,0,0,0,0-24H195.63l-8.12-27.41A12,12,0,0,0,176,40H144a12,12,0,0,0,0,24h23l3.56,12H152c-19.44,0-35.32,4.62-45.92,13.37a12,12,0,0,1-12.56,1.52c-13.13-6-57.19-25-61.65-26.89L26.6,61.76S22.4,60,20,60a12,12,0,0,0-4.61,23.08c1.72.73,43.67,18.5,68.2,29.66a36.25,36.25,0,0,0,15,3.23,35.78,35.78,0,0,0,22.78-8.09c5.74-4.73,15.58-7.48,27.89-7.84a84,84,0,0,0-24.4,48H94.48a48,48,0,1,0,0,24H136a12,12,0,0,0,12-12,60,60,0,0,1,31.8-52.94l3.5,11.8A48,48,0,1,0,208,112ZM48,172H68.77a24,24,0,1,1,0-24H48a12,12,0,0,0,0,24Zm160,12a24,24,0,0,1-17.4-40.5l5.89,19.91A12,12,0,0,0,208,172a12.28,12.28,0,0,0,3.41-.49,12,12,0,0,0,8.1-14.92l-5.91-19.92A24,24,0,0,1,208,184Z"/></svg><b>Delivery</b><span>Cg 8</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="delivery"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,112c-.57,0-1.13,0-1.69,0l-3.5-11.8c1.71-.15,3.44-.24,5.19-.24a12,12,0,0,0,0-24H195.63l-8.12-27.41A12,12,0,0,0,176,40H144a12,12,0,0,0,0,24h23l3.56,12H152c-19.44,0-35.32,4.62-45.92,13.37a12,12,0,0,1-12.56,1.52c-13.13-6-57.19-25-61.65-26.89L26.6,61.76S22.4,60,20,60a12,12,0,0,0-4.61,23.08c1.72.73,43.67,18.5,68.2,29.66a36.25,36.25,0,0,0,15,3.23,35.78,35.78,0,0,0,22.78-8.09c5.74-4.73,15.58-7.48,27.89-7.84a84,84,0,0,0-24.4,48H94.48a48,48,0,1,0,0,24H136a12,12,0,0,0,12-12,60,60,0,0,1,31.8-52.94l3.5,11.8A48,48,0,1,0,208,112ZM48,172H68.77a24,24,0,1,1,0-24H48a12,12,0,0,0,0,24Zm160,12a24,24,0,0,1-17.4-40.5l5.89,19.91A12,12,0,0,0,208,172a12.28,12.28,0,0,0,3.41-.49,12,12,0,0,0,8.1-14.92l-5.91-19.92A24,24,0,0,1,208,184Z"/></svg><b>Delivery</b><span id="shipLabel">Cg 8</span></button>
             </div>
             <h4 class="co-h">When</h4>
             <div class="co-set two" data-set="when" role="radiogroup" aria-label="When">
               <button class="co-opt" role="radio" aria-checked="true" data-v="now"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M177.62,159.6a52,52,0,0,1-34,34,12.2,12.2,0,0,1-3.6.55,12,12,0,0,1-3.6-23.45,28,28,0,0,0,18.32-18.32,12,12,0,0,1,22.9,7.2ZM220,144a92,92,0,0,1-184,0c0-28.81,11.27-58.18,33.48-87.28a12,12,0,0,1,17.9-1.33L107.07,74.5,127,19.89a12,12,0,0,1,18.94-5.12C168.2,33.25,220,82.85,220,144Zm-24,0c0-41.71-30.61-78.39-52.52-99.29l-20.21,55.4a12,12,0,0,1-19.63,4.5L80.71,82.36C67,103.38,60,124.06,60,144a68,68,0,0,0,136,0Z"/></svg><b>As soon as it can be</b><span id="whenNow">19 min</span></button>
-              <button class="co-opt" role="radio" aria-checked="false" data-v="trempan"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,148H203.89c.07-1.33.11-2.66.11-4a76,76,0,0,0-152,0c0,1.34,0,2.67.11,4H16a12,12,0,0,0,0,24H240a12,12,0,0,0,0-24ZM76,144a52,52,0,0,1,104,0c0,1.34-.07,2.67-.17,4H76.17C76.07,146.67,76,145.34,76,144Zm144,56a12,12,0,0,1-12,12H48a12,12,0,0,1,0-24H208A12,12,0,0,1,220,200ZM12.62,92.21a12,12,0,0,1,15.17-7.59l12,4a12,12,0,1,1-7.58,22.77l-12-4A12,12,0,0,1,12.62,92.21Zm56-48.41a12,12,0,1,1,22.76-7.59l4,12A12,12,0,1,1,72.62,55.8Zm140,60a12,12,0,0,1,7.59-15.18l12-4a12,12,0,0,1,7.58,22.77l-12,4a12,12,0,0,1-15.17-7.59Zm-48-55.59,4-12a12,12,0,1,1,22.76,7.59l-4,12a12,12,0,1,1-22.76-7.59Z"/></svg><b>Trempan slot</b><span>12 min, Cg 2 off</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="trempan"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,148H203.89c.07-1.33.11-2.66.11-4a76,76,0,0,0-152,0c0,1.34,0,2.67.11,4H16a12,12,0,0,0,0,24H240a12,12,0,0,0,0-24ZM76,144a52,52,0,0,1,104,0c0,1.34-.07,2.67-.17,4H76.17C76.07,146.67,76,145.34,76,144Zm144,56a12,12,0,0,1-12,12H48a12,12,0,0,1,0-24H208A12,12,0,0,1,220,200ZM12.62,92.21a12,12,0,0,1,15.17-7.59l12,4a12,12,0,1,1-7.58,22.77l-12-4A12,12,0,0,1,12.62,92.21Zm56-48.41a12,12,0,1,1,22.76-7.59l4,12A12,12,0,1,1,72.62,55.8Zm140,60a12,12,0,0,1,7.59-15.18l12-4a12,12,0,0,1,7.58,22.77l-12,4a12,12,0,0,1-15.17-7.59Zm-48-55.59,4-12a12,12,0,1,1,22.76,7.59l-4,12a12,12,0,1,1-22.76-7.59Z"/></svg><b>Trempan slot</b><span id="whenTrempan">12 min, Cg 2 off</span></button>
             </div>
             <div id="addr" hidden>
               <h4 class="co-h">Where to</h4>
@@ -496,7 +496,7 @@ p{margin:0}
         <p class="n">13 up <small>tickets</small></p><b>Stop promising</b>
         <p>New tickets get a range rather than a number, delivery pauses, and the truck says so instead of quietly taking money for a forty minute wait.</p></div>
     </div>
-    <p class="quote-note" style="margin-top:14px">Band widths are how much of a Saturday night the truck actually spends in each state.</p>
+    <p class="quote-note" style="margin-top:14px">Band widths are the share of a Friday or Saturday session, 21:00 to 04:00, that the modelled queue spends in each state: roughly 41, 41 and 17 per cent.</p>
   </div>
 </section>
 
@@ -596,7 +596,7 @@ function fire(){
   const h     = t.mins/60, hh = h<6 ? h+24 : h;
   const peak  = open ? Math.max(0,1-Math.abs(hh-23.75)/3.4) : 0;
   return {open, late, closes: late ? CLOSE[(t.day+6)%7] : CLOSE[t.day],
-          queue: open? Math.round(1+peak*11) : 0,
+          queue: open? Math.round(1+peak*14) : 0,
           mins: open? Math.round(9+peak*29) : 12, t};
 }
 
@@ -651,7 +651,7 @@ const STEPS=[{b:"Cut",s:"ki karni"},{b:"Format",s:"kon bo ke"},
 function drawStepper(){
   $("#stepper").innerHTML=STEPS.map((s,i)=>
     `<button data-s="${i}" ${i===S.step?'aria-current="step"':""} class="${i<S.step?"done":""}">
-      <b>${s.b}</b><span>${s.s}</span></button>`).join("");
+      <b>${s.b}</b><span lang="pap">${s.s}</span></button>`).join("");
   $$(".step").forEach(el=>{el.hidden = +el.dataset.step !== S.step});
   $("#back").disabled = S.step===0;
   $("#next").innerHTML = S.step===3 ? "Add to order"+IC.check : "Next"+IC.arrowR;
@@ -664,7 +664,7 @@ function drawCuts(){
     out+=CUTS.filter(c=>c.tier===tr).map(c=>{
       const from=Math.min(...Object.values(c.p).flat().filter(v=>v!=null));
       return `<button class="opt" role="radio" data-cut="${c.id}" aria-checked="${c.id===S.cut}">
-        <b>${c.en}</b><span>${c.pap}</span><u>from ${money(from)}</u></button>`;
+        <b>${c.en}</b><span lang="pap">${c.pap}</span><u>from ${money(from)}</u></button>`;
     }).join("");
     out+="</div>";
   });
@@ -676,7 +676,7 @@ function drawFmts(){
     const off=o.price==null;
     return `<button class="opt" role="radio" data-fmt="${o.key}" ${off?"disabled":""}
       aria-checked="${o.key===S.fmt && !off}">
-      <b>${o.f.en}${o.size?` <small>${o.size}</small>`:""}</b><span>${o.f.pap}</span>
+      <b>${o.f.en}${o.size?` <small>${o.size}</small>`:""}</b><span lang="pap">${o.f.pap}</span>
       <u>${off?"not served":money(o.price)}</u></button>`;
   }).join("");
   const missing=FORMATS.filter(f=>c.p[f.id]==null).map(f=>f.en.toLowerCase());
@@ -690,7 +690,7 @@ function drawSides(){
       <b>${s.en}</b><span>${s.sub}</span>${s.d?`<u>plus ${money(s.d)}</u>`:""}</button>`).join("");
   $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && optOf(c,S.fmt)?.price!=null).map(c=>
     `<button class="opt" data-half="${c.id}" aria-pressed="${c.id===S.half}">
-      <b>${c.en}</b><span>${c.pap}</span><u>plus ${money(3)}</u></button>`).join("")
+      <b>${c.en}</b><span lang="pap">${c.pap}</span><u>plus ${money(3)}</u></button>`).join("")
     || `<p class="body" style="font-size:.86rem">No second cut works in this format.</p>`;
 }
 function drawSauces(){
@@ -733,16 +733,31 @@ function drawCart(){
   const save=S.when==="trempan" && sub ? 2 : 0;
   $("#tSub").textContent=money(sub);
   $("#tShip").textContent=money(ship);
+  $("#shipLabel").textContent=money(8);
   $("#tSaveRow").hidden = !save;
   $("#tSave").textContent="-"+money(save);
   $("#tTotal").textContent=money(Math.max(0,sub+ship-save));
-  $("#place").disabled = !S.cart.length;
-  $("#placeLabel").textContent = S.cart.length
-    ? (S.pay==="cash" ? "Send it, pay at the window" : "Send it to the grill")
-    : "Add something first";
+  const needAddr = S.where==="delivery" &&
+    !($("#addrLine").value.trim() && $("#addrPhone").value.trim());
+  $("#place").disabled = !S.cart.length || needAddr;
+  $("#placeLabel").textContent = !S.cart.length ? "Add something first"
+    : needAddr ? "Where should the rider go?"
+    : (S.pay==="cash" ? "Send it, pay at the window" : "Send it to the grill");
 }
 
 /* ------------------------------------------------------------------ quote */
+/* Trempan is a booking, so the option has to name the slot it books. The lane
+   runs 21:00 to 23:00, and outside it the next lane is the coming night. */
+function nextTrempanSlot(){
+  const t=island();
+  const LANE_OPEN=21*60, LANE_SHUT=23*60;
+  if(t.mins>=LANE_OPEN && t.mins<LANE_SHUT){
+    const slot=Math.ceil((t.mins+20)/15)*15;      // next quarter hour with lead time
+    if(slot<LANE_SHUT) return {mins:slot, when:"tonight"};
+  }
+  return {mins:LANE_OPEN, when: t.mins<LANE_OPEN ? "tonight" : "tomorrow"};
+}
+
 function drawQuote(){
   const f=fire();
   const mins = S.when==="trempan" ? 12 : f.mins;
@@ -756,16 +771,19 @@ function drawQuote(){
   $("#readyAt").textContent = f.open ? "ready "+clock(f.t.mins+mins) : "opens 21:00";
   $("#fireBar").style.width = f.open ? Math.min(100, mins/45*100)+"%" : "0%";
   $("#whenNow").textContent = f.open ? f.mins+" min" : "at 21:00";
+  const slot=nextTrempanSlot();
+  $("#whenTrempan").textContent = `${clock(slot.mins)} ${slot.when}, Cg 2 off`;
   $("#fireNote").textContent = !f.open
     ? "The grill is cold. Orders placed now queue for 21:00, and the quote firms up when the coals are lit."
     : S.when==="trempan"
-      ? "Trempan slot. Twelve minutes is held for you, and the kitchen eats the cost if it slips."
+      ? `Trempan slot at ${clock(nextTrempanSlot().mins)} ${nextTrempanSlot().when}. Twelve minutes is held for you, and the kitchen eats the cost if it slips.`
       : f.queue>7
         ? `${f.queue} tickets on the rail right now. That is where this number comes from.`
         : `${f.queue} tickets on the rail. Quoted from the rail, not from an average.`;
 }
 
 /* --------------------------------------------------------------- the rail */
+const RAIL_EPOCH=island().mins;
 function drawRail(){
   const f=fire(), now=f.t.mins;
   // No tickets run on a cold grill. Inventing six of them at three in the
@@ -777,14 +795,33 @@ function drawRail(){
       Nothing on the rail. Come back after nine.</p>`;
     return;
   }
-  const TICKETS=[
-    {code:"F-038", in:now-14, due:now-1, items:[[2,"Chicken, regular","ku sous, sin salu"],[1,"Loaded fries","beef"]]},
-    {code:"F-039", in:now-11, due:now+2, items:[[1,"Ribs, large","Jack Daniels"],[1,"Chicken, caesar",""]]},
-    {code:"F-040", in:now-8,  due:now+6, items:[[1,"Picanha, large","kòrtá"],[1,"Kamaron, plain",""]]},
-    {code:"F-041", in:now-6,  due:now+9, items:[[2,"Chicken, kapsalon","extra pika"]]},
-    {code:"F-042", in:now-3,  due:now+13,items:[[1,"Steak, regular","ku sous, sin pika"],[1,"Juice lamunchi",""]]},
-    {code:"F-043", in:now-1,  due:now+17,items:[[1,"Mix 3 basic","ribs, chorizo, chicken"]]}
+  /* The rail is the queue. Drawing a fixed six of them while the panel above
+     quoted a live depth of ten made the page argue with itself, so the rail is
+     now exactly f.queue tickets deep, drawn from a repeating pool. */
+  const POOL=[
+    {items:[[2,"Chicken, regular","ku sous, sin salu"],[1,"Loaded fries","beef"]]},
+    {items:[[1,"Ribs, large","Jack Daniels"],[1,"Chicken, caesar",""]]},
+    {items:[[1,"Picanha, large","kòrtá"],[1,"Kamaron, plain",""]]},
+    {items:[[2,"Chicken, kapsalon","extra pika"]]},
+    {items:[[1,"Steak, regular","ku sous, sin pika"],[1,"Juice lamunchi",""]]},
+    {items:[[1,"Mix 3 basic","ribs, chorizo, chicken"]]},
+    {items:[[1,"Pòrkchòp, regular","sin salu"],[1,"Chicken, sandwich",""]]},
+    {items:[[1,"Rib eye, large","bon kushiná"]]},
+    {items:[[3,"Chicken, regular","mitar mitar ku chorizo"]]},
+    {items:[[1,"Karkó, plain","salsa rosada"],[1,"Wings, small","buffalo"]]},
+    {items:[[1,"Surf and turf, large",""],[1,"Arizona",""]]},
+    {items:[[2,"Steak, kapsalon","extra pika"]]}
   ];
+  const n=Math.max(1,f.queue);
+  const span=Math.max(6, f.mins + 4);      // the oldest ticket is closest to done
+  // Anchored to the minute the page opened, not to now, so the rail actually
+  // moves as time passes instead of freezing every ticket at the same offset.
+  const TICKETS=Array.from({length:n},(_,i)=>({
+    code:"F-0"+(38+i),
+    in:  RAIL_EPOCH - Math.round((n-i)*(span/n)) + 2,
+    due: RAIL_EPOCH + Math.round((i+1)*(span/n)) - Math.round(span*0.18),
+    items: POOL[i % POOL.length].items
+  })).filter(t=>t.due-now > -8);          // pushed tickets leave the rail
   // The batch hint is derived, not written. Find the cut that appears on the most
   // separate tickets: that is the one worth firing in a single pass.
   const tally={};
@@ -805,6 +842,10 @@ function drawRail(){
       `Saves roughly ${Math.max(2,(tickets.size-1)*3)} minutes across ${[...tickets].join(", ")}, and the rail reorders itself as tickets land.`;
   }
 
+  if(!TICKETS.length){
+    $("#railGrid").innerHTML=`<p class="cart-empty" style="grid-column:1/-1">Rail cleared. The next tickets land in a moment.</p>`;
+    return;
+  }
   $("#railGrid").innerHTML=TICKETS.map(t=>{
     const left=t.due-now;
     const cls = left<0 ? "late" : left<7 ? "soon" : "";
@@ -865,14 +906,14 @@ document.addEventListener("click",e=>{
 
   const inc=e.target.closest("[data-inc]"), dec=e.target.closest("[data-dec]"),
         del=e.target.closest("[data-del]");
-  if(inc){ const it=S.cart[+inc.dataset.inc]; it.qty++; drawCart();
+  if(inc){ const m=focusMark(); const it=S.cart[+inc.dataset.inc]; it.qty++; drawCart(); focusRestore(m);
     say(`${CUTS.find(c=>c.id===it.cut).en}, ${it.qty} on the ticket.`); return; }
-  if(dec){ const i=+dec.dataset.dec, it=S.cart[i];
+  if(dec){ const m=focusMark(); const i=+dec.dataset.dec, it=S.cart[i];
     it.qty--;
-    if(it.qty<1){ S.cart.splice(i,1); drawCart();
+    if(it.qty<1){ S.cart.splice(i,1); drawCart(); focusRestore(m);
       say(`${CUTS.find(c=>c.id===it.cut).en} removed.`); return; }
-    drawCart(); say(`${CUTS.find(c=>c.id===it.cut).en}, ${it.qty} on the ticket.`); return; }
-  if(del){ const it=S.cart.splice(+del.dataset.del,1)[0]; drawCart();
+    drawCart(); focusRestore(m); say(`${CUTS.find(c=>c.id===it.cut).en}, ${it.qty} on the ticket.`); return; }
+  if(del){ const m=focusMark(); const it=S.cart.splice(+del.dataset.del,1)[0]; drawCart(); focusRestore(m);
     say(`${CUTS.find(c=>c.id===it.cut).en} removed.`); return; }
 });
 
@@ -913,6 +954,8 @@ function say(html){
   addedTimer=setTimeout(()=>{$("#added").textContent="";},6000);
 }
 $("#note").addEventListener("input",drawReadback);
+$("#addrLine").addEventListener("input",drawCart);
+$("#addrPhone").addEventListener("input",drawCart);
 $("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; render();} });
 $("#next").addEventListener("click",()=>{
   if(S.step<3){ S.step++; render(); return; }
@@ -955,36 +998,60 @@ function drawReadback(){
   const note=$("#note").value.trim();
 
   const f=fire(), mins=S.when==="trempan"?12:f.mins;
+  const timing = f.open
+    ? `<span>Fire time <b>${mins} min</b></span>
+       <span>Ready <b>${clock(f.t.mins+mins)}</b></span>
+       <span>On the rail <b>${f.queue} tickets</b></span>`
+    : `<span>Fire time <b>quoted at 21:00</b></span>
+       <span><b>The grill is cold. This joins the queue for tonight.</b></span>`;
   $("#readback").innerHTML=`<h4>So that is</h4>
-    <p>${bits.join(", ")}${note?`. <span style="color:var(--smoke)">"${note}"</span>`:"."}</p>
-    <div class="bits">
-      <span>Plate <b>${money(base())}</b></span>
-      <span>Fire time <b>${mins} min</b></span>
-      <span>Ready <b>${clock(f.t.mins+mins)}</b></span>
-      <span>${f.open?`On the rail <b>${f.queue} tickets</b>`:"<b>The grill is cold until 21:00</b>"}</span>
-    </div>`;
+    <p lang="pap">${bits.join(", ")}${note?`. <span style="color:var(--smoke)">"${note}"</span>`:"."}</p>
+    <div class="bits"><span>Plate <b>${money(base())}</b></span>${timing}</div>`;
 }
-function render(){
-  // Every draw call below replaces a container wholesale, so note what had focus
-  // and hand it back to the equivalent control afterwards.
+/* Anything that redraws a container destroys the control the user just pressed.
+   These two put focus back, and they are used by every redraw path, not only by
+   render(): the cart's quantity and remove buttons redraw the cart on their own. */
+const FOCUS_KEYS=["cut","fmt","side","half","sauce","pref","v","cur","s","inc","dec","del"];
+function focusMark(){
   const a=document.activeElement;
-  const mark = a && a.closest && a.closest(".step, .side")
-    ? ["cut","fmt","side","half","sauce","pref","v","cur"]
-        .map(k=>a.dataset && a.dataset[k]!=null ? `[data-${k}="${a.dataset[k]}"]` : null)
-        .find(Boolean)
-    : null;
+  if(!a || a===document.body || !a.dataset) return null;
+  for(const k of FOCUS_KEYS){
+    if(a.dataset[k]!=null) return {sel:`[data-${k}="${a.dataset[k]}"]`, key:k};
+  }
+  return null;
+}
+function focusRestore(mark){
+  if(!mark || document.activeElement!==document.body) return;
+  let again=document.querySelector(mark.sel);
+  // A removed cart line takes its buttons with it, so fall back to the row that
+  // slid into its place, then to the cart, rather than dropping to <body>.
+  if(!again && ["inc","dec","del"].includes(mark.key))
+    again=document.querySelector("[data-del]") || document.querySelector("#next");
+  if(again) again.focus({preventScroll:true});
+}
 
+function render(){
+  const mark=focusMark();
   drawStepper(); drawCuts(); drawFmts(); drawSides(); drawSauces();
   $("#footPrice").textContent=money(base());
   drawReadback(); drawCart(); drawQuote();
   $("#addr").hidden = S.where!=="delivery";
   wireRadios();
-
-  if(mark){
-    const again=document.querySelector(mark);
-    if(again && document.activeElement===document.body) again.focus({preventScroll:true});
-  }
+  focusRestore(mark);
 }
+/* The website's tray links here with the plate the customer tapped. Honour it
+   rather than opening on the default every time. */
+(function fromHash(){
+  const h=new URLSearchParams(location.hash.replace(/^#/,""));
+  const wantCut=h.get("cut"), wantFmt=h.get("fmt");
+  if(wantCut && CUTS.some(c=>c.id===wantCut)) S.cut=wantCut;
+  if(wantFmt){
+    const o=options(cut()).find(x=>x.key===wantFmt || x.key.startsWith(wantFmt+":"));
+    if(o && o.price!=null) S.fmt=o.key;
+  }
+  keepFormat();
+})();
+
 render(); drawRail();
 setInterval(()=>{drawQuote(); drawRail();},30000);
 })();
