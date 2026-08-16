@@ -57,7 +57,7 @@ track('first_report_viewed', {
 
 ### 2. Budget time-to-value in seconds, and spend the whole first session buying it down
 
-**Principle:** Doherty threshold (Doherty & Thadani, IBM Systems Journal, 1982) — when system response drops below roughly 400ms, users stop waiting on the machine and throughput and satisfaction rise sharply. Treat the 400ms figure as directional rather than a law; it came from 1980s mainframe terminal work and gets over-quoted as universal. The mechanism generalises fine: every wait long enough to notice is a place where attention leaves and may not come back.
+**Principle:** Doherty threshold (Doherty & Thadani, IBM technical report GE20-0752-0, November 1982) — when system response drops below roughly 400ms, users stop waiting on the machine and throughput and satisfaction rise sharply. Treat the 400ms figure as directional rather than a law; it came from 1980s mainframe terminal work and gets over-quoted as universal. The mechanism generalises fine: every wait long enough to notice is a place where attention leaves and may not come back.
 
 Write the number down: *time-to-value is currently 4 minutes 10 seconds and 11 taps; target 40 seconds and 3 taps.* Then walk the flow and classify every element as **on the value path** or **not**, and delete or defer the second category. Company size, job title, how-did-you-hear-about-us, avatar, email verification, tour — none of these are on the value path for any product I have seen.
 
@@ -255,7 +255,7 @@ Run this against the screen or PR before merging.
 
 - **Activation as a funnel stage** — Dave McClure, "Startup Metrics for Pirates" (AARRR), 2007.
 - **Behavioural activation metrics, and their limits** — Facebook growth-team practice as recounted by Chamath Palihapitiya. The widely-quoted "7 friends in 10 days" is a correlational observation and was described by its own authors as a rallying heuristic; treat any such "magic number" as a hypothesis requiring a causal test.
-- **Response time and productivity** — Walter J. Doherty & Ahrvind J. Thadani, "The Economic Value of Rapid Response Time", *IBM Systems Journal*, 1982. The ~400ms figure is from mainframe terminal work; the mechanism generalises, the specific number should not be treated as a universal constant.
+- **Response time and productivity** — Walter J. Doherty & Ahrvind J. Thadani, "The Economic Value of Rapid Response Time", *IBM technical report GE20-0752-0, November 1982*, 1982. The ~400ms figure is from mainframe terminal work; the mechanism generalises, the specific number should not be treated as a universal constant.
 - **Registration walls / deferred signup** — Jared Spool, "The $300 Million Button", User Interface Engineering. Single client, self-reported, unpublished; an existence proof about the cost of one obstacle, not a replicable effect size. Same caveat for the Expedia "Company field" case (~$12M/year, company-reported, popularised via Silicon.com, 2010).
 - **Minimalist instruction, training wheels, learning by doing** — John M. Carroll, *The Nurnberg Funnel: Designing Minimalist Instruction for Practical Computer Skill*, MIT Press, 1990 (IBM Watson Research Center).
 - **Skip onboarding instruction where design can carry it** — Alita Kendrick, "Onboarding: Skip It When Possible", Nielsen Norman Group, 2021.

@@ -3,7 +3,7 @@
 Fifteen skills covering interface work end to end, in three layers. They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
-Claude loads a skill automatically when a task matches its `description`. You can also invoke one by name.
+The agent loads a skill automatically when a task matches its `description`. You can also invoke one by name.
 
 ## The three layers
 

@@ -99,10 +99,10 @@ hue:
   --color-brand-50:  oklch(0.970 0.012 264);  /* #F1F5FE */
   --color-brand-100: oklch(0.940 0.026 264);  /* #E2EBFD */
   --color-brand-200: oklch(0.890 0.053 264);  /* #C9DBFF */
-  --color-brand-300: oklch(0.820 0.101 264);  /* #A7C4FF */
-  --color-brand-400: oklch(0.735 0.163 264);  /* #7DA7FF */
-  --color-brand-500: oklch(0.655 0.216 264);  /* #558AFF */
-  --color-brand-600: oklch(0.580 0.240 264);  /* #2F6BFF  ← chroma peak */
+  --color-brand-300: oklch(0.820 0.090 264);  /* #A7C4FF */
+  --color-brand-400: oklch(0.735 0.136 264);  /* #7DA7FF */
+  --color-brand-500: oklch(0.655 0.183 264);  /* #558AFF */
+  --color-brand-600: oklch(0.580 0.229 264);  /* #2F6BFF  ← chroma peak */
   --color-brand-700: oklch(0.505 0.228 264);  /* #1B52E4 */
   --color-brand-800: oklch(0.435 0.192 264);  /* #1642B8 */
   --color-brand-900: oklch(0.375 0.149 264);  /* #15388E */
@@ -114,8 +114,10 @@ The lightness ladder is `0.97 0.94 0.89 0.82 0.735 0.655 0.58 0.505 0.435 0.375 
 peaking at 600 (multipliers `0.05 0.11 0.22 0.42 0.68 0.90 1.00 0.95 0.80 0.62 0.40` of the hue's maximum).
 Reuse that ladder for every hue and the ramps stay in register: **step 700 of any hue lands within a narrow
 contrast band on white.** Measured across five hues on this ladder, step 700 gives 5.47–6.56:1 and step 600
-gives 4.00–4.78:1. Chroma maximum differs per hue because the sRGB gamut does — roughly 0.24 at blue, 0.22 red,
-0.17 green and amber. Clamp chroma to gamut rather than letting the browser clip a channel, which is what
+gives 4.00–4.78:1. The chroma values above are already **clamped into the sRGB gamut**, which is why they are
+lower than the bell curve asks for at 300–500 — and why the peak differs per hue: at lightness 0.58 sRGB
+affords roughly **0.23 for blue, 0.22 red, 0.16 green, 0.12 amber**. That last number is the whole reason amber
+ramps go muddy in the middle. Clamp deliberately rather than letting the browser clip a channel, which is what
 produces the flat, plasticky bright steps.
 
 **Why not HSL, honestly.** The usual claim — "HSL ramps have uneven steps" — is only mildly true within a
@@ -152,8 +154,8 @@ The contract, measured on the ladder in move 2:
 
 | Use | Step on white/light | Step on a dark surface (L≈0.21) | Measured range |
 |---|---|---|---|
-| Body text, links, icons with meaning | **700** | **400** | 5.47–6.56:1 / 7.28–8.16:1 |
-| Large text (≥24px, or ≥18.66px bold) | **600** | **500** | 4.00–4.78:1 / 5.26–6.16:1 |
+| Body text, links, icons with meaning | **700** | **400** | 5.47–6.56:1 / 7.15–8.01:1 |
+| Large text (≥24px, or ≥18.66px bold) | **600** | **500** | 4.00–4.78:1 / 5.16–6.04:1 |
 | Solid fill with a white label | **600–700**, hue-dependent | — | see below |
 | Input borders, focus rings, meaningful icons | **600** | **500** | ≥3:1 |
 | Decorative dividers, wash backgrounds | 50–200 | 800–950 | no floor |
@@ -259,7 +261,7 @@ slice, and cards that disappear. Each has a specific fix and a specific number.
 the base surface. Pure `#000` gives you nowhere to go *below* the surface, makes every shadow invisible, and on
 OLED produces visible smearing during scroll as pixels switch fully off and on.
 
-**6b. Not pure white text.** Use **lightness 0.94–0.96** (`#EFF0F3`) — 15.7:1 on the surface above, still far
+**6b. Not pure white text.** Use **lightness 0.94–0.96** (`#EFF0F3`) — 15.7:1 on that base surface, still far
 past AA. `#FFF` on `#000` is 21:1 and is the wrong target: at maximum luminance difference on large text areas,
 light scatter in the eye spreads the glyph edges (halation), which readers with astigmatism report as bloom or
 doubling. Reserve the top of the range for the rare element that must shout.
@@ -271,8 +273,10 @@ attributed it to pupil constriction under a bright background producing a sharpe
 genuine accommodation for photophobia, some low-vision conditions and night use, and a strong preference for
 many people. Ship it because users want it and some need it. Ship light mode just as carefully.
 
-**6c. Desaturate and lighten every hue.** A colour tuned against white vibrates against near-black — high
-chroma at low surround luminance produces chromatic aberration at the edges and an apparent glow. Move down the
+**6c. Desaturate and lighten every hue.** A colour tuned against white vibrates against near-black. Two things
+are happening: the pupil is wider in a dark surround, so more light scatters and saturated edges bloom; and the
+eye focuses different wavelengths at slightly different depths (longitudinal chromatic aberration), which is
+most pronounced for saturated blues and violets and is why they appear to float against dark. Move down the
 ramp by roughly **two to three steps and cut chroma by 30–40%**:
 
 | Role | Light theme | Dark theme |
@@ -557,6 +561,8 @@ Run against the palette file and the rendered screen, in both themes.
 - [ ] Contrast unit test covers every text-token × surface-token pair, in both themes, and fails CI.
 - [ ] Checked in a CVD simulator (Chrome DevTools Rendering panel: protanopia, deuteranopia, tritanopia,
       achromatopsia) and in greyscale.
+- [ ] Checked under `forced-colors: active` — nothing whose only boundary was a background or a shadow has
+      disappeared; focus and selection use system colour keywords.
 
 ## Sources
 

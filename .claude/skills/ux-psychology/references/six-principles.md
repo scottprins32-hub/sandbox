@@ -23,9 +23,12 @@ waiting to be corrected rather than composed.
 and picked what most people need, so accepting it feels like following advice rather than being lazy.
 
 **The real citation.** The strongest evidence is Johnson & Goldstein (2003, *Science*) on organ-donation
-consent: countries with opt-out defaults have consent rates in the high 90s, opt-in countries a small
-fraction of that, with otherwise similar populations. The default effect is one of the most robust findings
-in behavioural science. **Evidence: robust.**
+consent: countries with opt-out defaults have recorded-consent rates in the high 90s, opt-in countries a small
+fraction of that, with otherwise similar populations. Note the ceiling on that claim — it measures *recorded
+consent*, not transplants performed, which depend on family veto and clinical infrastructure. For product
+work the cleaner evidence is Madrian & Shea (2001) on automatic enrolment in retirement plans, where the
+default moved actual behaviour rather than a register entry. The default effect is one of the most robust
+findings in behavioural science. **Evidence: robust.**
 
 **Correction — the "70–90% never change defaults" figure.** The video gives no source and I could not find
 one for that range. The closest real number is Jared Spool's survey of Microsoft Word users, where **fewer

@@ -29,7 +29,7 @@ which owns Gestalt grouping, preattentive salience and the theory of hierarchy; 
 gives per-state values. **Which colours the tokens hold** → `color-and-theming`. **How much space around a
 target** → `spacing-and-layout`. **Whether a pressed state should use elevation** → `depth-and-overlays`.
 **Why people abandon a task**, or whether a wait is a skeleton or a spinner →
-`friction-and-flow` (`references/perceived-performance.md` owns loading strategy; this skill owns which state
+`friction-and-flow` (`friction-and-flow/references/perceived-performance.md` owns loading strategy; this skill owns which state
 the *control* enters). **Duration, easing, choreography** → `design-motion-principles`. **Whether it looks
 good** → `taste-frontend-design`.
 
@@ -164,7 +164,7 @@ the shift is derived from the theme instead of hard-coded.
   --state-hover: 8%; --state-press: 12%; --state-selected: 10%; --state-drag: 16%;
 
   --surface: #ffffff; --on-surface: #111827;
-  --action: #1d4ed8;  --on-action: #ffffff;      /* 8.0:1 */
+  --action: #1d4ed8;  --on-action: #ffffff;      /* 6.7:1 */
   --focus-ring: #1d4ed8; --focus-ring-halo: var(--surface);
 }
 /* Repeat this block under @media (prefers-color-scheme: dark) too, or a user who never
@@ -362,7 +362,7 @@ inputs, labels and helper text is what breaks — use `min-height` plus padding.
 same at 320 CSS px wide with no two-dimensional scrolling.
 
 Error *wording*, field order and how many fields to ask for belong to `friction-and-flow`
-(`references/forms.md`). This move owns the state surface, not the form design.
+(`friction-and-flow/references/forms.md`). This move owns the state surface, not the form design.
 
 ### 7. Every action gets a response, budgeted by latency
 

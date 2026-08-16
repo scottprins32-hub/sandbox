@@ -1,6 +1,6 @@
 ---
 name: ethical-persuasion-audit
-description: Decides whether a persuasion technique is legitimate influence or a deceptive pattern, and whether it is lawful — an operational pre-ship audit, not an essay. Covers the asymmetry / transparency / retrospect / regret-evidence tests, the deceptive-pattern taxonomy with a concrete fix for each, and the EU (DSA Art. 25, GDPR consent, UCPD and Omnibus, Consumer Rights Directive, Accessibility Act) and US (FTC Act §5, ROSCA, CPRA) layer that developers usually do not know is enforced. Use this whenever the user is building or reviewing anything involving consent, cookies, permissions, signup, checkout, pricing, trials, subscriptions, cancellation, urgency or scarcity messaging, social proof, reviews, notifications, or any default that benefits the business — even if they never say "dark pattern", "ethics" or "compliance". Also use it on requests phrased as goals: "reduce cancellations", "increase opt-in rate", "add a countdown timer", "make the unsubscribe less obvious", "get more people to accept cookies", or "why is our refund rate so high".
+description: Decides whether a persuasion technique is legitimate influence or a deceptive pattern, and whether it is lawful — an operational pre-ship audit, not an essay. Covers the asymmetry / transparency / retrospect / evidence tests, a fifth subject test for features that act on someone who cannot refuse (workforce monitoring, timestamped proof-of-work, checkpoint scans), the deceptive-pattern taxonomy with a concrete fix for each, and the EU (DSA Art. 25, GDPR consent, UCPD and Omnibus, Consumer Rights Directive, Accessibility Act) and US (FTC Act §5, ROSCA, CPRA) layer that developers usually do not know is enforced. Use this whenever the user is building or reviewing anything involving consent, cookies, permissions, signup, checkout, pricing, trials, subscriptions, cancellation, urgency or scarcity messaging, social proof, reviews, notifications, or any default that benefits the business — even if they never say "dark pattern", "ethics" or "compliance". Also use it on requests phrased as goals: "reduce cancellations", "increase opt-in rate", "add a countdown timer", "make the unsubscribe less obvious", "get more people to accept cookies", or "why is our refund rate so high".
 ---
 
 # Ethical persuasion audit
@@ -58,7 +58,7 @@ The single biggest failure in this domain is applying a generic ethics rule to a
 7. **Which metric is applying the pressure, and does it have a counter-metric?** A team optimising opt-in
    rate with no refund-rate or complaint-rate guardrail will drift into deception without anyone deciding to.
 
-## The line, and four tests that find it
+## The line, and five tests that find it
 
 **Persuasion** makes a choice the user already wanted easier, clearer or more salient. **A deceptive pattern**
 — Harry Brignull's original term was "dark patterns"; he and most regulators now prefer *deceptive design* —
@@ -66,7 +66,14 @@ uses interface craft to produce an outcome the user would not have chosen with f
 attention. The distinguishing feature is not the technique. It is whether the user's own goal is being served
 or substituted.
 
-Run all four. Any single failure is a finding.
+Any single failure is a finding.
+
+**First, check which set applies.** Tests 1–4 assume the person being persuaded is the person who benefits,
+and that they can walk away. Ask: *is the person this feature acts on the same person it benefits, and can
+they decline it?* If the answer to either half is no — a worker handed a tool by their employer, a resident
+whose building signed a contract, a patient, a child — then tests 1–4 do not bind, because consent and
+opt-out are not real options for that person. Run **test 5** instead, and run it as well as the others where
+both apply.
 
 **1. The asymmetry test.** Is the effort to opt *in* the same as the effort to opt *out*? Count clicks,
 screens, seconds, and reading level in both directions. Accept-all in one tap and reject in three screens is
@@ -94,7 +101,37 @@ engagement with the thing they opted into. **A high opt-in rate paired with near
 feature is a confession, not a win.** Instrument these before you ship the change so you have a baseline
 (→ `behavioral-metrics`).
 
-A fifth, informal one worth keeping: **the deposition test.** Would you be comfortable explaining this
+**5. The subject test — for features that act on someone who cannot refuse.** This is the case tests 1–4
+miss entirely, and it is the whole of workforce and monitoring software: location capture, timestamped
+photos, checkpoint scans, activity metrics, quality scores. The subject of the feature is a worker; the
+beneficiary is their employer or the employer's customer. "They consented" is not available as an answer,
+because refusing means not having the job.
+
+Five questions, all of which must clear:
+
+- **Disclosure.** Would you show this person, in plain language and in *their* language, exactly what is
+  captured, how often, how long it is kept, and who can see it? If the honest version of that screen would
+  cause a problem, the feature is the problem.
+- **Reciprocity.** Does the subject get something from it themselves — proof they did the work when a
+  complaint is wrong, a shorter shift, fewer disputes, faster pay — or does the value flow only upward? A
+  monitoring feature that returns nothing to the monitored is extraction with a UI.
+- **Access and contest.** Can they see their own record, and is there a named route to correct an error?
+  Data used to evaluate someone, which they cannot see or challenge, is the thing to refuse to build.
+- **Proportionality.** Is there a less invasive design that serves the same legitimate purpose? Continuous
+  location tracking and a scan at arrival and departure often prove the same thing; one of them follows
+  someone home.
+- **Purpose limitation, enforced in code.** Data captured to prove a job was done gets reused for
+  performance ranking unless something stops it. Decide the permitted purpose at capture, write it down,
+  and constrain the query surface so a future feature cannot quietly widen it.
+
+The legal shape matches the ethical one. Under GDPR, **consent is generally not a valid basis for processing
+employee data** — the Article 29 Working Party's Opinion 2/2017 on data processing at work, carried forward
+by the EDPB, treats the power imbalance as making consent unlikely to be freely given, so employers must
+rely on another basis and satisfy necessity and proportionality. Systematic monitoring of individuals will
+usually require a **data protection impact assessment (Art. 35)**, and works-council or employee-consultation
+duties apply in many member states. Verify per market; this is an engineering checklist, not legal advice.
+
+A sixth, informal one worth keeping: **the deposition test.** Would you be comfortable explaining this
 decision, in writing, with the Slack thread attached? Most of this domain is decided in Slack threads that
 someone later reads out loud.
 

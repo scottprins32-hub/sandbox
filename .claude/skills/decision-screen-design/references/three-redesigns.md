@@ -105,7 +105,7 @@ about the thing.*
 require, which is worth knowing because it turns a design argument into a procurement one. California's
 amended Automatic Renewal Law (in force 1 July 2025) covers free-to-pay conversions, requires express
 affirmative consent to the renewal terms, mandates a reminder 3–21 days before expiry for promotional periods
-longer than 31 days, requires annual reminders for all auto-renewals, and requires online cancellation via a
+longer than 31 days, requires an annual reminder for annual automatic-renewal and continuous-service agreements, and requires online cancellation via a
 prominent direct link. ROSCA and FTC Act §5 apply federally regardless of the vacated Negative Option Rule
 amendments. The EU currently has *no* general pre-charge reminder duty — the CRD covers pre-contractual
 information and the payment-obligation button, not reminders — though the Commission's Digital Fairness Act

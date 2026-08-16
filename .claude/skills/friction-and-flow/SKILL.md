@@ -285,7 +285,7 @@ stopwatch on it. Two sets of numbers, both from named sources, both durable:
 | ~1s | Flow of thought stays unbroken; they notice, but don't lose the thread | No spinner needed; a subtle state change is enough. Never flash a loader here |
 | ~10s | Upper limit on holding attention to one task | Determinate progress, and the ability to leave and come back |
 
-**The Doherty threshold (Doherty & Thadani, IBM Systems Journal, 1982, "The Economic Value of Rapid Response
+**The Doherty threshold (Doherty & Thadani, IBM technical report GE20-0752-0, November 1982, "The Economic Value of Rapid Response
 Time"): ~400ms.** The industry standard at the time was a 2-second response; Doherty and Thadani showed
 productivity kept climbing well below that, peaking around 400ms. The finding that matters is the mechanism,
 not the number: *system response time drags user think-time with it.* A slow system doesn't just cost you
@@ -359,9 +359,11 @@ most reliably replicated findings in human performance, and it has direct, non-o
   disappears for touch, for non-maximised windows, and between two monitors, so don't build a critical web
   interaction on it.
 - **Put the action where the hand already is.** Primary submit at the end of the form, not the top of the
-  page. On mobile the reachable zone is the lower screen — Hoober's observational study of 1,333 people
-  (2013) found most one-handed use is thumb-driven from the bottom, which is why bottom sheets and bottom
-  nav beat top-right buttons on phones.
+  page. On mobile the reachable zone is the lower screen. Hoober's observational study of 1,333 people (2013)
+  found 49% held the phone one-handed (36% cradled, 15% two-handed) and that around three quarters of
+  touches were thumb-driven — so one-handed is the plurality case, not the majority. Bottom sheets and
+  bottom nav beating top-right buttons follows from Fitts plus that grip data as a reach heuristic, not
+  from a measured comparison.
 - **Distance is a safety feature.** Delete does not belong adjacent to Save; "Cancel subscription" does not
   belong next to "Update card". When separation isn't possible, change the interaction cost instead: a
   different gesture, or — better, see move 9 — make it undoable.

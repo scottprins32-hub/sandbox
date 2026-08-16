@@ -594,7 +594,8 @@ Run against the screen or the PR diff.
   `font-size` below 16px (Android does not); HTTP cache partitioning (Chrome 86 and equivalents) removed the
   cross-site caching benefit of third-party font hosts; `text-wrap: balance` shipped Chrome 114 / Firefox 121 /
   Safari 17.5 and is limited to ~6 lines in Chromium, ~10 in Firefox; `text-wrap: pretty` shipped Chrome 117
-  and Firefox 134, Safari later — progressive enhancement; `text-box-trim` is implemented in Chromium and
+  and Safari 26, but Firefox does not support it as of Firefox 156 — a genuine progressive enhancement
+  rather than a near-universal one; `text-box-trim` is implemented in Chromium and
   Safari but is not yet Baseline.
 - **APCA** — models stroke weight and polarity, which WCAG 2.x contrast ratio does not. Draft work toward
   WCAG 3, **not** a conformance standard; do not use it for compliance claims.

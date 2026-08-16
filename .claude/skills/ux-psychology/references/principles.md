@@ -909,7 +909,7 @@ recurring offender.
 **What it says** — When system response drops below about 400ms, user productivity rises sharply, because the
 person stays inside a continuous flow of thought rather than context-switching.
 **Established by** — Walter Doherty & Ahrvind Thadani (1982), "The Economic Value of Rapid Response Time",
-IBM Systems Journal, based on productivity data from IBM mainframe terminal users.
+IBM technical report GE20-0752-0, November 1982, based on productivity data from IBM mainframe terminal users.
 **Use it for** — Setting a budget for interaction feedback: acknowledge input in well under half a second,
 even if the real work takes longer. Optimistic UI exists to hit this.
 **Evidence** — Mixed. The paper and its productivity data are real; the popular framing — 400ms as a
