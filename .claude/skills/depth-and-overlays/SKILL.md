@@ -74,9 +74,9 @@ box-shadow:
 
 **The geometry rules that make layering work:**
 
-- **Blur ≈ 2–3× the Y offset** on every layer, and **negative spread ≈ −⅓ to −½ of the blur** on the wide layers. Without the spread, a 40px blur smears 20px out of *every* side and the element sits in fog; with it, the shadow stays under the element where gravity put it.
+- **Blur ≈ 1.5–3× the Y offset**, with the mid layer around 2× and the tight contact layer at the low end. Pair it with **negative spread ≈ −⅓ to −½ of the blur** on the wide layers: without the spread a 40px blur smears 20px out of *every* side and the element sits in fog; with it, the shadow stays under the element where gravity put it.
 - **No shadow above the element.** CSS Backgrounds 3 §6.1.2 specifies the blur as approximating a Gaussian with standard deviation equal to *half* the blur radius, centred on the shadow's edge — so a layer extends `blur/2` beyond its spread-adjusted rect, and its topmost pixel sits at `offsetY − spread − blur/2` below the element's top edge. Keep that **≥ 0** on the wide layers: `0 12px 20px -6px` gives `12 − (−6) − 10 = 8px`, safely below. The tight contact layer may bleed a pixel above — omnidirectional ambient occlusion is real and reads correctly.
-- **Alpha rises slowly, blur rises fast.** Across a 5-level scale blur goes 2px → ~56px (28×) while total alpha goes ~5% → ~16% (3×). Getting this backwards — dark shadows for high elevation — is what "harsh" means.
+- **Alpha rises slowly, blur rises fast.** Across the 5-level scale in move 4, the widest layer's blur goes 4px → 56px (14×) while its alpha goes 5% → 16% (3×). Getting this backwards — dark shadows for high elevation — is exactly what "harsh" means.
 
 How it fails: teams add layers but keep each layer's alpha at what they used for the single shadow. Three layers at 25% is not subtle, it is 75%. When you split a shadow, split the alpha.
 
