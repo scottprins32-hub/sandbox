@@ -66,9 +66,14 @@ p{margin:0}
    Argument on the left, phone on the right. Above 1080 wide and 900 tall the
    phone sticks while the argument scrolls past it; anywhere smaller it simply
    comes first, because a sticky element taller than the viewport is a trap. */
+/* Three areas, not two, so that on a phone the device comes straight after the
+   headline instead of behind two paragraphs and a list. */
 .stage{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:clamp(30px,5vw,80px);
+  grid-template-areas:"lead phone" "rest phone";
   align-items:start; padding-top:clamp(34px,6vw,76px); padding-bottom:clamp(40px,6vw,80px)}
-.stage-copy,.stage-phone{min-width:0}
+.stage-lead{grid-area:lead} .stage-rest{grid-area:rest} .stage-phone{grid-area:phone}
+.stage-lead,.stage-rest,.stage-phone{min-width:0}
+.stage-rest{margin-top:16px}
 .crumb{display:flex; align-items:center; gap:10px; color:var(--smoke); font-size:.8rem;
   margin-bottom:24px}
 .crumb a{color:var(--bone-2)} .crumb a:hover{color:var(--amber)}
@@ -451,8 +456,9 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
 
 @media (min-width:1081px) and (min-height:900px){ .stage-phone{position:sticky; top:22px} }
 @media (max-width:1080px){
-  .stage{grid-template-columns:1fr}
-  .stage-phone{justify-self:center; display:grid; justify-items:center; margin-top:12px}
+  .stage{grid-template-columns:1fr; grid-template-areas:"lead" "phone" "rest"; gap:26px}
+  .stage-phone{justify-self:center; display:grid; justify-items:center}
+  .stage-rest{margin-top:0}
   .move{grid-template-columns:40px 1fr; gap:16px}
   .move .then{grid-column:2; margin-top:6px}
   .vs{grid-template-columns:1fr}
@@ -475,11 +481,14 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
 
 <main>
 <div class="wrap stage">
-  <div class="stage-copy">
+  <div class="stage-lead">
     <p class="crumb"><a href="index.html">Fridays Baby Truck</a> <svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg> <span>The app</span></p>
     <p class="kicker">Prototype, native iOS and Android</p>
     <h1 class="h1">One screen<br>you actually<br>open <em>at midnight</em></h1>
     <p class="lede">Fridays currently rides a white-label of a shared island ordering platform. It works, but the brand is a skin on someone else's checkout and the app answers the wrong question. Nobody opens a food app at half past eleven to browse. They open it to find out how long, and when to leave the house.</p>
+  </div>
+
+  <div class="stage-rest">
     <p class="lede">So this one has no tab bar and no menu to browse. It is a single surface that changes identity through the night. Cold before nine. Quoting a live fire time once the coals are lit. And the moment you send an order it stops being a home screen and becomes the ticket, counting down to the minute you should walk out of the door.</p>
 
     <div class="ways">

@@ -1175,7 +1175,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
         <div class="totals">
           <div class="trow"><span data-i18n="tot.sub">Subtotal</span><span class="num" id="tSub"></span></div>
           <div class="trow save" id="tSaveRow" hidden><span data-i18n="tot.save">Trempan credit</span><span class="num" id="tSave"></span></div>
-          <div class="trow"><span data-i18n="tot.ship">Delivery</span><span class="num" id="tShip"></span></div>
+          <div class="trow" id="tShipRow" hidden><span data-i18n="tot.ship">Delivery</span><span class="num" id="tShip"></span></div>
           <div class="trow big"><span><span data-i18n="tot.total">Total</span><span class="cur" role="group" aria-label="Currency">
             <button data-cur="cg" aria-pressed="true">Cg</button>
             <button data-cur="usd" aria-pressed="false">USD</button></span></span>
@@ -2180,6 +2180,8 @@ function drawCart(){
   const ship=S.where==="delivery" && sub ? SHIP : 0;
   const save=S.when==="trempan" && sub ? TREMPAN_OFF : 0;
   $("#tSub").textContent=money(sub);
+  // a delivery line reading zero is noise on a window collection
+  $("#tShipRow").hidden = !ship;
   $("#tShip").textContent=money(ship);
   $("#shipLabel").textContent=money(SHIP);
   $("#tSaveRow").hidden = !save;
