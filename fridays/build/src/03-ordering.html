@@ -365,7 +365,7 @@ p{margin:0}
           <h3 class="q" lang="pap">Batata òf pan?</h3><p class="q-sub">fries or bread</p>
           <div class="opts" id="sides" role="radiogroup" aria-label="Fries or bread"></div>
           <div class="grp-l">Mitar mitar</div>
-          <p class="body" style="font-size:.86rem; margin-bottom:12px">Half and half. Two cuts on one plate, priced at the dearer of the two plus Cg 3 for the second grill pass. The single most requested thing at the window, and the one thing no ordering system on the island lets you do.</p>
+          <p class="body" style="font-size:.86rem; margin-bottom:12px">Half and half. Two cuts on one plate, priced at the dearer of the two plus a small charge for the second grill pass. A standing habit at any truk window, and the one thing no ordering system on the island lets you ask for.</p>
           <div class="opts" id="halves" role="group" aria-label="Mitar mitar, add a second cut"></div>
         </div>
 
@@ -565,7 +565,7 @@ const PREFS=[
  {id:"sinsalu", en:"Sin salu",    sub:"no salt"},
  {id:"welldone",en:"Bon kushiná", sub:"well done"},
  {id:"cut",     en:"Kòrtá",       sub:"sliced for sharing"},
- {id:"extra",   en:"Extra batata",sub:"plus Cg 4"}
+ {id:"extra",   en:"Extra batata",sub:"", d:4}
 ];
 const USD=1.79;          // XCG is pegged to the dollar at this rate
 
@@ -693,7 +693,8 @@ function drawSauces(){
       <span class="opt-tick">${IC.check}</span><b>${s.en}</b><span>${s.sub}</span></button>`).join("");
   $("#prefs").innerHTML=PREFS.map(p=>
     `<button class="opt" role="checkbox" data-pref="${p.id}" aria-checked="${S.prefs.has(p.id)}">
-      <span class="opt-tick">${IC.check}</span><b>${p.en}</b><span>${p.sub}</span></button>`).join("");
+      <span class="opt-tick">${IC.check}</span><b>${p.en}</b>
+      <span lang="pap">${p.sub}</span>${p.d?`<u>plus ${money(p.d)}</u>`:""}</button>`).join("");
 }
 
 /* ------------------------------------------------------------------- cart */
@@ -762,11 +763,13 @@ function drawQuote(){
   // page contradicting itself.
   $("#fireN").textContent = f.open ? mins : "-";
   $("#fireN").className = f.open && mins>25 ? "warm" : "";
-  $("#readyAt").textContent = f.open ? "ready "+clock(f.t.mins+mins) : "opens 21:00";
+  const slot=nextTrempanSlot();
+  $("#readyAt").textContent = S.when==="trempan"
+    ? `ready ${clock(slot.mins+mins)} ${slot.when}`
+    : f.open ? "ready "+clock(f.t.mins+mins) : "opens 21:00";
   $("#fireBar").style.width = f.open ? Math.min(100, mins/45*100)+"%" : "0%";
   $("#whenNow").textContent = f.open ? f.mins+" min" : "at 21:00";
-  const slot=nextTrempanSlot();
-  $("#whenTrempan").textContent = `${clock(slot.mins)} ${slot.when}, Cg 2 off`;
+  $("#whenTrempan").textContent = `${clock(slot.mins)} ${slot.when}, ${money(2)} off`;
   $("#fireNote").textContent = !f.open
     ? "The grill is cold. Orders placed now queue for 21:00, and the quote firms up when the coals are lit."
     : S.when==="trempan"
@@ -992,7 +995,12 @@ function drawReadback(){
   const note=$("#note").value.trim();
 
   const f=fire(), mins=S.when==="trempan"?12:f.mins;
-  const timing = f.open
+  const slot=nextTrempanSlot();
+  const timing = S.when==="trempan"
+    ? `<span>Fire time <b>${mins} min</b></span>
+       <span>Ready <b>${clock(slot.mins+mins)} ${slot.when}</b></span>
+       <span>Trempan slot <b>${clock(slot.mins)}</b></span>`
+    : f.open
     ? `<span>Fire time <b>${mins} min</b></span>
        <span>Ready <b>${clock(f.t.mins+mins)}</b></span>
        <span>On the rail <b>${f.queue} tickets</b></span>`
