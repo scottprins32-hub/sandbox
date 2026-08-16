@@ -110,7 +110,7 @@ p{margin:0}
 .opt:hover:not(:disabled){border-color:var(--bone-2)}
 .opt b{display:block; font-family:var(--f-display); font-weight:800; font-size:1.12rem;
   text-transform:uppercase; letter-spacing:.03em; line-height:1.08}
-.opt b small{font-family:var(--f-body); font-weight:600; font-size:.6rem; letter-spacing:.11em;
+.opt b small{font-family:var(--f-body); font-weight:600; font-size:.64rem; letter-spacing:.11em;
   color:var(--amber); margin-left:5px; vertical-align:.1em}
 .opt[aria-checked="true"] b small{color:#3D2C06}
 .opt span{display:block; font-family:var(--f-quote); font-style:italic; font-size:.76rem;
@@ -268,7 +268,8 @@ p{margin:0}
 .gov{display:grid; grid-template-columns:4.1fr 4.1fr 1.7fr; gap:2px;
   background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden}
 .gov>div{background:var(--card); padding:20px 22px 22px; min-width:0}
-.gov-bar{display:block; height:6px; border-radius:3px; margin-bottom:16px}
+.gov-bar{display:block; height:6px; border-radius:3px; margin-bottom:16px; width:100%}
+.gov .g1{--share:41%} .gov .g2{--share:41%} .gov .g3{--share:17%}
 .gov .g1 .gov-bar{background:var(--leaf)}
 .gov .g2 .gov-bar{background:var(--amber)}
 .gov .g3 .gov-bar{background:var(--ember)}
@@ -287,6 +288,7 @@ p{margin:0}
 
 @media (max-width:1000px){
   .gov{grid-template-columns:1fr}
+  .gov-bar{width:var(--share)}
   .app{grid-template-columns:1fr}
   .side{border-top:1px solid var(--line)}
   .cart{max-height:none}
@@ -480,7 +482,7 @@ p{margin:0}
       <div class="g1">
         <span class="gov-bar"></span>
         <p class="n">1 to 6 <small>tickets</small></p><b>Quote it and take it</b>
-        <p>Fire time is quoted straight, orders flow, nothing is throttled.</p></div>
+        <p>Fire time is quoted straight, orders flow, nothing is throttled. Most of a weeknight never leaves this band.</p></div>
       <div class="g2">
         <span class="gov-bar"></span>
         <p class="n">7 to 12 <small>tickets</small></p><b>Quote honestly, open the early lane</b>
@@ -488,7 +490,7 @@ p{margin:0}
       <div class="g3">
         <span class="gov-bar"></span>
         <p class="n">13 up <small>tickets</small></p><b>Stop promising</b>
-        <p>New tickets get a range rather than a number, delivery pauses, and the truck says so instead of quietly taking money for a forty minute wait.</p></div>
+        <p>New tickets get a range, not a number. Delivery pauses and the truck says so, rather than quietly taking money for a forty minute wait.</p></div>
     </div>
     <p class="quote-note" style="margin-top:14px">Band widths are the share of a Friday or Saturday session, 21:00 to 04:00, that the modelled queue spends in each state: roughly 41, 41 and 17 per cent.</p>
   </div>
