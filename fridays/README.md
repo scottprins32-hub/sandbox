@@ -199,5 +199,11 @@ at 20:59, 21:00, 01:59, 02:01, 02:59, 03:01, 03:59, 04:01 and 05:00 across all t
 surfaces; the order flow built end to end in both currencies; and a sweep for sideways
 scroll, clipped elements, console errors, document language and a main landmark at eight
 widths from 320 to 1920. The design, accessibility, code, UX, craft and factual accuracy of
-all four pages were then put through an adversarial review, and the thirty-one findings that
-survived verification are fixed here.
+all four pages were then put through two adversarial review rounds, six independent lenses
+each, with every finding handed to a skeptic told to refute it. Thirty-one findings survived
+the first round and thirteen the second, four of the second round's being regressions
+introduced by the first round's fixes. All are fixed here.
+
+Two findings were rejected with reasons. "Juice lamunchi" is not our mis-ordered Papiamentu:
+it is transcribed verbatim from the truck's printed menu, as is the Cg 5 it costs and the
+Cg 45 three-protein mix, both of which a reviewer read as invented.

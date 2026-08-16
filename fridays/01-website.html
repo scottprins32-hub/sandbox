@@ -131,11 +131,15 @@ p{margin:0}
    land on the bright core of the flame rather than below it. The scrim has to
    carry more weight there than it does on a wide viewport. */
 @media (max-width:820px){
+  /* The ramp starts climbing earlier than on desktop, because the small text
+     lands around 38% down rather than near the bottom. Measured: this takes the
+     background under the meta line from L .116 to under .04, which is what
+     --bone-2 needs to clear 4.5:1 over a photograph this bright. */
   .hero-bg::after{
     background:
-      radial-gradient(120% 80% at 60% 30%, rgba(226,82,27,.22), transparent 60%),
-      linear-gradient(to bottom, rgba(12,11,9,.86) 0%, rgba(12,11,9,.58) 26%,
-        rgba(12,11,9,.80) 58%, rgba(12,11,9,.94) 82%, var(--ink) 100%);
+      radial-gradient(120% 80% at 60% 26%, rgba(226,82,27,.20), transparent 58%),
+      linear-gradient(to bottom, rgba(12,11,9,.88) 0%, rgba(12,11,9,.62) 20%,
+        rgba(12,11,9,.90) 44%, rgba(12,11,9,.96) 74%, var(--ink) 100%);
   }
 }
 #embers{position:absolute; inset:0; z-index:-2; pointer-events:none}
