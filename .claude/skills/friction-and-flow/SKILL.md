@@ -207,24 +207,22 @@ A meta-analysis of default effects (Jachimowicz, Duncan, Weber & Johnson, 2019) 
 moderate-to-large average effect, which puts defaults among the most robust findings in this whole domain —
 unlike several crowd-pleasers flagged below.
 
-**The mechanism** is worth understanding because it tells you when defaults will and won't move: a default
-is simultaneously the low-effort option, an implicit recommendation from the vendor, and the reference point
-against which alternatives are judged as losses. All three push the same way. Its power is largest when the
-user is uncertain, uninterested, or in a hurry — which describes most settings screens.
+**The mechanism** tells you when defaults will and won't move: a default is simultaneously the low-effort
+option, an implicit recommendation from the vendor, and the reference point against which alternatives are
+judged as losses. All three push the same way, and the push is largest when the user is uncertain,
+uninterested, or in a hurry — which describes most settings screens.
 
 **What to build:**
 
-- Every select, toggle, radio group and text field ships with a considered default. "No default" is itself a
-  choice — usually the worst one, because it converts a free decision into a required one.
+- Every select, toggle, radio group and prefillable field ships with a considered default. "No default" is
+  itself a choice, usually the worst one, because it converts a free decision into a required one.
 - Default to the **most common correct answer**, computed from your own data, not to the first item
-  alphabetically. Country defaults to the user's actual country. Date range defaults to the range people
-  actually pick. Sort order defaults to the sort people actually want.
-- **Personalise the default over time** where you can. Last-used value, most-used value, values inherited
-  from a team template.
-- **Make the default visible and changeable in one gesture.** A default that is hard to find or hard to
-  override is a decision taken away, not a decision made easier.
-- Prefill from the platform (autofill, geolocation, OAuth profile) and treat the prefill as a default the
-  user can edit, never as a locked value.
+  alphabetically. Country defaults to the user's actual country; date range and sort order default to what
+  people actually pick.
+- **Personalise over time** where you can: last-used value, most-used value, a team template's value.
+- **Make the default visible and changeable in one gesture.** A default that is hard to find or override is
+  a decision taken away, not a decision made easier. Prefills from autofill, geolocation or an OAuth profile
+  are defaults the user can edit, never locked values.
 
 **Smart defaults vs. dark defaults.** The test is whose interest the default serves when they diverge. A
 default that costs the user money, exposes their data, enrolls them in recurring billing, or grants consent
@@ -351,29 +349,25 @@ proportional to `log2(2D/W)`. Far and small is slow and error-prone; near and la
 most reliably replicated findings in human performance, and it has direct, non-obvious consequences:
 
 - **Size touch targets by the finger, not the glyph.** Apple's HIG specifies 44×44pt, Material Design
-  48×48dp with 8dp spacing. WCAG 2.2 SC 2.5.8 requires 24×24 CSS px minimum at AA; SC 2.5.5 asks 44×44 at
-  AAA. Expand the hit area past the visible icon with padding or a pseudo-element rather than by inflating
-  the artwork.
+  48×48dp with 8dp spacing; WCAG 2.2 SC 2.5.8 requires 24×24 CSS px at AA and SC 2.5.5 asks 44×44 at AAA.
+  Expand the hit area past the visible icon with padding or a pseudo-element rather than inflating artwork.
 - **Bind labels to inputs.** `<label for>` makes the label part of the target — a free multiplication of hit
-  area on every checkbox and radio in your product. Bare checkboxes with unbound text next to them are the
-  most common Fitts bug in real codebases.
+  area on every checkbox and radio in your product, and the most common Fitts bug in real codebases.
 - **Screen edges and corners are effectively infinite targets on pointer devices** (Tognazzini, "A Quiz
   Designed to Give You Fitts", 1999). The cursor clamps at the edge, so an edge-flush control has unbounded
-  depth and a corner is unbounded in two dimensions — this is why the macOS menu bar and the Windows Start
-  button work. Caveats worth knowing: the effect disappears for touch, for non-maximised windows, and at the
-  boundary between two monitors, so don't build a critical interaction on it in a web app.
-- **Put the action where the hand already is.** The primary submit goes at the end of the form, not the top
-  of the page. On mobile, the reachable zone is the lower part of the screen — Hoober's observational study
-  of 1,333 people (2013) found most one-handed use is thumb-driven from the bottom, which is why bottom
-  sheets and bottom nav bars beat top-right buttons on phones.
-- **Distance is a safety feature.** Put destructive actions *away* from the ones people take fifty times a
-  day. Delete does not belong adjacent to Save; "Cancel subscription" does not belong next to "Update card".
-  When separation isn't possible, change the interaction cost instead: require a different gesture, or —
-  better, see move 9 — make it undoable.
-- **Diagonal travel across menus.** Hovering from a parent menu item to a submenu item passes over sibling
-  items and closes the submenu. Amazon's mega-dropdown solves this by tracking the pointer's direction
-  toward the submenu before switching (documented by Ben Kamens, 2013); the cheap version is a short close
-  delay on mouse-out.
+  depth and a corner is unbounded in two dimensions — this is why the macOS menu bar works. The effect
+  disappears for touch, for non-maximised windows, and between two monitors, so don't build a critical web
+  interaction on it.
+- **Put the action where the hand already is.** Primary submit at the end of the form, not the top of the
+  page. On mobile the reachable zone is the lower screen — Hoober's observational study of 1,333 people
+  (2013) found most one-handed use is thumb-driven from the bottom, which is why bottom sheets and bottom
+  nav beat top-right buttons on phones.
+- **Distance is a safety feature.** Delete does not belong adjacent to Save; "Cancel subscription" does not
+  belong next to "Update card". When separation isn't possible, change the interaction cost instead: a
+  different gesture, or — better, see move 9 — make it undoable.
+- **Diagonal travel across menus.** Moving from a parent item to a submenu item passes over siblings and
+  closes the submenu. Amazon's mega-dropdown tracks pointer direction toward the submenu before switching
+  (documented by Ben Kamens, 2013); the cheap version is a short close delay on mouse-out.
 
 **How it fails:** Fitts is about *acquisition*, not *decision*. Making a button huge doesn't help someone who
 doesn't know whether to press it. And enlarging every target competes with information density — for an
@@ -451,21 +445,21 @@ mistake becomes recoverable. It maps to Nielsen's third heuristic, "user control
 argued most directly by Aza Raskin ("Never Use a Warning When you Mean Undo", 2010). Gmail's Undo Send is the
 canonical shipped version.
 
-**Build it as:** perform the action immediately, show a transient, non-blocking confirmation with an Undo
-affordance ("Message archived — Undo"), and hold the actual irreversible commit for a grace window if you
-can. Keep undo available from the keyboard (`Cmd/Ctrl+Z`) where the surface supports it. Give the toast a
-long enough life for a slow reader — and never make undo the only recovery path, since a toast that
-disappears is not a safety net for someone using a screen reader or looking away.
+**Build it as:** perform the action immediately, show a transient non-blocking confirmation with an Undo
+affordance ("Message archived — Undo"), and hold the irreversible commit for a grace window if you can.
+Keep undo on the keyboard (`Cmd/Ctrl+Z`) where the surface supports it, give the toast a long enough life
+for a slow reader, and never make it the *only* recovery path — a toast that disappears is not a safety net
+for someone using a screen reader or looking away. Pair it with a trash/archive the user can dig through.
 
 **Keep confirmation when undo is genuinely impossible or the blast radius is large:** sending money,
 deleting an account and its data, publishing to a public audience, actions affecting other people, bulk
-operations across many records. There, escalate the friction to match: state precisely what will happen and
-to how many things, require typing the resource name for the worst cases (GitHub's repository-deletion
-pattern), and never make the destructive button the visually default one.
+operations across many records. Escalate friction to match: state precisely what will happen and to how many
+things, require typing the resource name for the worst cases (GitHub's repository-deletion pattern), and
+never make the destructive button the visually default one.
 
-**How it fails:** an undo that doesn't actually restore state — the record comes back but its position, its
-permissions, or its associations don't. Un-restorable "undo" is worse than a confirmation, because it makes
-a promise. If you can't restore fully, say what undo will and won't bring back.
+**How it fails:** an undo that doesn't actually restore state — the record comes back but its position,
+permissions or associations don't. Un-restorable "undo" is worse than a confirmation because it made a
+promise. If you can't restore fully, say what undo will and won't bring back.
 
 ## Anti-patterns
 
