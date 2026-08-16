@@ -382,32 +382,23 @@ out of `color-scheme` in three lines. If you need to support browsers older than
 :root[data-theme="dark"]  { color-scheme: dark;  }
 ```
 
-The measured values, so the compliance argument is checkable rather than asserted:
+The pairs that decide whether this set is compliant — full matrix in `references/palette-tokens.md`:
 
-| Token | Light hex | Ratio (light) | Dark hex | Ratio (dark) |
-|---|---|---|---|---|
-| `surface-sunken` / `surface` / `raised` / `overlay` | `#F6F7F9` / `#FFFFFF` / `#FFFFFF` / `#FFFFFF` | — | `#0C0E13` / `#15171C` / `#1E2025` / `#282A2F` | ~1.1:1 per step |
-| `text-primary` | `#1C1F27` | 16.47 on white | `#EFF0F3` | 15.73 / 14.29 raised |
-| `text-secondary` | `#4E535B` | 7.74 / 7.22 sunken | `#C7C9CB` | 10.80 / 9.80 raised |
-| `text-muted` | `#6D727B` | 4.84 / **4.51 sunken** | `#A2A3A6` | 7.11 / 6.46 / 5.70 overlay |
-| `text-disabled` | `#9A9FA8` | 2.66 — exempt | `#797A7D` | 4.18 — exempt |
-| `border-subtle` / `border` | `#E2E6EE` / `#D0D4DC` | 1.25 / 1.49 — decorative | `#2B2E34` / `#3E4148` | 1.32 / 1.75 — decorative |
-| `border-strong` | `#8E929A` | **3.12** on white | `#777A82` | 4.18 base / **3.35 overlay** |
-| `action` (fill) | `#1B52E4` | white label 6.22 | `#76A2FF` | dark ink 7.65 |
-| `action-text` (links) | `#1B52E4` | 6.22 on white | `#93B7FF` | 8.93 on surface |
-| `focus-ring` | `#3A70EE` | 4.44 white | `#93B7FF` | 8.93 / 8.11 raised |
-| `danger-text` | `#BE0013` | 6.56 white / 5.89 wash | `#FAADA4` | 9.89 / 9.14 wash |
-| `warning-text` | `#885A00` | 5.98 white / 5.42 wash | `#E0BE90` | 10.19 / 9.31 wash |
-| `success-text` | `#007A36` | 5.47 white / 4.95 wash | `#A4D2AC` | 10.58 / 9.43 wash |
-| `info-text` | `#1B52E4` | 6.22 white / 5.64 wash | `#A7C4FF` | 10.23 / 9.34 wash |
-| `danger-solid` | `#DF2225` | white label 4.78 | — | — |
-| `warning-solid` | `#FCAB00` | dark ink 8.60; 1.92 vs page — **needs a border** | — | — |
-| `success-solid` | `#00873C` | white label 4.63 | — | — |
+| Token | Light hex / ratio | Dark hex / ratio |
+|---|---|---|
+| `surface` → `raised` → `overlay` | `#FFFFFF`, shadow does the work | `#15171C` → `#1E2025` → `#282A2F`, ~1.1:1 per step |
+| `text-primary` | `#1C1F27` 16.47 on white | `#EFF0F3` 15.73 base / 14.29 raised |
+| `text-muted` (the quietest legal text) | `#6D727B` 4.84 white / **4.51 sunken** | `#A2A3A6` 7.11 base / **5.70 overlay** |
+| `border-strong` (control boundaries) | `#8E929A` **3.12** on white | `#777A82` 4.18 base / **3.35 overlay** |
+| `action` fill / `action-text` | `#1B52E4` white label 6.22 / link 6.22 | `#76A2FF` dark ink 7.65 / `#93B7FF` 8.93 |
+| `danger` / `warning` / `success` / `info` text | 6.56 / 5.98 / 5.47 / 6.22 on white | 9.89 / 10.19 / 10.58 / 10.23 on surface |
+| `danger` / `success` solid, white label | 4.78 / 4.63 | — |
+| `warning` solid `#FCAB00`, dark ink | 8.60 — but 1.92 vs page, **needs a border** | — |
 
-Note the two values that dictate their own tokens: `text-muted` sits at lightness 0.55 rather than 0.56 only
-because 0.56 scores 4.32:1 on the sunken surface and fails; `border-strong` sits at 0.58 in dark rather than
-0.52 only because 0.52 scores 2.95:1 on a raised card and fails. Those are the kind of decisions that a
-"check it afterwards" workflow never surfaces.
+Two values are set by their worst case rather than by taste: `text-muted` sits at lightness 0.55 rather than
+0.56 only because 0.56 scores 4.32:1 on the sunken surface and fails; dark `border-strong` sits at 0.58 rather
+than 0.52 only because 0.52 scores 2.95:1 on a raised card and fails. A check-it-afterwards workflow finds
+neither, because both pass on the surface you happen to test first.
 
 **Naming rules that keep this honest:**
 

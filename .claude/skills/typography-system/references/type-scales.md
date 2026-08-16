@@ -252,7 +252,11 @@ entire point of baking tracking and leading into the step — the call site stop
 
 /* Base layer: the defaults every page inherits. */
 @layer base {
-  html { font-family: var(--font-sans); -webkit-text-size-adjust: 100%; }
+  html {
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    font-synthesis: none;   /* dev guard: fake bold/italic render as regular, so they show up in review */
+  }
   body { font-size: var(--text-base); line-height: 1.5; }
 
   h1, h2, h3, h4, figcaption, blockquote { text-wrap: balance; }
@@ -263,9 +267,6 @@ entire point of baking tracking and leading into the step — the call site stop
 
   /* Numbers that sit in columns or update in place. */
   table, .tabular, .metric, .price { font-variant-numeric: tabular-nums lining-nums; }
-
-  /* Development guard: fake bold/italic render as regular, so they are obvious in review. */
-  :root { font-synthesis: none; }
 }
 ```
 
