@@ -54,12 +54,13 @@ Work in this order when building something new. Each row is a sibling skill in t
 |---|---|---|
 | 1 | `attention-and-hierarchy` | Laying out a screen. Where does the eye go, what is the one loudest thing, does the structure read before the content does. |
 | 2 | `friction-and-flow` | Anyone must complete a task: forms, signup, checkout, multi-step flows, choice-heavy screens. Also owns **perceived performance** — waiting is friction. |
-| 3 | `persuasive-copy` | Writing any user-visible words: CTAs, labels, errors, empty states, pricing, confirmations. Cheapest lever in the set; usually the most neglected. |
-| 4 | `onboarding-activation` | A new user's first run. Getting from arrival to the value moment before patience runs out. |
-| 5 | `habit-loop-design` | Retention — why they come back tomorrow. Triggers, rewards, investment, streaks, notifications. **Read the ethics skill alongside it, not after.** |
-| 6 | `decision-screen-design` | The moment of commitment: paywalls, plan comparison, price display, listing, booking and checkout summary screens. Owns the question-audit method — every element makes the user ask something, and the question decides whether they act. |
-| 7 | `ethical-persuasion-audit` | Before shipping anything from rows 3–6, and any time a flow involves consent, cancellation, billing, urgency, reference pricing, or a default that benefits you. Also the legal layer (EU DSA/GDPR/UCPD/Omnibus, FTC/ROSCA, WCAG). |
-| 8 | `behavioral-metrics` | Deciding whether any of it worked, and catching the backfire. Instrumentation, activation, retention curves, guardrail metrics, honest A/B testing. |
+| 3 | `list-and-queue-design` | The list, table or work queue someone lives in all day: default sort, row actions, columns, bulk operations, filter state, pagination, and queue mechanics. The dominant surface of any internal tool and the one most often built by accident. |
+| 4 | `persuasive-copy` | Writing any user-visible words: CTAs, labels, errors, empty states, pricing, confirmations. Cheapest lever in the set; usually the most neglected. |
+| 5 | `onboarding-activation` | A new user's first run. Getting from arrival to the value moment before patience runs out. |
+| 6 | `habit-loop-design` | Retention — why they come back tomorrow. Triggers, rewards, investment, streaks, notifications. **Read the ethics skill alongside it, not after.** |
+| 7 | `decision-screen-design` | The moment of commitment: paywalls, plan comparison, price display, listing, booking and checkout summary screens. Owns the question-audit method — every element makes the user ask something, and the question decides whether they act. |
+| 8 | `ethical-persuasion-audit` | Before shipping anything from rows 4–7, and any time a flow involves consent, cancellation, billing, urgency, reference pricing, or a default that benefits you. Also the legal layer (EU DSA/GDPR/UCPD/Omnibus, FTC/ROSCA, WCAG). |
+| 9 | `behavioral-metrics` | Deciding whether any of it worked, and catching the backfire. Instrumentation, activation, retention curves, guardrail metrics, honest A/B testing. |
 
 ### The craft layer
 
@@ -79,7 +80,7 @@ behaviour; that one is about the look.
 
 ### Looking up a specific effect
 
-`references/principles.md` is the master catalogue — roughly forty named principles with who established each
+`references/principles.md` is the master catalogue — 71 named principles with who established each
 one, what UI decision it should change, how strong the evidence actually is, and the standard misapplication.
 Read it when you half-remember an effect and want to know whether it is real before you build on it, or when
 someone cites a "law" in a design review and you want to check it.

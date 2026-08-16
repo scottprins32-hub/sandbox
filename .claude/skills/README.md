@@ -1,6 +1,6 @@
 # Design and UX skill set
 
-Fifteen skills covering interface work end to end, in three layers. They are project-agnostic — written to
+Sixteen skills covering interface work end to end, in three layers. They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
 The agent loads a skill automatically when a task matches its `description`. You can also invoke one by name.
@@ -17,13 +17,14 @@ they cannot answer.
 | **Commitment** | What question does each element make the user ask? | `decision-screen-design` |
 | **Craft** | What are the actual values — px, ratios, states? | `ui-craft` |
 
-### Behaviour — 8 skills
+### Behaviour — 9 skills
 
 | Skill | Answers |
 |---|---|
 | **ux-psychology** | Router and 71-entry principle catalogue. **Start here.** Forces a product diagnosis before any technique is picked. |
 | **attention-and-hierarchy** | Where does the eye land, and is that where it needs to be? Preattentive salience, Gestalt, whitespace, scan patterns, contrast. |
 | **friction-and-flow** | Why do people abandon a task they meant to finish? Cognitive load, Hick's/Fitts's, forms, defaults, and perceived performance — waiting is friction. |
+| **list-and-queue-design** | The list, table or work queue someone works all day. Default sort as the product opinion, row actions, bulk operations, filter state in the URL, and queue mechanics — claiming, ageing, and emptying. |
 | **persuasive-copy** | Does the wording move the decision? Framing, anchoring, social proof, CTA labels, errors, pricing language. |
 | **onboarding-activation** | How fast does a new user reach the moment value becomes real? Time-to-value, deferred signup, endowed progress, empty states that teach. |
 | **habit-loop-design** | Why would they come back tomorrow? B=MAP, the Hook model, variable reward, stored value, streaks, notification budgets — and when a habit loop is the wrong goal entirely. |
