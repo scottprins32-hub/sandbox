@@ -73,6 +73,12 @@ one, what UI decision it should change, how strong the evidence actually is, and
 Read it when you half-remember an effect and want to know whether it is real before you build on it, or when
 someone cites a "law" in a design review and you want to check it.
 
+`references/six-principles.md` is the source framing this set was built from: smart defaults, never start at
+zero, give value before asking, let users build before they commit, frame the ask as a loss, and control the
+first number — each with its before/after, the skill that owns it, and a correction of the citation. Read it
+when you want those six specifically, or before quoting any statistic attached to them. Four of the
+commonly repeated numbers in this area do not survive checking, and the corrections are listed there.
+
 ## Rules that hold across the whole set
 
 **Diagnose before prescribing.** Find the binding constraint. A conversion problem caused by an unclear value

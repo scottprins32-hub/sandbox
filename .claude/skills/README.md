@@ -33,6 +33,20 @@ reaching for techniques. The most common failure in this domain is optimising a 
 **Shipping anything persuasive** — `ethical-persuasion-audit` is a gate, not an appendix. Several patterns it
 covers are unlawful in the EU, which is often the more useful argument to have in a review.
 
+## The source framing
+
+This set was built from a video teaching six principles: smart defaults, never start the user at zero, give
+value before asking, let users build before they commit, frame the ask as a loss, and control the first
+number. All six are covered, distributed across the skills that own them.
+`ux-psychology/references/six-principles.md` keeps that framing intact — each principle with its before/after
+example, the skill that covers it in depth, and a corrected citation.
+
+Four statistics the video quotes did not survive checking: the car-wash loyalty study is Nunes & Drèze (USC
+and UCLA), not Columbia; the jam study's choice-overload effect averages near zero across 50 replications;
+the "70–90% never change defaults" and "free samples increase sales 2,000%" figures have no locatable source.
+The advice holds regardless — the corrections are in that file so the numbers don't get repeated in a design
+review or an interview.
+
 ## Evidence quality
 
 These skills cite named researchers and studies, and deliberately flag the findings that are contested or
