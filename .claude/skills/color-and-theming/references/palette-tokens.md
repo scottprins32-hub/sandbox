@@ -70,8 +70,8 @@ Fix this once and compliance becomes a naming question. Steps refer to the ladde
 | 100 | hover fill on a wash, selected row | — |
 | 200 | decorative border, chip background | — |
 | 300 | disabled fill, divider on a wash | **high-emphasis coloured text** (≈10:1) |
-| 400 | large decorative marks | **body text, links, meaningful icons** (7.2–8.2:1) |
-| 500 | UI boundaries pass only for some hues — measure | large text, secondary coloured text (5.2–6.2:1) |
+| 400 | large decorative marks | **body text, links, meaningful icons** (7.1–8.0:1) |
+| 500 | UI boundaries pass only for some hues — measure | large text, secondary coloured text (5.2–6.0:1) |
 | 600 | **large text, solid fills, input borders, focus rings** (4.0–4.8:1) | solid fills, hover states |
 | 700 | **body text, links, meaningful icons** (5.5–6.6:1) | pressed states |
 | 800 | pressed states, high-emphasis text | wash border |
@@ -81,9 +81,11 @@ Fix this once and compliance becomes a naming question. Steps refer to the ladde
 Two exceptions the table cannot smooth over, both from WCAG's luminance weighting rather than from the ramp:
 
 - **Green and amber at step 600 do not reach 4.5:1** (green 4.00, amber 4.37). They need 700 for body text.
-- **A solid fill carrying a white label** needs lightness ≈0.545 for green and ≈0.56 for blue/amber, rather
-  than the 0.58 that works for red. Amber cannot carry a white label at all at a usable saturation — invert to
-  dark ink on a bright fill.
+- **A solid fill carrying a white label is set by the hue, not by the step.** Step 600's lightness of 0.58
+  works for red (4.78:1) and *just* misses for blue — `#2F6BFF` measures **4.4988:1**, which prints as 4.50 in
+  the table below and still fails. Blue needs ≈0.575 (4.63:1), green ≈0.545 (`#00873C`, 4.63:1). Amber cannot
+  carry a white label at any usable saturation: forcing 4.5:1 drops it to lightness 0.574, where sRGB affords
+  only 0.12 chroma, and the result (`#A16C00`) is a brown. Invert instead — dark ink on a bright amber fill.
 
 ## Full ramps
 
@@ -209,7 +211,7 @@ unavailable as utilities — that is a cheap way to enforce "components use role
 
   --color-border-subtle: light-dark(oklch(0.925 0.012 264), oklch(0.300 0.012 264));
   --color-border:        light-dark(oklch(0.870 0.012 264), oklch(0.375 0.012 264));
-  --color-border-strong: light-dark(oklch(0.660 0.012 264), oklch(0.580 0.012 264));
+  --color-border-strong: light-dark(oklch(0.640 0.012 264), oklch(0.580 0.012 264));
 
   --color-action:      light-dark(oklch(0.505 0.228 264), oklch(0.72 0.145 264));
   --color-on-action:   light-dark(oklch(0.99  0     0  ), oklch(0.17 0.010 264));
@@ -269,13 +271,21 @@ import { ratio } from './ramp.mjs';
 import { test, expect } from 'vitest';
 
 // Resolved hexes per theme — export these from the same source that generates the CSS.
+// Enumerate EVERY surface a token can land on. A partial surface list is how a non-compliant
+// border ships: the worst case is the darkest surface in light and the lightest in dark, and a
+// token can clear one and fail the other. Light raised/overlay are white here, so they alias
+// base — list them anyway, so the loop already covers them the day someone tints a card.
 const THEMES = {
-  light: { surfaces: { base: '#FFFFFF', sunken: '#F6F7F9' },
-           text: { primary: '#1C1F27', secondary: '#4E535B', muted: '#6D727B' },
-           bounds: { borderStrong: '#8E929A', focus: '#3A70EE' } },
-  dark:  { surfaces: { base: '#15171C', raised: '#1E2025', overlay: '#282A2F' },
-           text: { primary: '#EFF0F3', secondary: '#C7C9CB', muted: '#A2A3A6' },
-           bounds: { borderStrong: '#777A82', focus: '#93B7FF' } },
+  light: { surfaces: { base: '#FFFFFF', raised: '#FFFFFF', overlay: '#FFFFFF', sunken: '#F6F7F9' },
+           text:   { primary: '#1C1F27', secondary: '#4E535B', muted: '#6D727B' },
+           bounds: { borderStrong: '#888C94', focus: '#3A70EE' },
+           status: { danger:  ['#BE0013', '#FCF0EF'], warning: ['#885A00', '#F7F3EC'],     // [text, wash]
+                     success: ['#007A36', '#EFF5F0'], info:    ['#1B52E4', '#EFF4FD'] } },
+  dark:  { surfaces: { sunken: '#0C0E13', base: '#15171C', raised: '#1E2025', overlay: '#282A2F' },
+           text:   { primary: '#EFF0F3', secondary: '#C7C9CB', muted: '#A2A3A6' },
+           bounds: { borderStrong: '#777A82', focus: '#93B7FF' },
+           status: { danger:  ['#FAADA4', '#3A110E'], warning: ['#E0BE91', '#2E1C00'],
+                     success: ['#A4D2AC', '#0B2713'], info:    ['#A7C4FF', '#0E1E42'] } },
 };
 
 for (const [theme, t] of Object.entries(THEMES)) {
@@ -286,14 +296,25 @@ for (const [theme, t] of Object.entries(THEMES)) {
         expect(ratio(c, s)).toBeGreaterThanOrEqual(4.5);
       });
 
-  // Boundaries and focus rings — 1.4.11. The overlay surface is the one that fails.
+  // Boundaries and focus rings — 1.4.11. Light fails first on sunken, dark first on overlay.
   for (const [sName, s] of Object.entries(t.surfaces))
     for (const [bName, c] of Object.entries(t.bounds))
       test(`${theme}: ${bName} on surface-${sName} ≥ 3:1`, () => {
         expect(ratio(c, s)).toBeGreaterThanOrEqual(3);
       });
+
+  // Status text on the page surfaces AND on its own wash — a wash is a surface too.
+  for (const [name, [c, wash]] of Object.entries(t.status))
+    for (const [sName, s] of Object.entries({ ...t.surfaces, wash }))
+      test(`${theme}: ${name}-text on ${sName} ≥ 4.5:1`, () => {
+        expect(ratio(c, s)).toBeGreaterThanOrEqual(4.5);
+      });
 }
 ```
+
+Tightest margins in the shipped set, so you know which rows move first: light `text-muted` on sunken
+**4.51**, light `border-strong` on sunken **3.15**, dark `border-strong` on overlay **3.35**. Any edit that
+darkens a light surface or lightens a dark one has to be re-run against all three.
 
 Deliberately excluded from the loop: `text-disabled` (exempt from 1.4.3 and 1.4.11) and the decorative border
 tokens (`border-subtle`, `border`), which are not required to identify any component. Excluding them is a

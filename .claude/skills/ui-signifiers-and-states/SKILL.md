@@ -40,9 +40,11 @@ Five choices set every number below. Answer them once per project, not per compo
 1. **Pointer, touch, or both?** Hover does not exist on touch. If any meaningful share of use is touch, hover
    may only ever *enhance* a signifier that is already visible — never carry one. Assume both unless you own
    the hardware.
-2. **Density and archetype.** Use the archetype table in `ux-psychology`. A marketing page affords 4px focus
-   rings, 48px targets and generous transitions. An ops console with 40 rows needs the same information in
-   2px and 28px, and needs states that survive being seen a thousand times — shape and position, not novelty.
+2. **Density and archetype.** `ui-craft` sets the density posture for the system; the archetype table in
+   `ux-psychology` names which surface you are on. States scale with it: a marketing page affords a 4px focus
+   ring at a generous offset and 150ms transitions, an ops console with 40 rows gets 2px at a 1px offset and
+   near-instant ones — and needs states that survive being seen a thousand times, carried by shape and
+   position rather than by novelty.
 3. **Light, dark, or both?** State deltas are not symmetric. On a light surface hover usually darkens; on a
    dark surface it usually lightens. A fixed `darken(4%)` produces an invisible hover in dark mode. Derive
    state layers from the theme's foreground colour, not from a hard-coded direction.
@@ -127,17 +129,13 @@ argument): `pointer` on anything clickable, `text` on text, `grab`/`grabbing` on
 on `aria-disabled` controls, and `default` — never `pointer` — on non-interactive elements.
 
 **Hit area** (law; `friction-and-flow` owns Fitts's law): WCAG 2.2 SC 2.5.8 Target Size (Minimum, AA)
-requires 24×24 CSS px; SC 2.5.5 (Enhanced, AAA) asks 44×44. Apple HIG specifies 44×44pt, Material 48×48dp.
-Enlarge the *target* without enlarging the *look*:
-
-```css
-.icon-btn { position: relative; width: 24px; height: 24px; }
-.icon-btn::after { content: ""; position: absolute; inset: -10px; }  /* 44×44, no layout impact */
-```
+requires 24×24 CSS px, SC 2.5.5 (Enhanced, AAA) asks 44×44, and `spacing-and-layout` owns those values, the
+invisible-expansion recipe and the minimum gap between adjacent targets. What belongs here is only that the
+expanded target must match what the signifier appears to advertise — a hit area reaching well past the visible
+control is a false affordance pointing the other way, swallowing clicks aimed at its neighbour.
 
 How it fails: hover-only table-row actions are the single most common way a desktop-designed app becomes
-unusable on a tablet. Second: invisible hit areas expanded until adjacent targets overlap — check spacing
-after applying the pseudo-element.
+unusable on a tablet.
 
 ### 3. Build the state matrix as a token layer, not per component
 
@@ -162,38 +160,31 @@ the shift is derived from the theme instead of hard-coded.
 :root {
   /* Deltas: convention, not law. Tune the values; keep the ordering. */
   --state-hover: 8%; --state-press: 12%; --state-selected: 10%; --state-drag: 16%;
-
-  --surface: #ffffff; --on-surface: #111827;
-  --action: #1d4ed8;  --on-action: #ffffff;      /* 6.7:1 */
-  --focus-ring: #1d4ed8; --focus-ring-halo: var(--surface);
 }
-/* Repeat this block under @media (prefers-color-scheme: dark) too, or a user who never
-   touched your toggle gets the light palette. `color-and-theming` owns that plumbing. */
-:root[data-theme="dark"] {
-  --surface: #0b1220; --on-surface: #e5e7eb;
-  --action: #93b4ff;  --on-action: #0b1220;      /* light-on-dark needs a lighter action, not the same one */
-  --focus-ring: #bfd3ff;
-}
+/* This skill defines no colours. `--color-action`, `--color-on-action`, `--color-surface`,
+   `--color-focus-ring` and the status set come from `color-and-theming` move 7, declared once
+   with light-dark() so both themes fall out of a single definition. */
 
-.btn-primary { background: var(--action); color: var(--on-action); }
+.btn-primary { background: var(--color-action); color: var(--color-on-action); }
 @media (hover: hover) and (pointer: fine) {
-  .btn-primary:hover { background: color-mix(in oklab, var(--action), var(--on-action) var(--state-hover)); }
+  .btn-primary:hover { background: color-mix(in oklab, var(--color-action), var(--color-on-action) var(--state-hover)); }
 }
-.btn-primary:active  { background: color-mix(in oklab, var(--action), var(--on-action) var(--state-press)); }
+.btn-primary:active  { background: color-mix(in oklab, var(--color-action), var(--color-on-action) var(--state-press)); }
 ```
 
-`color-mix()` in `oklab` gives perceptually even steps, so 8% looks like the same size of change on every hue
-— which a naive `hsl()` lightness shift does not (CSS Color Level 4/5; interoperable across evergreen
-browsers since 2023). `color-and-theming` owns where `--action` comes from; this skill owns the deltas. In
-Tailwind v4 the same tokens go in `@theme` and the deltas into one `@utility`, so the 8%/12% still exists in
-exactly one place:
+Mixing toward `--color-on-action` rather than toward black or white is what makes one rule correct in both
+themes: the foreground token already flips with the theme, so the hover darkens a light fill and lightens a
+dark one without a second block. `color-mix()` in `oklab` then gives perceptually even steps, so 8% looks like
+the same size of change on every hue — which a naive `hsl()` lightness shift does not (CSS Color Level 4/5;
+interoperable across evergreen browsers since 2023). In Tailwind v4 the palette lives in `@theme` and the
+deltas in one `@utility`, so the 8%/12% still exists in exactly one place:
 
 ```css
-@theme { --color-action: oklch(0.48 0.19 264); --color-on-action: oklch(0.99 0 0); }
+/* @theme carries the --color-* palette from `color-and-theming`; only the deltas live here. */
 @utility btn-primary {
   background: var(--color-action); color: var(--color-on-action);
-  &:hover  { @media (hover: hover) { background: color-mix(in oklab, var(--color-action), var(--color-on-action) 8%); } }
-  &:active { background: color-mix(in oklab, var(--color-action), var(--color-on-action) 12%); }
+  &:hover  { @media (hover: hover) { background: color-mix(in oklab, var(--color-action), var(--color-on-action) var(--state-hover)); } }
+  &:active { background: color-mix(in oklab, var(--color-action), var(--color-on-action) var(--state-press)); }
 }
 ```
 
@@ -243,17 +234,23 @@ Keyboard users get the ring, mouse users get a clean press, no accessibility cos
 
 ```css
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
-  border-radius: inherit;                 /* outline follows border-radius in current browsers */
-  box-shadow: 0 0 0 4px var(--focus-ring-halo);   /* two-tone: one ring always contrasts */
+  box-shadow: 0 0 0 4px var(--color-surface);   /* two-tone halo; use -raised on a raised card */
 }
 /* Only ship this alongside the rule above, never instead of it. */
 :where(a, button, input, select, textarea):focus:not(:focus-visible) { outline: none; }
 ```
 
+Nothing in that rule touches `border-radius`, and nothing should: current browsers already draw the outline
+following the element's *own* radius. The `border-radius: inherit` that circulates in focus snippets is
+actively harmful — `border-radius` is not an inherited property, so `inherit` explicitly pulls the *parent's*
+computed radius and applies it for the duration of focus. A 6px-rounded button inside a square wrapper snaps
+to square corners the instant it is tabbed to.
+
 The two-tone ring is the fix for indicators sitting on unknown backgrounds: a focus colour passing 3:1 on
-white fails on a dark card, so draw two rings of opposing luminance. `outline-offset` also needs an unclipped
+white fails on a dark card, so draw two rings of opposing luminance — the `box-shadow` fills the offset gap
+with the surface colour, so the outline always has a known neighbour. `outline-offset` also needs an unclipped
 ancestor — a focus ring inside `overflow: hidden` is a ring you cannot see, a frequent bug in scroll
 containers, table cells and rounded cards. Give the container padding equal to the offset, or pull the ring
 inward with `outline-offset: -2px`. And use `:focus-within` on composite widgets: the wrapper around a text
@@ -334,10 +331,13 @@ from form submission: a data bug wearing a style bug's clothes.
 
 **Validate on the user's schedule, not the DOM's.** `:invalid` matches an empty required field before the
 user types, so a form styled with it is red on arrival. `:user-invalid` / `:user-valid` match only after
-interaction or a submit attempt — Baseline widely available since late 2023:
+interaction or a submit attempt — `:user-invalid` reached Baseline *newly* available in November 2023 and
+*widely* available in May 2026, so it needs no fallback now but did while the 30-month window ran:
 
 ```css
-.field input:user-invalid { border-color: var(--danger); }
+/* --color-danger-solid, not --color-danger-border: the wash companion is 2.6:1 on white
+   and fails 1.4.11 as a control boundary. */
+.field input:user-invalid { border-color: var(--color-danger-solid); }
 .field input:user-invalid + .field-error { display: block; }
 ```
 
@@ -347,8 +347,8 @@ interaction or a submit attempt — Baseline widely available since late 2023:
 unrecognised selector inside a selector list invalidates the entire rule:
 
 ```css
-input:-webkit-autofill { -webkit-text-fill-color: var(--on-surface); box-shadow: inset 0 0 0 100px var(--surface); }
-input:autofill         { -webkit-text-fill-color: var(--on-surface); box-shadow: inset 0 0 0 100px var(--surface); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--color-text-primary); box-shadow: inset 0 0 0 100px var(--color-surface); }
+input:autofill         { -webkit-text-fill-color: var(--color-text-primary); box-shadow: inset 0 0 0 100px var(--color-surface); }
 /* Repeat both for :hover, :focus and :active, or the UA style returns on interaction. */
 ```
 
@@ -528,6 +528,8 @@ unlearnable anywhere, because finding one action means hovering each in turn.
 - **One empty state for "nothing exists" and "your filter matched nothing".**
 - **Chevrons that never rotate**, ticks that never appear, and other signifiers wired to nothing.
 - **Focus rings clipped by `overflow: hidden`.** Present in the CSS, invisible on screen.
+- **`border-radius: inherit` inside a `:focus-visible` rule.** `border-radius` is not inherited, so this
+  hands the control its parent's radius and changes its shape the moment it is focused.
 - **Deleting a confirmation under `prefers-reduced-motion`** instead of just removing its movement.
 
 ## Ship checklist
@@ -591,10 +593,11 @@ Run against the component or the PR diff.
 - **ARIA state semantics** — W3C *WAI-ARIA Authoring Practices Guide* for `aria-pressed`, `aria-checked`,
   `aria-selected`, `aria-current`, `aria-expanded`, `aria-disabled`, `aria-busy` and live regions.
   `aria-grabbed` is deprecated as of ARIA 1.1.
-- **Conventions, not law** — Apple *HIG* 44×44pt and Material Design 48×48dp target sizes (the binding
-  figures are the WCAG ones above; Fitts's law is owned by `friction-and-flow`); Material's disabled
+- **Conventions, not law** — Material's disabled
   treatment at 38% content over a 12% container; GOV.UK Design System's Button guidance that disabled
-  buttons have poor contrast and confuse users, so avoid them unless research shows they help.
+  buttons have poor contrast and confuse users, so avoid them unless research shows they help. The Apple HIG
+  and Material target-size conventions sit in `spacing-and-layout` with the WCAG figures; Fitts's law is
+  owned by `friction-and-flow`.
 - **Latency thresholds** — Robert B. Miller, "Response time in man-computer conversational transactions",
   *AFIPS '68* (~0.1s / ~1s / ~10s); Jakob Nielsen, *Usability Engineering*, 1993, ch. 5.
   `friction-and-flow` carries the fuller treatment including Doherty & Thadani (IBM, 1982).

@@ -122,9 +122,9 @@ failure and forced-colors, and reads as deliberate rather than as a photographic
 
 ```css
 .hero__panel {
-  background: var(--color-surface-inverse);          /* or surface, with dark text */
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
+  background: var(--image-ground, #15171C);          /* SKILL.md move 10; or a light surface, with dark text */
+  padding: var(--space-lg);                          /* spacing-and-layout's scale */
+  border-radius: 8px;                                /* your system's panel radius */
 }
 ```
 
@@ -189,7 +189,8 @@ design decision made once in Figma.
 
 - **Extract a dominant colour** and store it on the record. Use it as the container's
   `background-color` so the layout is legible before decode and after a failed request. Darken it to
-  ≤ the `#767676` luminance ceiling first, so it never becomes the thing that breaks contrast.
+  ≤ the `#767676` luminance ceiling first, so it never becomes the thing that breaks contrast, and
+  fall back to `--image-ground` (SKILL.md move 10) whenever extraction fails or the record predates it.
 - **Probe the text region's luminance.** Downscale to ~32px wide, sample the band where text will
   land, take the **99th-percentile** luminance (not the mean — a small blown-out highlight behind one
   word is exactly the failure case). Store it.

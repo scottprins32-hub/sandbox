@@ -69,9 +69,18 @@ h1, h2, h3, h4, figcaption, blockquote, .card-title { text-wrap: balance; }
 /* Unbreakable strings: URLs, emails, IDs, hashes, German compounds. */
 .breakable { overflow-wrap: break-word; hyphens: auto; }
 
-/* Never break these mid-token, even if they overflow — the user has to read them exactly. */
-.code-inline, .token, .serial { overflow-wrap: normal; word-break: keep-all; overflow-x: auto; }
+/* Never break these mid-token — the user has to read them exactly, so let them overflow. */
+.code-inline, .token, .serial { overflow-wrap: normal; word-break: keep-all; }
+
+/* Want the token to scroll inside its column instead? It has to stop being an inline box first. */
+.token--scroll { display: inline-block; max-inline-size: 100%; overflow-x: auto; vertical-align: text-bottom; }
 ```
+
+`overflow` does not apply to non-replaced inline boxes, so `overflow-x: auto` on an inline `<code>` or
+`<span>` is inert — the string overflows regardless, which is what the `keep-all` rule wants anyway.
+`.token--scroll` works only because `inline-block` makes it a block container. The `vertical-align` there is
+not decoration: an inline-block whose `overflow` is not `visible` takes its bottom margin edge as its baseline
+instead of its last line box, so without it the token sits visibly high in the surrounding text.
 
 `hyphens: auto` requires `lang` to be set correctly on the element or an ancestor — without it the browser
 has no dictionary and does nothing. It matters most in narrow columns and in languages with long compounds.

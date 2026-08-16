@@ -71,8 +71,9 @@ currently lacks.
    by "needs action, oldest first" — the actual job of the screen. Front-load the first two words of each row
    with the distinguishing information, not with a shared prefix like "Customer request —".
 9. **Table body text is `#9AA0A6` on white — 2.6:1.** Fails 1.4.3, and this is the text people read most.
-   *Fix:* `#4B5563` or darker for values; keep the muted ramp for labels only, and make the muted token pass
-   4.5:1.
+   *Fix:* values render in the secondary text token, not a one-off grey; the muted level is for labels only,
+   and it has to clear 4.5:1 on the row background including the hover and selected states. Take the levels
+   from `color-and-theming`.
 10. **The red banner is permanent.** A red strip that has been there for three weeks has taught every user to
     filter red at the top of the page. When there is a real incident, it will be invisible. *Fix:* dismissible,
     with the red channel reserved for states that are both new and actionable.

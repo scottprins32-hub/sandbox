@@ -11,12 +11,14 @@ Conventions used below:
 - **Ring** = the shared focus treatment: 2px outline, 2px offset, ≥3:1 against both the component and the
   surrounding background (WCAG 1.4.11), never expressed as a background change.
 - Every "selected", "invalid" and "expanded" row assumes a **non-colour cue as well** (SC 1.4.1).
+- `--color-*` tokens named below are the semantic set from `color-and-theming/SKILL.md`; this skill adds only
+  the `--state-*` deltas.
 
 ## Button (all variants)
 
 | State | Filled / primary | Outline / secondary | Ghost / text | Destructive | Attribute |
 |---|---|---|---|---|---|
-| Rest | Fill `--action`, label ≥4.5:1 on it | 1px border ≥3:1, transparent fill | No border, no fill | Fill `--danger`, label ≥4.5:1 | — |
+| Rest | Fill `--color-action`, label ≥4.5:1 on it | 1px border ≥3:1, transparent fill | No border, no fill | Fill `--color-danger-solid`, label ≥4.5:1 | — |
 | Hover | SL-8 | SL-4 fill appears; border one step darker | SL-6 fill appears | SL-8 | — |
 | Active | SL-12 (+ optional `translate-y: 1px`) | SL-8 | SL-10 | SL-12 | — |
 | Focus-visible | Ring | Ring | Ring | Ring | — |
@@ -25,7 +27,7 @@ Conventions used below:
 | Toggled on | Fill + check glyph or inset border | Fill appears + glyph | Fill appears + glyph | — | `aria-pressed="true"` |
 
 Icon-only buttons additionally need: an accessible name (`aria-label` or visually hidden text), a 24×24 CSS
-px minimum target (44×44 on touch — expand with a pseudo-element, not padding), and `aria-hidden` on the
+px minimum target, 44×44 on touch (`spacing-and-layout` owns the expansion recipe), and `aria-hidden` on the
 glyph so the name is not read twice.
 
 ## Link
@@ -51,7 +53,7 @@ left alone. If it performs an action rather than navigates, it should be a `<but
 | Hover | Border one step darker; pointer only | — |
 | Focus | Ring **plus** a border colour change | — |
 | Filled | Identical to rest | — |
-| Invalid | Border `--danger` + icon + message below | `aria-invalid="true"`, `aria-describedby` → message id |
+| Invalid | Border `--color-danger-solid` + icon + message below | `aria-invalid="true"`, `aria-describedby` → message id |
 | Warning | Distinct from invalid, non-blocking | `aria-describedby` only |
 | Disabled | Muted, `not-allowed`, value not submitted | `disabled` |
 | Read-only | Full contrast, flattened border, focusable and copyable | `readonly` |
@@ -118,7 +120,7 @@ Tab exits to the panel. `aria-controls` on the tab, `role="tabpanel"` + `aria-la
 | Focus | Managed via roving tabindex or `aria-activedescendant` — the ring may be the highlight itself | — |
 | Checked | Tick in a reserved leading slot (reserve the slot even when unchecked, or rows shift) | `role="menuitemcheckbox"` + `aria-checked` |
 | Submenu | Trailing chevron | `aria-haspopup="menu"`, `aria-expanded` |
-| Destructive | `--danger` label + confirm or undo | — |
+| Destructive | `--color-danger-text` label + confirm or undo | — |
 | Disabled | Muted, still arrow-navigable so it can be read | `aria-disabled="true"` |
 
 ## Table row / list item / card

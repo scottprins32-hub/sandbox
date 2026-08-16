@@ -17,7 +17,8 @@ what this is for". Hierarchy is not decoration. It is the interface's answer to 
 - A screen "feels cluttered", "feels overwhelming", or "looks unfinished" and nobody can say why.
 - A specific element is being missed: the CTA, the error, the empty-state action, the new feature.
 - Deciding what the primary action is, or discovering there are now four of them.
-- Colour, contrast, dark mode and accessibility questions where the real question is legibility and rank.
+- Colour, contrast, dark mode and accessibility questions where the real question is legibility and rank. The
+  values that satisfy the answer — ramps, tokens, both themes — are `color-and-theming`'s.
 
 Go elsewhere when: the problem is people *abandoning a task* they started (`friction-and-flow`); the problem
 is the *words* rather than their prominence (`persuasive-copy`); the problem is a first-time user not
@@ -183,16 +184,11 @@ The numbers that bind (WCAG 2.1/2.2 Level AA):
 | UI component boundaries, icons, chart marks, focus rings | 3:1 | 1.4.11 Non-text Contrast |
 | Meaning never carried by colour alone | — | 1.4.1 Use of Color |
 
-Concrete, because the failures are always the same greys and greens (computed against white):
-
-```
-#111827  17.7:1  ok — primary text
-#4B5563   7.6:1  ok — secondary text
-#6B7280   4.8:1  ok — the quietest text you are allowed for body copy
-#9CA3AF   2.5:1  FAILS — the "muted label" colour half the industry ships
-#16A34A   3.3:1  FAILS as text — the green in your success message
-#F59E0B   2.2:1  FAILS everything — amber text is almost always illegal
-```
+The failures cluster in three predictable places, so check those first: the light "muted label" grey, which
+looks correct on a calibrated display in a dark room and vanishes on a laptop in a café; the success green and
+the warning amber, which both pass as 3:1 graphical marks and fail as body text; and the brand colour used as
+text, which almost never clears 4.5:1 at the saturation the brand wants. Do not pick greys by eye to fix these
+— `color-and-theming` ships a measured ramp with a compliant value at every level in both themes.
 
 What to build:
 
@@ -219,8 +215,10 @@ deliberately. Second failure: the WCAG 2.x contrast formula is known to misjudge
 light-on-dark and thin type; APCA is the candidate replacement being developed for WCAG 3 but is not a
 conformance standard. Meet 2.x because it is what is enforced, and still look at dark mode with your eyes.
 
-`references/contrast-and-color.md` has the full treatment: focus indicators, dark mode, chart encoding,
-CVD-safe palette construction and tooling.
+`references/contrast-and-color.md` has the full argument: why luminance difference is preattentive, the two
+WCAG exemptions people misread, why the ladder re-ranks in dark mode, CVD-safe encoding, and the tooling that
+checks it. The values it deliberately does not ship — ramps, tokens, focus-ring CSS — live in
+`color-and-theming` and `ui-signifiers-and-states`.
 
 ### 5. Design for scanning, and know what the scan-pattern research actually says
 
@@ -472,6 +470,8 @@ attributable version.
 - `references/auditing-a-screen.md` — read when reviewing an existing screen rather than building a new one:
   the full audit toolkit (five-second, first-click, upside-down, zoom-out, CVD simulation) and a worked
   ten-finding audit of a dense operations dashboard.
-- `references/contrast-and-color.md` — read when working on a palette, a dark theme, chart colours, focus
-  indicators, or an accessibility audit: the full WCAG contrast mechanics, how to build a text ramp that is
-  both compliant and hierarchical, colour-vision-safe encoding, and the tooling to check it in CI.
+- `references/contrast-and-color.md` — read when ranking things by contrast, arguing about whether a grey is
+  legible, or preparing for an accessibility audit: why luminance difference is the fastest hierarchy channel,
+  the full WCAG contrast mechanics and the two exemptions people misread, the three-level ladder and why the
+  quietest level still has to pass, colour-vision-safe encoding, and the tooling to check it in CI. It carries
+  no palette on purpose; `color-and-theming` owns the values.

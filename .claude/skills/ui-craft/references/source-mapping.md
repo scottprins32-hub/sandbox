@@ -1,25 +1,26 @@
-# The craft video, mapped and corrected
+# Common craft rules, and the ones that are wrong
 
-The source video covers UI fundamentals in roughly ten minutes: signifiers, hierarchy, grids, whitespace,
-typography, colour, dark mode, shadows, icons, buttons, states, micro-interactions and overlays. It is
-substantially more accurate than most material in this space — the dark-mode elevation point and the shadow
-quality test are both correct and better stated than in many design-system docs.
+The advice that circulates in UI-fundamentals talks, threads and design-system onboarding docs is mostly
+sound: signifiers, hierarchy, grids, whitespace, typography, colour, dark mode, shadows, icons, buttons,
+states, micro-interactions and overlays. Two of its better points — dark-mode elevation inverting, and the
+shadow quality test — are stated more clearly there than in many published design-system docs.
 
-This file maps each topic to the skill that owns it, corrects the handful of points that are wrong or
-under-justified, and names what the video omits.
+This file maps each of those topics onto the skill that owns it, corrects the handful of rules that are wrong
+or resting on a bad reason, and names what the usual treatment leaves out entirely.
 
-**Read this when** you want the video's framing specifically, or you're about to repeat one of its rules.
+**Read this when** you are about to repeat one of these rules in a review, or someone has just quoted one at
+you and you need to know whether it holds.
 
 ---
 
 ## Where each topic lives
 
-| Video topic | Skill |
+| Topic | Skill |
 |---|---|
 | Containers signal grouping; greyed-out signals inactive; the UI teaches its own use | `ui-signifiers-and-states` |
 | Button/input states, feedback, micro-interactions, the copy-button chip | `ui-signifiers-and-states` |
 | Icon sizing, icon buttons, CTA pairs, button padding | `ui-signifiers-and-states` |
-| Hierarchy via size, position and colour; the card redesign | `attention-and-hierarchy` (theory) + `typography-system` (values) |
+| Hierarchy via size, position and colour; redesigning a card | `attention-and-hierarchy` (theory) + `typography-system` (values) |
 | 12/8/4 column grids, whitespace, the 8pt system, grouping by proximity | `spacing-and-layout` |
 | One typeface, tracking and line-height on large text, size ranges by density | `typography-system` |
 | Primary and accent colour, ramps, semantic colour, dark mode | `color-and-theming` |
@@ -31,23 +32,29 @@ under-justified, and names what the video omits.
 
 ### The 8pt grid — right rule, weak reason
 
-The video justifies multiples of 8 as *"you can always halve things with consistency."* That isn't much of a
-reason, and it won't survive a colleague asking why.
+The usual justification for multiples of 8 is *"you can always halve things with consistency."* That isn't
+much of a reason, and it won't survive a colleague asking why.
 
 The better reasons:
 
-- **Device pixel ratios.** 8 divides cleanly at 1×, 1.5×, 2× and 3×, so values stay on whole pixels instead
-  of landing on fractional ones that get rounded inconsistently and produce soft edges.
-- **Decision elimination.** The point of a scale is that it removes a choice from every layout decision. Any
-  value outside the scale needs a justification, which is what makes drift visible in code review.
+- **Device pixel ratios — but this argues for 4, not 8.** Do the arithmetic before repeating it. Multiples of
+  4 already land on whole device pixels at every common ratio: 4 × 1.75 = 7, 4 × 1.5 = 6, 4 × 3 = 12. So does
+  8, but it buys nothing extra — the DPR argument justifies a **4pt base**, and stopping there would be
+  correct. What it rules out is a 2pt or 6pt base: 2 × 1.75 = 3.5 and 6 × 1.75 = 10.5, which land on
+  fractional pixels and produce softened hairlines. Use this reason for choosing 4 as the unit, and one of
+  the reasons below for choosing 8 as the default step.
+- **Decision elimination.** This is the real case for 8 specifically. The point of a scale is that it removes
+  a choice from every layout decision, and a coarser step removes more of them. Any value outside the scale
+  needs a justification, which is what makes drift visible in code review — and drift is easier to spot
+  against eight than against four.
 - **Composability.** An 8pt rhythm with 4pt half-steps handles dense UI without abandoning the system.
 
-Keep the rule. Use the real reasons. And note the video is right that not everything must snap to a
+Keep the rule. Use the real reasons. And keep the accompanying point that not everything must snap to a
 12-column grid — grids earn their keep on repeating content, not on custom landing sections.
 
 ### Semantic colour is convention, not psychology
 
-The video presents *blue = trust, red = danger, yellow = warning, green = success* as though the meanings
+*Blue = trust, red = danger, yellow = warning, green = success* is usually presented as though the meanings
 were intrinsic. They aren't. They're a Western software convention — worth following rigidly **inside** a
 product for internal consistency, but not a fact about human beings. Red signals prosperity and good fortune
 across much of East Asia; white is associated with mourning in several cultures. Claims that specific hues
@@ -60,13 +67,13 @@ it with an icon, a text label, or a shape. A red border alone is not an error st
 
 ### "Ghost buttons" — terminology
 
-The video calls borderless icon buttons *ghost buttons*. Conventionally a **ghost button** is a text or
+Borderless icon buttons are often called *ghost buttons*. Conventionally a **ghost button** is a text or
 outline button with a transparent background; a borderless icon-only control is an **icon button**. Minor,
 but it's the kind of thing that causes confusion in a component library PR.
 
 ### Button padding
 
-The stated guideline — *"double the height for the width"* — reads as garbled. The usable heuristic is
+The guideline as usually stated — *"double the height for the width"* — is garbled. The usable heuristic is
 **horizontal padding roughly twice the vertical padding** (e.g. `padding: 12px 24px`), which yields balanced
 buttons at any label length. Total width is a consequence of the label, not a target.
 
@@ -79,7 +86,7 @@ every additional family needs a justification, not that the count is capped at o
 
 ### Sound advice worth keeping
 
-These the video gets right, and the skills preserve them:
+These are right as usually stated, and the skills preserve them:
 
 - **Tracking down, leading down, as type size goes up** (≈ −2% to −3% letter-spacing, ~110–120% line-height
   on display text). The underlying mechanism is optical sizing: type is drawn with spacing tuned for text
@@ -94,19 +101,19 @@ These the video gets right, and the skills preserve them:
 
 ---
 
-## What the video omits
+## What the usual treatment leaves out
 
 Three gaps, one of them serious.
 
-**Accessibility, almost entirely.** The video covers input focus states but never mentions keyboard focus
-rings, contrast ratios, target sizes, or reduced motion. This is the biggest gap: a UI built to its
-standards can look polished and still be unusable by keyboard, illegible at low vision, and non-compliant.
-The floor is in `ui-craft/SKILL.md` and enforced inline throughout the five craft skills — contrast (1.4.3,
-1.4.11), never-colour-alone (1.4.1), visible focus (2.4.7), target size (2.5.8), reflow (1.4.10), text
-spacing (1.4.12), and `prefers-reduced-motion`.
+**Accessibility, almost entirely.** Input focus states get covered; keyboard focus rings, contrast ratios,
+target sizes and reduced motion generally do not. This is the biggest gap: a UI built to the standard advice
+can look polished and still be unusable by keyboard, illegible at low vision, and non-compliant. The floor is
+in `ui-craft/SKILL.md` and enforced inline throughout the five craft skills — contrast (1.4.3, 1.4.11),
+never-colour-alone (1.4.1), visible focus (2.4.7), target size (2.5.8), reflow (1.4.10), text spacing
+(1.4.12), and `prefers-reduced-motion`.
 
-**Design tokens.** The video teaches five independent sets of preferences with no mechanism binding them.
-Tokens — and specifically the primitive/semantic split — are what make it one system, make dark mode a
+**Design tokens.** The rules above are five independent sets of preferences with no mechanism binding them.
+Tokens — and specifically the primitive/semantic split — are what make them one system, make dark mode a
 redefinition rather than a rewrite, and stop components hardcoding values and drifting. This is the spine of
 `ui-craft/SKILL.md`.
 

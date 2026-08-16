@@ -1,6 +1,6 @@
 ---
 name: spacing-and-layout
-description: Settles the actual numbers for space and structure — the spacing scale and its token names, how much gap goes inside a group versus between groups, page gutters and measure, layout primitives, CSS Grid/flexbox gap, container queries, fluid clamp() sizing, and the WCAG floors for reflow, text-spacing overrides and target size. Use this whenever the user is building or reviewing any layout, page, card, form, section, grid, table, nav or responsive behaviour — even if they never say "spacing", "grid" or "layout" — including "this feels cluttered", "it looks cramped/unfinished", "make it breathe", "how much padding", "what should my spacing scale be", "should I use a 12-column grid", "it breaks on mobile", "the sidebar collapses wrong", or any question about px values, gaps, margins, breakpoints or container queries. Use it alongside `attention-and-hierarchy`, which owns *why* proximity groups things; this skill supplies the numbers that make it true.
+description: Settles the actual numbers for space and structure — the spacing scale and its token names, how much gap goes inside a group versus between groups, page gutters and content max-widths, layout primitives, CSS Grid/flexbox gap, container queries, fluid clamp() sizing, and the WCAG floors for reflow, text-spacing overrides and target size. Use this whenever the user is building or reviewing any layout, page, card, form, section, grid, table, nav or responsive behaviour — even if they never say "spacing", "grid" or "layout" — including "this feels cluttered", "it looks cramped/unfinished", "make it breathe", "how much padding", "what should my spacing scale be", "should I use a 12-column grid", "it breaks on mobile", "the sidebar collapses wrong", or any question about px values, gaps, margins, breakpoints or container queries. Use it alongside `attention-and-hierarchy`, which owns *why* proximity groups things; this skill supplies the numbers that make it true.
 ---
 
 # Spacing and layout
@@ -52,9 +52,10 @@ a scale into a codebase with 300 arbitrary values is a week of work nobody funds
 5. **Existing design system?** If Material, Tailwind's default scale, Radix, shadcn/ui or a company system is
    already in play, adopt its scale rather than inventing a parallel one. Two spacing systems in one codebase
    is worse than one imperfect system.
-6. **Content constraints.** Maximum measure for prose (45–75 characters), the widest thing that must fit
-   without scrolling (a table? a code block? a chart?), and whether the product supports user-set root font
-   size — which decides `rem` versus `px` for your tokens.
+6. **Content constraints.** Maximum measure for prose (`typography-system` move 4 decides the number; you
+   only need it as a token), the widest thing that must fit without scrolling (a table? a code block? a
+   chart?), and whether the product supports user-set root font size — which decides `rem` versus `px` for
+   your tokens.
 
 **Law, convention, taste.** Each move below is tagged. *Law* means a WCAG success criterion or a browser
 behaviour — you comply or you ship a defect. *Convention* means a widely-shared pattern with a real but
@@ -132,7 +133,8 @@ explains nothing. Three real reasons:
   accept the 10.
 - **1px borders.** 16px padding plus a 1px border is 17px of inset unless `box-sizing: border-box` is set
   globally (it should be). For a border that must not change the box, use `outline` or an inset `box-shadow`.
-- **Type leading.** `line-height` is a unitless ratio (1.4–1.6 for body), not a spacing step — see move 6.
+- **Type leading.** `line-height` is a unitless ratio, not a spacing step; the values are
+  `typography-system` move 5.
 - **Percentages and fractions.** `1fr`, `50%`, `minmax()` are not violations; the scale governs gaps and
   padding, not track sizes.
 
@@ -148,18 +150,24 @@ background tint you draw is another mark the eye has to resolve. `attention-and-
 (Gestalt proximity, Palmer's common region). Here is the number.
 
 **The proximity ratio.** Space *within* a group must be visibly smaller than space *between* groups. Aim for
-**at least 2×, ideally 2–3× between adjacent levels of the hierarchy**. Under 1.5× the difference is
-ambiguous; the eye cannot resolve it and the grouping information is lost.
+**at least 2× between adjacent levels of the hierarchy**. Under 1.5× the eye cannot resolve the difference:
+the two levels read as one and the grouping information is gone.
 
 | Relationship | Token | Value |
 |---|---|---|
 | Label → its input | `--space-2xs` | 4px |
 | Input → its hint/error | `--space-2xs` | 4px |
 | Field → next field | `--space-lg` | 24px |
-| Field group → next group | `--space-xl`–`2xl` | 32–48px |
+| Field group → next group | `--space-2xl` | 48px |
 | Section → next section | `--space-3xl`–`4xl` | 64–96px |
 
-Each step is 2–6× the one above it. That is what makes the structure readable before a word is.
+Reading down: 6× from inside a field to between fields, then 2× to the group, then 1.3–2× to the section.
+The section step is the only one allowed under 2×, because a section boundary almost always carries a heading
+or a surface change as well, so the space is not working alone. Scale the whole column for a denser product
+(2 / 12 / 24 / 32) rather than tightening one row — 24px between fields with 32px between groups is the
+common version of that mistake, a 1.33× step that reads as one level instead of two. Where a legend, divider
+or background change genuinely marks a boundary you can go tighter than 2×, but set the *token* at the value
+that works without one, because most group boundaries have neither.
 
 **The equidistant-label bug.** The most common spacing defect in shipped software, invisible until you look
 for it:
@@ -339,33 +347,30 @@ How it fails: a `clamp()` minimum below the readable floor. Set the min to the s
 usable (≥16px for body text on mobile, or iOS Safari zooms the page on input focus), not to whatever makes
 the curve look smooth.
 
-### 6. Where type meets space: measure, leading, and the vertical-rhythm myth — *convention + taste*
+### 6. Where type meets space: heading margins and the vertical-rhythm myth — *convention + taste*
 
-`typography-system` owns the type scale — sizes, weights, tracking. This move covers only the places where
-type decisions *are* spacing decisions, which is where the two skills touch.
+Measure, leading per size step, and the unitless-`line-height` rule are `typography-system` moves 4–5.
+Settle them there; they are type decisions that happen to have a length. Two things at this boundary are
+genuinely spatial and belong here.
 
-- **Measure: 45–75 characters** for body prose, ~66 as the classic target (Robert Bringhurst, *The Elements
-  of Typographic Style*; Matthew Butterick, *Practical Typography*, argues 45–90 depending on size and
-  leading). Set it with `ch` units — `max-width: 68ch` — which tracks the actual font. Long lines lose the
-  reader on the return sweep; short ones break the rhythm.
-- **Line-height: unitless, 1.4–1.6 for body**, tightening to 1.1–1.25 as headings get larger. Unitless is not
-  a style preference: `line-height: 24px` on `body` is inherited as *24px* by a 32px heading and clips it.
-  `line-height: 1.5` is inherited as a ratio and behaves.
-- **Longer measure needs more leading.** They trade off — a 75ch line at 1.4 is harder to track than a 60ch
-  line at 1.4. If you cannot shorten the measure, raise the leading.
-- **The baseline-grid myth.** Forcing every text block onto a strict baseline grid (as print does) is
-  expensive on the web and pays almost nothing: dynamic content, variable fonts, user zoom, text-spacing
-  overrides (move 7) and mixed embedded content all break the alignment the moment it ships. Align *space
-  between blocks* to the scale; let leading be a ratio. This is taste, and typographers will argue — but the
-  cost/benefit on a responsive, user-restylable medium is clear.
-
-Space around text belongs to the *type*, not the layout: heading margins expressed in `em` scale with the
-heading, so a `2.5rem` H1 and a `1.25rem` H3 get proportional air from one rule.
+**Heading margins go in `em`, not scale steps.** Space around a heading belongs to the *type*, not the
+layout. A margin in `em` resolves against the element's own font size, so one rule gives a `2.5rem` H1 and a
+`1.25rem` H3 proportional air; the same rule in `rem` gives them identical air and the H1 looks starved.
 
 ```css
 h2 { margin-block: 1.6em 0.5em; line-height: 1.2; text-wrap: balance; }
 p  { max-width: var(--measure); text-wrap: pretty; }
 ```
+
+Roughly 3:1 in favour of the space *above* — the same asymmetry as move 2's heading fix, expressed in the
+heading's own units. Use the scale tokens (move 2) in a component where the heading renders at one known
+size; use `em` in prose, where headings arrive at four or five sizes and you want one rule.
+
+**The baseline-grid myth.** Forcing every text block onto a strict baseline grid (as print does) is expensive
+on the web and pays almost nothing: dynamic content, variable fonts, user zoom, text-spacing overrides
+(move 7) and mixed embedded content all break the alignment the moment it ships. Align *space between blocks*
+to the scale; let leading be a ratio. This is taste, and typographers will argue — but the cost/benefit on a
+responsive, user-restylable medium is clear.
 
 ### 7. Survive the user's settings: reflow and text-spacing — *law*
 
@@ -429,6 +434,12 @@ pseudo-element:
 
 Check that the expanded areas do not overlap each other — overlapping hit areas cause mis-taps, which is the
 failure the spacing exception exists to prevent.
+
+This skill owns target geometry: the floors above, the expansion recipe, and the 8px between neighbours.
+`ui-signifiers-and-states` owns the other half of the problem — an invisible expansion is a compromise, not
+a free win, because the target the user can *see* is still 24px, and a control that reacts to a press
+10px outside its visible edge reads as a misfire. Grow the visible control wherever the layout allows it;
+expand invisibly only where it does not.
 
 **Safe areas.** On notched and gesture-bar devices, content under the home indicator or in the corner
 curvature is untappable. `env()` returns 0 unless the viewport opts in with
@@ -523,7 +534,7 @@ Run against the screen or the PR diff.
 
 - [ ] Every spacing value in the diff comes from the token scale; no arbitrary values without a comment.
 - [ ] Tokens are in `rem`, not `px`.
-- [ ] Within-group gaps are at least 2× smaller than between-group gaps, everywhere it matters.
+- [ ] Within-group gaps are at least 2× smaller than between-group gaps wherever space is the only cue.
 - [ ] No label, hint or heading sits equidistant between the thing it belongs to and the thing it does not.
 - [ ] Container padding is ≥ the largest gap inside that container.
 - [ ] Sibling spacing uses `gap` on the parent, not margins on children; no `:last-child` resets.
@@ -532,7 +543,9 @@ Run against the screen or the PR diff.
 - [ ] `auto-fit`/`auto-fill` tracks use `minmax(min(Xrem, 100%), 1fr)`.
 - [ ] Components that render at multiple widths use container queries, not media queries.
 - [ ] Every `clamp()` on a font size has a `rem` term in its middle value.
-- [ ] Prose is capped at 45–75ch; `line-height` is unitless.
+- [ ] Prose is capped at 45–75ch and `line-height` is unitless (both `typography-system`) — and the cap is a
+      ceiling you approach, not a target, because `ch` is the advance of `0` and a 65ch box holds well over
+      65 characters.
 - [ ] **320px / 400% zoom:** no horizontal page scroll, no clipped content, no two-dimensional scrolling
       except for tables, maps and diagrams that genuinely require it (WCAG 1.4.10).
 - [ ] **Text-spacing override applied** (1.5 line-height, 0.12em letter, 0.16em word, 2em paragraph): nothing
@@ -570,11 +583,11 @@ Run against the screen or the PR diff.
 - **Layout primitives** — Heydon Pickering & Andy Bell, *Every Layout* (Stack, Cluster, Sidebar, Switcher,
   Grid, Center, Cover, Frame, Reel, Imposter). The source of the composition-over-columns framing and of the
   breakpoint-free Sidebar and Switcher techniques.
-- **Typography** — Robert Bringhurst, *The Elements of Typographic Style* (measure: 45–75 characters
-  satisfactory, 66 widely regarded as ideal); Matthew Butterick, *Practical Typography* (line length and line
-  spacing, with a wider recommended range than Bringhurst's); Ellen Lupton, *Thinking with Type* (grid
-  systems and their limits). The argument against strict web baseline grids in move 6 is this skill's
-  judgment, not a claim from any of them.
+- **Typography** — measure, leading and the type scale are sourced in `typography-system` (Bringhurst,
+  Butterick); the 45–75-character cap this skill's checklist enforces is theirs, and the reasoning behind it
+  lives there. Ellen Lupton, *Thinking with Type*, is the source used here, for grid systems and their
+  limits. The argument against strict web baseline grids in move 6 is this skill's judgment, not a claim from
+  any of them.
 - **Grids** — Josef Müller-Brockmann, *Grid Systems in Graphic Design* (1981), the origin of the modular grid
   in modern practice, and worth reading for the part everyone skips: grids serve repeating, systematic
   content and are a means, not an aesthetic.

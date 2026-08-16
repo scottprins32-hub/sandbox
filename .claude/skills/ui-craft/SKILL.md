@@ -1,6 +1,6 @@
 ---
 name: ui-craft
-description: The execution layer of interface design — the actual values behind a screen: spacing scales, type scales, colour ramps, elevation, component state matrices, and the design tokens that hold them together. Start here for any request about making a UI look right, building or auditing a design system, setting up tokens or theming, adding dark mode, or fixing a screen that "looks off", "feels cluttered", "looks unfinished", or "looks like a spreadsheet" — and whenever writing CSS, Tailwind config, or component styles from scratch. Use it even when the user never says design, CSS or tokens; if they are building a visible component, this applies.
+description: Router and shared token layer for the five craft skills — the primitive-versus-semantic split that makes typography, spacing, colour, depth and states one system instead of five sets of preferences, plus the build order and the accessibility floor that spans all of them. Start here when building or auditing a whole design system, setting up a token file or Tailwind theme from scratch, or when a screen is clearly wrong and you cannot yet name which layer owns it — it diagnoses and hands off. Go straight to the specialist once the symptom is named: cluttered, cramped or "looks unfinished" to `spacing-and-layout`; muddy, garish, washed out, or anything about palettes, tokens for colour and dark mode to `color-and-theming`; flat, or any shadow, overlay or text-on-image question to `depth-and-overlays`; dead, unresponsive or missing states to `ui-signifiers-and-states`; "looks like a Word document" or a spreadsheet to `typography-system`.
 ---
 
 # UI craft
@@ -141,5 +141,6 @@ adopt it unless you have a better system. "One typeface is enough" is taste — 
 yours to overrule. Each skill in this set marks which is which, so you know what you're allowed to disagree
 with.
 
-`references/source-mapping.md` maps the source video's topics onto these five skills, with corrections to
-the handful of points it gets wrong or under-justifies. Read it if you want that framing specifically.
+`references/source-mapping.md` takes the craft rules that circulate most widely — the 8pt grid, semantic
+colour, "one typeface is enough", ghost buttons, button padding — maps each onto the skill that owns it, and
+corrects the ones that are wrong or resting on a bad reason. Read it before repeating one of them in a review.

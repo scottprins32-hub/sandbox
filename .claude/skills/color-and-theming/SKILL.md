@@ -133,9 +133,11 @@ the perceived hue drifts ~5°. Noticeable, not fatal. The two failures that actu
   hue 284. Lighten a saturated blue in HSL and it turns lavender, which is why hand-made HSL tints of a blue
   brand never quite look like the brand.
 
-`oklch()` is supported in Chrome 111, Safari 15.4 and Firefox 113, and has been Baseline "widely available"
-since May 2023. Keep hex fallbacks in comments so a human can read the file, and use `color-mix(in oklab, …)`
-for derived values rather than hand-picking near-neighbours.
+`oklch()` is supported in Chrome 111, Safari 15.4 and Firefox 113 — Baseline **newly available** since May
+2023 and **widely available** since November 2025. Those are two different labels with a fixed gap: widely
+available is always the newly-available date plus 30 months, the point at which the long tail of unupdated
+devices has turned over. Keep hex fallbacks in comments so a human can read the file, and use
+`color-mix(in oklab, …)` for derived values rather than hand-picking near-neighbours.
 
 How it fails: authoring OKLCH values by eye without checking gamut. Chroma 0.24 at lightness 0.82 does not
 exist in sRGB; the browser clamps silently and your 300 step is not the colour you wrote.
@@ -197,7 +199,7 @@ Split the role rather than arguing with the brand team:
 
 ```css
 :root {
-  --brand:        oklch(0.655 0.216 264);  /* #558AFF  logo, large marks, decorative fills   */
+  --brand:        oklch(0.655 0.183 264);  /* #558AFF  logo, large marks, decorative fills   */
   --color-action: oklch(0.505 0.228 264);  /* #1B52E4  buttons and links — 6.22:1 on white   */
   --color-on-action: oklch(0.99 0 0);      /*          white label on the fill — 6.22:1      */
 }
@@ -290,12 +292,16 @@ dark surfaces it is *lighter*, and the same nominal difference reads far harsher
 Dark borders sit at a smaller delta:
 
 ```css
-/* light: subtle 1.25:1, default 1.49:1, strong 3.12:1 (input outlines — meets 1.4.11) */
-/* dark:  subtle 1.32:1, default 1.75:1, strong 4.18:1 on base, 3.35:1 on the overlay surface */
+/* light: subtle 1.25:1, default 1.49:1, strong 3.37:1 on the page, 3.15:1 on the sunken surface */
+/* dark:  subtle 1.32:1, default 1.75:1, strong 4.18:1 on base,     3.35:1 on the overlay surface */
 ```
 
-The catch: a dark `--border-strong` must clear 3:1 against the *highest* surface it can land on, not the base.
-At lightness 0.52 it passes on the base (3.25:1) and fails on a raised card (2.95:1). Set it at **0.58**.
+The catch, and it points in opposite directions per theme: `--border-strong` must clear 3:1 against the
+*worst* surface it can land on, which in dark is the **lightest** and in light is the **darkest**. A dark
+border at lightness 0.52 passes on the base (3.25:1) and fails on a raised card (2.95:1) — set it at **0.58**.
+A light border at lightness 0.660 passes on the white page (3.12:1) and fails on the `#F6F7F9` sunken surface
+(2.91:1), so every input inside a well, code block or table header is a 1.4.11 defect — set it at **0.640**
+(3.37:1 page, 3.15:1 sunken). Testing either one against the base surface alone finds neither failure.
 
 **6e. Elevation inverts — surfaces get lighter as they rise.** In light mode depth comes from shadow: the
 higher the element, the darker and more diffuse the shadow. On a near-black surface a black shadow is nearly
@@ -352,7 +358,7 @@ out of `color-scheme` in three lines. If you need to support browsers older than
   /* ── borders ── only -strong is legal as a control boundary (1.4.11) ───────── */
   --color-border-subtle:   light-dark(oklch(0.925 0.012 264), oklch(0.300 0.012 264));
   --color-border:          light-dark(oklch(0.870 0.012 264), oklch(0.375 0.012 264));
-  --color-border-strong:   light-dark(oklch(0.660 0.012 264), oklch(0.580 0.012 264));
+  --color-border-strong:   light-dark(oklch(0.640 0.012 264), oklch(0.580 0.012 264));
 
   /* ── interactive ──────────────────────────────────────────────────────────── */
   --color-action:          light-dark(oklch(0.505 0.228 264), oklch(0.72 0.145 264));
@@ -393,16 +399,19 @@ The pairs that decide whether this set is compliant — full matrix in `referenc
 | `surface` → `raised` → `overlay` | `#FFFFFF`, shadow does the work | `#15171C` → `#1E2025` → `#282A2F`, ~1.1:1 per step |
 | `text-primary` | `#1C1F27` 16.47 on white | `#EFF0F3` 15.73 base / 14.29 raised |
 | `text-muted` (the quietest legal text) | `#6D727B` 4.84 white / **4.51 sunken** | `#A2A3A6` 7.11 base / **5.70 overlay** |
-| `border-strong` (control boundaries) | `#8E929A` **3.12** on white | `#777A82` 4.18 base / **3.35 overlay** |
+| `border-strong` (control boundaries) | `#888C94` 3.37 white / **3.15 sunken** | `#777A82` 4.18 base / **3.35 overlay** |
 | `action` fill / `action-text` | `#1B52E4` white label 6.22 / link 6.22 | `#76A2FF` dark ink 7.65 / `#93B7FF` 8.93 |
 | `danger` / `warning` / `success` / `info` text | 6.56 / 5.98 / 5.47 / 6.22 on white | 9.89 / 10.19 / 10.58 / 10.23 on surface |
 | `danger` / `success` solid, white label | 4.78 / 4.63 | — |
 | `warning` solid `#FCAB00`, dark ink | 8.60 — but 1.92 vs page, **needs a border** | — |
 
-Two values are set by their worst case rather than by taste: `text-muted` sits at lightness 0.55 rather than
-0.56 only because 0.56 scores 4.32:1 on the sunken surface and fails; dark `border-strong` sits at 0.58 rather
-than 0.52 only because 0.52 scores 2.95:1 on a raised card and fails. A check-it-afterwards workflow finds
-neither, because both pass on the surface you happen to test first.
+Three values are set by their worst case rather than by taste. `text-muted` sits at lightness 0.55 rather than
+0.56 only because 0.56 scores 4.32:1 on the sunken surface and fails. Light `border-strong` sits at 0.640
+rather than 0.660 for the same reason — 0.660 scores 3.12:1 on the white page and 2.91:1 on that sunken
+surface. Dark `border-strong` sits at 0.58 rather than 0.52 only because 0.52 scores 2.95:1 on a raised card.
+A check-it-afterwards workflow finds none of the three, because each one passes on the surface you happen to
+test first. The worst case is the darkest surface in light and the lightest surface in dark, so a test that
+only enumerates the base surface is not a test.
 
 **Naming rules that keep this honest:**
 
@@ -541,7 +550,8 @@ Run against the palette file and the rendered screen, in both themes.
 - [ ] Ramps generated at fixed OKLab lightness per step, chroma clamped into gamut, hue constant.
 - [ ] Body text ≥4.5:1 and large text ≥3:1 on **every** surface it can appear on, in both themes (1.4.3).
 - [ ] Input borders, focus rings, meaningful icons and control states ≥3:1 against their adjacent colour
-      (1.4.11) — including on the *raised* and *overlay* surfaces, not just the base.
+      (1.4.11) — on **every** surface, not just the base. The worst case is the *sunken* surface in light and
+      the *overlay* in dark, and a token can pass on one and fail on the other.
 - [ ] Solid buttons pass twice: label vs fill, and fill vs page if the fill identifies the control.
 - [ ] Green and amber steps checked individually — they fail at the step where red and blue pass.
 - [ ] No status, state, required field, chart series, diff or selection carried by colour alone (1.4.1);
@@ -577,9 +587,11 @@ Run against the palette file and the rendered screen, in both themes.
   method rather than an adopted standard. WCAG 3 is not expected to reach Recommendation before 2028. Meet
   WCAG 2.x; use APCA as a supplementary signal only.
 - **CSS Color Module Level 4** — `oklch()` / `oklab()`, based on Björn Ottosson's Oklab (2020). Support:
-  Safari 15.4, Chrome 111, Firefox 113; Baseline widely available since May 2023. **CSS Color Level 5** —
-  `color-mix()`. **CSS Color Adjust Level 1** — the `color-scheme` property. `light-dark()`: Chrome 123
-  (Mar 2024), Firefox 120 (Nov 2023), Safari 17.5 (May 2024); Baseline widely available from November 2026.
+  Safari 15.4, Chrome 111, Firefox 113; Baseline newly available May 2023, widely available since November
+  2025. **CSS Color Level 5** — `color-mix()`. **CSS Color Adjust Level 1** — the `color-scheme` property.
+  `light-dark()`: Chrome 123 (Mar 2024), Firefox 120 (Nov 2023), Safari 17.5 (May 2024); Baseline newly
+  available May 2024, widely available from November 2026. The two Baseline labels are 30 months apart by
+  definition — quote whichever one your support matrix actually needs, and do not use them interchangeably.
 - **Material Design** — Material 2 dark theme: `#121212` base surface with white elevation overlays from 0% at
   0dp to 16% at 24dp (1dp card = 5%, 8dp bar = 12%). Material 3 replaced computed overlays with explicit tonal
   `surface-container-lowest / low / … / highest` tokens and expresses elevation primarily through surface tint

@@ -82,9 +82,10 @@ Built from three videos, each mapped to the layer it belongs to, with its citati
   survive checking: the car-wash loyalty study is Nunes & Drèze (USC/UCLA), not Columbia; the jam study's
   choice-overload effect averages near zero across 50 replications; the "70–90% never change defaults" and
   "free samples +2,000%" figures have no locatable source.
-- `ui-craft/references/source-mapping.md` — video two's craft topics. Mostly accurate; corrections cover
-  semantic colour presented as universal when it is a Western convention (and the red/green axis it relies on
-  is the most common colour-vision deficiency), the 8pt grid's real justification, and button padding.
+- `ui-craft/references/source-mapping.md` — video two's craft topics, rewritten to stand on its own as the
+  craft rules that circulate most widely and the ones that are wrong. Corrections cover semantic colour
+  presented as universal when it is a Western convention (and the red/green axis it relies on is the most
+  common colour-vision deficiency), the 8pt grid's real justification, and button padding.
 - `decision-screen-design/references/three-redesigns.md` — video three's three redesigns, marked as reasoning
   rather than evidence: they carry no published data and each changes a dozen variables at once, so nothing
   can be attributed to any single change.
@@ -94,9 +95,27 @@ Built from three videos, each mapped to the layer it belongs to, with its citati
 Not an appendix. WCAG floors are enforced inline throughout the craft skills — contrast (1.4.3, 1.4.11),
 never colour alone (1.4.1), visible keyboard focus (2.4.7), target size (2.5.8), reflow (1.4.10), text
 spacing (1.4.12), and `prefers-reduced-motion`. This is the largest gap in the source material: a UI built
-exactly to video two's standards can look polished and still be unusable by keyboard.
+exactly to the standard craft advice can look polished and still be unusable by keyboard.
 
 ## Portability
 
-Copy `.claude/skills/` into another repo and it works unchanged. Nothing depends on this project's stack;
-code examples use CSS, Tailwind v4 and React for illustration only.
+Nothing here depends on this project's stack — code examples use CSS, Tailwind v4 and React for illustration
+only — so `.claude/skills/` copies into another repo as a unit. What does not copy: three skills the set
+*points at* are not in this directory and resolve here only because they are installed globally in this
+environment. In a repo without them those pointers are dead ends, on exactly the three questions the craft
+skills deliberately refuse to answer themselves.
+
+- **`design-motion-principles`** — cited from most of the craft set and from `attention-and-hierarchy` for
+  easing, duration and choreography. Without it you lose every "how to spend motion well" answer. Working
+  fallback: 150–250ms with `ease-out` for hover and enter, ~90ms for press, and `attention-and-hierarchy`
+  move 7 to decide whether to spend motion at all.
+- **`taste-frontend-design`** — cited wherever a skill declines to legislate visual taste or generic
+  AI-looking design. Without it, the nearest substitutes in this set are `attention-and-hierarchy`'s squint,
+  greyscale and count audits, and `ui-craft`'s rule that if you notice the effect before the content, the
+  effect is wrong.
+- **`dataviz`** — cited by `color-and-theming` for chart and categorical palettes. Without it,
+  `attention-and-hierarchy/references/contrast-and-color.md` still carries the fallback that matters:
+  sequential ramps monotonic in lightness (viridis, cividis), direct labels at line ends, and a non-hue
+  encoding on every series.
+
+Everything else — all sixteen skills and their references — resolves inside this directory.

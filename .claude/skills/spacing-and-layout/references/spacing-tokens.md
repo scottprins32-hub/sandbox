@@ -55,7 +55,7 @@ The one to start from if you are unsure.
   --gap-inline:    var(--space-2xs);   /*  4 */
   --gap-field:     var(--space-2xs);   /*  4 */
   --gap-fields:    var(--space-lg);    /* 24 */
-  --gap-group:     var(--space-xl);    /* 32 */
+  --gap-group:     var(--space-2xl);   /* 48  2× the field gap — 32 here reads as one level, not two */
   --gap-section:   var(--space-3xl);   /* 64 */
   --pad-card:      var(--space-lg);    /* 24 */
   --pad-control-y: var(--space-sm);    /* 12 */
@@ -82,11 +82,20 @@ Half-steps do the work. Information density is the feature; do not "fix" it with
   --pad-control-y: var(--space-2xs);   /*  4 */
   --pad-control-x: var(--space-xs);    /*  8 */
   --control-min-h: 1.75rem;            /* 28 */
-  --measure:       80ch;
+  --measure:       66ch;
   --content-max:   none;
   --gutter:        var(--space-md);
 }
 ```
+
+**Measure does not compress.** Every other token in this preset shrinks; `--measure` does not, and it is the
+one people push the other way — a dense tool feels like it should run text edge to edge. A readable
+line length is a property of the type, not of the surface: density buys you more *rows* on screen, not
+longer *lines*. 80ch is the value usually reached for here and it is out of range twice over — past the
+45–75-character convention in the ship checklist, and past the 80-character ceiling in **WCAG 1.4.8 Visual
+Presentation (AAA)**. It is worse than it looks, because `ch` is the advance width of `0`, which is wider
+than the average character in running prose, so a cap in `ch` always yields more characters than its number
+suggests. `typography-system` move 4 owns the measure and the conversion.
 
 **The compact caveat.** A 28px control passes WCAG 2.5.8 (24×24 CSS px, Level AA) only if it is also ≥24px
 wide *or* satisfies the spacing exception. It fails the 44px touch standard, so a compact density must be
@@ -135,11 +144,11 @@ and 8px is the WCAG-friendly floor (Material specifies ≥8dp between touch targ
 | Label → input | 4px |
 | Input → hint or error | 4px |
 | Field → next field | 24px |
-| Fieldset → next fieldset | 32px |
+| Fieldset → next fieldset | 48px |
 | Legend → first field | 12px |
 | Checkbox/radio → its label | 8px |
 | Stacked checkbox → next checkbox | 12px |
-| Form → submit row | 32px |
+| Form → submit row | 48px |
 
 The critical ratio is **4px inside a field versus 24px between fields (1:6)**. Anything under 1:2 produces
 the equidistant-label bug described in `SKILL.md` move 2.

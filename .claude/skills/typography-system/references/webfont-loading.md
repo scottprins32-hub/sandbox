@@ -84,7 +84,7 @@ subset anything** — it is a hint about which of your already-subsetted files t
 ```css
 @font-face {
   font-family: "InterVariable";
-  src: url("/fonts/inter-var-latin.woff2") format("woff2-variations");
+  src: url("/fonts/inter-var-latin.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -94,13 +94,20 @@ subset anything** — it is a hint about which of your already-subsetted files t
 
 @font-face {
   font-family: "InterVariable";
-  src: url("/fonts/inter-var-latin-ext.woff2") format("woff2-variations");
+  src: url("/fonts/inter-var-latin-ext.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
   unicode-range: U+0100-02AF, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 ```
+
+**`format("woff2")` even for a variable font.** The `format("woff2-variations")` string you will find in
+tutorials from the transitional era is legacy syntax; CSS Fonts 4 normalised it to
+`format(woff2) tech(variations)`, and every browser that supports WOFF2 loads a variable WOFF2 from a plain
+`format("woff2")`. A format string the user agent does not recognise makes it skip that whole `src` component,
+so the old value can only fail closed and buys nothing. Reach for `tech(variations)` only when you actually
+need to gate on variable-font support, inside `@supports font-tech(variations)`.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: typography-system
-description: Settles the actual type values for a product — which typefaces, the size scale with tracking and line-height baked in per step, measure, weight as a hierarchy lever, tabular figures, webfont loading, and the WCAG floors for resize and text spacing. Use this whenever the user is writing or reviewing any interface, page, component, email or document that contains words — even if they never say "typography", "font" or "type scale" — including "what font should I use", "pick a type scale", "my headings look wrong", "this looks like a Word document", "the text is hard to read", "our numbers jump around in the table", "the page jumps when fonts load", "how big should body text be", or any request that involves setting `font-size`, `line-height`, `letter-spacing` or `@font-face`. Most of a UI is text, so reach for this before spacing or colour on any new project.
+description: Settles the actual type values for a product — which typefaces, the size scale with tracking and line-height baked in per step, measure, weight as a hierarchy lever, tabular figures, webfont loading, and the WCAG floors for resize and text spacing. Use this whenever a type decision is being made or reviewed — even if the user never says "typography", "font" or "type scale" — including "what font should I use", "pick a type scale", "my headings look wrong", "this looks like a Word document", "our numbers jump around in the table", "the page jumps when fonts load", "how big should body text be", or any diff touching `font-size`, `line-height`, `letter-spacing` or `@font-face`. Use it alongside `depth-and-overlays`, which owns text set over a photograph or a scrim, and `color-and-theming`, which owns text colour and contrast tokens; this skill owns the faces, sizes, spacing-per-step and measure. On a new project settle type before spacing, because the type sizes determine what the spacing scale has to accommodate.
 ---
 
 # Typography system
@@ -148,7 +148,11 @@ adjacent pair is distinguishable side by side. Six to eleven steps covers everyt
 }
 ```
 
-Step ratios: 1.09, 1.17, 1.14, 1.13, 1.11, 1.20, 1.25, 1.27, 1.26, 1.25 — accelerating, exactly as argued.
+Step ratios: 1.09, 1.17, 1.14, 1.13, 1.11, 1.20, 1.25, 1.27, 1.26, 1.25 — two regimes, not one smooth curve.
+From 12px to 20px the steps are a flat 2px, so the ratio *falls* at every one of them — 1.17, 1.14, 1.13, 1.11
+— because 2px is already a clear rank change at those sizes and a growing ratio would skip steps you need.
+From 20px up it climbs to 1.25–1.27 and holds, because that is where 2px stops being visible. No single
+constant reproduces both halves; that is the argument.
 
 **Tailwind v4**, CSS-first. A `--text-*` key plus its `--line-height` / `--letter-spacing` / `--font-weight`
 modifiers means one utility carries all of them, which is the whole point:
@@ -256,16 +260,17 @@ The default failure: a `<p>` with no max-width on a 1440px display at 16px is ro
 line**. This is the single most common typographic defect in shipped web pages and it costs one declaration.
 
 ```css
-.prose { max-width: 65ch; }        /* ~60–75 rendered characters */
+.prose { max-width: 65ch; }        /* ~70–78 rendered characters — the top of the band */
 .prose-narrow { max-width: 45ch; } /* sidebars, cards, callouts */
 ```
 ```css
 @theme { --container-prose: 65ch; }  /* Tailwind v4 → max-w-prose */
 ```
 
-`ch` is the advance width of `0`, not the average character, and `0` is wider than most lowercase — so `65ch`
-renders as roughly 70–78 actual characters in a typical sans. Set it, then count a real line. If the font
-swaps on load, the measure changes with it.
+`ch` is the advance width of `0`, not the average character, and `0` is wider than most lowercase, so `65ch`
+renders as roughly 70–78 actual characters in a typical sans — the top of the band, and past 1.4.8's 80 in a
+face with wide figures. Use `58–60ch` to land near Bringhurst's 66. Either way, set it and then count a real
+line; if the font swaps on load, the measure changes with it.
 
 Three notes that matter more than they look:
 
@@ -539,7 +544,8 @@ Run against the screen or the PR diff.
       dashboard. No two adjacent steps within 2px.
 - [ ] Display sizes carry negative tracking (−0.02em to −0.03em at 48px+) and tight leading (1.0–1.15);
       sizes ≤12px carry slightly positive tracking; every all-caps run has ≥0.05em added.
-- [ ] Body copy capped at 45–75 characters (`max-width: ~65ch`), verified by counting a rendered line.
+- [ ] Body copy capped at 45–75 characters (`max-width: 58–65ch`, since `ch` over-counts), verified by
+      counting a rendered line.
 - [ ] Body `line-height` ≥1.5 at long measure; headings 1.1–1.25; single-line UI labels ~1.
 - [ ] Body weight ≥400. No 300-weight body text anywhere.
 - [ ] Only loaded weights are used; `font-synthesis: none` in development shows no fake bolds.

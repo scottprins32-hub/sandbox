@@ -52,7 +52,7 @@ for anything with a table in it.
 }
 
 .card      { background: var(--color-surface-raised); border: 1px solid var(--color-border-subtle); }
-.card:hover{ background: var(--color-surface-hover); border-color: var(--color-border-default); }
+.card:hover{ background: var(--color-surface-overlay); border-color: var(--color-border); }
 ```
 
 Hover in this style is a **border + background** change, not a lift. That is a feature: it costs no
@@ -144,7 +144,8 @@ muddiness problem in `SKILL.md` move 5. Override the namespace with role names (
 ## Lint and migration
 
 **Lint rule.** Any `box-shadow` in a component file whose value is not `var(--elevation-*)`,
-`var(--edge-highlight)`, `var(--focus-ring)`, `none`, or an `inset` autofill override is a violation.
+`var(--edge-highlight)`, a focus ring built from `--color-focus-ring` (`ui-signifiers-and-states` owns
+that shape), `none`, or an `inset` autofill override is a violation.
 
 ```bash
 # Every literal shadow left in the codebase, worst offenders first.

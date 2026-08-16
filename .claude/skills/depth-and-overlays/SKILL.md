@@ -1,6 +1,6 @@
 ---
 name: depth-and-overlays
-description: Settles the actual values for depth — a named elevation scale with layered box-shadow specs, shadow colour derived from the surface, inset shadows for wells and pressed states, borders vs shadows vs surface-shift as three different depth signals, dark-mode depth where shadows stop working, and text over photography with a *computed* contrast guarantee rather than an eyeballed one. Use this whenever the user is building or reviewing cards, modals, dropdowns, popovers, tooltips, sticky bars, drag states, hero sections, image banners, cover art, or anything with a `box-shadow`, `backdrop-filter` or gradient overlay — even if they never say "elevation", "shadow" or "depth". Also use it for symptoms like "the shadows look cheap/muddy/harsh", "this looks flat", "the card disappears in dark mode", "my modal doesn't feel on top", "the text on our hero image is hard to read", "how do I put text on a photo", "should this be a border or a shadow", or any glassmorphism / frosted-panel request. If a diff contains a `box-shadow` with an X offset or an `rgba(0,0,0,…)` scrim, this skill owns it.
+description: Settles the actual values for depth — a named elevation scale with layered box-shadow specs, shadow colour derived from the surface, inset shadows for wells and pressed states, borders vs shadows vs surface-shift as three different depth signals, dark-mode depth where shadows stop working, and text over photography with a *computed* contrast guarantee rather than an eyeballed one. Use this whenever the user is building or reviewing cards, modals, dropdowns, popovers, tooltips, sticky bars, drag states, hero sections, image banners, cover art, or anything with a `box-shadow`, `backdrop-filter` or gradient overlay — even if they never say "elevation", "shadow" or "depth". Also use it for symptoms like "the shadows look cheap/muddy/harsh", "this looks flat", "my dark-mode shadows have become glowing halos", "my modal doesn't feel on top", "the text on our hero image is hard to read", "how do I put text on a photo", "should this be a border or a shadow", or any glassmorphism / frosted-panel request. If a diff contains a `box-shadow` with an X offset or an `rgba(0,0,0,…)` scrim, this skill owns it. Use it alongside `color-and-theming`, which owns the dark surface ladder that replaces shadow when cards vanish on a dark background; this skill owns the shadows themselves and everything that sits over an image.
 ---
 
 # Depth and overlays
@@ -13,11 +13,13 @@ This skill settles two questions with numbers. **How far above the page is this 
 
 - Defining shadows for a design system, or auditing a codebase where every component invented its own.
 - Cards, panels, modals, dialogs, sheets, dropdowns, popovers, tooltips, toasts, sticky headers, FABs, drag ghosts — anything that must be understood as *above* something else.
-- "Looks flat", "looks cheap", "muddy", "harsh"; dark mode where cards vanish or shadows become halos.
+- "Looks flat", "looks cheap", "muddy", "harsh"; dark mode where shadows become glowing halos or stop doing anything at all. (Cards *vanishing* on a dark background is the surface ladder, which move 9 hands to `color-and-theming`.)
 - Text over photography, video, gradients, or user-uploaded/CMS imagery — heroes, cover images, card thumbnails with overlaid titles, article headers. Frosted-glass panels and translucent bars.
 - Deciding whether a boundary should be a border, a shadow, or a background step.
 
 Go elsewhere when: the question is **which colour the surfaces are** or the dark-theme surface ladder itself (`color-and-theming` — it owns the tokens, this skill owns the shadows that sit on them); **how much space** inside or around the elevated thing (`spacing-and-layout`); **which of eight states** a pressed control has and what else changes (`ui-signifiers-and-states` — this skill supplies the depth values for the pressed and dragging states it specifies); **how the elevation animates** on hover or open (`design-motion-principles`); whether the whole thing looks generic or AI-shaped (`taste-frontend-design`); **whether the eye lands in the right place** (`attention-and-hierarchy`). `ui-craft` routes the whole craft set.
+
+`design-motion-principles` and `taste-frontend-design` sit outside this set and may not be installed alongside it. Without them: transition elevation over 150–250ms with `ease-out` on hover and open, keep press feedback fast (~90ms, as in move 7 below), and let `attention-and-hierarchy`'s motion move decide whether the motion is worth spending at all.
 
 ## Decide first
 
@@ -41,7 +43,7 @@ The mechanism is worth knowing so you can apply it elsewhere. A shadow is a low-
 
 Two tests. **The kill test:** apply `* { box-shadow: none !important }`. If the layout becomes ambiguous — you can no longer tell what is on top of what — the shadows are load-bearing. If it just looks flatter and stays perfectly clear, they were decoration, and decoration that vanishes in forced-colors mode (move 8) at that. **The squint test:** blur a screenshot by 4px; if the shadow still reads as a distinct dark shape rather than a soft ground, it is too dark or too tight.
 
-**Tuning a new level without guessing:** set y-offset to roughly ¼ of the height you want the element to read as (a resting card `y: 1`, a modal `y: 6–8`); set blur to **2–3× the offset**, because blur is the variable that reads as *softness of the light* and soft is the default in every real interior; raise alpha until you can just perceive the lift, then back off one step — correct is **4–10%** per layer, not 20–40%; then add the contact and ambient layers from move 3.
+**Tuning a new level without guessing:** set y-offset to roughly ¼ of the height you want the element to read as (a resting card `y: 1`, a modal `y: 6–8`); set blur to **1.5–3× the offset**, because blur is the variable that reads as *softness of the light* and soft is the default in every real interior; raise alpha until you can just perceive the lift, then back off one step — correct is **4–10%** per layer at resting and floating levels, rising to at most **16%** on the widest layer of a modal or drag level, never 20–40%; then add the contact and ambient layers from move 3.
 
 How it fails: someone reaches for `0 4px 8px rgba(0,0,0,0.4)`. 40% alpha at 8px blur has a visible boundary, so every card gets a grey halo and the page reads as a stack of stickers.
 
@@ -74,7 +76,7 @@ box-shadow:
 
 **The geometry rules that make layering work:**
 
-- **Blur ≈ 1.5–3× the Y offset**, with the mid layer around 2× and the tight contact layer at the low end. Pair it with **negative spread ≈ −⅓ to −½ of the blur** on the wide layers: without the spread a 40px blur smears 20px out of *every* side and the element sits in fog; with it, the shadow stays under the element where gravity put it.
+- **Blur ≈ 1.5–3× the Y offset** on the body and ambient layers, with the body layer around 2×. The tight contact layer is the deliberate exception and sits *below* the range at **1–2×** — it stands for hard occlusion right where the element meets the page, not for soft light. Pair the range with **negative spread**: about **−¼ of the blur on the body layer and −⅓ on the widest ambient one**, so the pull-in grows with the reach. Without it a 40px blur smears 20px out of *every* side and the element sits in fog; with it, the shadow stays under the element where gravity put it. Dark mode runs less spread — −⅙ to −¼ — because there the shadow's job is separation and you want it to reach (move 9).
 - **No shadow above the element.** CSS Backgrounds 3 §6.1.2 specifies the blur as approximating a Gaussian with standard deviation equal to *half* the blur radius, centred on the shadow's edge — so a layer extends `blur/2` beyond its spread-adjusted rect, and its topmost pixel sits at `offsetY − spread − blur/2` below the element's top edge. Keep that **≥ 0** on the wide layers: `0 12px 20px -6px` gives `12 − (−6) − 10 = 8px`, safely below. The tight contact layer may bleed a pixel above — omnidirectional ambient occlusion is real and reads correctly.
 - **Alpha rises slowly, blur rises fast.** Across the 5-level scale in move 4, the widest layer's blur goes 4px → 56px (14×) while its alpha goes 5% → 16% (3×). Getting this backwards — dark shadows for high elevation — is exactly what "harsh" means.
 
@@ -262,7 +264,9 @@ What this skill owns is what happens to the shadows:
   --shadow-hsl: 222 60% 2%;          /* darker than the darkest surface, or it does nothing */
 
   /* Shadows stop meaning "height" and start meaning "separate from what is behind me".
-     Higher alpha, tighter blur, and only on things that genuinely overlay content. */
+     Alpha rises to 40–65% — four to five times the light-mode value — because the shadow
+     must now darken an already-dark surface; spread pulls in less so it reaches further;
+     layer count drops to two; and only things that genuinely overlay content get one. */
   --elevation-1: none;                                              /* surface step is enough */
   --elevation-3:
     0 4px 10px -2px hsl(var(--shadow-hsl) / 0.50),
@@ -307,7 +311,19 @@ Round up and treat those as floors. Two adjustments:
 - **Tinting the scrim costs you alpha.** Black is the most efficient scrim per unit of image dulled. A dark navy `#0B1B34` needs **α ≈ 0.60** to reach the same 4.5:1 that black reaches at 0.55, because the scrim's own luminance adds back in. Recompute for any non-black scrim rather than assuming.
 - **Off-white text costs you alpha too.** These assume pure `#FFFFFF`. `#F5F5F5` pushes the 4.5:1 floor to about 0.56. Keep text over imagery pure white, or recompute.
 
-**The failure case nobody handles: the image does not load.** A black gradient scrim over a container with no background is transparent-over-white when the `<img>` 404s, is still decoding, or is blocked. White headline, white background, zero contrast. **Set the container's `background-color` to a dark colour** — the brand's darkest surface, or a server-extracted dominant colour — so failure degrades to legible rather than to blank.
+**The failure case nobody handles: the image does not load.** A black gradient scrim over a container with no background is transparent-over-white when the `<img>` 404s, is still decoding, or is blocked. White headline, white background, zero contrast. **Set the container's `background-color` to a dark colour**, so failure degrades to legible rather than to blank.
+
+That colour is a token this skill owns, because its job is a contrast guarantee rather than a palette decision: it must clear the text floor *on its own*, with no image and no scrim.
+
+```css
+:root {
+  /* The ground under any image. Alias it to your palette's darkest surface if
+     you have one; the literal is here so this works before you do. */
+  --image-ground: #15171C;   /* 17.9:1 against #FFFFFF — passes with the scrim removed */
+}
+```
+
+Any dark value works provided it is at or below the `#767676` ceiling in the table above; a server-extracted dominant colour is better still, darkened to that ceiling first (`references/text-over-imagery.md` §4). Use `var(--image-ground, #15171C)` at the point of use — this one declaration is load-bearing, and an undefined custom property in `background-color` is invalid at computed-value time, which resolves to `transparent` and reinstates the exact bug.
 
 ### 11. Gradient scrims: the geometry and the two banding artefacts — *craft*
 
@@ -370,7 +386,7 @@ The modern alternative to a scrim is a translucent panel that blurs what is behi
 /* User asked for less transparency. Honour it — but see the caveat below. */
 @media (prefers-reduced-transparency: reduce) {
   .glass {
-    background-color: var(--color-surface-inverse);
+    background-color: var(--image-ground, #15171C);   /* opaque, and still 4.5:1 under white text */
     -webkit-backdrop-filter: none; backdrop-filter: none;
   }
 }
@@ -410,8 +426,8 @@ What is wrong, itemised: an **X offset** nothing else in the system has (move 2)
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  background-color: var(--color-surface-inverse);   /* legible if the image never arrives */
+  border-radius: 12px;                              /* your system's card radius */
+  background-color: var(--image-ground, #15171C);   /* legible if the image never arrives */
   box-shadow: var(--elevation-2);
   border: 1px solid var(--color-border-subtle);     /* survives forced-colors and dark mode */
 }
@@ -462,7 +478,7 @@ Run against the screen or the PR diff.
 
 - [ ] Every `box-shadow` in the diff comes from an elevation token; no literals in components.
 - [ ] Every shadow offsets on Y only — or every shadow shares one declared X sign and ratio.
-- [ ] Every level above 0 has ≥2 layers, blur ≈ 2–3× the offset, negative spread on the wide layers, and per-layer alpha in the 4–16% range in light mode.
+- [ ] Every level above 0 has ≥2 layers; blur ≈ 1.5–3× the offset on the body and ambient layers (the tight contact layer runs at 1–2×); negative spread ≈ −¼ of the blur on the body layer and ≈ −⅓ on the widest ambient one; light-mode per-layer alpha 4–10% at levels 1–3, and no more than 16% on the widest layer of levels 4–5. Dark mode runs its own numbers — alpha 40–65%, spread −⅙ to −¼ (move 9).
 - [ ] Shadow colour comes from `--shadow-hsl` at lightness ~10–14%, not `rgba(0,0,0,…)`; saturated sections override it.
 - [ ] Elevation order matches z-index order — the modal outranks the popover, which outranks the card.
 - [ ] The elevation sheet has been rendered on white, page, sunken, the brand blocks, a photo, and the dark base.
@@ -470,7 +486,7 @@ Run against the screen or the PR diff.
 - [ ] Every shadow-only container also has a border, or a `@media (forced-colors: active)` rule that gives it one (`box-shadow`, `text-shadow` and gradients are all forced to `none` there).
 - [ ] Text over imagery: the scrim's minimum alpha across the **whole text band** meets the computed floor — **0.55** black for 4.5:1 body, **0.45** for 3:1 large text; recomputed if the scrim is tinted or the text is not pure white (WCAG 1.4.3).
 - [ ] Verified by screenshotting over a **pure white** test image and sampling under the glyphs, not by eye on the art-directed photo.
-- [ ] The image container has a dark `background-color`, so a failed or slow image still leaves legible text.
+- [ ] The image container has a dark `background-color` (`--image-ground`, or a darkened extracted colour) that clears the text floor with the scrim removed, so a failed or slow image still leaves legible text — and every `var()` on that declaration carries a literal fallback, since an undefined custom property resolves to `transparent`.
 - [ ] Gradient scrims use a multi-stop eased ramp (no Mach band at the top edge), an explicit `rgb(0 0 0 / 0)` terminal stop, and a noise overlay if quantisation banding shows on flat areas.
 - [ ] `backdrop-filter` panels carry contrast in the tint, ship `-webkit-`, have an `@supports` fallback that raises the tint, honour `prefers-reduced-transparency` without depending on it, and are not full-viewport behind a scroll region. Profiled on a low-end device.
 - [ ] Focus rings on elevated surfaces clear 3:1 against the surface they land on (WCAG 1.4.11) — including over a scrim on a photo.

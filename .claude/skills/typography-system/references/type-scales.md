@@ -34,7 +34,7 @@ distinct at a glance.
 
 ## B. Product / app default — the general-purpose scale
 
-The scale in SKILL.md, repeated here for completeness. Nine usable steps; body 16px; the range covers dense
+The scale in SKILL.md, repeated here for completeness. Eleven steps; body 16px; the range covers dense
 tables through to a marketing-ish empty state without a second scale.
 
 ```css

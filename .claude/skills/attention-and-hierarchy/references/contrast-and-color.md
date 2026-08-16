@@ -1,8 +1,33 @@
 # Contrast and colour as hierarchy
 
-Read this when building or auditing a palette, adding a dark theme, choosing chart colours, fixing focus
-indicators, or preparing for an accessibility review. The framing throughout: contrast is the only part of
-visual hierarchy you can compute, so it is the part you can put in CI and stop arguing about.
+Contrast is the only part of visual hierarchy you can compute, which makes it the part you can put in CI and
+stop arguing about. This file is the argument: why a luminance difference is read before anything else on a
+screen, what the standard actually requires, and how to spend the headroom above the floor as *rank* rather
+than as compliance.
+
+It deliberately ships no palette. Ramp values, semantic tokens and both themes belong to `color-and-theming`;
+focus-ring specs and the rest of the state matrix to `ui-signifiers-and-states`; chart and categorical palettes
+to `dataviz`. Take the reasoning from here and the numbers from there — one set of values, in one place.
+
+**Read this when** you are ranking things by contrast, arguing about whether a grey is legible, preparing for
+an accessibility review, or deciding what a colour is allowed to mean.
+
+## Why contrast steers the eye at all
+
+The visual system does not measure absolute lightness; it measures differences. Early visual processing is
+built on centre–surround comparison, so what reaches attention is edges and ratios rather than values. This is
+why the same grey reads as light on a dark card and dark on a white one, and why a contrast ratio is
+meaningless until you name the surface behind it.
+
+Two consequences run through everything below.
+
+- **Luminance difference is preattentive** — intensity is one of the features resolved in parallel across the
+  whole field (move 1 in SKILL.md). A block of text one clear step darker than its neighbours is ranked before
+  a single word is decoded. It is the fastest hierarchy channel you have, and it costs no space and no extra
+  mark on the screen.
+- **It is therefore zero-sum, like every salience channel.** Rank is carried by the *gaps* between your levels,
+  not by how dark the darkest one is. Push every level towards maximum and you have spent the channel and
+  ranked nothing.
 
 ## What the standard actually requires
 
@@ -27,43 +52,26 @@ Two exemptions people misread:
   explains why it can't proceed beats a grey ghost the user cannot diagnose.
 - **1.4.11 applies to boundaries *required to identify* the component**, not to every line you draw. An input
   field whose border is the only thing marking it as an input needs 3:1. A hairline divider inside a card that
-  is already identifiable is decorative and exempt. This is why `#E5E7EB` on white (1.24:1) is fine as a
-  divider and a failure as an input outline.
+  is already identifiable is decorative and exempt. This is why a 1.2:1 hairline is fine as a divider and a
+  failure as an input outline.
 
-## Build a text ramp that is both compliant and hierarchical
+## Three text levels, and the quietest one still passes
 
-Define exactly three text levels. The constraint that makes it work: **the quietest level still passes 4.5:1**.
-If you need a fourth level of quiet, the screen has too much on it — delete or defer instead.
+Define exactly three levels of text — primary, secondary, muted — and hold one constraint: **the quietest
+level still clears 4.5:1 on every surface it can land on.** Three is not arbitrary. It is about as many steps
+as a reader ranks reliably from lightness alone without measuring, and a fourth level always ends up below the
+floor. If you need a fourth degree of quiet, the screen has too much on it — delete or defer instead.
 
-Light theme on `#FFFFFF`:
+Two rules make the ladder real rather than nominal:
 
-```
---text-primary:   #111827   17.7:1   headings, values, anything read carefully
---text-secondary: #4B5563    7.6:1   body copy, descriptions
---text-muted:     #6B7280    4.8:1   labels, timestamps, help text — the floor
-```
+- **Check each text level against every surface it appears on**, not just the page background. Muted text
+  measured only against white is the classic false pass: the same value on a tinted card, a well or a hover
+  row drops below 4.5:1 while the audit still reports green.
+- **Make the steps unmistakable.** If primary and secondary differ by half a step, you have three tokens and
+  one rank. Auditors read ratios; users read gaps.
 
-`#9CA3AF` on white is **2.5:1** and fails. It is the most-shipped contrast failure in modern UI, because it
-looks correct to a designer on a calibrated display in a dark room and disappears on a laptop in a café.
-
-Dark theme on `#0B0F19`:
-
-```
---text-primary:   #F9FAFB   18.3:1
---text-secondary: #D1D5DB   13.0:1
---text-muted:     #9CA3AF    7.5:1
-```
-
-Note what happened: `#9CA3AF` fails in light mode (2.5:1) and passes comfortably in dark (7.5:1), while
-`#4B5563` passes in light (7.6:1) and fails in dark (2.5:1). **A dark theme is a second design, not a token
-inversion.** Check both.
-
-Two dark-mode craft notes that are not in the spec but matter:
-
-- Avoid pure `#FFFFFF` on pure `#000000`. Maximum contrast on large text areas produces halation for many
-  readers, especially with astigmatism. Near-black surface, near-white text.
-- Saturated colours that worked on white look neon on near-black. Desaturate and lighten: `#2563EB` reads well
-  on white (5.2:1) but wants `#60A5FA` (7.5:1 on `#0B0F19`) in dark.
+The measured values for all three levels, in both themes, with the surfaces each is guaranteed against:
+`color-and-theming` and `color-and-theming/references/palette-tokens.md`.
 
 ## Do not chase AAA everywhere
 
@@ -73,6 +81,14 @@ secondary, secondary clearly darker than muted, and the gaps large enough to be 
 
 Where AAA genuinely earns its place: long-form reading, medical and financial figures, anything read under bad
 conditions, anything an older audience uses. Apply it to those surfaces, not as a global rule.
+
+## A dark theme re-ranks the ladder
+
+Rank order does not survive inversion. Contrast against a near-black surface does not mirror contrast against
+white, so the levels reshuffle rather than swap: a grey that fails badly as muted text in light mode can be
+comfortably readable in dark, and a grey that carries secondary text in light can fail outright in dark. **A
+dark theme is a second design, not a token inversion** — audit the ladder twice, as two ladders. How to
+re-derive the ramp for dark instead of inverting it is `color-and-theming`'s move on dark mode.
 
 ## Never let colour carry meaning alone
 
@@ -103,50 +119,22 @@ Specific places colour-only encoding hides:
   `required` / `aria-required`.
 - **Links in body text.** A blue word among black words is colour-only. Underline it, or ensure ≥3:1 against
   the surrounding text *and* add a non-colour cue on hover and focus (WCAG technique G183).
-- **Charts.** Multi-series line charts distinguished only by hue. Use direct labels at the line ends, distinct
-  markers, or dash patterns. For categorical series, vary lightness as well as hue so the set survives
-  greyscale.
+- **Charts.** Multi-series lines distinguished only by hue. Use direct labels at the line ends, distinct
+  markers, or dash patterns, and vary lightness as well as hue so the set survives greyscale. For sequential
+  data, a ramp that is monotonic in lightness (viridis, cividis) survives greyscale and most CVD types where a
+  red-to-green ramp does not. Series palettes and their construction: `dataviz`.
 - **Diffs and status tables.** Add `+`/`−`, or an icon column, or a text status word.
-- **Maps and heatmaps.** Use a sequential ramp that is monotonic in lightness, so it survives greyscale and
-  most CVD types. Viridis and Cividis are built for this; red-to-green ramps are the classic failure.
+- **Maps and heatmaps.** Same rule as charts — lightness must do the work hue is getting credit for.
 
-## Focus indicators
+## Focus is the keyboard user's hierarchy
 
-Keyboard focus is a hierarchy problem as much as a compliance one — it is the "you are here" of non-mouse
-navigation, and `outline: none` with no replacement is the single most damaging line of CSS in frontend.
-
-```css
-/* Visible on any background, and only for keyboard interaction */
-:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-  border-radius: inherit;
-}
-```
-
-- The ring needs ≥3:1 against the adjacent background (1.4.11). A single ring colour rarely achieves this on
-  both light and dark surfaces — either define a per-theme token, or use a two-tone ring (a dark outline with a
-  light `box-shadow` halo, or vice versa) so one of the two always contrasts.
-- Use `:focus-visible`, not `:focus`, so mouse users don't see rings on click while keyboard users keep them.
-- `outline-offset` matters: an outline flush against a filled button is much harder to see than one with 2px of
-  breathing room.
-- Check that sticky headers and footers do not cover the focused element when tabbing (2.4.11).
-
-## Colour tokens that stay honest
-
-Structure the palette so that misuse is visible in code review:
-
-- **Separate role tokens from palette tokens.** `--color-blue-600` is a palette value; `--color-action` is a
-  role. Components reference roles only. This is what lets you reserve the brand colour for interactive
-  elements — the rule from move 1 in SKILL.md — and detect violations by grepping for palette tokens in
-  component files.
-- **Status colours come in pairs**: a text/icon value that passes 4.5:1 on the surface, and a background wash
-  that the text passes against. `#16A34A` is 3.3:1 on white — usable as a 3:1 graphical mark or large text,
-  not as body text. Success *text* needs a darker green.
-- **Amber is a trap.** `#F59E0B` is 2.15:1 on white. Warning text in amber almost always fails; use a dark
-  amber for the text and reserve the bright value for the icon or the fill.
-- **Document the reserved colour.** One colour means "act here". If it also means "brand" and "chart series 1"
-  and "selected row", it means nothing.
+Everything above assumes the eye chooses where to go. For a keyboard user the focus ring *is* the eye, and
+`outline: none` with no replacement deletes the hierarchy entirely for that user — the single most damaging
+line of CSS in frontend. Two facts that are hierarchy problems rather than styling ones: the ring must clear
+3:1 against whatever sits behind it *at the moment it renders* (1.4.11), which one ring colour rarely manages
+on both light and dark surfaces; and the focused element must not be covered by a sticky header or footer as
+the user tabs (2.4.11). The ring CSS, the two-tone construction that survives both themes, and the other nine
+states: `ui-signifiers-and-states`.
 
 ## Checking it automatically
 
@@ -158,26 +146,21 @@ Structure the palette so that misuse is visible in code review:
   alternatives. Automated tools catch roughly a third of real accessibility issues — they are a floor and a
   regression guard, not an audit.
 - **On the palette itself:** compute ratios for every text-token × surface-token pair as a unit test, so a
-  palette change cannot silently break a theme. The relative-luminance formula is short enough to inline:
-
-  ```js
-  const lin = c => (c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-  const ratio = (a, b) => {
-    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
-    return (x + 0.05) / (y + 0.05);
-  };
-  ```
+  palette change cannot silently break a theme. A runnable version, with the luminance formula and the fixture
+  covering both themes, is in `color-and-theming/references/palette-tokens.md` under "The contrast unit test" —
+  use that one rather than writing a second.
 - **By hand:** the one check worth doing manually every time is the *lightest text on the lightest surface* in
-  each theme. That pair is where the failure lives.
+  each theme. That pair is where the failure lives, and it is the pair a page-level automated sweep misses when
+  the combination does not happen to render on the page it crawled.
 
 ## The APCA caveat
 
 The WCAG 2.x ratio is a simple luminance formula and is known to misjudge some real-world legibility —
 particularly light-on-dark pairs and very thin or very large type. APCA (Accessible Perceptual Contrast
-Algorithm) models this better and is a candidate method being developed for WCAG 3.
+Algorithm) models this better and is a candidate method for WCAG 3, not a conformance standard;
+`color-and-theming` tracks its current standards status.
 
 The practical position: **WCAG 2.x is what is legally enforced and what auditors test against, so meet it.**
-Use APCA, if you use it, as a supplementary signal that catches things 2.x misses — not as a justification for
-shipping something that fails 2.x. And in either case, look at the screen in dark mode with your own eyes; both
-formulas are proxies for a judgement neither of them fully captures.
+Use APCA, if you use it, as a supplementary signal that catches things 2.x misses — never as a justification
+for shipping something that fails 2.x. And in either case, look at the screen in dark mode with your own eyes;
+both formulas are proxies for a judgement neither of them fully captures.
