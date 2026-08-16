@@ -253,7 +253,10 @@ p{margin:0}
   text-transform:uppercase; letter-spacing:.03em; line-height:1.1}
 .chip span{display:block; font-family:var(--f-quote); font-style:italic; font-size:.72rem;
   color:var(--smoke)}
+.chip b small{font-family:var(--f-body); font-weight:600; font-size:.56rem; letter-spacing:.1em;
+  color:var(--amber); margin-left:4px; vertical-align:.1em}
 .chip[aria-pressed="true"]{background:var(--amber); border-color:var(--amber); color:#241A05}
+.chip[aria-pressed="true"] b small{color:#3D2C06}
 .chip[aria-pressed="true"] span{color:#5A4410}
 .chip:disabled{opacity:.34}
 
@@ -500,17 +503,30 @@ function vTonight(){
    December 2024 menu. null means the kitchen does not serve that combination. */
 const FMTS=[["Regular","with fries"],["Large","bigger plate"],["Caesar salad","on salad"],
             ["Sandwich","in a bun"],["Wrap","rolled"],["Kapsalon","over fries"]];
+/* An array is a box the printed menu lists twice, small and large. */
 const CUTS=[
-  {en:"Chicken",         pap:"Galiña",   p:[19,28,21,15,19,22]},
+  {en:"Chicken",         pap:"Galiña",   p:[[19,23],28,21,15,19,[22,34]]},
   {en:"Pork chop",       pap:"Pòrkchòp", p:[20,29,22,16,null,null]},
-  {en:"Steak",           pap:"Steak",    p:[21,32,23,17,21,24]},
+  {en:"Steak",           pap:"Steak",    p:[21,32,23,17,21,[24,38]]},
   {en:"Ribs",            pap:"Ribs",     p:[22,32,24,18,null,null]},
-  {en:"Beef tenderloin", pap:"Lomitu",   p:[28,37,28,23,24,33]},
+  {en:"Beef tenderloin", pap:"Lomitu",   p:[28,37,28,23,24,[33,43]]},
   {en:"Picanha",         pap:"Picanha",  p:[null,37,37,29,null,43]}
 ];
+function options(ci){
+  const out=[];
+  CUTS[ci].p.forEach((v,i)=>{
+    if(v==null){ out.push({key:"f"+i, i, size:null, price:null}); return; }
+    if(Array.isArray(v)){
+      out.push({key:"f"+i+"s", i, size:"small", price:v[0]});
+      out.push({key:"f"+i+"l", i, size:"large", price:v[1]});
+    } else out.push({key:"f"+i, i, size:null, price:v});
+  });
+  return out;
+}
 function vOrder(st){
-  const ci=st.cut??2, fi=st.fmt??0, s=fireState();
-  const price=CUTS[ci].p[fi];
+  const ci=st.cut??2, s=fireState();
+  const opts=options(ci);
+  const active=opts.find(o=>o.key===st.fmt && o.price!=null) || opts.find(o=>o.price!=null);
   return `<div class="appbar"><div><h2>Òrdena</h2><span class="sub">step 2 of 4</span></div></div>
     <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=2?"on":""}"></i>`).join("")}</div>
     <p class="qline">Ki karni?</p><p class="qsub">which cut</p>
@@ -521,14 +537,13 @@ function vOrder(st){
     <hr class="hr">
     <p class="qline">Kon bo ke?</p><p class="qsub">how do you want it</p>
     <div class="grid2" data-set="fmt">
-      ${FMTS.map((f,i)=>{
-        const v=CUTS[ci].p[i];
-        return `<button class="chip" ${v==null?"disabled":""} aria-pressed="${i===fi&&v!=null}" data-i="${i}">
-          <b>${f[0]}</b><span>${v==null?"not served":"Cg "+v}</span></button>`;
-      }).join("")}
+      ${opts.map(o=>`<button class="chip" ${o.price==null?"disabled":""}
+        aria-pressed="${o.key===active?.key}" data-k="${o.key}">
+        <b>${FMTS[o.i][0]}${o.size?` <small>${o.size}</small>`:""}</b>
+        <span>${o.price==null?"not served":"Cg "+o.price}</span></button>`).join("")}
     </div>
     <div class="bar">
-      <div class="bl"><b>Cg ${price??"-"}</b><span>ready ${clock(s.t.mins+s.fire)}, ${s.fire} min</span></div>
+      <div class="bl"><b>Cg ${active?.price ?? "-"}</b><span>ready ${clock(s.t.mins+s.fire)}, ${s.fire} min</span></div>
       <button class="btn btn-hot btn-sm" data-go="ticket">Batata o pan?${ICONS.arrowR}</button>
     </div>`;
 }
@@ -675,12 +690,13 @@ function phone(slot,idx){
     if(go){ show(go.dataset.go); return; }
     const chip=e.target.closest(".chip:not(:disabled)");
     if(chip){
-      const i=+chip.dataset.i;
       if(chip.parentElement.dataset.set==="cut"){
-        state.cut=i;
-        // keep the chosen format if this cut still does it, otherwise fall back
-        if(CUTS[i].p[state.fmt??0]==null) state.fmt=CUTS[i].p.findIndex(v=>v!=null);
-      } else state.fmt=i;
+        state.cut=+chip.dataset.i;
+        // keep the chosen box if this cut still does it, otherwise fall back
+        const opts=options(state.cut);
+        if(!opts.some(o=>o.key===state.fmt && o.price!=null))
+          state.fmt=(opts.find(o=>o.price!=null)||{}).key;
+      } else state.fmt=chip.dataset.k;
       show("order");
       return;
     }

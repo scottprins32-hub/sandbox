@@ -323,7 +323,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
   margin-top:auto; letter-spacing:.03em}
 
 /* -------------------------------------------------------------------- visit */
-.visit{display:grid; grid-template-columns:1fr 1fr; gap:var(--s9); align-items:start}
+.visit{display:grid; grid-template-columns:1fr 1fr; gap:var(--s9); align-items:stretch}
 .hours{width:100%; border-collapse:collapse}
 .hours th{text-align:left; font-weight:500; font-size:.92rem; color:var(--bone-2);
   padding:11px 0; border-bottom:1px solid var(--line)}
@@ -343,8 +343,11 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 .contact b{display:block; font-size:.96rem; font-weight:600}
 .contact span{display:block; font-size:.75rem; color:var(--smoke)}
 .contact .go{margin-left:auto; color:var(--smoke); font-size:1rem}
-.visit-fig{border-radius:16px; overflow:hidden; aspect-ratio:16/10}
-.visit-fig img{width:100%; height:100%; object-fit:cover}
+/* min-width:0 matters: a grid item defaults to min-width:auto, so without it the
+   figure sizes to the photograph's intrinsic width and blows out the column. */
+.visit-fig{border-radius:16px; overflow:hidden; min-height:clamp(280px,32vw,460px);
+  margin:0; width:100%; min-width:0}
+.visit-fig img{width:100%; height:100%; object-fit:cover; object-position:50% 42%}
 
 /* ------------------------------------------------------------------- footer */
 .ft{border-top:1px solid var(--line); padding-block:var(--s8) var(--s6)}

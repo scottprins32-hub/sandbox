@@ -115,6 +115,9 @@ p{margin:0}
 .opt:hover:not(:disabled){border-color:var(--bone-2)}
 .opt b{display:block; font-family:var(--f-display); font-weight:800; font-size:1.12rem;
   text-transform:uppercase; letter-spacing:.03em; line-height:1.08}
+.opt b small{font-family:var(--f-body); font-weight:600; font-size:.6rem; letter-spacing:.11em;
+  color:var(--amber); margin-left:5px; vertical-align:.1em}
+.opt[aria-pressed="true"] b small{color:#3D2C06}
 .opt span{display:block; font-family:var(--f-quote); font-style:italic; font-size:.76rem;
   color:var(--smoke); margin-top:1px}
 .opt u{display:block; text-decoration:none; font-size:.72rem; font-weight:600; color:var(--bone-2);
@@ -140,9 +143,20 @@ p{margin:0}
   resize:vertical}
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
 
+/* The window repeats your order back before it goes on the coals. So does this,
+   and it gives the pane something to say on the shorter steps. */
+.readback{margin:auto 22px 0; padding:18px 20px; border:1px solid var(--line);
+  border-radius:14px; background:var(--card-2)}
+.readback h4{margin:0 0 10px; font-family:var(--f-body); font-size:.63rem; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--smoke)}
+.readback p{font-family:var(--f-quote); font-style:italic; font-size:clamp(1.15rem,1.9vw,1.5rem);
+  line-height:1.35; color:var(--bone); letter-spacing:-.01em}
+.readback .bits{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; padding-top:12px;
+  border-top:1px solid var(--line); font-size:.78rem; color:var(--smoke)}
+.readback .bits b{color:var(--bone-2); font-weight:600; font-variant-numeric:tabular-nums}
 .step-foot{display:flex; align-items:center; justify-content:space-between; gap:14px;
   padding:16px 22px; border-top:1px solid var(--line); background:var(--card-2); flex-wrap:wrap;
-  margin-top:auto}
+  margin-top:20px}
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:9px; font-weight:600;
   font-size:.9rem; padding:12px 20px; border-radius:12px;
   transition:background .25s, border-color .25s, transform .2s var(--ease), opacity .2s}
@@ -358,6 +372,8 @@ p{margin:0}
           </div>
         </div>
 
+        <div class="readback" id="readback"></div>
+
         <div class="step-foot">
           <button class="btn btn-quiet" id="back"><svg class="ic" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228,128a12,12,0,0,1-12,12H69l51.52,51.51a12,12,0,0,1-17,17l-72-72a12,12,0,0,1,0-17l72-72a12,12,0,0,1,17,17L69,116H216A12,12,0,0,1,228,128Z"/></svg>Back</button>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
@@ -474,21 +490,22 @@ const FORMATS=[
  {id:"wrap",    en:"Wrap",         pap:"Wrap",         sub:"rolled"},
  {id:"kapsalon",en:"Kapsalon",     pap:"Kapsalon",     sub:"over fries"}
 ];
+/* An array means the printed menu lists a small and a large for that box. */
 const CUTS=[
  {id:"chicken", tier:"basic",  en:"Chicken",         pap:"Galiña",
-  p:{regular:19,large:28,caesar:21,plain:17,sandwich:15,wrap:19,kapsalon:22}},
+  p:{regular:[19,23],large:28,caesar:21,plain:[17,25],sandwich:15,wrap:19,kapsalon:[22,34]}},
  {id:"porkchop",tier:"basic",  en:"Pork chop",       pap:"Pòrkchòp",
-  p:{regular:20,large:29,caesar:22,plain:18,sandwich:16,wrap:null,kapsalon:null}},
+  p:{regular:20,large:29,caesar:22,plain:[18,26],sandwich:16,wrap:null,kapsalon:null}},
  {id:"chorizo", tier:"basic",  en:"Chorizo",         pap:"Chorizo",
-  p:{regular:21,large:30,caesar:23,plain:19,sandwich:17,wrap:null,kapsalon:null}},
+  p:{regular:21,large:30,caesar:23,plain:[19,27],sandwich:17,wrap:null,kapsalon:null}},
  {id:"steak",   tier:"basic",  en:"Steak",           pap:"Steak",
-  p:{regular:21,large:32,caesar:23,plain:19,sandwich:17,wrap:21,kapsalon:24}},
+  p:{regular:21,large:32,caesar:23,plain:[19,27],sandwich:17,wrap:21,kapsalon:[24,38]}},
  {id:"ribs",    tier:"basic",  en:"Ribs",            pap:"Ribs",
-  p:{regular:22,large:32,caesar:24,plain:20,sandwich:18,wrap:null,kapsalon:null}},
+  p:{regular:22,large:32,caesar:24,plain:[20,30],sandwich:18,wrap:null,kapsalon:null}},
  {id:"shrimps", tier:"premium",en:"Shrimps",         pap:"Kamaron",
   p:{regular:24,large:33,caesar:33,plain:30,sandwich:25,wrap:27,kapsalon:null}},
  {id:"lomitu",  tier:"premium",en:"Beef tenderloin", pap:"Lomitu",
-  p:{regular:28,large:37,caesar:28,plain:25,sandwich:23,wrap:24,kapsalon:33}},
+  p:{regular:28,large:37,caesar:28,plain:25,sandwich:23,wrap:24,kapsalon:[33,43]}},
  {id:"carco",   tier:"premium",en:"Conch",           pap:"Karkó",
   p:{regular:null,large:33,caesar:33,plain:30,sandwich:25,wrap:null,kapsalon:null}},
  {id:"picanha", tier:"premium",en:"Picanha",         pap:"Picanha",
@@ -550,14 +567,42 @@ const S={step:0, cut:"steak", fmt:"regular", side:"batata", half:null,
          sauces:new Set(["pika"]), prefs:new Set(), cart:[], cur:"cg",
          where:"window", when:"now", pay:"card"};
 const cut =()=>CUTS.find(c=>c.id===S.cut);
-const fmt =()=>FORMATS.find(f=>f.id===S.fmt);
+/* One button per orderable box. A format the menu prints twice becomes two
+   options, small and large, rather than quietly losing the large. */
+function options(c){
+  const out=[];
+  FORMATS.forEach(f=>{
+    const v=c.p[f.id];
+    if(v==null){ out.push({key:f.id, f, size:null, price:null}); return; }
+    if(Array.isArray(v)){
+      out.push({key:f.id+":s", f, size:"small", price:v[0]});
+      out.push({key:f.id+":l", f, size:"large", price:v[1]});
+    } else out.push({key:f.id, f, size:null, price:v});
+  });
+  return out;
+}
+const optOf=(c,key)=>options(c).find(o=>o.key===key) || null;
+const label=(cutId,key)=>{
+  const o=optOf(CUTS.find(c=>c.id===cutId), key);
+  if(!o) return key;
+  return o.size ? `${o.f.en.toLowerCase()} (${o.size})` : o.f.en.toLowerCase();
+};
 const base=()=>{
-  const c=cut(); let v=c.p[S.fmt] ?? 0;
-  if(S.half){ const o=CUTS.find(x=>x.id===S.half); v=Math.max(v, o.p[S.fmt] ?? 0) + 3; }
+  let v=optOf(cut(), S.fmt)?.price ?? 0;
+  if(S.half){
+    const oh=optOf(CUTS.find(x=>x.id===S.half), S.fmt);
+    v=Math.max(v, oh?.price ?? 0) + 3;
+  }
   v += SIDES.find(s=>s.id===S.side)?.d || 0;
   if(S.prefs.has("extra")) v += 4;
   return v;
 };
+function keepFormat(){          // after a cut change, land on something orderable
+  if(optOf(cut(), S.fmt)?.price == null){
+    S.fmt = (options(cut()).find(o=>o.price!=null) || {}).key ?? null;
+  }
+  if(S.half && optOf(CUTS.find(x=>x.id===S.half), S.fmt)?.price == null) S.half=null;
+}
 const money=(v,cur=S.cur)=> cur==="usd" ? "USD "+(v/USD).toFixed(2) : "Cg "+v;
 
 /* ------------------------------------------------------------------ steps */
@@ -577,7 +622,7 @@ function drawCuts(){
   ["basic","premium"].forEach(tr=>{
     out+=`<p class="grp-l">${tr==="basic"?"Basic":"Premium"}</p><div class="opts">`;
     out+=CUTS.filter(c=>c.tier===tr).map(c=>{
-      const from=Math.min(...Object.values(c.p).filter(v=>v!=null));
+      const from=Math.min(...Object.values(c.p).flat().filter(v=>v!=null));
       return `<button class="opt" data-cut="${c.id}" aria-pressed="${c.id===S.cut}">
         <b>${c.en}</b><span>${c.pap}</span><u>from Cg ${from}</u></button>`;
     }).join("");
@@ -587,11 +632,12 @@ function drawCuts(){
 }
 function drawFmts(){
   const c=cut();
-  $("#fmts").innerHTML=FORMATS.map(f=>{
-    const v=c.p[f.id];
-    return `<button class="opt" data-fmt="${f.id}" ${v==null?"disabled":""}
-      aria-pressed="${f.id===S.fmt && v!=null}">
-      <b>${f.en}</b><span>${f.pap}</span><u>${v==null?"not served":"Cg "+v}</u></button>`;
+  $("#fmts").innerHTML=options(c).map(o=>{
+    const off=o.price==null;
+    return `<button class="opt" data-fmt="${o.key}" ${off?"disabled":""}
+      aria-pressed="${o.key===S.fmt && !off}">
+      <b>${o.f.en}${o.size?` <small>${o.size}</small>`:""}</b><span>${o.f.pap}</span>
+      <u>${off?"not served":"Cg "+o.price}</u></button>`;
   }).join("");
   const missing=FORMATS.filter(f=>c.p[f.id]==null).map(f=>f.en.toLowerCase());
   $("#fmtHint").textContent = missing.length
@@ -602,7 +648,7 @@ function drawSides(){
   $("#sides").innerHTML=SIDES.map(s=>
     `<button class="opt" data-side="${s.id}" aria-pressed="${s.id===S.side}">
       <b>${s.en}</b><span>${s.sub}</span>${s.d?`<u>plus Cg ${s.d}</u>`:""}</button>`).join("");
-  $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && c.p[S.fmt]!=null).map(c=>
+  $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && optOf(c,S.fmt)?.price!=null).map(c=>
     `<button class="opt" data-half="${c.id}" aria-pressed="${c.id===S.half}">
       <b>${c.en}</b><span>${c.pap}</span><u>plus Cg 3</u></button>`).join("")
     || `<p class="body" style="font-size:.86rem">No second cut works in this format.</p>`;
@@ -632,7 +678,7 @@ function drawCart(){
     box.innerHTML=`<p class="cart-empty">Nothing on the ticket yet.<br>Pick a cut to start.</p>`;
   }else{
     box.innerHTML=S.cart.map((it,i)=>`<div class="line">
-      <b>${CUTS.find(c=>c.id===it.cut).en}, ${FORMATS.find(f=>f.id===it.fmt).en.toLowerCase()}</b>
+      <b>${CUTS.find(c=>c.id===it.cut).en}, ${label(it.cut,it.fmt)}</b>
       <em class="num">${money(it.price*it.qty)}</em>
       <span class="mods">${describe(it)}</span>
       <span class="line-act">
@@ -730,14 +776,11 @@ document.addEventListener("click",e=>{
   if(s){ S.step=+s.dataset.s; render(); return; }
 
   const c=e.target.closest("[data-cut]");
-  if(c){ S.cut=c.dataset.cut;
-    if(cut().p[S.fmt]==null) S.fmt=FORMATS.find(f=>cut().p[f.id]!=null).id;
-    if(S.half && CUTS.find(x=>x.id===S.half).p[S.fmt]==null) S.half=null;
-    render(); return; }
+  if(c){ S.cut=c.dataset.cut; keepFormat(); render(); return; }
 
   const f=e.target.closest("[data-fmt]:not(:disabled)");
   if(f){ S.fmt=f.dataset.fmt;
-    if(S.half && CUTS.find(x=>x.id===S.half).p[S.fmt]==null) S.half=null;
+    if(S.half && optOf(CUTS.find(x=>x.id===S.half), S.fmt)?.price==null) S.half=null;
     render(); return; }
 
   const sd=e.target.closest("[data-side]");
@@ -777,6 +820,7 @@ document.addEventListener("click",e=>{
   if(del){ S.cart.splice(+del.dataset.del,1); drawCart(); return; }
 });
 
+$("#note").addEventListener("input",drawReadback);
 $("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; render();} });
 $("#next").addEventListener("click",()=>{
   if(S.step<3){ S.step++; render(); return; }
@@ -795,10 +839,36 @@ $("#place").addEventListener("click",()=>{
     `Concept only, nothing is charged. In production this would drop ${n} item${n===1?"":"s"} onto the rail below as ticket F-044.`;
 });
 
+/* Read the plate back the way the hatch would say it, in the mix of Papiamentu
+   and English people actually order in. */
+function drawReadback(){
+  const c=cut(), o=optOf(c,S.fmt);
+  if(!o||o.price==null){ $("#readback").hidden=true; return; }
+  $("#readback").hidden=false;
+  const bits=[c.en.toLowerCase()];
+  if(S.half) bits.push("mitar mitar ku "+CUTS.find(x=>x.id===S.half).pap.toLowerCase());
+  bits.push(o.size ? `${o.f.en.toLowerCase()}, ${o.size}` : o.f.en.toLowerCase());
+  bits.push("ku "+SIDES.find(s=>s.id===S.side).en.toLowerCase());
+  const sauce=[...S.sauces].filter(id=>id!=="none").map(id=>SAUCES.find(s=>s.id===id).en.toLowerCase());
+  if(S.sauces.has("none")) bits.push("sin sous");
+  else if(sauce.length) bits.push("ku "+sauce.join(" i "));
+  [...S.prefs].forEach(id=>bits.push(PREFS.find(p=>p.id===id).en.toLowerCase()));
+  const note=$("#note").value.trim();
+
+  const f=fire(), mins=S.when==="trempan"?12:f.mins;
+  $("#readback").innerHTML=`<h4>So that is</h4>
+    <p>${bits.join(", ")}${note?`. <span style="color:var(--smoke)">"${note}"</span>`:"."}</p>
+    <div class="bits">
+      <span>Plate <b>${money(base())}</b></span>
+      <span>Fire time <b>${mins} min</b></span>
+      <span>Ready <b>${clock(f.t.mins+mins)}</b></span>
+      <span>${f.open?`On the rail <b>${f.queue} tickets</b>`:"<b>The grill is cold until 21:00</b>"}</span>
+    </div>`;
+}
 function render(){
   drawStepper(); drawCuts(); drawFmts(); drawSides(); drawSauces();
   $("#footPrice").textContent=money(base());
-  drawCart(); drawQuote();
+  drawReadback(); drawCart(); drawQuote();
 }
 render(); drawRail();
 setInterval(()=>{drawQuote(); drawRail();},30000);
