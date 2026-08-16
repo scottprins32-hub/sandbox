@@ -17,7 +17,11 @@ is excellent science about digit span and folklore about menu length; it appears
 
 The **Skill** line points at the sibling skill that covers the principle in depth: `attention-and-hierarchy`,
 `friction-and-flow`, `persuasive-copy`, `onboarding-activation`, `habit-loop-design`,
-`ethical-persuasion-audit`, `behavioral-metrics`.
+`decision-screen-design`, `ethical-persuasion-audit`, `behavioral-metrics`.
+
+For the *craft* counterpart — the concrete values rather than the mechanism — see `ui-craft` and its
+specialists (`typography-system`, `spacing-and-layout`, `color-and-theming`, `depth-and-overlays`,
+`ui-signifiers-and-states`).
 
 ---
 

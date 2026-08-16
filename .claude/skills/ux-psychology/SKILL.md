@@ -57,8 +57,19 @@ Work in this order when building something new. Each row is a sibling skill in t
 | 3 | `persuasive-copy` | Writing any user-visible words: CTAs, labels, errors, empty states, pricing, confirmations. Cheapest lever in the set; usually the most neglected. |
 | 4 | `onboarding-activation` | A new user's first run. Getting from arrival to the value moment before patience runs out. |
 | 5 | `habit-loop-design` | Retention — why they come back tomorrow. Triggers, rewards, investment, streaks, notifications. **Read the ethics skill alongside it, not after.** |
-| 6 | `ethical-persuasion-audit` | Before shipping anything from rows 3–5, and any time a flow involves consent, cancellation, billing, urgency, or a default that benefits you. Also the legal layer (EU DSA/GDPR/UCPD, FTC/ROSCA, WCAG). |
-| 7 | `behavioral-metrics` | Deciding whether any of it worked, and catching the backfire. Instrumentation, activation, retention curves, guardrail metrics, honest A/B testing. |
+| 6 | `decision-screen-design` | The moment of commitment: paywalls, plan comparison, price display, listing, booking and checkout summary screens. Owns the question-audit method — every element makes the user ask something, and the question decides whether they act. |
+| 7 | `ethical-persuasion-audit` | Before shipping anything from rows 3–6, and any time a flow involves consent, cancellation, billing, urgency, reference pricing, or a default that benefits you. Also the legal layer (EU DSA/GDPR/UCPD/Omnibus, FTC/ROSCA, WCAG). |
+| 8 | `behavioral-metrics` | Deciding whether any of it worked, and catching the backfire. Instrumentation, activation, retention curves, guardrail metrics, honest A/B testing. |
+
+### The craft layer
+
+This set decides *what a screen should do*. It does not tell you that a shadow is 0 2px 8px at 6% opacity,
+or which six states a button needs. That is `ui-craft` and its five specialists — `typography-system`,
+`spacing-and-layout`, `color-and-theming`, `depth-and-overlays`, `ui-signifiers-and-states`.
+
+Both layers are needed on real work. Theory without values produces a design review full of adjectives;
+values without theory produce a tidy screen that emphasises the wrong thing. Read `attention-and-hierarchy`
+for *why the eye goes there* and the craft skills for *the numbers that put it there*.
 
 For **animation and motion craft** specifically, use the `design-motion-principles` skill — this set covers
 when to spend motion as attention, not how to tune the easing curve.
