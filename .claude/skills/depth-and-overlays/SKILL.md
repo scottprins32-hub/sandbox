@@ -11,12 +11,10 @@ This skill settles two questions with numbers. **How far above the page is this 
 
 ## When this is the right skill
 
-- Defining shadows for a design system, or auditing a codebase where every component has its own.
+- Defining shadows for a design system, or auditing a codebase where every component invented its own.
 - Cards, panels, modals, dialogs, sheets, dropdowns, popovers, tooltips, toasts, sticky headers, FABs, drag ghosts — anything that must be understood as *above* something else.
-- "Looks flat", "looks cheap", "the shadows look like a 2013 tutorial", "muddy", "harsh".
-- Dark mode where cards vanish, or shadows turn into glowing halos.
-- Text over photography, video, gradients, or user-uploaded/CMS imagery. Hero sections, cover images, card thumbnails with overlaid titles, article headers.
-- Frosted-glass panels, `backdrop-filter`, translucent navbars and sheets.
+- "Looks flat", "looks cheap", "muddy", "harsh"; dark mode where cards vanish or shadows become halos.
+- Text over photography, video, gradients, or user-uploaded/CMS imagery — heroes, cover images, card thumbnails with overlaid titles, article headers. Frosted-glass panels and translucent bars.
 - Deciding whether a boundary should be a border, a shadow, or a background step.
 
 Go elsewhere when: the question is **which colour the surfaces are** or the dark-theme surface ladder itself (`color-and-theming` — it owns the tokens, this skill owns the shadows that sit on them); **how much space** inside or around the elevated thing (`spacing-and-layout`); **which of eight states** a pressed control has and what else changes (`ui-signifiers-and-states` — this skill supplies the depth values for the pressed and dragging states it specifies); **how the elevation animates** on hover or open (`design-motion-principles`); whether the whole thing looks generic or AI-shaped (`taste-frontend-design`); **whether the eye lands in the right place** (`attention-and-hierarchy`). `ui-craft` routes the whole craft set.
@@ -76,10 +74,9 @@ box-shadow:
 
 **The geometry rules that make layering work:**
 
-- **Blur ≈ 2–3× the Y offset** on every layer.
-- **Negative spread ≈ −⅓ to −½ of the blur** on the wide layers. Without it, a 40px blur smears 20px out of *every* side and the element looks like it is sitting in fog. With it, the shadow stays under the element where gravity put it.
-- **No shadow above the element.** CSS Backgrounds 3 §6.1.2 specifies the blur as approximating a Gaussian with standard deviation equal to *half* the blur radius, with the transition centred on the shadow's edge — so a layer extends `blur/2` beyond its (spread-adjusted) rect. The topmost shadow pixel therefore sits at `offsetY − spread − blur/2` below the element's top edge. Keep that **≥ 0** on the wide layers: `0 12px 20px -6px` gives `12 − (−6) − 10 = 8px`, safely below. The tight contact layer may bleed a pixel above — omnidirectional ambient occlusion is real and reads correctly.
-- **Alpha rises slowly, blur rises fast.** Across a full 5-level scale, blur goes from 2px to ~56px (28×) while total alpha goes from ~5% to ~16% (3×). Getting this backwards — dark shadows for high elevation — is what "harsh" means.
+- **Blur ≈ 2–3× the Y offset** on every layer, and **negative spread ≈ −⅓ to −½ of the blur** on the wide layers. Without the spread, a 40px blur smears 20px out of *every* side and the element sits in fog; with it, the shadow stays under the element where gravity put it.
+- **No shadow above the element.** CSS Backgrounds 3 §6.1.2 specifies the blur as approximating a Gaussian with standard deviation equal to *half* the blur radius, centred on the shadow's edge — so a layer extends `blur/2` beyond its spread-adjusted rect, and its topmost pixel sits at `offsetY − spread − blur/2` below the element's top edge. Keep that **≥ 0** on the wide layers: `0 12px 20px -6px` gives `12 − (−6) − 10 = 8px`, safely below. The tight contact layer may bleed a pixel above — omnidirectional ambient occlusion is real and reads correctly.
+- **Alpha rises slowly, blur rises fast.** Across a 5-level scale blur goes 2px → ~56px (28×) while total alpha goes ~5% → ~16% (3×). Getting this backwards — dark shadows for high elevation — is what "harsh" means.
 
 How it fails: teams add layers but keep each layer's alpha at what they used for the single shadow. Three layers at 25% is not subtle, it is 75%. When you split a shadow, split the alpha.
 
@@ -131,11 +128,10 @@ Then map roles to levels once, in a table everyone can read, and never decide pe
 | 4 | Over everything | Modal, dialog, action sheet, command palette, drawer |
 | 5 | In the user's hand | Drag ghost, reorder preview |
 
-Tailwind v4, CSS-first. Anything in the `--shadow-*` namespace generates a utility, so these become `shadow-e1` … `shadow-e5`:
+Tailwind v4, CSS-first: anything in the `--shadow-*` namespace generates a utility, so these become `shadow-e1` … `shadow-e5`, and `--inset-shadow-*` gives you `inset-shadow-well`.
 
 ```css
 @import "tailwindcss";
-
 @theme {
   --shadow-e1: 0 1px 1px 0 hsl(var(--shadow-hsl)/0.05), 0 2px 4px -1px hsl(var(--shadow-hsl)/0.05);
   --shadow-e3: 0 1px 1px 0 hsl(var(--shadow-hsl)/0.04), 0 4px 8px -2px hsl(var(--shadow-hsl)/0.06),
@@ -152,9 +148,9 @@ How it fails: eleven bespoke shadows, no two alike, and a "raised" hover state t
 
 ### 5. Derive the shadow colour from the surface, not from black — *convention*
 
-`rgba(0, 0, 0, 0.1)` is the default and it is the reason shadows look dirty on anything that is not white.
+`rgba(0, 0, 0, 0.1)` is the default and the reason shadows look dirty on anything that is not white.
 
-Give the honest mechanism, because the usual one ("black shadows turn grey") is imprecise. Alpha-compositing pure black over a colour multiplies every channel by `(1 − α)`. That preserves hue ratios but drops luminance, and perceived **colourfulness falls with luminance** (the Hunt effect) — so the shaded region under a card on a saturated brand block loses chroma while everything around it keeps it, and reads as a smudge of dirt rather than shade. Real shade is not an absence of light; it is a region lit by *ambient* light, which carries the colour of the surroundings. A shadow colour that keeps hue and chroma and only drops lightness looks like shade because it is behaving like one.
+The usual explanation ("black shadows turn grey") is imprecise; the honest mechanism is better. Alpha-compositing black over a colour multiplies every channel by `(1 − α)`, preserving hue ratios but dropping luminance — and perceived **colourfulness falls with luminance** (the Hunt effect). So the shaded region under a card on a saturated block loses chroma while everything around it keeps it, and reads as a smudge of dirt. Real shade is not an absence of light; it is a region lit by *ambient* light, which carries the colour of its surroundings. A shadow that keeps hue and chroma and only drops lightness looks like shade because it is behaving like one.
 
 ```css
 :root {
@@ -227,9 +223,9 @@ The **raised (physical) button** is three cues at once — a lit top edge, a sha
 }
 ```
 
-This is a deliberate stylistic commitment, not a neutral default — it is legible and satisfying, and it dates a UI fast if applied everywhere. Use it on one control, usually the primary action, and let everything else stay flat. `taste-frontend-design` owns that judgment; `ui-signifiers-and-states` owns the rest of the state matrix these values plug into.
+This is a deliberate stylistic commitment, not a neutral default: legible and satisfying, and it dates a UI fast if applied everywhere. Use it on one control — usually the primary action — and let everything else stay flat. `taste-frontend-design` owns that judgment; `ui-signifiers-and-states` owns the rest of the state matrix these values plug into.
 
-**Keep inset tokens separate from elevation tokens.** `box-shadow` is one property — a component that needs both a cast shadow and an inset highlight must compose them in one declaration, so store them as `--elevation-2` and `--edge-highlight` and concatenate at the use site.
+**Keep inset tokens separate from elevation tokens.** `box-shadow` is a single property, so a component needing both a cast shadow and an inset highlight must compose them in one declaration — store `--elevation-2` and `--edge-highlight` separately and concatenate at the use site.
 
 ### 8. Border, shadow, or surface step — three signals, three costs — *craft, with one law*
 
@@ -320,24 +316,16 @@ A **flat** full-bleed scrim at 0.55 is legal and ugly: it dulls the entire photo
 The rule that turns this from decoration into a guarantee: **the scrim must be at or above the computed floor across the whole text band, not merely at the very edge.** Measure where the text block starts and ends as a percentage of the container, then hold the plateau to just past the top of the text before easing out.
 
 ```css
-/* Text occupies the bottom 0–40% of the card. Plateau to 42%, ease to nothing by 100%.
-   Stops follow a smoothstep curve so the ramp has no slope discontinuity at either end. */
-.hero__scrim {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to top,
-    rgb(0 0 0 / 0.62)   0%,
-    rgb(0 0 0 / 0.62)  42%,
-    rgb(0 0 0 / 0.59)  50%,
-    rgb(0 0 0 / 0.50)  58%,
-    rgb(0 0 0 / 0.40)  65%,
-    rgb(0 0 0 / 0.29)  72%,
-    rgb(0 0 0 / 0.19)  79%,
-    rgb(0 0 0 / 0.09)  86%,
-    rgb(0 0 0 / 0.03)  93%,
-    rgb(0 0 0 / 0)    100%);
+/* Text occupies the bottom 0–40%. Plateau to 42%, then ease to nothing by 100%.
+   Stops follow a smoothstep curve, so the ramp has no slope discontinuity at either end. */
+:root {
+  --scrim-bottom: linear-gradient(to top,
+    rgb(0 0 0 / 0.62)  0%, rgb(0 0 0 / 0.62) 42%, rgb(0 0 0 / 0.59) 50%,
+    rgb(0 0 0 / 0.50) 58%, rgb(0 0 0 / 0.40) 65%, rgb(0 0 0 / 0.29) 72%,
+    rgb(0 0 0 / 0.19) 79%, rgb(0 0 0 / 0.09) 86%, rgb(0 0 0 / 0.03) 93%,
+    rgb(0 0 0 / 0)   100%);
 }
+.hero__scrim { position: absolute; inset: 0; pointer-events: none; background: var(--scrim-bottom); }
 ```
 
 **Write the terminal stop as `rgb(0 0 0 / 0)`, not `transparent`.** Gradient interpolation is specified in premultiplied alpha, so modern engines handle `transparent` correctly, but writing the explicit colour costs nothing and removes any doubt about a legacy engine fading through grey.
@@ -410,7 +398,7 @@ The modern alternative to a scrim is a translucent panel that blurs what is behi
 .hero h2 { color: #fff; text-shadow: 1px 1px 3px #000; }
 ```
 
-What is wrong, itemised: an **X offset** nothing else in the system has (move 2); a **single dark tight shadow** at 40% that reads as an outline (moves 1, 3); a **flat scrim** that dulls the whole photograph (move 11) and, at 0.35, delivers **2.44:1** against a white image — a straight 1.4.3 failure, short even of the 3:1 large-text floor (move 10); **`text-shadow` as the guarantee**, which measures nothing and is deleted in forced-colors (moves 8, 10); and **no container background**, so a failed image request leaves white text on white (move 10).
+What is wrong, itemised: an **X offset** nothing else in the system has (move 2); a **single dark tight shadow** at 40% that reads as an outline (moves 1, 3); a **flat scrim** that dulls the whole photograph (move 11) and, at 0.35, delivers **2.43:1** against a white image — a straight 1.4.3 failure, short even of the 3:1 large-text floor (move 10); **`text-shadow` as the guarantee**, which measures nothing and is deleted in forced-colors (moves 8, 10); and **no container background**, so a failed image request leaves white text on white (move 10).
 
 **After:**
 
@@ -432,14 +420,10 @@ What is wrong, itemised: an **X offset** nothing else in the system has (move 2)
 }
 .hero__scrim {
   position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(to top,
-    rgb(0 0 0 / 0.62)  0%, rgb(0 0 0 / 0.62) 42%, rgb(0 0 0 / 0.59) 50%,
-    rgb(0 0 0 / 0.50) 58%, rgb(0 0 0 / 0.40) 65%, rgb(0 0 0 / 0.29) 72%,
-    rgb(0 0 0 / 0.19) 79%, rgb(0 0 0 / 0.09) 86%, rgb(0 0 0 / 0.03) 93%,
-    rgb(0 0 0 / 0)   100%);
+  background: var(--scrim-bottom);                  /* eased, plateaus at 0.62 across the text */
 }
 .hero__body { position: relative; padding: var(--space-lg); }   /* occupies the bottom ~40% */
-.hero__title { color: #fff; }                                    /* 4.5:1 guaranteed by the scrim */
+.hero__title { color: #fff; }                                   /* 4.5:1 guaranteed by the scrim */
 
 @media (forced-colors: active) {
   .hero__body { background-color: Canvas; }
@@ -447,7 +431,9 @@ What is wrong, itemised: an **X offset** nothing else in the system has (move 2)
 }
 ```
 
-Verify it, do not trust it: screenshot over a **pure white** test image and sample the lightest pixel under the headline. That single check is the difference between a scrim that looks right and one that is right.
+The plateau is 0.62 rather than the bare 0.55 floor deliberately: it scores **6.19:1** against a pure-white image, which leaves headroom for an off-white text token, a slightly lighter brand scrim, or a headline that wraps one line further up than the design assumed.
+
+Verify it, do not trust it: screenshot over a **pure white** test image and sample the lightest pixel under the headline. That one check is the difference between a scrim that looks right and one that is right.
 
 ## Anti-patterns
 
@@ -473,21 +459,18 @@ Run against the screen or the PR diff.
 
 - [ ] Every `box-shadow` in the diff comes from an elevation token; no literals in components.
 - [ ] Every shadow offsets on Y only — or every shadow shares one declared X sign and ratio.
-- [ ] Every level above 0 has ≥2 stacked layers, with blur ≈ 2–3× the offset and negative spread on wide layers.
-- [ ] Per-layer alpha is in the 4–16% range in light mode, not 25–40%.
+- [ ] Every level above 0 has ≥2 layers, blur ≈ 2–3× the offset, negative spread on the wide layers, and per-layer alpha in the 4–16% range in light mode.
 - [ ] Shadow colour comes from `--shadow-hsl` at lightness ~10–14%, not `rgba(0,0,0,…)`; saturated sections override it.
-- [ ] Elevation order matches z-index order; the modal's shadow is heavier than the popover's, which is heavier than the card's.
+- [ ] Elevation order matches z-index order — the modal outranks the popover, which outranks the card.
 - [ ] The elevation sheet has been rendered on white, page, sunken, the brand blocks, a photo, and the dark base.
-- [ ] Dark theme: elevation lives in the surface ladder; cards remain visible with `box-shadow: none`; no light-coloured glow.
-- [ ] Every shadow-only container also has a border, or a `@media (forced-colors: active)` rule that gives it one (`box-shadow`, `text-shadow` and gradients are all forced to `none`).
+- [ ] Dark theme: elevation lives in the surface ladder; cards stay visible with `box-shadow: none`; no light glow.
+- [ ] Every shadow-only container also has a border, or a `@media (forced-colors: active)` rule that gives it one (`box-shadow`, `text-shadow` and gradients are all forced to `none` there).
 - [ ] Text over imagery: the scrim's minimum alpha across the **whole text band** meets the computed floor — **0.55** black for 4.5:1 body, **0.45** for 3:1 large text; recomputed if the scrim is tinted or the text is not pure white (WCAG 1.4.3).
-- [ ] Verified by screenshotting over a **pure white** test image and sampling under the glyphs, not by looking at the art-directed photo.
+- [ ] Verified by screenshotting over a **pure white** test image and sampling under the glyphs, not by eye on the art-directed photo.
 - [ ] The image container has a dark `background-color`, so a failed or slow image still leaves legible text.
-- [ ] Gradient scrims use a multi-stop eased ramp (no visible Mach band at the top edge) and an explicit `rgb(0 0 0 / 0)` terminal stop.
-- [ ] Large flat gradients checked for quantisation banding; noise overlay added if present.
-- [ ] `backdrop-filter` panels carry the contrast in the tint, ship `-webkit-`, have an `@supports` fallback that raises the tint, and honour `prefers-reduced-transparency` without depending on it.
-- [ ] No `backdrop-filter` or >40px blur behind a full-viewport scroll region; profiled on a low-end device.
-- [ ] Focus rings on elevated surfaces still clear 3:1 against the surface they land on (WCAG 1.4.11) — including on a scrim over a photo.
+- [ ] Gradient scrims use a multi-stop eased ramp (no Mach band at the top edge), an explicit `rgb(0 0 0 / 0)` terminal stop, and a noise overlay if quantisation banding shows on flat areas.
+- [ ] `backdrop-filter` panels carry contrast in the tint, ship `-webkit-`, have an `@supports` fallback that raises the tint, honour `prefers-reduced-transparency` without depending on it, and are not full-viewport behind a scroll region. Profiled on a low-end device.
+- [ ] Focus rings on elevated surfaces clear 3:1 against the surface they land on (WCAG 1.4.11) — including over a scrim on a photo.
 - [ ] Elevation changes on hover/press respect `prefers-reduced-motion` for the transform component (`design-motion-principles`).
 - [ ] Nothing in the depth system carries meaning by shadow alone (WCAG 1.4.1) — "selected" is not "has a shadow".
 

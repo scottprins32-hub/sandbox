@@ -15,7 +15,7 @@ This skill answers two questions: **did the thing we built actually work, and wh
 - Before shipping anything from the persuasion/engagement skills — the guardrails must be live first.
 - Deciding what to do when you have a few hundred users a week and someone asked for statistical significance.
 
-Go elsewhere when: you need to *find and validate* the activation moment itself in depth → **onboarding-activation** and its `references/instrumenting-activation.md`, which owns candidate generation and the causation test. You are deciding whether a mechanic is defensible → **ethical-persuasion-audit** (a guardrail regression is evidence, not a substitute for the ethics review). You already know where the funnel leaks and need the fix → **friction-and-flow**, **attention-and-hierarchy**, **persuasive-copy**, **habit-loop-design**. Unsure which principle is at play → **ux-psychology** (router + full catalog).
+Go elsewhere when: you need to *find and validate* the activation moment itself in depth → **onboarding-activation** and its `onboarding-activation/references/instrumenting-activation.md`, which owns candidate generation and the causation test. You are deciding whether a mechanic is defensible → **ethical-persuasion-audit** (a guardrail regression is evidence, not a substitute for the ethics review). You already know where the funnel leaks and need the fix → **friction-and-flow**, **attention-and-hierarchy**, **persuasive-copy**, **habit-loop-design**. Unsure which principle is at play → **ux-psychology** (router + full catalog).
 
 ## Diagnose first
 
@@ -62,7 +62,7 @@ Rules that keep the definition honest over time:
 - **Never silently redefine an event.** Emit a new name and run both in parallel for a full retention window. A redefined metric with the same name destroys your ability to read your own history — and you will not remember the redefinition happened six months later.
 - **Version the definition in code, next to the event, with an owner in a comment.** This is the artifact that stops three teams having three definitions of "active".
 
-Finding and *validating* the right candidate — including the test that separates a lever from a symptom — is covered in depth in **onboarding-activation → `references/instrumenting-activation.md`**. Read it before you commit to a definition.
+Finding and *validating* the right candidate — including the test that separates a lever from a symptom — is covered in depth in **`onboarding-activation/references/instrumenting-activation.md`**. Read it before you commit to a definition.
 
 ### 2. Guardrail metrics: the ship gate
 
@@ -257,7 +257,7 @@ Roughly where the lines fall (verify against current national guidance — this 
 
 **Practical consequences for your measurement plan.** Consent rates are not uniform — they vary by geography, device and audience — so consent-gated analytics gives you a **biased sample, not a smaller one**, and the bias correlates with exactly the privacy-conscious users you might most want to understand. Design for this: put your critical activation and guardrail events on the server side where the lawful basis is contractual necessity and the data is minimised, and reserve consent-gated tooling (replay, heatmaps) for diagnostic work rather than for anything that feeds a ship decision.
 
-**The case for privacy-preserving analytics** is not only ethical: cookieless, aggregate, first-party analytics can often run without a consent banner (subject to the conditions above), which means it measures 100% of your traffic instead of the consenting fraction. A complete unbiased count of page-level behaviour frequently beats a partial, consent-skewed count with richer per-user detail. Collect the minimum that answers your written questions, set a retention limit and enforce it, and never send PII — email, name, raw IP, free-text field contents — into an analytics event payload; it is the single most common way teams create a breach out of a dashboard. See **ethical-persuasion-audit → `references/consent-and-cancellation.md`** for the consent UI itself, which has its own legal requirements.
+**The case for privacy-preserving analytics** is not only ethical: cookieless, aggregate, first-party analytics can often run without a consent banner (subject to the conditions above), which means it measures 100% of your traffic instead of the consenting fraction. A complete unbiased count of page-level behaviour frequently beats a partial, consent-skewed count with richer per-user detail. Collect the minimum that answers your written questions, set a retention limit and enforce it, and never send PII — email, name, raw IP, free-text field contents — into an analytics event payload; it is the single most common way teams create a breach out of a dashboard. See **`ethical-persuasion-audit/references/consent-and-cancellation.md`** for the consent UI itself, which has its own legal requirements.
 
 ## The instrumentation plan template
 
