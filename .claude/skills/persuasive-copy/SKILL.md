@@ -261,12 +261,12 @@ commercial practice in the EU and a §5 deception risk in the US, and they're th
 outlives.
 
 **Charm pricing is weaker than folklore.** Anderson & Simester (2003) ran real catalogue field experiments
-and found $9 endings increased demand — in one test the same item sold 21 units at $39 against 16 at $34 and
-17 at $44. Note the unit counts: these are small samples, and the authors found the effect was **stronger
-for new items** and interacted with other discount cues. The left-digit mechanism (Thomas & Morwitz, 2005) is
-real; the blanket rule "always end in 9" is not. A $9 ending also signals *discount*, which actively works
-against a premium or enterprise positioning, and it does nothing on a B2B page where a procurement team is
-comparing feature matrices. Round numbers when you sell on quality; charm endings when you sell on price.
+where $9 endings increased demand — in one test the same item sold 21 units at $39 against 16 at $34 and 17
+at $44. Note the unit counts: small samples, and the effect was **stronger for new items** and interacted
+with other discount cues. The left-digit mechanism (Thomas & Morwitz, 2005) is real; the blanket rule
+"always end in 9" is not. A $9 ending also signals *discount*, working against a premium or enterprise
+positioning, and does nothing on a B2B page where procurement is comparing feature matrices. Round numbers
+when you sell on quality; charm endings when you sell on price.
 
 ### 5. Social proof that names someone like the reader
 
@@ -312,13 +312,13 @@ looks like"), or say nothing.
 
 **What to build:** testimonials with a name, a role, a company and a *specific outcome* ("cut our Friday
 reconciliation from 3 hours to 20 minutes" beats "great product, highly recommend"); counts scoped to the
-reader's segment, industry or geography; real, recent activity rather than a rolling ticker; review
-distributions rather than a bare average. And note that fabricated proof is now explicitly regulated — the
-FTC's 2024 rule on consumer reviews and testimonials bans fake and purchased reviews, and fake reviews and
-fake "consumer" endorsements sit on the EU UCPD Annex I blacklist.
+reader's segment, industry or geography; real recent activity rather than a rolling ticker; review
+distributions rather than a bare average. Fabricated proof is now explicitly regulated — the FTC's 2024 rule
+on consumer reviews and testimonials bans fake and purchased reviews, and fake reviews and fake "consumer"
+endorsements sit on the EU UCPD Annex I blacklist.
 
 **When to skip it entirely:** internal and mandated tools. "Trusted by 1,200 teams" means nothing to someone
-whose employer bought the licence. There, the only proof that helps is local and operational: "Ana approved
+whose employer bought the licence. There the only proof that helps is local and operational: "Ana approved
 this yesterday", "your site manager submitted 14 of these last month".
 
 ### 6. Credibility: who is saying it, and what have you given first
@@ -468,10 +468,10 @@ decision-relevant token*, and dense prose defeats skimming. Jargon is only effic
 own working vocabulary and it replaces a longer phrase; everywhere else it is an obstacle disguised as
 precision.
 
-Practical rules: lead with the decision, one idea per sentence, name each concept with exactly one word
-everywhere in the product (elegant variation costs the reader a lookup — "member", "user", "seat" and
-"teammate" for the same thing is a real bug), active voice with a named actor, kill nominalisations
-("perform a validation" → "check"), and read your longest sentence out loud.
+Practical rules: lead with the decision; one idea per sentence; name each concept with exactly one word
+everywhere in the product (elegant variation costs a lookup — "member", "user", "seat" and "teammate" for
+the same thing is a real bug); active voice with a named actor; kill nominalisations ("perform a validation"
+→ "check"); read your longest sentence out loud.
 
 **Register and localisation — where literal translation changes the social relationship.** English has one
 second person; Romanian, German, French, Spanish, Dutch and many others have two. A breezy English "you"
