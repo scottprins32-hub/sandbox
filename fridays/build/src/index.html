@@ -1,0 +1,219 @@
+<meta charset="utf-8">
+<title>Fridays Rebuild</title>
+<meta name="description" content="A research-led redesign of fridays.cw: the website, a native app, and an ordering system built on the grammar of a Curacao trùk 'i pan.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0B09">
+
+<style>
+{{FONTS}}
+:root{
+  --ink:#0C0B09; --card:#151310; --card-2:#1C1815; --raise:#252019;
+  --line:rgba(246,241,231,.10); --line-2:rgba(246,241,231,.19);
+  --bone:#F6F1E7; --bone-2:#C6BEB0; --smoke:#9C9285; --dim:#8A8174;
+  --amber:#FABE4C; --amber-2:#FFD98A; --ember:#E2521B; --leaf:#8FBA68;
+  --f-display:'Shoulders',ui-sans-serif,system-ui,sans-serif;
+  --f-body:'Instrument',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --f-quote:'InstrumentSerif',Georgia,serif;
+  --gut:clamp(20px,5vw,72px); --maxw:1320px; --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0; background:var(--ink); color:var(--bone); font-family:var(--f-body);
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+img{max-width:100%; display:block}
+a{color:inherit; text-decoration:none}
+:focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:3px}
+.ic{width:1em; height:1em; flex:none; display:block}
+.wrap{width:100%; max-width:var(--maxw); margin-inline:auto; padding-inline:var(--gut)}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
+h1,h2,h3{margin:0; font-family:var(--f-display); font-weight:800; text-transform:uppercase;
+  line-height:.88; letter-spacing:.012em}
+p{margin:0}
+.kicker{font-weight:600; font-size:.7rem; letter-spacing:.20em; text-transform:uppercase;
+  color:var(--smoke)}
+.lede{font-size:clamp(1.02rem,1.4vw,1.24rem); color:var(--bone-2); line-height:1.5; max-width:62ch}
+.body{color:var(--bone-2); max-width:60ch}
+
+.hero{position:relative; padding-block:clamp(72px,10vw,140px) clamp(40px,5vw,72px);
+  overflow:hidden; isolation:isolate}
+.hero-bg{position:absolute; inset:0; z-index:-2}
+.hero-bg img{width:100%; height:100%; object-fit:cover; object-position:50% 45%}
+.hero-bg::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom,rgba(12,11,9,.86),rgba(12,11,9,.72) 40%,var(--ink) 96%)}
+.hero h1{font-size:clamp(2.5rem,8vw,7rem); margin-block:16px 22px}
+.hero h1 em{font-family:var(--f-quote); font-style:italic; font-weight:400; text-transform:none;
+  color:var(--amber); font-size:.34em}
+.brandline{display:flex; align-items:center; gap:12px}
+.brandline img{width:44px; filter:brightness(0) invert(1)}
+.brandline b{font-family:var(--f-display); font-weight:800; font-size:1.4rem; letter-spacing:.03em;
+  text-transform:uppercase; line-height:1}
+.brandline span{display:block; font-size:.55rem; letter-spacing:.30em; color:var(--smoke);
+  font-weight:600; margin-top:2px}
+
+.sec{padding-block:clamp(48px,6vw,92px)}
+.sec-head{margin-bottom:clamp(28px,3.4vw,48px); max-width:64ch}
+.sec-head .kicker{margin-bottom:12px}
+.sec-head h2{font-size:clamp(1.8rem,3.6vw,3rem); margin-bottom:14px}
+
+/* the three doors */
+.doors{display:grid; gap:14px}
+.door{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.12fr); gap:clamp(20px,3vw,48px);
+  align-items:center; padding:clamp(22px,2.8vw,38px); border:1px solid var(--line);
+  border-radius:20px; background:var(--card); transition:border-color .35s var(--ease),
+  transform .35s var(--ease)}
+.door:hover{border-color:var(--line-2); transform:translateY(-3px)}
+.door-n{font-family:var(--f-display); font-weight:800; font-size:.72rem; letter-spacing:.2em;
+  color:var(--amber); margin-bottom:12px}
+.door h3{font-size:clamp(1.7rem,3.2vw,2.6rem); margin-bottom:14px}
+.door p{color:var(--bone-2); font-size:.95rem; margin-bottom:18px}
+.door .go{display:inline-flex; align-items:center; gap:9px; font-weight:600; font-size:.9rem;
+  color:var(--amber)}
+.door .go .ic{transition:transform .3s var(--ease)}
+.door:hover .go .ic{transform:translateX(4px)}
+.door-fig{border-radius:14px; overflow:hidden; aspect-ratio:16/10; background:var(--raise)}
+.door-fig img{width:100%; height:100%; object-fit:cover}
+.door:nth-child(even) .door-fig{order:-1}
+
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px}
+.tags span{font-size:.68rem; font-weight:600; letter-spacing:.06em; padding:4px 10px;
+  border-radius:999px; border:1px solid var(--line-2); color:var(--bone-2)}
+
+/* Findings. Five items, so the row split is 3 then 2 rather than an auto-fit
+   grid that leaves three empty cells hanging off the end. */
+.finds{display:grid; grid-template-columns:repeat(6,1fr);
+  gap:2px; background:var(--line); border:1px solid var(--line); border-radius:16px;
+  overflow:hidden}
+.find{background:var(--card); padding:clamp(20px,2.4vw,28px)}
+.find:nth-child(-n+3){grid-column:span 2}
+.find:nth-child(n+4){grid-column:span 3}
+.find b{display:block; font-family:var(--f-display); font-weight:800; font-size:2.2rem;
+  letter-spacing:.02em; color:var(--amber); line-height:.9; margin-bottom:10px}
+.find i{font-style:normal; display:block; font-size:.92rem; font-weight:600; margin-bottom:6px}
+.find p{font-size:.85rem; color:var(--smoke)}
+
+.note{border:1px solid var(--line); border-left:2px solid var(--amber); border-radius:0 12px 12px 0;
+  background:var(--card); padding:20px 22px; max-width:70ch}
+.note b{display:block; font-size:.92rem; font-weight:600; margin-bottom:8px}
+.note p{font-size:.88rem; color:var(--bone-2)}
+.note p+p{margin-top:10px}
+
+.ft{border-top:1px solid var(--line); padding-block:36px 48px; margin-top:clamp(40px,5vw,80px);
+  font-size:.78rem; color:var(--smoke)}
+.ft-in{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.ft a{color:var(--bone-2)} .ft a:hover{color:var(--amber)}
+
+@media (max-width:1000px){
+  .finds{grid-template-columns:repeat(2,1fr)}
+  .find:nth-child(-n+3),.find:nth-child(n+4){grid-column:span 1}
+  .find:last-child{grid-column:span 2}
+}
+@media (max-width:860px){
+  .door{grid-template-columns:1fr}
+  .door:nth-child(even) .door-fig{order:0}
+}
+@media (max-width:560px){
+  .finds{grid-template-columns:1fr}
+  .find:last-child{grid-column:span 1}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.001ms !important; animation-duration:.001ms !important}
+}
+</style>
+
+<section class="hero">
+  <div class="hero-bg"><img src="{{IMG:flames_wide}}" alt=""></div>
+  <div class="wrap">
+    <div class="brandline">
+      <img src="{{IMG:logo}}" alt="">
+      <span><b>Fridays</b><span>Baby Truck</span></span>
+    </div>
+    <h1>Three surfaces,<br>one window <em>bon nochi</em></h1>
+    <p class="lede">A research-led redesign of fridays.cw for Curacao's best known trùk 'i pan. A marketing site, a native app and an ordering system, each built on the same idea: a food truck has exactly one interface, a lit window in the side of a van at night, and every digital surface should behave like it.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">What the research turned up</p>
+      <h2>Five things worth<br>rebuilding around</h2>
+    </div>
+    <div class="finds">
+      <div class="find"><b>77</b><i>prices in a grid</i>
+        <p>Eleven cuts against seven formats. The real menu is a matrix, and every surface Fridays owns flattens it into a list or a photograph of a poster.</p></div>
+      <div class="find"><b>40</b><i>minutes at the window</i>
+        <p>The wait reviewers report on a busy night. No site, app or checkout anywhere quotes it, so the surprise lands at the hatch.</p></div>
+      <div class="find"><b>1</b><i>page, one language</i>
+        <p>fridays.cw is a single English page with the menu as a 1.5 MB scan. Curacao's first language is Papiamentu.</p></div>
+      <div class="find"><b>ƒ</b><i>a retired currency</i>
+        <p>The menu still prices in Antillean guilders, which stopped being legal tender on 1 July 2025. The island runs on the Caribbean guilder now.</p></div>
+      <div class="find"><b>4</b><i>unconnected front doors</i>
+        <p>Phone, an embedded widget, a white-labelled shared app, and walking up. None of them share a queue.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">The work</p>
+      <h2>Three surfaces</h2>
+      <p class="body">Each one is a single self-contained file. Fonts, photography and icons are inlined, so they open from disk with nothing to install and nothing to fetch.</p>
+    </div>
+    <div class="doors">
+      <a class="door" href="01-website.html">
+        <div>
+          <h3>The website</h3>
+          <div class="tags"><span>Papiamentu, Dutch, English</span><span>Live fire time</span><span>The menu as a matrix</span></div>
+          <p>Night-black and lit by their own fire photography. A live window card answers the only question that matters at eleven at night, the full seventy-seven price grid is tappable rather than scanned, and the trùk 'i pan story finally gets told.</p>
+          <span class="go">Open the site{{ICON:arrow-right}}</span>
+        </div>
+        <figure class="door-fig"><img src="{{IMG:truck_wide}}" alt="The Fridays truck lit up at night" loading="lazy"></figure>
+      </a>
+
+      <a class="door" href="02-app.html">
+        <div>
+          <h3>The app</h3>
+          <div class="tags"><span>Five live screens</span><span>Fire ticket</span><span>Trempan early lane</span></div>
+          <p>A different posture from the site: operational, tight, organised around one object. Your order becomes a live ticket with a fire timeline and an instruction rather than a status, and a loyalty lane that pays you to come before the peak instead of stamping a card.</p>
+          <span class="go">Open the app concept{{ICON:arrow-right}}</span>
+        </div>
+        <figure class="door-fig"><img src="{{IMG:bag_tall}}" alt="A Fridays paper bag handed over at the window" loading="lazy"></figure>
+      </a>
+
+      <a class="door" href="03-ordering.html">
+        <div>
+          <h3>The ordering system</h3>
+          <div class="tags"><span>Working builder</span><span>Kitchen rail</span><span>Queue governor</span></div>
+          <p>Four questions in the truck's own order: which cut, how do you want it, batata or pan, what sauce. Plus mitar mitar, an honest fire quote drawn from the rail, Caribbean guilders with a dollar toggle, and the kitchen-side view that makes the promised time true.</p>
+          <span class="go">Build an order{{ICON:arrow-right}}</span>
+        </div>
+        <figure class="door-fig"><img src="{{IMG:ribs_wide}}" alt="Ribs being basted on the charcoal grill" loading="lazy"></figure>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Honest notes</p>
+      <h2>What is real and<br>what is modelled</h2>
+    </div>
+    <div class="note">
+      <b>Real</b>
+      <p>Every price, format, opening hour, address and phone number is transcribed from Fridays' own December 2024 printed menu and from fridays.cw. The photography is theirs. The three reviews are the ones on their site, under the names given there. The Caribbean guilder changeover, the trùk 'i pan history and the Papiamentu vocabulary are sourced and cited in the README.</p>
+      <b style="margin-top:16px">Modelled</b>
+      <p>Queue depth and fire time are simulated from a plausible curve that peaks between 22:30 and 01:00. They move with real Curacao time, so the pages read differently at nine in the evening and at two in the morning, but no live kitchen is feeding them. Trempan, the fire ticket and the rail are proposals, not features that exist today.</p>
+      <b style="margin-top:16px">Needs a native pass</b>
+      <p>The Papiamentu was written from sourced vocabulary and checked against dictionaries, not by a native speaker. Before anything ships, a Curacao copywriter should go through it line by line. The menu also prints two prices for chicken at Regular, read here as a small and a large; that one is worth confirming with the kitchen.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="ft">
+  <div class="wrap ft-in">
+    <span>Concept work for Fridays Baby Truck, Caracasbaaiweg 216, Willemstad. Not affiliated, not a live site.</span>
+    <span><a href="https://www.fridays.cw/" rel="noopener">The current site</a></span>
+  </div>
+</footer>

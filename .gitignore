@@ -21,3 +21,6 @@ coverage/
 # misc
 .DS_Store
 *.tsbuildinfo
+
+# Fridays concept build cache (downloaded source assets)
+fridays/build/.cache/
