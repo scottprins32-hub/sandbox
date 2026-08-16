@@ -1,16 +1,14 @@
 # Fridays Baby Truck: a rebuild
 
 A research-led concept redesign of [fridays.cw](https://www.fridays.cw/) for Curaçao's best
-known *trùk 'i pan*. Three surfaces, one idea.
+known *trùk 'i pan*. Two products, one idea.
 
 | File | What it is |
 |---|---|
-| `index.html` | The hub. Research findings, the three surfaces, and an honest note on what is real and what is modelled |
-| `01-website.html` | The marketing site. Trilingual, live fire time, the full menu as a matrix |
-| `02-app.html` | The native app concept. Five working screens in phone frames |
-| `03-ordering.html` | The ordering system. A working order builder, plus the kitchen rail behind it |
+| `index.html` | The website. Trilingual marketing site, the full menu as the matrix it is, and the whole order flow from first question to a live collection ticket, plus the kitchen rail behind the hatch |
+| `app.html` | The phone app. One device, one surface that changes identity through the night, with a dial on the plinth that scrubs a whole night of island time |
 
-Each is a single self-contained HTML file. Fonts are subset and inlined, photography is
+Both are a single self-contained HTML file. Fonts are subset and inlined, photography is
 compressed and inlined as data URIs, icons are inlined SVG. Nothing is fetched at view
 time, so they open straight from disk with no server and no build step.
 
@@ -121,22 +119,29 @@ sits with the aggregator rather than with Fridays.
 > You walk up, you say what you want in Papiamentu, someone puts it on charcoal, and you
 > wait in the warm dark. Every digital surface should behave like that window.
 
-**The website is the window seen from across the street.** It makes you hungry, it tells
-you whether the grill is lit and how deep the queue is, and it hands you to the window.
-The menu is presented as the matrix it actually is: pick a cut, pick a format, tap the
-price. Empty cells say the kitchen does not do that combination, here, rather than letting
-you find out at the hatch. Papiamentu, Dutch and English, switchable.
+**The website is the window seen from across the street, and then the window itself.**
+It makes you hungry, it tells you whether the grill is lit and how deep the queue is, and
+then it takes the order rather than handing you to somebody else's checkout. The menu is
+presented as the matrix it actually is: pick a cut, pick a format, tap the price. Empty
+cells say the kitchen does not do that combination, here, rather than letting you find out
+at the hatch. Four hash routes carry it end to end: the marketing page, the four-question
+builder, a live collection ticket that ages against the island clock, and the staff rail
+that makes the quote true. Papiamentu, Dutch and English, switchable, through all four.
 
 **The app is the window in your pocket.** A different posture from the site: operational,
-tight, built around one object. Your order becomes a live fire ticket with a timeline and a
-collection code, and instead of reporting a status it gives an instruction: the minute to
+tight, built around one object, and deliberately without a tab bar, because a tab bar spends
+its best real estate advertising peers to a product that has none. It is one surface that
+changes identity through the night. Cold before nine. Quoting a live fire time once the
+coals are lit. And the moment an order goes in it stops being a home screen and becomes the
+ticket: a timeline, a collection code, and instead of a status an instruction, the minute to
 walk out of the door, computed from the queue and how far away you are. **Trempan** is the loyalty
 mechanic: book a collection slot in the first two hours after the grill lights, 21:00 to
 23:00, and the kitchen guarantees twelve minutes and takes Cg 2 off, because an empty grill
 is worth more to them than a full one. Loyalty that
 moves demand beats loyalty that stamps a card.
 
-**The ordering system is the window's grammar.** Four questions in the truck's own order:
+**The order flow is the window's grammar,** and it is the same four questions in both
+products, off the same table of prices. In the truck's own order:
 *Ki karni?* which cut. *Kon bo ke?* how do you want it. *Batata òf pan?* fries or bread.
 *Ku sous?* with sauce. Including **mitar mitar**, half and half, which is the most requested
 thing at a truk window and which no ordering system on the island supports. Behind it, the
@@ -154,11 +159,21 @@ from their fire photography. Type is Big Shoulders Display for condensed poster 
 Instrument Sans for interface text, and Instrument Serif italic for the Papiamentu, which
 gives the second language its own voice instead of setting it in parentheses.
 
-The three surfaces deliberately do not share a layout language. The site is editorial:
-wide, photographic, asymmetric. The app is operational: tight cards, live state, almost no
-photography. The ordering system is a tool: visible structure, tabular numbers, everything
-on screen at once. They share a palette and a typeface, which is what makes them one brand,
-and differ in posture, which is what makes each one right for its job.
+The two products deliberately do not share a layout language. The site is editorial where
+it sells and a tool where it takes an order: wide and photographic on the way in, then
+visible structure, tabular numbers and every piece of state on screen at once once you are
+building a plate. The app is operational throughout: one column, tight cards, live state,
+four thumbnails and no other photography. They share a palette and a typeface, which is what
+makes them one brand, and differ in posture, which is what makes each one right for its job.
+
+The app's architecture was chosen against two alternatives rather than assumed. A four-tab
+controller with per-tab navigation stacks and a five-tab variant were both drawn up in full
+and both rejected: three independent reviews, judging separately for craft, for buildability
+in one vanilla file, and for whether it serves somebody standing on Caracasbaaiweg at 23:40,
+all landed on the single-surface shape. What survived from the others is the modal grammar
+(a sheet you can throw away, a cover you must acknowledge), the lock screen with the push
+already sitting on it, and the refused menu cell that explains itself at the moment of
+asking instead of doing nothing.
 
 ## What is real and what is modelled
 
@@ -167,13 +182,14 @@ transcribed from the December 2024 printed menu and from fridays.cw. The photogr
 Fridays' own. The three reviews are the ones on their site, under the names given there.
 
 **Modelled.** Queue depth and fire time are simulated from a curve peaking between 22:30
-and 01:00, using one shared formula so all three surfaces quote the same number at the same
-instant. They run against real Curaçao time, so the pages genuinely read differently at nine
+and 01:00, using one shared formula so both products quote the same number at the same
+instant, verified at twelve session boundaries. They run against real Curaçao time, so the pages genuinely read differently at nine
 in the evening and at two in the morning, but no live kitchen feeds them. Trempan, the fire
 ticket, the rail and the governor are proposals, not existing features. So are the prices
 the printed menu does not carry, and they are labelled as such on the hub: sides at Cg 2,
 the mitar mitar second grill pass at Cg 3, extra batata at Cg 4, delivery at Cg 8, and the
-Cg 2 Trempan credit.
+Cg 2 Trempan credit. The app's clock dial is a demo control and says so on the plinth: left
+on Live it shows the truck as it actually is, which for most of the day is a cold grill.
 
 **Needs a native pass.** The Papiamentu was written from sourced vocabulary, corrected once
 in review (`preis` not `prijs`, `Djadumingu` not `Djadomingo`, `òf` not `o`, `tum'é` and

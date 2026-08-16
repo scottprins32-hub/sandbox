@@ -1,0 +1,1525 @@
+<meta charset="utf-8">
+<title>Fridays Fire Ticket</title>
+<meta name="description" content="A working prototype of the Fridays Baby Truck app. One surface that changes identity through the night: cold, lit, firing, leave now, ready. Scrub the island clock and watch it happen.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0908">
+
+<style>
+{{FONTS}}
+
+/* The app is a different animal from the website. The site is editorial: wide,
+   photographic, loud. The app is operational: tighter, quieter, and organised
+   around one live object rather than around appetite. Same palette, different
+   posture. There is no tab bar, because this product has one object and a tab
+   bar spends its best real estate advertising peers to a thing that has none. */
+:root{
+  --ink:#0A0908; --page:#0E0D0B; --card:#16130F; --card-2:#1D1915; --raise:#252019;
+  --line:rgba(246,241,231,.10); --line-2:rgba(246,241,231,.19);
+  --bone:#F6F1E7; --bone-2:#C6BEB0; --smoke:#9C9285; --dim:#8A8174;
+  --amber:#FABE4C; --amber-2:#FFD98A; --ember:#E2521B; --leaf:#8FBA68; --cool:#6D9BC3;
+  --f-display:'Shoulders',ui-sans-serif,system-ui,sans-serif;
+  --f-body:'Instrument',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --f-quote:'InstrumentSerif',Georgia,serif;
+  --gut:clamp(20px,5vw,72px); --maxw:1400px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --scr-h:662px;
+  --z-sheet:20; --z-cover:30; --z-system:40;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--page); color:var(--bone); font-family:var(--f-body);
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(90% 55% at 50% -8%, rgba(226,82,27,.16), transparent 62%)}
+img{max-width:100%; display:block}
+figure{margin:0}
+button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+a{color:inherit; text-decoration:none}
+:focus-visible{outline:2.5px solid var(--amber); outline-offset:2px; border-radius:3px}
+[tabindex="-1"]:focus{outline:none}
+.ic{width:1em; height:1em; flex:none; display:block}
+.wrap{width:100%; max-width:var(--maxw); margin-inline:auto; padding-inline:var(--gut);
+  position:relative; z-index:1}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+h1,h2,h3{margin:0; font-family:var(--f-display); font-weight:800; text-transform:uppercase;
+  line-height:.9; letter-spacing:.01em}
+.h1{font-size:clamp(2.2rem,5vw,4.1rem)}
+.h2{font-size:clamp(1.65rem,3vw,2.5rem)}
+.h3{font-size:clamp(1.08rem,1.6vw,1.4rem)}
+p{margin:0}
+.kicker{font-weight:600; font-size:.7rem; letter-spacing:.20em; text-transform:uppercase;
+  color:var(--smoke)}
+.lede{font-size:clamp(1rem,1.25vw,1.14rem); color:var(--bone-2); line-height:1.55; max-width:54ch}
+.body{color:var(--bone-2); max-width:58ch}
+.pap{font-family:var(--f-quote); font-style:italic; text-transform:none; font-weight:400}
+
+/* ================================================================ the stage
+   Argument on the left, phone on the right. Above 1080 wide and 900 tall the
+   phone sticks while the argument scrolls past it; anywhere smaller it simply
+   comes first, because a sticky element taller than the viewport is a trap. */
+.stage{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:clamp(30px,5vw,80px);
+  align-items:start; padding-top:clamp(34px,6vw,76px); padding-bottom:clamp(40px,6vw,80px)}
+.stage-copy,.stage-phone{min-width:0}
+.crumb{display:flex; align-items:center; gap:10px; color:var(--smoke); font-size:.8rem;
+  margin-bottom:24px}
+.crumb a{color:var(--bone-2)} .crumb a:hover{color:var(--amber)}
+.stage h1{margin-block:14px 20px}
+.stage h1 em{font-family:var(--f-quote); font-style:italic; font-weight:400; text-transform:none;
+  color:var(--amber); font-size:.42em; letter-spacing:-.01em}
+.stage .lede+.lede{margin-top:16px}
+
+/* the ways in: prose buttons that set a whole state in one press, so nobody has
+   to guess what the phone can do and nothing plays at the reader */
+.ways{margin-top:30px; border-top:1px solid var(--line); padding-top:22px}
+.ways h2{font-family:var(--f-body); font-size:.68rem; font-weight:700; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--smoke); margin-bottom:14px}
+.ways ul{margin:0; padding:0; display:grid; gap:8px; max-width:52ch}
+.ways li{list-style:none}
+.way{display:flex; align-items:center; gap:13px; width:100%; text-align:left; padding:12px 14px;
+  border:1px solid var(--line); border-radius:13px; background:var(--card);
+  transition:border-color .25s, transform .25s var(--ease)}
+.way:hover{border-color:var(--line-2); transform:translateX(3px)}
+.way .w-ic{width:34px; height:34px; border-radius:10px; background:var(--raise); color:var(--amber);
+  display:grid; place-items:center; font-size:1rem; flex:none}
+.way b{display:block; font-size:.9rem; font-weight:600}
+.way span{display:block; font-size:.78rem; color:var(--smoke); line-height:1.4}
+.way .go{margin-left:auto; color:var(--dim); font-size:.9rem; flex:none}
+
+.sec{padding-block:clamp(42px,5.2vw,82px)}
+.sec-head{margin-bottom:clamp(26px,3.4vw,46px); max-width:60ch}
+.sec-head .kicker{margin-bottom:12px}
+.sec-head h2{margin-bottom:16px}
+
+/* --------------------------------------------------------------- the plinth
+   Every control that is not part of the product lives out here, so nothing fake
+   ever appears inside the screen. */
+.plinth{width:330px; max-width:100%; margin-top:18px; display:grid; gap:12px}
+.dial{border:1px solid var(--line); border-radius:16px; background:var(--card); padding:13px 15px}
+.dial-top{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:8px}
+.dial-top b{font-family:var(--f-display); font-weight:800; font-size:1.45rem; letter-spacing:.03em;
+  line-height:1; font-variant-numeric:tabular-nums}
+.dial-top .kicker{font-size:.6rem}
+.dial input[type=range]{width:100%; accent-color:var(--amber); height:22px; margin:0; display:block}
+.dial-x{display:flex; justify-content:space-between; font-size:.64rem; color:var(--dim);
+  letter-spacing:.04em}
+.presets{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap}
+.mini{border:1px solid var(--line-2); border-radius:9px; padding:6px 10px; font-size:.72rem;
+  font-weight:600; color:var(--bone-2); transition:.2s; white-space:nowrap}
+.mini:hover{border-color:var(--bone); color:var(--bone)}
+.mini[aria-pressed="true"]{background:var(--amber); border-color:var(--amber); color:#241A05}
+.mini.live[aria-pressed="true"]{background:var(--leaf); border-color:var(--leaf); color:#15200C}
+.plinth-note{font-size:.74rem; color:var(--smoke); line-height:1.5}
+.plinth-note b{color:var(--bone-2); font-weight:600}
+
+/* ------------------------------------------------------------ device frame */
+.phone{width:330px; max-width:100%; min-width:0; flex:none; border-radius:44px; padding:11px;
+  background:linear-gradient(155deg,#3A342C,#151310 42%,#0D0C0A);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.9), inset 0 0 0 1px rgba(246,241,231,.10);
+  position:relative}
+.screen{border-radius:34px; overflow:hidden; background:var(--ink); height:var(--scr-h);
+  display:flex; flex-direction:column; position:relative; isolation:isolate; min-width:0}
+.statusbar{display:flex; align-items:center; justify-content:space-between;
+  padding:11px 22px 3px; font-size:.72rem; font-weight:600; letter-spacing:.02em; flex:none;
+  position:relative; z-index:6}
+.statusbar .sb-r{display:flex; gap:6px; align-items:center; font-size:.78rem; color:var(--bone-2)}
+/* the island carries the live activity, so a glance at the top of the phone is
+   enough while the ticket is on the coals */
+.island{position:absolute; top:11px; left:50%; transform:translateX(-50%); height:23px;
+  min-width:86px; background:#000; border-radius:14px; z-index:7; display:flex;
+  align-items:center; justify-content:center; gap:7px; padding:0;
+  transition:min-width .35s var(--ease), padding .35s var(--ease)}
+.island.live{min-width:0; padding:0 13px}
+.island .ic{font-size:.82rem; color:var(--ember)}
+.island b{font-size:.72rem; font-weight:700; letter-spacing:.04em; color:var(--bone);
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* the root surface. One layer, never unmounted, scroll preserved. */
+.app{flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; min-width:0}
+.view{flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none;
+  padding:2px 15px 14px}
+.view::-webkit-scrollbar{display:none}
+.appbar{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  padding:8px 0 14px}
+.appbar h2{font-size:1.32rem; letter-spacing:.03em}
+.appbar .sub{font-family:var(--f-quote); font-style:italic; font-size:.8rem; color:var(--smoke);
+  text-transform:none; letter-spacing:0; display:block; margin-top:3px}
+.avatar{width:36px; height:36px; border-radius:50%; background:var(--raise); color:var(--amber);
+  display:grid; place-items:center; font-weight:700; font-size:.78rem; flex:none;
+  border:1px solid var(--line-2); transition:border-color .25s}
+.avatar:hover{border-color:var(--amber)}
+
+/* the thumb zone: one primary whose label is always the true next move */
+.thumb{flex:none; min-width:0; padding:10px 15px 15px; background:var(--ink);
+  border-top:1px solid var(--line); display:grid; gap:8px}
+.thumb .sub{font-size:.72rem; color:var(--smoke); text-align:center}
+
+/* ------------------------------------------------------ in-app components */
+.card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:15px;
+  margin-bottom:11px; width:100%; text-align:left; display:block}
+button.card{transition:border-color .25s} button.card:hover{border-color:var(--line-2)}
+.card-hd{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:11px}
+.card-hd h3{font-size:.9rem; letter-spacing:.09em; color:var(--bone-2); font-family:var(--f-body);
+  font-weight:700; text-transform:uppercase}
+.card-hd .ic{color:var(--dim); font-size:.95rem}
+
+.pill{display:inline-flex; align-items:center; gap:6px; font-size:.62rem; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; padding:4px 9px; border-radius:999px}
+.pill i{width:6px; height:6px; border-radius:50%; background:currentColor; flex:none}
+.pill.on{background:rgba(143,186,104,.16); color:#A6D07E}
+.pill.warm{background:rgba(226,82,27,.20); color:#FF9163}
+.pill.cool{background:rgba(109,155,195,.16); color:#9CC0DE}
+.pill.amber{background:rgba(250,190,76,.17); color:var(--amber)}
+
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);
+  border-radius:14px; overflow:hidden}
+.stat{background:var(--card-2); padding:11px 8px; text-align:center}
+.stat b{display:block; font-family:var(--f-display); font-weight:800; font-size:1.7rem;
+  line-height:1; letter-spacing:.02em}
+.stat b.warm{color:var(--ember)}
+.stat span{display:block; font-size:.63rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--smoke); margin-top:5px}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:600;
+  font-size:.88rem; padding:13px 18px; border-radius:14px; width:100%;
+  transition:background .25s, border-color .25s, transform .2s var(--ease), opacity .2s}
+.btn .ic{font-size:1.05em}
+.btn-hot{background:var(--amber); color:#241A05}
+.btn-hot:active{transform:scale(.98)}
+.btn-fire{background:var(--ember); color:#fff}
+.btn-line{border:1px solid var(--line-2); color:var(--bone)}
+.btn-line:hover{border-color:var(--bone)}
+.btn-quiet{color:var(--smoke); padding:9px} .btn-quiet:hover{color:var(--bone)}
+.btn-sm{padding:9px 13px; font-size:.78rem; border-radius:11px; width:auto}
+.btn:disabled{opacity:.42; cursor:not-allowed}
+
+.row{display:flex; align-items:center; gap:11px; padding:10px 0; width:100%; text-align:left}
+.row+.row{border-top:1px solid var(--line)}
+.row .rl{flex:1; min-width:0}
+.row b{display:block; font-size:.87rem; font-weight:600}
+.row span{display:block; font-size:.74rem; color:var(--smoke)}
+.row em{font-style:normal; font-family:var(--f-display); font-weight:800; font-size:1.15rem;
+  letter-spacing:.02em; flex:none; font-variant-numeric:tabular-nums}
+.row .go{color:var(--dim); font-size:.9rem; flex:none}
+.row-ic{width:34px; height:34px; border-radius:10px; background:var(--raise); color:var(--amber);
+  display:grid; place-items:center; font-size:1rem; flex:none}
+button.row{transition:opacity .2s} button.row:hover{opacity:.82}
+
+.note{font-size:.74rem; color:var(--smoke); line-height:1.5}
+.hr{height:1px; background:var(--line); border:0; margin:13px 0}
+.qline{font-family:var(--f-display); font-weight:800; font-size:1.42rem; text-transform:uppercase;
+  letter-spacing:.03em; margin-bottom:2px}
+.qsub{font-family:var(--f-quote); font-style:italic; font-size:.82rem; color:var(--smoke);
+  margin-bottom:12px}
+
+.usual{background:linear-gradient(150deg,var(--card-2),var(--card)); border-color:var(--line-2)}
+.u-top{display:flex; align-items:flex-start; gap:12px; margin-bottom:13px}
+.u-name{font-family:var(--f-display); font-weight:800; font-size:1.42rem; text-transform:uppercase;
+  letter-spacing:.03em; line-height:1; display:block}
+.u-mods{font-size:.76rem; color:var(--smoke); margin-top:5px}
+.u-price{margin-left:auto; font-family:var(--f-display); font-weight:800; font-size:1.42rem;
+  color:var(--amber); flex:none; letter-spacing:.02em}
+
+.scroll{display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; margin:0 -15px;
+  padding:2px 15px 4px}
+.scroll::-webkit-scrollbar{display:none}
+.dish{flex:none; width:124px; text-align:left}
+.dish img{width:124px; height:124px; border-radius:14px; object-fit:cover; margin-bottom:8px}
+.dish b{display:block; font-size:.78rem; font-weight:600; line-height:1.25}
+.dish span{display:block; font-size:.74rem; color:var(--amber); font-weight:600; margin-top:2px}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.chip{padding:10px 12px; border:1px solid var(--line-2); border-radius:13px; text-align:left;
+  transition:.22s var(--ease); background:var(--card); position:relative}
+.chip b{display:block; font-family:var(--f-display); font-weight:800; font-size:.97rem;
+  text-transform:uppercase; letter-spacing:.03em; line-height:1.1}
+.chip span{display:block; font-family:var(--f-quote); font-style:italic; font-size:.72rem;
+  color:var(--smoke)}
+.chip span.m{font-family:var(--f-body); font-style:normal; font-size:.73rem;
+  font-variant-numeric:tabular-nums}
+.chip b small{font-family:var(--f-body); font-weight:600; font-size:.62rem; letter-spacing:.1em;
+  color:var(--amber); margin-left:4px; vertical-align:.1em}
+.chip[aria-checked="true"],.chip[aria-pressed="true"]{background:var(--amber);
+  border-color:var(--amber); color:#241A05}
+.chip[aria-checked="true"] b small,.chip[aria-pressed="true"] b small{color:#3D2C06}
+.chip[aria-checked="true"] span,.chip[aria-pressed="true"] span{color:#5A4410}
+.chip:disabled{background:transparent; border-style:dashed; border-color:var(--line-2);
+  cursor:not-allowed}
+.chip:disabled b{color:var(--smoke)}
+.chip:disabled span{color:var(--smoke)}
+.steps{display:flex; gap:6px; margin-bottom:13px}
+.steps button{flex:1; padding:0; height:22px; display:flex; align-items:flex-start}
+.steps i{height:3px; width:100%; border-radius:2px; background:var(--raise);
+  transition:background .3s}
+.steps button.on i{background:var(--amber)}
+.steps button.done i{background:rgba(250,190,76,.42)}
+
+.seg{display:grid; gap:6px}
+.seg-row{display:grid; grid-template-columns:repeat(3,1fr); gap:6px}
+.seg-row.two{grid-template-columns:repeat(2,1fr)}
+.seg-opt{padding:10px 6px; border:1px solid var(--line-2); border-radius:11px; text-align:center;
+  transition:.22s}
+.seg-opt .ic{font-size:1.1rem; margin:0 auto 5px; color:var(--smoke)}
+.seg-opt b{display:block; font-size:.75rem; font-weight:600}
+.seg-opt span{display:block; font-size:.66rem; color:var(--smoke); margin-top:2px}
+.seg-opt[aria-checked="true"]{border-color:var(--amber); background:rgba(250,190,76,.10)}
+.seg-opt[aria-checked="true"] .ic{color:var(--amber)}
+.seg-h{margin:12px 0 0; font-size:.65rem; font-weight:700; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--smoke); font-family:var(--f-body)}
+.field{margin-top:12px}
+.field label{display:block; font-size:.66rem; font-weight:700; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--smoke); margin-bottom:7px}
+.field input,.field textarea{width:100%; background:var(--card); border:1px solid var(--line-2);
+  border-radius:11px; padding:10px 12px; color:var(--bone); font:inherit; font-size:.86rem;
+  resize:vertical}
+.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
+.sw{width:42px; height:24px; border-radius:999px; background:var(--raise); position:relative;
+  flex:none; transition:background .25s; border:1px solid var(--line-2)}
+.sw::after{content:""; position:absolute; top:2px; left:2px; width:18px; height:18px;
+  border-radius:50%; background:var(--bone-2); transition:transform .25s var(--ease)}
+[aria-checked="true"]>.sw{background:var(--leaf); border-color:var(--leaf)}
+[aria-checked="true"]>.sw::after{transform:translateX(18px); background:#15200C}
+
+/* ------------------------------------------------------------- the ticket */
+.ticket{background:var(--card); border:1px solid var(--line-2); border-radius:18px;
+  overflow:hidden; margin-bottom:11px; position:relative}
+.tk-top{padding:15px 15px 17px; background:linear-gradient(160deg,#231D14,var(--card))}
+.tk-code{display:flex; align-items:flex-end; justify-content:space-between; gap:12px}
+.tk-code b{font-family:var(--f-display); font-weight:800; font-size:2.85rem; line-height:.82;
+  letter-spacing:.04em; color:var(--amber); display:block}
+.tk-code .lab{font-size:.6rem; letter-spacing:.13em; text-transform:uppercase; color:var(--smoke);
+  display:block; margin-bottom:5px}
+.tk-code .when{font-family:var(--f-display); font-weight:800; font-size:1.78rem; line-height:.85;
+  letter-spacing:.03em; display:block; text-align:right}
+.perf{position:relative; height:21px; background:var(--card)}
+.perf::before,.perf::after{content:""; position:absolute; top:50%; width:21px; height:21px;
+  border-radius:50%; background:var(--ink); transform:translateY(-50%)}
+.perf::before{left:-10.5px} .perf::after{right:-10.5px}
+.perf i{position:absolute; left:14px; right:14px; top:50%; height:0;
+  border-top:2px dashed var(--line-2)}
+.tk-body{padding:3px 15px 15px}
+.timeline{display:grid; margin:5px 0 3px}
+.tl{display:grid; grid-template-columns:26px 1fr auto; gap:11px; align-items:start;
+  padding-bottom:15px; position:relative}
+.tl:last-child{padding-bottom:0}
+.tl::before{content:""; position:absolute; left:12px; top:20px; bottom:-2px; width:2px;
+  background:var(--line)}
+.tl:last-child::before{display:none}
+.tl .tl-dot{width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
+  background:var(--raise); color:var(--dim); font-size:.74rem; z-index:1;
+  border:1px solid var(--line); position:relative}
+.tl.done .tl-dot{background:rgba(143,186,104,.18); color:#A6D07E; border-color:transparent}
+.tl.live .tl-dot{background:var(--ember); color:#fff; border-color:transparent}
+.tl.live .tl-dot::after{content:""; position:absolute; inset:-5px; border-radius:50%;
+  border:1.5px solid rgba(226,82,27,.45); animation:ring 2s var(--ease) infinite}
+@keyframes ring{0%{transform:scale(.85); opacity:1} 100%{transform:scale(1.3); opacity:0}}
+.tl b{display:block; font-size:.85rem; font-weight:600}
+.tl span{display:block; font-size:.73rem; color:var(--smoke)}
+.tl time{font-family:var(--f-display); font-weight:800; font-size:.98rem; letter-spacing:.03em;
+  color:var(--bone-2)}
+.tl.live time{color:var(--ember)}
+.tl:not(.done):not(.live) b{color:var(--smoke)}
+
+/* the countdown takes the top third once leaving is the next thing you do */
+.leave{border-radius:18px; padding:16px; margin-bottom:11px; text-align:center;
+  background:linear-gradient(160deg,rgba(226,82,27,.26),rgba(226,82,27,.06));
+  border:1px solid rgba(226,82,27,.4)}
+.leave .lv-n{font-family:var(--f-display); font-weight:800; font-size:3.6rem; line-height:.85;
+  color:#FF9163; letter-spacing:.02em; font-variant-numeric:tabular-nums; display:block}
+.leave b{display:block; font-size:1rem; font-weight:600; margin-top:8px}
+.leave span{display:block; font-size:.78rem; color:var(--bone-2); margin-top:3px}
+.leave.calm{background:linear-gradient(160deg,rgba(143,186,104,.20),rgba(143,186,104,.04));
+  border-color:rgba(143,186,104,.34)}
+.leave.calm .lv-n{color:#A6D07E}
+
+/* ---------------------------------------------------------------- overlays */
+.scrim{position:absolute; inset:0; background:rgba(6,5,4,.62); animation:fade .25s var(--ease) both}
+@keyframes fade{from{opacity:0} to{opacity:1}}
+.sheet-wrap{position:absolute; inset:0; z-index:var(--z-sheet); display:flex;
+  flex-direction:column; justify-content:flex-end}
+.sheet{position:relative; background:var(--card-2); border-radius:22px 22px 0 0;
+  border-top:1px solid var(--line-2); max-height:88%; display:flex; flex-direction:column;
+  animation:sheetIn .32s var(--ease) both}
+@keyframes sheetIn{from{transform:translateY(100%)} to{transform:none}}
+.grab{width:38px; height:4px; border-radius:2px; background:var(--line-2); margin:9px auto 2px;
+  flex:none}
+.sheet-hd{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:6px 15px 10px; flex:none}
+.sheet-hd h2{font-size:1.02rem; letter-spacing:.04em}
+.sheet-hd .x{color:var(--smoke); font-size:1rem; padding:6px}
+.sheet-hd .x:hover{color:var(--bone)}
+.sheet-bd{overflow-y:auto; overscroll-behavior:contain; padding:2px 15px 14px;
+  scrollbar-width:none; min-width:0}
+.sheet-bd::-webkit-scrollbar{display:none}
+.sheet-ft{padding:10px 15px 15px; border-top:1px solid var(--line); flex:none;
+  background:var(--card-2)}
+.sheet-ft .bl{display:flex; align-items:center; gap:12px; margin-bottom:9px}
+.sheet-ft .bl b{font-family:var(--f-display); font-weight:800; font-size:1.4rem;
+  letter-spacing:.02em; line-height:1}
+.sheet-ft .bl span{font-size:.72rem; color:var(--smoke); margin-left:auto; text-align:right}
+
+/* a cover is not a sheet: no grabber, no scrim, you acknowledge it */
+.cover{position:absolute; inset:0; z-index:var(--z-cover); display:flex; flex-direction:column;
+  background:var(--ink); animation:coverIn .34s var(--ease) both}
+@keyframes coverIn{from{transform:translateY(100%)} to{transform:none}}
+.cover-bd{flex:1; overflow-y:auto; padding:20px 18px; display:flex; flex-direction:column;
+  justify-content:center; gap:12px; text-align:center; align-items:center}
+.cover-ft{padding:12px 15px 16px; flex:none}
+.seal{width:64px; height:64px; border-radius:50%; background:rgba(143,186,104,.18); color:#A6D07E;
+  display:grid; place-items:center; font-size:1.8rem}
+.cover h2{font-size:1.5rem; letter-spacing:.04em}
+/* the collection code, readable across a service window at one in the morning */
+.codecard{background:#F6F1E7; color:#0A0908}
+.codecard .cover-bd{gap:9px}
+.codecard b{font-family:var(--f-display); font-weight:800; font-size:4.4rem; line-height:.85;
+  letter-spacing:.05em}
+.codecard .k{font-size:.66rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  color:#645A4D}
+.codecard p{font-size:.83rem; color:#463F35; max-width:26ch}
+.codecard .bars{display:flex; gap:3px; margin-top:4px; height:46px; align-items:flex-end}
+.codecard .bars i{display:block; width:3px; height:46px; background:#0A0908; border-radius:1px}
+.codecard .cover-ft{border-top:1px solid rgba(10,9,8,.14)}
+.codecard .btn-line{border-color:rgba(10,9,8,.28); color:#0A0908}
+.codecard .btn-line:hover{border-color:#0A0908}
+
+/* the lock screen and the push banner sit above everything */
+.lock{position:absolute; inset:0; z-index:var(--z-system); display:flex; flex-direction:column;
+  padding:52px 18px 20px; background:linear-gradient(170deg,#1A1512,#0A0908 62%)}
+.lock::before{content:""; position:absolute; inset:0;
+  background:radial-gradient(80% 40% at 50% 6%, rgba(226,82,27,.24), transparent 70%)}
+.lock>*{position:relative}
+.lk-time{font-family:var(--f-display); font-weight:800; font-size:4.2rem; line-height:.85;
+  letter-spacing:.02em; text-align:center; font-variant-numeric:tabular-nums}
+.lk-date{text-align:center; color:var(--bone-2); font-size:.84rem; margin-top:8px}
+.push{display:flex; gap:11px; width:100%; text-align:left; padding:12px 13px; border-radius:18px;
+  background:rgba(38,33,27,.88); backdrop-filter:blur(14px); border:1px solid var(--line-2);
+  animation:pushDrop .5s var(--ease) both}
+@keyframes pushDrop{from{transform:translateY(-16px); opacity:0} to{transform:none; opacity:1}}
+.push .p-ic{width:32px; height:32px; border-radius:9px; background:var(--ember); color:#fff;
+  display:grid; place-items:center; font-size:1rem; flex:none}
+.push .p-hd{font-size:.6rem; letter-spacing:.13em; text-transform:uppercase; color:var(--smoke);
+  display:flex; justify-content:space-between; gap:8px}
+.push b{display:block; font-size:.85rem; font-weight:600; margin-top:3px}
+.push p{font-size:.78rem; color:var(--bone-2); line-height:1.4}
+.lock .push{margin-top:auto}
+.lk-open{margin-top:12px; font-size:.78rem; color:var(--smoke); width:100%; padding:9px}
+.lk-open:hover{color:var(--bone)}
+.banner{position:absolute; top:44px; left:8px; right:8px; z-index:35; width:calc(100% - 16px);
+  box-shadow:0 14px 34px -12px rgba(0,0,0,.85)}
+
+/* ---------------------------------------------------------- page furniture */
+.moves{display:grid; gap:2px; background:var(--line); border:1px solid var(--line);
+  border-radius:18px; overflow:hidden}
+.move{display:grid; grid-template-columns:50px 1fr minmax(0,1.05fr); gap:clamp(18px,3vw,42px);
+  align-items:start; padding:clamp(22px,2.8vw,34px); background:var(--card)}
+.move-n{width:44px; height:44px; border-radius:12px; background:var(--raise); color:var(--amber);
+  display:grid; place-items:center; font-size:1.3rem}
+.move h3{margin-bottom:10px}
+.move p{color:var(--bone-2); font-size:.93rem}
+.move .then{color:var(--smoke); font-size:.88rem; border-left:2px solid var(--amber);
+  padding-left:16px}
+.move .then b{color:var(--bone); font-weight:600; display:block; margin-bottom:3px;
+  font-size:.8rem; letter-spacing:.06em; text-transform:uppercase}
+
+.vs{display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--line);
+  border:1px solid var(--line); border-radius:18px; overflow:hidden}
+.vs>div{background:var(--card); padding:clamp(22px,2.6vw,32px)}
+.vs h3{font-size:.96rem; font-family:var(--f-body); font-weight:700; letter-spacing:.11em;
+  margin-bottom:16px}
+.vs .now h3{color:var(--smoke)} .vs .next h3{color:var(--amber)}
+.vs li{list-style:none; display:flex; gap:11px; padding:10px 0; font-size:.9rem;
+  color:var(--bone-2); align-items:flex-start}
+.vs li+li{border-top:1px solid var(--line)}
+.vs ul{margin:0; padding:0}
+.vs .ic{font-size:1.05rem; margin-top:2px; flex:none}
+.vs .now .ic{color:var(--dim)} .vs .next .ic{color:var(--leaf)}
+
+.ft{border-top:1px solid var(--line); padding-block:34px 44px; margin-top:clamp(34px,4vw,70px);
+  font-size:.78rem; color:var(--smoke)}
+.ft-in{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.ft a{color:var(--bone-2)} .ft a:hover{color:var(--amber)}
+
+@media (min-width:1081px) and (min-height:900px){ .stage-phone{position:sticky; top:22px} }
+@media (max-width:1080px){
+  .stage{grid-template-columns:1fr}
+  .stage-phone{justify-self:center; display:grid; justify-items:center; margin-top:12px}
+  .move{grid-template-columns:40px 1fr; gap:16px}
+  .move .then{grid-column:2; margin-top:6px}
+  .vs{grid-template-columns:1fr}
+}
+/* On a narrow screen the phone fills the width, so the frame shrinks rather than
+   the screen growing: an inner scroller that fills the viewport swallows swipes. */
+@media (max-width:520px){
+  :root{--scr-h:600px}
+  .phone{width:100%; padding:8px; border-radius:34px}
+  .screen{border-radius:27px}
+  .plinth{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;
+    animation-iteration-count:1 !important; transition-duration:.001ms !important}
+}
+</style>
+
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<main>
+<div class="wrap stage">
+  <div class="stage-copy">
+    <p class="crumb"><a href="index.html">Fridays Baby Truck</a> {{ICON:caret-right}} <span>The app</span></p>
+    <p class="kicker">Prototype, native iOS and Android</p>
+    <h1 class="h1">One screen<br>you actually<br>open <em>at midnight</em></h1>
+    <p class="lede">Fridays currently rides a white-label of a shared island ordering platform. It works, but the brand is a skin on someone else's checkout and the app answers the wrong question. Nobody opens a food app at half past eleven to browse. They open it to find out how long, and when to leave the house.</p>
+    <p class="lede">So this one has no tab bar and no menu to browse. It is a single surface that changes identity through the night. Cold before nine. Quoting a live fire time once the coals are lit. And the moment you send an order it stops being a home screen and becomes the ticket, counting down to the minute you should walk out of the door.</p>
+
+    <div class="ways">
+      <h2>Ways in</h2>
+      <ul>
+        <li><button class="way" data-way="cold">
+          <span class="w-ic">{{ICON:moon-stars}}</span>
+          <span><b>Before the grill lights</b><span>20:20. The window is shut and the only useful thing to do is book the early lane.</span></span>
+          <span class="go">{{ICON:caret-right}}</span></button></li>
+        <li><button class="way" data-way="order">
+          <span class="w-ic">{{ICON:basket}}</span>
+          <span><b>Order the way the window asks</b><span>22:10. Ki karni, kon bo ke, batata òf pan, ku sous. Four questions, in that order.</span></span>
+          <span class="go">{{ICON:caret-right}}</span></button></li>
+        <li><button class="way" data-way="firing">
+          <span class="w-ic">{{ICON:fire}}</span>
+          <span><b>A ticket on the coals</b><span>23:40, the worst of the peak. Fifteen tickets deep and the quote says so.</span></span>
+          <span class="go">{{ICON:caret-right}}</span></button></li>
+        <li><button class="way" data-way="leave">
+          <span class="w-ic">{{ICON:car}}</span>
+          <span><b>The minute to leave the house</b><span>The whole product, in one number and one notification.</span></span>
+          <span class="go">{{ICON:caret-right}}</span></button></li>
+        <li><button class="way" data-way="lock">
+          <span class="w-ic">{{ICON:device-mobile}}</span>
+          <span><b>The lock screen</b><span>How this actually gets used. You do not open it. You glance at it.</span></span>
+          <span class="go">{{ICON:caret-right}}</span></button></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stage-phone">
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar" aria-hidden="true">
+          <span class="num" id="sbClock">23:40</span>
+          <span class="sb-r">{{ICON:cell-signal-full}}{{ICON:wifi-high}}{{ICON:battery-full}}</span>
+        </div>
+        <div class="island" id="island" aria-hidden="true"></div>
+        <div class="app" id="app"></div>
+      </div>
+    </div>
+
+    <div class="plinth">
+      <div class="dial">
+        <div class="dial-top">
+          <b class="num" id="dialTime">23:40</b>
+          <span class="kicker" id="dialState">Simulated</span>
+        </div>
+        <label class="sr" for="dial">Island time, from eight in the evening to half past four in the morning</label>
+        <input type="range" id="dial" min="1200" max="1710" step="5" value="1420">
+        <div class="dial-x"><span>20:00</span><span>23:00</span><span>02:00</span><span>04:30</span></div>
+        <div class="presets" role="group" aria-label="Jump the clock">
+          <button class="mini live" data-jump="live" aria-pressed="false">Live</button>
+          <button class="mini" data-jump="1270" aria-pressed="false">21:10, early lane</button>
+          <button class="mini" data-jump="1420" aria-pressed="true">23:40, the peak</button>
+          <button class="mini" data-jump="1610" aria-pressed="false">02:50, last hour</button>
+        </div>
+      </div>
+      <p class="plinth-note">The phone runs on <b>Curacao time</b>, which never shifts for daylight saving. Left on Live it shows the truck as it is right now, which for most of the day is a cold grill, so the dial scrubs a night instead. Fire time, queue depth, the Trempan lane and the ticket all move with it.</p>
+    </div>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">The shape of it</p>
+      <h2 class="h2">Three decisions<br>the rest follows from</h2>
+    </div>
+    <div class="moves">
+      <div class="move">
+        <span class="move-n">{{ICON:ticket}}</span>
+        <div>
+          <h3 class="h3">The ticket is the app</h3>
+          <p>Not a menu, not a feed, not five tabs. Once you have ordered, the surface you were already looking at becomes a live ticket with a fire timeline and a collection code. Everything else is how you get to one.</p>
+        </div>
+        <p class="then"><b>Why it matters</b>Charcoal is not a microwave. If the wait is real, the honest move is to show it minute by minute rather than spin a progress bar.</p>
+      </div>
+      <div class="move">
+        <span class="move-n">{{ICON:car}}</span>
+        <div>
+          <h3 class="h3">It tells you when to leave</h3>
+          <p>The app knows the depth of the rail and how far away you are. So it stops reporting status and starts giving an instruction: leave in six minutes and your food hits the window as you park. Change where you are coming from and the number moves.</p>
+        </div>
+        <p class="then"><b>Why it matters</b>Food that waits for a customer goes soft. A customer who waits at the window blocks the next twelve. Timing the handover fixes both.</p>
+      </div>
+      <div class="move">
+        <span class="move-n">{{ICON:sun-horizon}}</span>
+        <div>
+          <h3 class="h3">It pays you to come early</h3>
+          <p>Trempan is a lane, not a discount code. Book a collection slot in the first two hours after the grill lights, 21:00 to 23:00, and the kitchen guarantees twelve minutes and takes Cg 2 off, because an empty grill is worth more to them than a full one.</p>
+        </div>
+        <p class="then"><b>Why it matters</b>The truck's only real problem is that everyone arrives between 22:30 and 01:00. Loyalty that moves demand beats loyalty that stamps a card.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">What changes</p>
+      <h2 class="h2">Renting a platform,<br>or owning the counter</h2>
+    </div>
+    <div class="vs">
+      <div class="now">
+        <h3>ON THE SHARED PLATFORM</h3>
+        <ul>
+          <li>{{ICON:x}}<span>The menu arrives as a flat list, so the cut and format grid the kitchen actually runs on is flattened into hundreds of near-duplicate lines.</span></li>
+          <li>{{ICON:x}}<span>No queue depth, so the quoted time is the same at 20:00 and at midnight.</span></li>
+          <li>{{ICON:x}}<span>The customer belongs to the platform. Fridays cannot message a regular or see who they are.</span></li>
+          <li>{{ICON:x}}<span>English and Dutch only, on an island whose first language is Papiamentu.</span></li>
+          <li>{{ICON:x}}<span>Commission on every order, on a Cg 21 plate.</span></li>
+        </ul>
+      </div>
+      <div class="next">
+        <h3>ON THEIR OWN APP</h3>
+        <ul>
+          <li>{{ICON:check}}<span>The builder mirrors the window: pick the cut, pick the format, batata or pan, then sauce, with the cells the kitchen refuses saying so.</span></li>
+          <li>{{ICON:check}}<span>Fire time is quoted from the live rail, so a busy Saturday quotes the high thirties and a quiet Tuesday quotes about ten.</span></li>
+          <li>{{ICON:check}}<span>Fridays keeps the relationship, the order history and the reason someone stopped coming.</span></li>
+          <li>{{ICON:check}}<span>Papiamentu first, with Dutch and English behind it. The website next door switches all three live.</span></li>
+          <li>{{ICON:check}}<span>Card fees only, and a cash-at-the-window option that costs nothing.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="margin-top:18px; max-width:70ch">This prototype runs in English with the truck's own Papiamentu kept where the truck uses it: the greeting, the four questions, the words on the plate. The language switching itself is demonstrated on the website rather than duplicated here, because the Papiamentu still needs a native speaker's pass before any of it ships.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="ft">
+  <div class="wrap ft-in">
+    <span>Fridays Baby Truck app prototype. Nothing is charged and no order is sent.</span>
+    <span><a href="index.html">The website and the ordering system</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+document.documentElement.lang="en";   // the artifact wrapper supplies <html>, not its lang
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const IMG={{IMGJSON:t_ribs,t_caesar,t_kapsalon,t_shrimp}};
+const I={
+  fire:`{{ICON:fire}}`, basket:`{{ICON:basket}}`, ticket:`{{ICON:ticket}}`, user:`{{ICON:user}}`,
+  check:`{{ICON:check}}`, timer:`{{ICON:timer}}`, car:`{{ICON:car}}`, x:`{{ICON:x}}`,
+  caretR:`{{ICON:caret-right}}`, caretL:`{{ICON:caret-left}}`, arrowR:`{{ICON:arrow-right}}`,
+  chef:`{{ICON:chef-hat}}`, bowl:`{{ICON:bowl-food}}`, storefront:`{{ICON:storefront}}`,
+  card:`{{ICON:credit-card}}`, money:`{{ICON:money}}`, bank:`{{ICON:bank}}`, globe:`{{ICON:globe}}`,
+  bell:`{{ICON:bell}}`, sun:`{{ICON:sun-horizon}}`, moon:`{{ICON:moon-stars}}`,
+  gift:`{{ICON:gift}}`, drop:`{{ICON:drop}}`, seal:`{{ICON:seal-check}}`, pin:`{{ICON:map-pin}}`,
+  note:`{{ICON:note-pencil}}`, users:`{{ICON:users-three}}`, moto:`{{ICON:motorcycle}}`,
+  receipt:`{{ICON:receipt}}`, minus:`{{ICON:minus}}`, plus:`{{ICON:plus}}`, info:`{{ICON:info}}`,
+  clock:`{{ICON:clock}}`, hourglass:`{{ICON:hourglass-medium}}`, heart:`{{ICON:heart}}`
+};
+
+/* =========================================================== the menu, once
+   The same December 2024 printed menu the website reads from, in the same
+   shape. `null` means the kitchen does not serve that combination. An array is
+   a box the menu prints twice, small and large. */
+const FMTS=[
+ {id:"regular", en:"Regular",      pap:"Regular",       sub:"with fries"},
+ {id:"large",   en:"Large",        pap:"Grandi",        sub:"bigger plate"},
+ {id:"caesar",  en:"Caesar salad", pap:"Salada caesar", sub:"on salad"},
+ {id:"plain",   en:"Plain",        pap:"Simpel",        sub:"meat only"},
+ {id:"sandwich",en:"Sandwich",     pap:"Pan ku…",       sub:"in a bun"},
+ {id:"wrap",    en:"Wrap",         pap:"Wrap",          sub:"rolled"},
+ {id:"kapsalon",en:"Kapsalon",     pap:"Kapsalon",      sub:"over fries"}
+];
+const CUTS=[
+ {id:"chicken", tier:"basic",  en:"Chicken",         pap:"Galiña",
+  p:{regular:[19,23],large:28,caesar:21,plain:[17,25],sandwich:15,wrap:19,kapsalon:[22,34]}},
+ {id:"porkchop",tier:"basic",  en:"Pork chop",       pap:"Pòrkchòp",
+  p:{regular:20,large:29,caesar:22,plain:[18,26],sandwich:16,wrap:null,kapsalon:null}},
+ {id:"chorizo", tier:"basic",  en:"Chorizo",         pap:"Chorizo",
+  p:{regular:21,large:30,caesar:23,plain:[19,27],sandwich:17,wrap:null,kapsalon:null}},
+ {id:"steak",   tier:"basic",  en:"Steak",           pap:"Steak",
+  p:{regular:21,large:32,caesar:23,plain:[19,27],sandwich:17,wrap:21,kapsalon:[24,38]}},
+ {id:"ribs",    tier:"basic",  en:"Ribs",            pap:"Ribs",
+  p:{regular:22,large:32,caesar:24,plain:[20,30],sandwich:18,wrap:null,kapsalon:null}},
+ {id:"shrimps", tier:"premium",en:"Shrimps",         pap:"Kamaron",
+  p:{regular:24,large:33,caesar:33,plain:30,sandwich:25,wrap:27,kapsalon:null}},
+ {id:"lomitu",  tier:"premium",en:"Beef tenderloin", pap:"Lomitu",
+  p:{regular:28,large:37,caesar:28,plain:25,sandwich:23,wrap:24,kapsalon:[33,43]}},
+ {id:"carco",   tier:"premium",en:"Conch",           pap:"Karkó",
+  p:{regular:null,large:33,caesar:33,plain:30,sandwich:25,wrap:null,kapsalon:null}},
+ {id:"picanha", tier:"premium",en:"Picanha",         pap:"Picanha",
+  p:{regular:null,large:37,caesar:37,plain:34,sandwich:29,wrap:null,kapsalon:43}},
+ {id:"ribeye",  tier:"premium",en:"Rib eye",         pap:"Rib eye",
+  p:{regular:null,large:38,caesar:38,plain:35,sandwich:30,wrap:null,kapsalon:null}},
+ {id:"surfturf",tier:"premium",en:"Surf and turf",   pap:"Picanha ku kamaron",
+  p:{regular:null,large:38,caesar:38,plain:35,sandwich:30,wrap:null,kapsalon:null}}
+];
+const SIDES=[["Batata","soft-fried chips",0],["Pan","on a bun",0],
+             ["Aros moro","rice and beans",2],["Funchi","cornmeal",2],["Salada","green or macaroni",2]];
+const SAUCES=[["Pika","onion relish, hot"],["Salsa rosada","mayo and ketchup"],
+              ["Sous di pinda","peanut"],["Chimichurri","herb and garlic"],
+              ["Jack Daniels","the house glaze"],["Sin sous","nothing on it"]];
+const PREFS=[["Sin salu","no salt",0],["Bon kushiná","well done",0],
+             ["Kòrtá","sliced for sharing",0],["Extra batata","more chips",4]];
+const ORIGINS=[["Punda",8],["Otrobanda",11],["Jan Thiel",16]];
+const USD=1.79, HALF_ADD=3, SHIP=8, TREMPAN_OFF=2;
+
+/* ------------------------------------------------------------ session time
+   The app thinks in session minutes: 1260 is 21:00 and 1560 is 02:00 the next
+   morning, so a night is one monotonic run of numbers. That is what lets the
+   dial scrub across midnight and lets a ticket age correctly while it does. */
+const OPENS=1260, LANE_SHUT=1380, CLOSE=[120,120,120,180,120,240,240];
+function realIsland(){
+  const p=new Intl.DateTimeFormat("en-GB",{timeZone:"America/Curacao",weekday:"short",
+    hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());
+  const g=k=>p.find(x=>x.type===k).value;
+  const day=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(g("weekday"));
+  const mins=(+g("hour"))*60+(+g("minute"));
+  // before noon we are still inside the night that started yesterday
+  return mins<720 ? {day:(day+6)%7, smin:mins+1440} : {day, smin:mins};
+}
+let SIM=1420;                               // null means run on the real clock
+const REALDAY=realIsland().day;
+const now=()=>SIM==null ? realIsland().smin : SIM;
+const sessionDay=()=>SIM==null ? realIsland().day : REALDAY;
+const pad=n=>String(n).padStart(2,"0");
+const clock=m=>{const x=((Math.round(m)%1440)+1440)%1440; return pad(Math.floor(x/60))+":"+pad(x%60);};
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function fire(){
+  const t=now(), shut=1440+CLOSE[sessionDay()];
+  const open=t>=OPENS && t<shut;
+  // Fractional hours across the session, so the queue peaks at 23:45 rather
+  // than snapping on the hour. Identical curve to the website.
+  const h=t/60;
+  const peak=open ? Math.max(0, 1-Math.abs(h-23.75)/3.4) : 0;
+  return {open, shut, t,
+    queue: open ? Math.round(1+peak*14) : 0,
+    mins:  open ? Math.round(9+peak*29) : 12};
+}
+function nextSlot(){
+  const t=now();
+  if(t>=OPENS && t<LANE_SHUT){
+    const s=Math.ceil((t+20)/15)*15;
+    if(s<LANE_SHUT) return {at:s, when:"tonight"};
+  }
+  return {at:OPENS, when: t<OPENS ? "tonight" : "tomorrow"};
+}
+
+/* ------------------------------------------------------------------ state */
+const USUAL={cut:"steak", fmt:"regular", side:0, sauces:[0], prefs:[], half:null, note:"",
+             name:"Steak, regular", mods:"Ku sous, sin pika.", price:21};
+const S={
+  ticket:null, sheet:null, cover:null, system:null, banner:null,
+  order:{step:0, cut:"steak", fmt:"regular", side:0, sauces:new Set([0]), prefs:new Set(),
+         half:null, halfOn:false, note:"", },
+  where:"window", when:"now", pay:"card", origin:0, alerts:true, slot:null,
+  toast:"", scroll:0
+};
+const cutOf=id=>CUTS.find(c=>c.id===id);
+const driveMin=()=>ORIGINS[S.origin][1];
+const cg=v=>"Cg "+v;
+function options(c){
+  const out=[];
+  FMTS.forEach(f=>{
+    const v=c.p[f.id];
+    if(v==null){ out.push({key:f.id, f, size:null, price:null}); return; }
+    if(Array.isArray(v)){
+      out.push({key:f.id+":s", f, size:"small", price:v[0]});
+      out.push({key:f.id+":l", f, size:"large",  price:v[1]});
+    } else out.push({key:f.id, f, size:null, price:v});
+  });
+  return out;
+}
+const optOf=(c,key)=>options(c).find(o=>o.key===key) || null;
+const boxName=(cutId,key)=>{
+  const o=optOf(cutOf(cutId),key);
+  return o ? (o.size ? `${o.f.en.toLowerCase()} (${o.size})` : o.f.en.toLowerCase()) : key;
+};
+function orderPrice(o){
+  let v=optOf(cutOf(o.cut),o.fmt)?.price ?? 0;
+  if(o.half) v=Math.max(v, optOf(cutOf(o.half),o.fmt)?.price ?? 0) + HALF_ADD;
+  v += SIDES[o.side][2];
+  const pr=o.prefs.has ? [...o.prefs] : o.prefs;
+  pr.forEach(i=>{ v += PREFS[i][2]; });
+  return v;
+}
+function keepFormat(){
+  const o=S.order;
+  if(optOf(cutOf(o.cut),o.fmt)?.price==null)
+    o.fmt=(options(cutOf(o.cut)).find(x=>x.price!=null)||{}).key ?? null;
+  if(o.half===o.cut) o.half=null;
+  if(o.half && optOf(cutOf(o.half),o.fmt)?.price==null) o.half=null;
+}
+function plateWords(o){
+  const bits=[cutOf(o.cut).en.toLowerCase()];
+  if(o.half) bits.push("mitar mitar ku "+cutOf(o.half).pap.toLowerCase());
+  const box=optOf(cutOf(o.cut),o.fmt);
+  bits.push(box.size ? `${box.f.en.toLowerCase()}, ${box.size}` : box.f.en.toLowerCase());
+  bits.push("ku "+SIDES[o.side][0].toLowerCase());
+  const sc=[...o.sauces];
+  if(sc.includes(5)) bits.push("sin sous");
+  else if(sc.length) bits.push("ku "+sc.map(i=>SAUCES[i][0].toLowerCase()).join(" i "));
+  [...o.prefs].forEach(i=>bits.push(PREFS[i][0].toLowerCase()));
+  return bits.join(", ");
+}
+function orderTotals(){
+  const sub=orderPrice(S.order);
+  const ship=S.where==="delivery" ? SHIP : 0;
+  const save=S.when==="trempan" ? TREMPAN_OFF : 0;
+  return {sub, ship, save, total:Math.max(0, sub+ship-save)};
+}
+
+/* ------------------------------------------------------------- the ticket */
+function makeTicket(opts){
+  const f=fire(), t=now(), o=opts||{};
+  const startAt = o.startAt ?? (S.when==="trempan" ? (S.slot ?? nextSlot().at) : (f.open ? t : OPENS));
+  const cook = o.cook ?? (S.when==="trempan" ? 12 : (f.open ? f.mins : 12));
+  const tt = orderTotals();
+  return {
+    code:"F-"+String(40+(startAt%57)).padStart(3,"0"),
+    placedAt:o.placedAt ?? t, startAt, cook, readyAt:startAt+cook,
+    items:o.items ?? [{cut:S.order.cut, fmt:S.order.fmt, side:S.order.side,
+      sauces:[...S.order.sauces], prefs:[...S.order.prefs], half:S.order.half,
+      note:S.order.note, price:orderPrice(S.order), qty:1}],
+    sub:o.sub ?? tt.sub, ship:o.ship ?? tt.ship, save:o.save ?? tt.save,
+    total:o.total ?? tt.total,
+    where:o.where ?? S.where, when:o.when ?? S.when, pay:o.pay ?? S.pay,
+    collected:false, notified:false
+  };
+}
+function itemName(it){ return `${cutOf(it.cut).en}, ${boxName(it.cut,it.fmt)}`; }
+function itemMods(it){
+  const bits=[SIDES[it.side][0].toLowerCase()];
+  if(it.half) bits.push("mitar mitar ku "+cutOf(it.half).pap.toLowerCase());
+  it.sauces.forEach(i=>bits.push(SAUCES[i][0].toLowerCase()));
+  it.prefs.forEach(i=>bits.push(PREFS[i][0].toLowerCase()));
+  if(it.note) bits.push('"'+esc(it.note)+'"');
+  return bits.join(", ");
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function rootState(){
+  if(S.ticket){
+    if(S.ticket.collected) return "collected";
+    const left=S.ticket.readyAt-now();
+    if(left<=0) return "ready";
+    if(left<=driveMin()) return "leave";
+    return "firing";
+  }
+  return fire().open ? "lit" : "cold";
+}
+
+/* ============================================================== the surface */
+const MAP="https://www.google.com/maps/place/Fridays+Baby+Truck/@12.1049886,-68.8903898,17z";
+const app=$("#app");
+app.innerHTML=`<div class="view" id="view"></div><div class="thumb" id="thumb"></div>
+  <div id="ovl"></div><div id="bnr"></div>`;
+const view=$("#view"), thumb=$("#thumb"), ovl=$("#ovl"), bnr=$("#bnr");
+
+function appbar(st,f){
+  const sub = st==="cold"      ? "the grill lights at "+clock(OPENS)
+            : st==="lit"       ? (f.queue>7 ? f.queue+" tickets on the rail" : "the coals are lit")
+            : st==="collected" ? "collected, dushi"
+            : st==="ready"     ? "ready at the window"
+            : "your ticket is on the rail";
+  return `<div class="appbar">
+    <div><h2><span lang="pap">Bon nochi</span>, Shanira</h2><span class="sub">${sub}</span></div>
+    <button class="avatar" data-open="account" aria-label="Your account, Shanira Martis">SM</button>
+  </div>`;
+}
+function windowCard(f){
+  const note = !f.open
+    ? `The grill lights at ${clock(OPENS)}. An order placed now joins the queue for then.`
+    : f.queue>7
+      ? `The rail is ${f.queue} deep, which is where that number comes from. A Trempan slot runs twelve minutes flat.`
+      : `Quoted off the rail, not off an average. Nothing is sitting under a lamp.`;
+  return `<div class="card">
+    <div class="card-hd"><h3>The window</h3>
+      <span class="pill ${f.open?(f.queue>7?"warm":"on"):"cool"}"><i></i>${
+        f.open?(f.queue>7?"Busy":"Open"):"Closed"}</span></div>
+    <div class="stats">
+      <div class="stat"><b class="num ${f.open&&f.mins>25?"warm":""}">${f.open?f.mins:"-"}</b><span>min fire</span></div>
+      <div class="stat"><b class="num">${f.queue}</b><span>on grill</span></div>
+      <div class="stat"><b class="num">${f.open?clock(f.shut):clock(OPENS)}</b><span>${f.open?"closes":"opens"}</span></div>
+    </div>
+    <p class="note" style="margin-top:11px">${note}</p>
+  </div>`;
+}
+function usualCard(){
+  return `<div class="card usual">
+    <div class="u-top">
+      <div><span class="note" style="letter-spacing:.12em; text-transform:uppercase; font-size:.62rem; font-weight:700" lang="pap">Bo usual</span>
+        <b class="u-name">${USUAL.name}</b>
+        <p class="u-mods" lang="pap">${USUAL.mods}</p></div>
+      <span class="u-price num">${USUAL.price}</span>
+    </div>
+    <button class="btn btn-line" data-order="usual">${I.basket}Put it in the builder</button>
+  </div>`;
+}
+function trempanCard(){
+  const s=nextSlot();
+  const held = S.slot!=null;
+  return `<div class="card">
+    <div class="card-hd"><h3 lang="pap">Trempan</h3>
+      <span class="pill amber">${clock(OPENS)} to ${clock(LANE_SHUT)}</span></div>
+    <p class="note">${held
+      ? `Slot held at ${clock(S.slot)}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
+      : `Collect in the first two hours after the grill lights and the kitchen guarantees twelve minutes and takes ${cg(TREMPAN_OFF)} off, because an empty grill costs them more than a discount does.`}</p>
+    <button class="btn btn-line" style="margin-top:12px" data-open="trempan">${I.sun}${
+      held ? "Change the slot" : `Book the ${s.when==="tomorrow"?"next":"next"} lane`}</button>
+  </div>`;
+}
+function tonightCard(){
+  const D=[["t_ribs","Jack Daniels ribs",22,"ribs","regular"],
+           ["t_caesar","Steak caesar",23,"steak","caesar"],
+           ["t_kapsalon","Chicken kapsalon",22,"chicken","kapsalon:s"],
+           ["t_shrimp","Surf and turf",38,"surfturf","large"]];
+  return `<div class="card">
+    <div class="card-hd"><h3>On the coals tonight</h3></div>
+    <div class="scroll">${D.map(d=>`<button class="dish" data-dish="${d[3]}" data-dishbox="${d[4]}">
+      <img src="${IMG[d[0]]}" alt=""><b>${d[1]}</b><span class="num">${cg(d[2])}</span></button>`).join("")}</div>
+  </div>`;
+}
+function originRow(){
+  return `<div class="card">
+    <div class="card-hd"><h3>Coming from</h3></div>
+    <div class="seg-row" role="radiogroup" aria-label="Coming from">
+      ${ORIGINS.map((o,i)=>`<button class="seg-opt" role="radio" data-origin="${i}"
+        aria-checked="${i===S.origin}"><b>${o[0]}</b><span class="num">${o[1]} min</span></button>`).join("")}
+    </div>
+    <p class="note" style="margin-top:10px">The drive is what turns a ready time into an instruction, so it sits next to the number it moves.</p>
+  </div>`;
+}
+function ticketBlock(st){
+  const K=S.ticket, t=now(), left=K.readyAt-t, drive=driveMin();
+  const coals=K.startAt+2, rest=Math.max(K.startAt+4, K.readyAt-4);
+  const stages=[
+    {at:K.placedAt, b:"Ticket in", s:"Accepted, on the rail", ic:I.check},
+    {at:coals, b:"On the coals", s:itemName(K.items[0]), ic:I.fire},
+    {at:rest,  b:"Resting and boxed", s:"Four minutes off the heat", ic:I.timer},
+    K.where==="delivery"
+      ? {at:K.readyAt, b:"With the rider", s:"On the way to you", ic:I.moto}
+      : {at:K.readyAt, b:"At the window", s:"Hatch 2, show the code", ic:I.storefront}
+  ];
+  const liveAt=stages.findIndex(s=>s.at>t);
+
+  let call="";
+  if(st==="firing"){
+    const n=Math.max(0,left-drive);
+    call=`<div class="leave"><span class="lv-n">${n}</span>
+      <b>Leave in ${n} ${n===1?"minute":"minutes"}</b>
+      <span>${drive} minute drive from ${ORIGINS[S.origin][0]}. We will tell you when.</span></div>`;
+  }else if(st==="leave"){
+    call=`<div class="leave"><span class="lv-n" aria-hidden="true">${I.car}</span>
+      <b lang="pap">Sali awor</b>
+      <span>Leave now. ${drive} minutes from ${ORIGINS[S.origin][0]}, and it comes off the coals about when you park.</span></div>`;
+  }else if(st==="ready"){
+    call=`<div class="leave calm"><span class="lv-n" aria-hidden="true">${I.check}</span>
+      <b>Ready at hatch 2</b><span>Show ${K.code} at the window.</span></div>`;
+  }else if(st==="collected"){
+    call=`<div class="card"><div class="row" style="padding-top:0">
+      <span class="row-ic">${I.check}</span>
+      <span class="rl"><b>Collected. Dushi.</b><span>${K.code} was handed over at ${clock(K.readyAt)}.</span></span>
+    </div></div>`;
+  }
+  const money=(v)=>cg(v);
+  return call+`
+  <div class="ticket">
+    <div class="tk-top"><div class="tk-code">
+      <div><span class="lab">Collection code</span><b>${K.code}</b></div>
+      <div><span class="lab">Ready around</span><span class="when num">${clock(K.readyAt)}</span></div>
+    </div></div>
+    <div class="perf" aria-hidden="true"><i></i></div>
+    <div class="tk-body"><div class="timeline">
+      ${stages.map((s,i)=>{
+        const cls = liveAt<0 ? "done" : i<liveAt ? "done" : i===liveAt ? "live" : "";
+        return `<div class="tl ${cls}"><span class="tl-dot">${s.ic}</span>
+          <div><b>${s.b}</b><span>${s.s}</span></div><time class="num">${clock(s.at)}</time></div>`;
+      }).join("")}
+    </div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><h3>On this ticket</h3></div>
+    ${K.items.map(it=>`<div class="row"><span class="row-ic">${I.bowl}</span>
+      <span class="rl"><b>${it.qty>1?it.qty+" x ":""}${itemName(it)}</b>
+      <span lang="pap">${itemMods(it)}</span></span><em class="num">${money(it.price*it.qty)}</em></div>`).join("")}
+    ${K.save?`<div class="row"><span class="row-ic">${I.sun}</span>
+      <span class="rl"><b lang="pap">Trempan credit</b><span>Twelve minutes guaranteed</span></span>
+      <em class="num">-${money(K.save)}</em></div>`:""}
+    ${K.ship?`<div class="row"><span class="row-ic">${I.moto}</span>
+      <span class="rl"><b>Delivery</b><span>Willemstad and Caracasbaai</span></span>
+      <em class="num">${money(K.ship)}</em></div>`:""}
+    <div class="row"><span class="row-ic">${K.pay==="cash"?I.money:I.card}</span>
+      <span class="rl"><b>${K.pay==="cash"?"Pay at the window":"Paid on the Maestro"}</b>
+      <span>${K.pay==="cash"?"Cg or USD, no card fee":"Ending 4471"}</span></span>
+      <em class="num">${money(K.total)}</em></div>
+  </div>`;
+}
+
+function renderRoot(){
+  const st=rootState(), f=fire();
+  const keep=view.scrollTop;
+  let body;
+  if(st==="cold")      body=windowCard(f)+trempanCard()+usualCard()+tonightCard();
+  else if(st==="lit")  body=windowCard(f)+usualCard()+trempanCard()+tonightCard();
+  else                 body=ticketBlock(st)+(st==="collected"?tonightCard():originRow());
+  view.innerHTML=appbar(st,f)+body+(S.toast?`<p class="note" style="text-align:center">${S.toast}</p>`:"");
+  thumb.innerHTML=thumbHTML(st,f);
+  view.scrollTop=keep;
+  wireRadios(view);
+  paintChrome(st,f);
+}
+function thumbHTML(st,f){
+  if(st==="cold") return `<button class="btn btn-hot" data-open="trempan">${I.sun}Book a Trempan slot</button>
+    <p class="sub">Nothing is on the coals until ${clock(OPENS)}.</p>`;
+  if(st==="lit") return `<button class="btn btn-hot" data-order="usual">${I.fire}Order it again, ${cg(USUAL.price)}</button>
+    <button class="btn btn-quiet" data-open="order">Build something else</button>`;
+  const K=S.ticket, left=K.readyAt-now(), drive=driveMin();
+  if(st==="firing") return `<a class="btn btn-line" href="${MAP}" rel="noopener">${I.pin}Open the driving route</a>
+    <p class="sub">Leave in ${Math.max(0,left-drive)} min. The phone will say so.</p>`;
+  if(st==="leave") return `<a class="btn btn-fire" href="${MAP}" rel="noopener">${I.car}Leave now, open the route</a>
+    <p class="sub">${clock(K.readyAt)} at hatch 2.</p>`;
+  if(st==="ready") return `<button class="btn btn-hot" data-open="code">${I.ticket}Show the code</button>
+    <button class="btn btn-quiet" data-here>I am at the window</button>`;
+  return `<button class="btn btn-hot" data-save>${I.heart}Save this as a usual</button>
+    <button class="btn btn-quiet" data-again>Order something else</button>`;
+}
+function paintChrome(st,f){
+  $("#sbClock").textContent=clock(now());
+  const isl=$("#island");
+  if(S.ticket && !S.ticket.collected){
+    const left=S.ticket.readyAt-now(), drive=driveMin();
+    const txt = left<=0 ? "Ready" : left<=drive ? "Leave now" : Math.max(0,left-drive)+" min";
+    isl.className="island live";
+    isl.innerHTML=`${I.fire}<b>${txt}</b>`;
+  }else{ isl.className="island"; isl.innerHTML=""; }
+  $("#dialTime").textContent=clock(now());
+  $("#dialState").textContent = SIM==null ? "Live" : "Simulated";
+  $("#dial").value = SIM!=null ? SIM : Math.min(1710, Math.max(1200, now()));
+  $$(".mini").forEach(b=>b.setAttribute("aria-pressed",
+    String(b.dataset.jump==="live" ? SIM==null : SIM!=null && +b.dataset.jump===SIM)));
+}
+
+/* ================================================================= overlays
+   Three grammars, deliberately different. A sheet is a place you came from and
+   can throw away. A cover is something you acknowledge. The lock screen is the
+   system, above both. */
+const QS=[["Ki karni?","which cut"],["Kon bo ke?","how do you want it"],
+          ["Batata òf pan?","fries or bread"],["Ku sous?","with sauce"]];
+
+function orderBody(){
+  const o=S.order, c=cutOf(o.cut);
+  let pg="";
+  if(o.step===0){
+    pg=`<div class="grid2" role="radiogroup" aria-label="Which cut">${CUTS.map(x=>
+      `<button class="chip" role="radio" data-cut="${x.id}" aria-checked="${x.id===o.cut}">
+        <b>${x.en}</b><span lang="pap">${x.pap}</span></button>`).join("")}</div>`;
+  }else if(o.step===1){
+    pg=`<div class="grid2" role="radiogroup" aria-label="How do you want it">${options(c).map(x=>
+      `<button class="chip ${x.price==null?"off":""}" role="radio" data-box="${x.key}"
+        ${x.price==null?"disabled":""} aria-checked="${x.key===o.fmt && x.price!=null}">
+        <b>${x.f.en}${x.size?` <small>${x.size}</small>`:""}</b>
+        <span class="m">${x.price==null
+          ? "the kitchen does not fire "+c.en.toLowerCase()+" this way"
+          : cg(x.price)}</span></button>`).join("")}</div>
+      <p class="note" style="margin-top:12px">Eleven cuts against seven boxes is seventy-seven
+      combinations and the kitchen refuses eighteen of them. Better to find out here than at the window.</p>`;
+  }else if(o.step===2){
+    pg=`<div class="grid2" role="radiogroup" aria-label="Fries or bread">${SIDES.map((s,i)=>
+      `<button class="chip" role="radio" data-side="${i}" aria-checked="${i===o.side}">
+        <b>${s[0]}</b><span class="m">${s[1]}${s[2]?", plus "+cg(s[2]):""}</span></button>`).join("")}</div>
+      <hr class="hr">
+      <button class="row" role="switch" data-halftoggle aria-checked="${!!o.halfOn}">
+        <span class="row-ic">${I.users}</span>
+        <span class="rl"><b lang="pap">Mitar mitar</b><span>Two cuts on one plate, priced at the
+        dearer of the two plus ${cg(HALF_ADD)} for the second pass on the grill.</span></span>
+        <span class="sw" aria-hidden="true"></span></button>
+      ${o.halfOn?`<div class="grid2" style="margin-top:10px" role="radiogroup" aria-label="Second cut">
+        ${CUTS.filter(x=>x.id!==o.cut && optOf(x,o.fmt)?.price!=null).map(x=>
+          `<button class="chip" role="radio" data-half="${x.id}" aria-checked="${x.id===o.half}">
+            <b>${x.en}</b><span lang="pap">${x.pap}</span></button>`).join("")
+        || `<p class="note">No second cut works in this box.</p>`}</div>`:""}`;
+  }else{
+    pg=`<div class="grid2" role="group" aria-label="Sauces">${SAUCES.map((s,i)=>
+      `<button class="chip" role="checkbox" data-sauce="${i}" aria-checked="${o.sauces.has(i)}">
+        <b>${s[0]}</b><span class="m">${s[1]}</span></button>`).join("")}</div>
+      <p class="qsub" style="margin:14px 0 8px">How it comes off the grill</p>
+      <div class="grid2" role="group" aria-label="Preparation">${PREFS.map((p,i)=>
+        `<button class="chip" role="checkbox" data-pref="${i}" aria-checked="${o.prefs.has(i)}">
+          <b>${p[0]}</b><span class="m">${p[1]}${p[2]?", plus "+cg(p[2]):""}</span></button>`).join("")}</div>
+      <div class="field"><label for="oNote">Anything else for the kitchen</label>
+        <textarea id="oNote" rows="2" placeholder="Sin salu. Cut the steak for two.">${esc(o.note)}</textarea></div>`;
+  }
+  return `<div class="steps" role="group" aria-label="The four questions">${QS.map((q,i)=>
+      `<button data-step="${i}" class="${i===o.step?"on":i<o.step?"done":""}"
+        aria-label="Question ${i+1}, ${q[1]}"${i===o.step?' aria-current="step"':""}><i></i></button>`).join("")}</div>
+    <p class="qline" lang="pap">${QS[o.step][0]}</p><p class="qsub">${QS[o.step][1]}</p>${pg}`;
+}
+function orderFoot(){
+  const o=S.order, f=fire(), p=orderPrice(o);
+  return `<div class="bl"><b class="num">${cg(p)}</b>
+      <span>${f.open ? `${f.mins} min, ready ${clock(now()+f.mins)}`
+                     : `the grill lights at ${clock(OPENS)}`}</span></div>
+    <div style="display:flex; gap:8px">
+      ${o.step>0?`<button class="btn btn-line btn-sm" data-oback>${I.caretL}Back</button>`:""}
+      <button class="btn btn-hot" style="flex:1" data-onext>${
+        o.step<3 ? "Next"+I.arrowR : "<span lang=\"pap\">Kla</span>"+I.check}</button>
+    </div>`;
+}
+function confirmBody(){
+  const t=orderTotals(), s=nextSlot(), f=fire();
+  const seg=(set,opts)=>`<div class="seg-row ${opts.length===2?"two":""}" role="radiogroup"
+    aria-label="${set}">${opts.map(o=>
+    `<button class="seg-opt" role="radio" data-set="${set}" data-v="${o[0]}"
+      aria-checked="${S[set]===o[0]}">${o[1]}<b>${o[2]}</b><span>${o[3]}</span></button>`).join("")}</div>`;
+  return `<p style="font-family:var(--f-quote); font-style:italic; font-size:1.05rem;
+      line-height:1.35; color:var(--bone); margin-bottom:14px" lang="pap">${plateWords(S.order)}.</p>
+    <h3 class="seg-h" style="margin-top:0">Where</h3>
+    ${seg("where",[["window",I.storefront,"At the window","Hatch 2"],
+                   ["table",I.users,"Sit at the truck","Terrace"],
+                   ["delivery",I.moto,"Delivery",cg(SHIP)]])}
+    <h3 class="seg-h">When</h3>
+    ${seg("when",[["now",I.fire,"As soon as it can be", f.open?f.mins+" min":"at "+clock(OPENS)],
+                  ["trempan",I.sun,"Trempan", clock(S.slot ?? s.at)+", "+cg(TREMPAN_OFF)+" off"]])}
+    <h3 class="seg-h">How you pay</h3>
+    ${seg("pay",[["card",I.card,"Card","Maestro, Visa"],
+                 ["cash",I.money,"Cash at the window","Cg, USD"]])}
+    ${S.where==="delivery"?`<div class="field"><label for="oAddr">Street and number</label>
+      <input id="oAddr" autocomplete="street-address" placeholder="Kaya, number, district" value="${esc(S.addr||"")}"></div>`:""}
+    <div class="card" style="margin-top:14px">
+      <div class="row" style="padding-top:0"><span class="rl"><b>Plate</b></span><em class="num">${cg(t.sub)}</em></div>
+      ${t.ship?`<div class="row"><span class="rl"><b>Delivery</b></span><em class="num">${cg(t.ship)}</em></div>`:""}
+      ${t.save?`<div class="row"><span class="rl"><b lang="pap">Trempan credit</b></span><em class="num">-${cg(t.save)}</em></div>`:""}
+    </div>`;
+}
+function confirmFoot(){
+  const t=orderTotals(), f=fire();
+  const need = S.where==="delivery" && !(S.addr||"").trim();
+  return `<div class="bl"><b class="num">${cg(t.total)}</b>
+      <span>${(t.total/USD).toFixed(2)} USD at the peg</span></div>
+    <button class="btn btn-hot" data-send ${need?"disabled":""}>${I.fire}${
+      need ? "Where should the rider go?"
+           : S.pay==="cash" ? "Send it, pay at the window" : "Send it to the grill"}</button>
+    <p class="note" style="text-align:center; margin-top:8px">Nothing is charged. This is a prototype.</p>`;
+}
+const BARS=[["21:00",24,"early"],["21:30",31,"early"],["22:00",46,"early"],["22:30",68,""],
+            ["23:00",88,"peak"],["23:30",100,"peak"],["00:00",94,"peak"],["00:30",78,"peak"],
+            ["01:00",58,""],["01:30",41,""],["02:00",27,""],["02:30",16,""]];
+const FULL=[5,8];      // slots already taken tonight
+function trempanBody(){
+  const at=Math.floor((now()-OPENS)/30);
+  const slots=Array.from({length:9},(_,i)=>OPENS+i*15);
+  return `<div class="card" style="margin-bottom:11px">
+      <div class="card-hd"><h3>When the truck is busy</h3></div>
+      <div class="chart" role="img" aria-label="Queue depth through the night: shallow from 21:00 to about 22:30, deepest between 23:00 and 00:30, easing again after 01:00. Trempan covers the shallow stretch.">
+        ${BARS.map((b,i)=>`<div class="${b[2]}${i===at?" at":""}" style="height:${b[1]}%"></div>`).join("")}</div>
+      <div class="chart-x"><span>21:00</span><span>23:30</span><span>02:30</span></div>
+      <p class="note" style="margin-top:9px">The rail stays shallow until about 23:00. Book inside
+      that window and the kitchen holds twelve minutes for you.</p>
+    </div>
+    <p class="qsub" style="margin-bottom:8px">${nextSlot().when==="tomorrow"?"Tomorrow":"Tonight"}, ${DAYS[(sessionDay()+(nextSlot().when==="tomorrow"?1:0))%7]}</p>
+    <div class="slotgrid" role="radiogroup" aria-label="Collection slot">${slots.map((m,i)=>
+      `<button role="radio" data-slot="${m}" ${FULL.includes(i)?"disabled":""}
+        aria-checked="${S.slotPick===m}" class="num">${clock(m)}</button>`).join("")}</div>
+    <p class="note" style="margin-top:10px">Greyed times are already held by somebody else.</p>
+    <div class="card" style="margin-top:12px">
+      <div class="row" style="padding-top:0"><span class="row-ic">${I.seal}</span>
+        <span class="rl"><b>Twelve minutes, guaranteed</b><span>More than five minutes late and the plate is free.</span></span></div>
+      <div class="row"><span class="row-ic">${I.money}</span>
+        <span class="rl"><b>${cg(TREMPAN_OFF)} off every Trempan plate</b><span>Applied on the ticket, no code to remember.</span></span></div>
+    </div>`;
+}
+function trempanFoot(){
+  return `<button class="btn btn-hot" data-hold ${S.slotPick==null?"disabled":""}>${I.sun}${
+    S.slotPick==null ? "Pick a slot" : "Hold "+clock(S.slotPick)}</button>`;
+}
+function accountBody(){
+  const sw=(on)=>`<span class="sw" aria-hidden="true"></span>`;
+  return `<div class="card"><div class="card-hd"><h3>Saved usuals</h3></div>
+      <div class="row" style="padding-top:0"><span class="row-ic">${I.bowl}</span>
+        <span class="rl"><b>Steak, regular</b><span lang="pap">Ku sous, sin pika. Ordered 34 times.</span></span><em class="num">21</em></div>
+      <div class="row"><span class="row-ic">${I.bowl}</span>
+        <span class="rl"><b>Chicken kapsalon, large</b><span lang="pap">Extra pika. For Randy.</span></span><em class="num">34</em></div>
+      <div class="row"><span class="row-ic">${I.bowl}</span>
+        <span class="rl"><b>Mix 3 basic</b><span>Ribs, chorizo, chicken. Friday nights.</span></span><em class="num">45</em></div>
+    </div>
+    <div class="card"><div class="card-hd"><h3>Recent tickets</h3></div>
+      <div class="row" style="padding-top:0"><span class="row-ic">${I.receipt}</span>
+        <span class="rl"><b>F-038, last Saturday</b><span>Steak caesar and a lamunchi. Collected 23:52.</span></span><em class="num">28</em></div>
+      <div class="row"><span class="row-ic">${I.receipt}</span>
+        <span class="rl"><b>F-011, two weeks ago</b><span lang="pap">Mix 3 basic, mitar mitar. Trempan slot, 21:30.</span></span><em class="num">45</em></div>
+    </div>
+    <div class="card"><div class="card-hd"><h3>How you pay</h3></div>
+      <div class="row" style="padding-top:0"><span class="row-ic">${I.card}</span>
+        <span class="rl"><b>Maestro, ending 4471</b><span>Default</span></span><span class="go">${I.check}</span></div>
+      <div class="row"><span class="row-ic">${I.bank}</span>
+        <span class="rl"><b>Bank transfer</b><span>MCB, Banco di Caribe and Orco</span></span></div>
+      <div class="row"><span class="row-ic">${I.money}</span>
+        <span class="rl"><b>Cash at the window</b><span>Cg and USD, no card fee</span></span></div>
+    </div>
+    <div class="card"><div class="card-hd"><h3>Preferences</h3></div>
+      <button class="row" role="switch" data-alerts aria-checked="${S.alerts}" style="padding-top:0">
+        <span class="row-ic">${I.bell}</span>
+        <span class="rl"><b>Tell me when to leave</b><span>One push, ${driveMin()} minutes before it is ready</span></span>
+        ${sw()}</button>
+      <div class="row"><span class="row-ic">${I.car}</span>
+        <span class="rl"><b>I usually come from</b><span>Used to time the handover</span></span></div>
+      <div class="seg-row" role="radiogroup" aria-label="Where you usually come from" style="margin-top:4px">
+        ${ORIGINS.map((o,i)=>`<button class="seg-opt" role="radio" data-origin="${i}"
+          aria-checked="${i===S.origin}"><b>${o[0]}</b><span class="num">${o[1]} min</span></button>`).join("")}
+      </div>
+      <div class="row" style="margin-top:6px"><span class="row-ic">${I.globe}</span>
+        <span class="rl"><b lang="pap">Papiamentu</b><span>Nederlands, English. The website next door switches all three live.</span></span></div>
+    </div>`;
+}
+const SHEETS={
+  order:  {t:"Òrdena",   pap:true, body:orderBody,   foot:orderFoot},
+  confirm:{t:"Konfirmá", pap:true, body:confirmBody, foot:confirmFoot},
+  trempan:{t:"Trempan",  pap:true, body:trempanBody, foot:trempanFoot},
+  account:{t:"Bo kuenta",pap:true, body:accountBody, foot:null}
+};
+
+function coverBits(){
+  const K=S.ticket;
+  if(S.cover==="placed") return {
+    label:"Order sent",
+    body:`<span class="seal">${I.check}</span>
+      <h2>Sent to the grill</h2>
+      <p class="note" style="max-width:28ch">Your ticket is on the rail. The phone will tell you
+      when to leave, ${driveMin()} minutes before it comes off the coals.</p>
+      <p style="font-family:var(--f-display); font-weight:800; font-size:3rem; letter-spacing:.04em;
+        color:var(--amber); line-height:1">${K.code}</p>
+      <p class="note">Ready around <b class="num" style="color:var(--bone)">${clock(K.readyAt)}</b></p>`,
+    foot:`<button class="btn btn-hot" data-closecover>${I.ticket}See the ticket</button>`};
+  return {
+    label:"Collection code "+K.code,
+    body:`<span class="k">Collection code</span><b>${K.code}</b>
+      <p>Hold this up at hatch 2. ${clock(K.readyAt)}, ${itemName(K.items[0])}.</p>
+      <span class="bars" aria-hidden="true">${Array.from({length:34},(_,i)=>
+        `<i style="height:${[46,30,40,24,46,34][i%6]}px; width:${i%4?3:5}px; opacity:${i%7?1:.25}"></i>`).join("")}</span>`,
+    foot:`<button class="btn btn-line" data-closecover>${I.x}Done</button>`};
+}
+function pushContent(){
+  const f=fire(), K=S.ticket;
+  if(K && !K.collected){
+    const left=K.readyAt-now(), d=driveMin();
+    if(left<=0) return {t:"Ready at hatch 2", b:`${K.code} is off the coals. Show the code at the window.`};
+    if(left<=d) return {t:"Sali awor", pap:true,
+      b:`Leave now. ${K.code} is ready at ${clock(K.readyAt)}, ${d} minutes from ${ORIGINS[S.origin][0]}.`};
+    return {t:`${K.code} is on the coals`, b:`Ready around ${clock(K.readyAt)}. We will tell you when to leave.`};
+  }
+  if(!f.open) return {t:`The grill lights at ${clock(OPENS)}`,
+    b:"Trempan slots for the early lane are open now, twelve minutes flat."};
+  return {t:"The coals are lit", b:`${f.queue} on the rail, about ${f.mins} minutes.`};
+}
+function pushCard(cls,action){
+  const p=pushContent();
+  return `<button class="push ${cls}" ${action}>
+    <span class="p-ic">${I.fire}</span>
+    <span style="min-width:0">
+      <span class="p-hd"><span>Fridays</span><span>now</span></span>
+      <b ${p.pap?'lang="pap"':""}>${p.t}</b><span class="note" style="color:var(--bone-2)">${p.b}</span>
+    </span></button>`;
+}
+
+let ovlKey="", returnTo=null;
+function overlayShell(){
+  if(S.system==="lock") return `<div class="lock" id="ovlIn" role="dialog" aria-modal="true"
+    aria-label="Lock screen" tabindex="-1"></div>`;
+  if(S.cover){
+    const c=coverBits();
+    return `<div class="cover ${S.cover==="code"?"codecard":""}" role="dialog" aria-modal="true"
+      aria-label="${c.label}" tabindex="-1">
+      <div class="cover-bd" id="ovlIn"></div><div class="cover-ft" id="ovlFt"></div></div>`;
+  }
+  if(S.sheet){
+    const s=SHEETS[S.sheet];
+    return `<div class="sheet-wrap">
+      <button class="scrim" data-close aria-label="Close ${s.t}"></button>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" tabindex="-1">
+        <span class="grab" aria-hidden="true"></span>
+        <div class="sheet-hd"><h2 id="shTitle" ${s.pap?'lang="pap"':""}>${s.t}</h2>
+          <button class="x" data-close aria-label="Close">${I.x}</button></div>
+        <div class="sheet-bd" id="ovlIn"></div>
+        <div class="sheet-ft" id="ovlFt"></div></div></div>`;
+  }
+  return "";
+}
+const FOCUS_KEYS=["cut","box","side","half","sauce","pref","step","v","origin","slot","open"];
+function overlayFill(){
+  const inn=$("#ovlIn"), ft=$("#ovlFt");
+  if(!inn) return;
+  // refilling destroys the control the user just pressed, so remember how to
+  // find its replacement first and hand focus back afterwards
+  const keep=inn.scrollTop;
+  const a=document.activeElement;
+  let mark=null;
+  if(a && a.dataset) for(const k of FOCUS_KEYS){
+    if(a.dataset[k]!=null){
+      mark = k==="v" ? `[data-set="${a.dataset.set}"][data-v="${a.dataset.v}"]`
+                     : `[data-${k}="${a.dataset[k]}"]`;
+      break;
+    }
+  }
+  const after=()=>{
+    inn.scrollTop=keep;
+    if(mark && document.activeElement===document.body){
+      const again=ovl.querySelector(mark);
+      if(again) again.focus({preventScroll:true});
+    }
+  };
+  if(S.system==="lock"){
+    inn.innerHTML=`<p class="lk-time num">${clock(now())}</p>
+      <p class="lk-date">${DAYS[sessionDay()]}, Caracasbaaiweg</p>
+      ${pushCard("", 'data-lockpush')}
+      <button class="lk-open" data-unlock>Open the app</button>`;
+    after(); return;
+  }
+  if(S.cover){ const c=coverBits(); inn.innerHTML=c.body; ft.innerHTML=c.foot; after(); return; }
+  if(S.sheet){
+    const s=SHEETS[S.sheet];
+    inn.innerHTML=s.body();
+    ft.innerHTML=s.foot?s.foot():"";
+    ft.hidden=!s.foot;
+    wireRadios(inn);
+    after();
+  }
+}
+function renderOverlay(){
+  const key = S.system ? "sys:"+S.system : S.cover ? "cov:"+S.cover : S.sheet ? "sh:"+S.sheet : "";
+  const fresh = key!==ovlKey;
+  if(fresh){ ovlKey=key; ovl.innerHTML=overlayShell(); }
+  overlayFill();
+  const busy=!!key;
+  view.inert=busy; thumb.inert=busy;
+  if(fresh && busy){
+    const box=ovl.querySelector('[role="dialog"]');
+    // visibility and transform are still resolving on this frame, so a focus()
+    // call here would be dropped
+    if(box) requestAnimationFrame(()=>requestAnimationFrame(()=>box.focus({preventScroll:true})));
+  }
+}
+function renderBanner(){
+  bnr.innerHTML = S.banner ? pushCard("banner",'data-bannertap') : "";
+}
+function paint(){ renderRoot(); renderOverlay(); renderBanner(); }
+
+function openOverlay(kind,name,from){
+  returnTo = from || document.activeElement;
+  if(kind==="sheet"){ S.sheet=name; S.cover=null; }
+  else if(kind==="cover"){ S.cover=name; }
+  else { S.system=name; }
+  paint();
+}
+function closeTop(){
+  if(S.system) S.system=null;
+  else if(S.cover) S.cover=null;
+  else if(S.sheet) S.sheet = S.sheet==="confirm" ? "order" : null;
+  paint();
+  if(!S.sheet && !S.cover && !S.system && returnTo && document.contains(returnTo)){
+    returnTo.focus({preventScroll:true}); returnTo=null;
+  }
+}
+let sayTimer=0;
+function say(m){
+  $("#live").textContent=m;
+  clearTimeout(sayTimer); sayTimer=setTimeout(()=>{$("#live").textContent="";},7000);
+}
+
+/* role="radio" promises one tab stop per group and arrow keys inside it. */
+function wireRadios(root){
+  $$('[role="radiogroup"]',root||document).forEach(g=>{
+    const rs=[...g.querySelectorAll('[role="radio"]')].filter(r=>!r.disabled);
+    if(!rs.length) return;
+    let at=rs.findIndex(r=>r.getAttribute("aria-checked")==="true");
+    if(at<0) at=0;
+    rs.forEach((r,i)=>{ r.tabIndex = i===at ? 0 : -1; });
+  });
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && (S.sheet||S.cover||S.system||S.banner)){
+    if(S.banner && !S.sheet && !S.cover && !S.system){ S.banner=false; renderBanner(); return; }
+    closeTop(); return;
+  }
+  const r=e.target.closest && e.target.closest('[role="radio"]');
+  if(!r) return;
+  const g=r.closest('[role="radiogroup"]'); if(!g) return;
+  const step={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1,Home:"first",End:"last"}[e.key];
+  if(step===undefined) return;
+  e.preventDefault();
+  const list=[...g.querySelectorAll('[role="radio"]')].filter(x=>!x.disabled);
+  const at=list.indexOf(r); if(at<0) return;
+  const nx = step==="first" ? list[0] : step==="last" ? list[list.length-1]
+           : list[(at+step+list.length)%list.length];
+  nx.focus(); nx.click();          // in a radio group, moving focus selects
+});
+
+/* ------------------------------------------------------------------ events */
+const refreshSheet=overlayFill;
+document.addEventListener("click",e=>{
+  const T=e.target;
+  const hit=s=>T.closest(s);
+
+  const way=hit("[data-way]");
+  if(way){ runWay(way.dataset.way, way); return; }
+  const jump=hit("[data-jump]");
+  if(jump){ setClock(jump.dataset.jump==="live" ? null : +jump.dataset.jump); return; }
+
+  if(hit("[data-close]") || hit("[data-closecover]")){ closeTop(); return; }
+  if(hit("[data-unlock]")){ S.system=null; paint(); return; }
+  if(hit("[data-lockpush]")){ S.system=null; S.banner=false; paint(); say("Ticket opened"); return; }
+  if(hit("[data-bannertap]")){ S.banner=false; paint(); return; }
+
+  const openIt=hit("[data-open]");
+  if(openIt){
+    const n=openIt.dataset.open;
+    if(n==="code") openOverlay("cover","code",openIt);
+    else openOverlay("sheet",n,openIt);
+    if(n==="trempan") S.slotPick = S.slot ?? null;
+    if(n==="order"||n==="trempan") refreshSheet();
+    return;
+  }
+  if(hit("[data-order]")){
+    Object.assign(S.order,{step:0, cut:USUAL.cut, fmt:USUAL.fmt, side:USUAL.side,
+      sauces:new Set(USUAL.sauces), prefs:new Set(USUAL.prefs), half:null, halfOn:false, note:""});
+    openOverlay("sheet","order",T.closest("button")); return;
+  }
+  const dish=hit("[data-dish]");
+  if(dish){
+    Object.assign(S.order,{step:2, cut:dish.dataset.dish, fmt:dish.dataset.dishbox, side:0,
+      sauces:new Set([0]), prefs:new Set(), half:null, halfOn:false, note:""});
+    keepFormat(); openOverlay("sheet","order",dish); return;
+  }
+
+  const o=S.order;
+  const c=hit("[data-cut]");
+  if(c){ o.cut=c.dataset.cut; keepFormat(); refreshSheet(); return; }
+  const b=hit("[data-box]:not(:disabled)");
+  if(b && S.sheet==="order"){ o.fmt=b.dataset.box;
+    if(o.half && optOf(cutOf(o.half),o.fmt)?.price==null) o.half=null;
+    refreshSheet(); return; }
+  const sd=hit("[data-side]");
+  if(sd){ o.side=+sd.dataset.side; refreshSheet(); return; }
+  if(hit("[data-halftoggle]")){ o.halfOn=!o.halfOn; if(!o.halfOn) o.half=null; refreshSheet(); return; }
+  const hf=hit("[data-half]");
+  if(hf){ o.half = o.half===hf.dataset.half ? null : hf.dataset.half; refreshSheet(); return; }
+  const sa=hit("[data-sauce]");
+  if(sa){ const i=+sa.dataset.sauce;
+    if(i===5){ o.sauces.clear(); o.sauces.add(5); }
+    else { o.sauces.delete(5); o.sauces.has(i)?o.sauces.delete(i):o.sauces.add(i); }
+    refreshSheet(); return; }
+  const pf=hit("[data-pref]");
+  if(pf){ const i=+pf.dataset.pref; o.prefs.has(i)?o.prefs.delete(i):o.prefs.add(i);
+    refreshSheet(); return; }
+  const stp=hit("[data-step]");
+  if(stp){ o.step=+stp.dataset.step; refreshSheet(); return; }
+  if(hit("[data-oback]")){ o.step=Math.max(0,o.step-1); refreshSheet(); return; }
+  if(hit("[data-onext]")){
+    if(o.step<3){ o.step++; refreshSheet(); }
+    else { S.sheet="confirm"; renderOverlay(); }
+    return;
+  }
+  const set=hit("[data-set]");
+  if(set){ S[set.dataset.set]=set.dataset.v; refreshSheet(); return; }
+  const org=hit("[data-origin]");
+  if(org){ S.origin=+org.dataset.origin; paint(); if(S.sheet) refreshSheet(); return; }
+  if(hit("[data-alerts]")){ S.alerts=!S.alerts; refreshSheet(); return; }
+  const slot=hit("[data-slot]:not(:disabled)");
+  if(slot){ S.slotPick=+slot.dataset.slot; refreshSheet(); return; }
+  if(hit("[data-hold]")){
+    S.slot=S.slotPick; S.when="trempan"; closeTop();
+    say(`Trempan slot held at ${clock(S.slot)}`); return;
+  }
+  if(hit("[data-send]")){
+    S.ticket=makeTicket(); S.cover="placed"; S.sheet=null; paint();
+    say(`Ticket ${S.ticket.code}, ready around ${clock(S.ticket.readyAt)}`); return;
+  }
+  if(hit("[data-here]")){ S.ticket.collected=true; S.toast=""; paint();
+    say("Collected"); return; }
+  if(hit("[data-save]")){ S.toast="Saved as a usual."; paint(); say("Saved as a usual"); return; }
+  if(hit("[data-again]")){ S.ticket=null; S.toast=""; S.slot=null; S.when="now";
+    Object.assign(S.order,{step:0, half:null, halfOn:false, sauces:new Set([0]), prefs:new Set(), note:""});
+    openOverlay("sheet","order",T.closest("button")); return; }
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="oNote") S.order.note=e.target.value;
+  if(e.target.id==="oAddr"){ S.addr=e.target.value;
+    const ft=$("#ovlFt"); if(ft && S.sheet==="confirm") ft.innerHTML=confirmFoot(); }
+  if(e.target.id==="dial") setClock(+e.target.value);
+});
+
+/* --------------------------------------------------------------- the clock */
+function setClock(v){
+  SIM=v;
+  maybeNotify();
+  paint();
+}
+function maybeNotify(){
+  const K=S.ticket;
+  if(!K || K.collected || !S.alerts || K.notified) return;
+  const left=K.readyAt-now();
+  // once per ticket, on a real threshold crossing, never on a bare timer
+  if(left<=driveMin() && left>0){
+    K.notified=true; S.banner=true;
+    clearTimeout(bannerTimer);
+    bannerTimer=setTimeout(()=>{ S.banner=false; renderBanner(); },9000);
+    say("Notification: leave now");
+  }
+}
+let bannerTimer=0;
+function runWay(w,from){
+  S.sheet=S.cover=S.system=null; S.banner=false;
+  if(w==="cold"){ SIM=1220; S.ticket=null; S.slot=null; S.when="now"; }
+  if(w==="order"){
+    SIM=1330; S.ticket=null; S.when="now";
+    Object.assign(S.order,{step:0, cut:"steak", fmt:"regular", side:0,
+      sauces:new Set([0]), prefs:new Set(), half:null, halfOn:false, note:""});
+    openOverlay("sheet","order",from); return;
+  }
+  if(w==="firing"){
+    SIM=1420; S.when="now"; S.slot=null;
+    const f=fire();
+    S.ticket=makeTicket({placedAt:1414, startAt:1414, cook:f.mins,
+      items:[{cut:"steak", fmt:"regular", side:0, sauces:[0], prefs:[], half:null, note:"",
+        price:21, qty:1}], sub:21, ship:0, save:0, total:21, where:"window", when:"now", pay:"card"});
+  }
+  if(w==="leave"){
+    SIM=1420; S.when="now"; S.slot=null;
+    const ready=1420+driveMin();
+    S.ticket=makeTicket({placedAt:ready-37, startAt:ready-37, cook:37,
+      items:[{cut:"steak", fmt:"regular", side:0, sauces:[0], prefs:[], half:null, note:"",
+        price:21, qty:1}], sub:21, ship:0, save:0, total:21, where:"window", when:"now", pay:"card"});
+    S.ticket.readyAt=ready;
+    maybeNotify();
+  }
+  if(w==="lock"){ S.system="lock"; }
+  paint();
+  if(S.system){
+    const box=ovl.querySelector('[role="dialog"]');
+    returnTo=from;
+    if(box) requestAnimationFrame(()=>requestAnimationFrame(()=>box.focus({preventScroll:true})));
+  }
+}
+
+/* ------------------------------------------------------------------- boot */
+keepFormat();
+paint();
+setInterval(()=>{ if(SIM==null){ maybeNotify(); paint(); } },20000);
+})();
+</script>
+
