@@ -40,8 +40,8 @@ Five choices set every number below. Answer them once per project, not per compo
 1. **Pointer, touch, or both?** Hover does not exist on touch. If any meaningful share of use is touch, hover
    may only ever *enhance* a signifier that is already visible — never carry one. Assume both unless you own
    the hardware.
-2. **Density and archetype.** `ui-craft` sets the density posture for the system; the archetype table in
-   `ux-psychology` names which surface you are on. States scale with it: a marketing page affords a 4px focus
+2. **Density and archetype.** `ui-craft` names the three densities (editorial / product / dense tool) and
+   their starting values; the archetype table in `ux-psychology` tells you which surface you are on. States scale with it: a marketing page affords a 4px focus
    ring at a generous offset and 150ms transitions, an ops console with 40 rows gets 2px at a 1px offset and
    near-instant ones — and needs states that survive being seen a thousand times, carried by shape and
    position rather than by novelty.

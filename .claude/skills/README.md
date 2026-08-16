@@ -76,19 +76,22 @@ number. Several skills close by naming the statistics they deliberately refused 
 
 ## Source material and corrections
 
-Built from three videos, each mapped to the layer it belongs to, with its citations checked:
+Three of the reference files exist to fact-check advice that circulates widely and is usually cited wrongly.
+Each keeps the advice, which is mostly sound, and corrects the attribution — so you can use the principle
+without repeating a number that does not survive checking.
 
-- `ux-psychology/references/six-principles.md` — video one's six principles. Four of its statistics did not
-  survive checking: the car-wash loyalty study is Nunes & Drèze (USC/UCLA), not Columbia; the jam study's
-  choice-overload effect averages near zero across 50 replications; the "70–90% never change defaults" and
-  "free samples +2,000%" figures have no locatable source.
-- `ui-craft/references/source-mapping.md` — video two's craft topics, rewritten to stand on its own as the
-  craft rules that circulate most widely and the ones that are wrong. Corrections cover semantic colour
-  presented as universal when it is a Western convention (and the red/green axis it relies on is the most
-  common colour-vision deficiency), the 8pt grid's real justification, and button padding.
-- `decision-screen-design/references/three-redesigns.md` — video three's three redesigns, marked as reasoning
-  rather than evidence: they carry no published data and each changes a dozen variables at once, so nothing
-  can be attributed to any single change.
+- `ux-psychology/references/six-principles.md` — six conversion principles (smart defaults, endowed
+  progress, reciprocity, the IKEA effect, loss framing, anchoring). Four commonly quoted statistics fail:
+  the car-wash loyalty study is Nunes & Drèze (USC/UCLA), not Columbia; the jam study's choice-overload
+  effect averages near zero across 50 replications; and the "70–90% never change defaults" and "free samples
+  +2,000%" figures have no locatable source at all.
+- `ui-craft/references/source-mapping.md` — the craft rules that circulate most widely, and the ones that are
+  wrong. Covers semantic colour presented as universal when it is a Western convention (and the red/green
+  axis it depends on is the most common colour-vision deficiency), the 8pt grid's real justification — the
+  device-pixel-ratio argument only supports a 4pt base — and button padding.
+- `decision-screen-design/references/three-redesigns.md` — three worked conversion redesigns, marked as
+  reasoning rather than evidence: they carry no published data and each changes a dozen variables at once,
+  so nothing can be attributed to any single change.
 
 ## Accessibility
 

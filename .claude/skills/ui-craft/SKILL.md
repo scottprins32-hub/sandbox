@@ -21,10 +21,23 @@ shadow that changes on every card. **Consistency is the effect. A system is the 
 
 These five choices determine every number downstream. Settle them before writing CSS.
 
-1. **Density.** A marketing page and a dashboard are opposite problems. Marketing: few sizes, wide range,
-   generous whitespace, large type. Dashboard: many small sizes in a tight range, rarely above 24px, tight
-   spacing, because information density *is* the feature. Applying marketing spacing to an ops table wastes
-   the screen; applying dashboard density to a landing page looks cramped and cheap.
+1. **Density.** A marketing page and a dashboard are opposite problems, and this one choice sets the starting
+   values in all five specialist skills. Pick one of three and name it — the specialists refer to these names
+   rather than each inventing their own scale.
+
+   | Density | Fits | Spacing rhythm | Type sizes | Top of type scale | Min target |
+   |---|---|---|---|---|---|
+   | **Editorial** | Marketing, landing, docs, blog | 8pt base, sections 64–96px | 5–6 sizes, wide range | 48–60px | 44×44 |
+   | **Product** | App screens, settings, forms, cards | 8pt base, sections 32–48px | 6–8 sizes | 30–38px | 44×44 |
+   | **Dense tool** | Ops tables, dashboards, consoles | 4pt base, sections 16–24px | 4–5 sizes, tight range | 20–24px | 24×24 floor, 32px rows |
+
+   Applying editorial spacing to an ops table wastes the screen an operator needs; applying dense-tool values
+   to a landing page reads as cramped and cheap. **Dense tool is where accessibility gets squeezed**, so it
+   carries an explicit floor: 24×24 CSS px is the WCAG 2.2 minimum (2.5.8), not a target, and the comfortable
+   44×44 is what you give up to get the density. If a product has both a marketing surface and an ops
+   surface, they are two densities in one codebase — scope the tokens, don't average them.
+
+   `list-and-queue-design` owns the case where dense-tool needs a runtime comfortable/compact toggle.
 2. **Platform and input.** Touch needs larger targets and has no hover — any signifier that only appears on
    hover does not exist on a phone. Pointer allows denser layouts and hover affordances.
 3. **Brand constraints.** An existing brand colour, typeface or logo is a fixed point. Brand colours very

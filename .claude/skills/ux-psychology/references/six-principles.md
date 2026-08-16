@@ -1,12 +1,15 @@
-# The six principles, mapped and fact-checked
+# Six conversion principles, mapped and fact-checked
 
-The source video teaches six principles with before/after examples. This file preserves that framing —
-the examples are good and worth keeping — maps each principle to the skill in this set that covers it in
-depth, and corrects the citations. Four of the video's attributions are wrong or unsourced. They are
-corrected below, because repeating them in a design review or a portfolio interview is the kind of error a
-senior person catches.
+Six principles that circulate widely in product and UX teaching — smart defaults, never start the user at
+zero, give value before asking, let users build before they commit, frame the ask as a loss, and control the
+first number. The advice is sound. The citations attached to it usually are not: four of the statistics most
+often quoted alongside these principles do not survive checking, and repeating them in a design review or a
+portfolio interview is the kind of error a senior person catches.
 
-**Read this when** you want the video's framing specifically, or you're about to cite one of its studies.
+This file keeps each principle with its before/after, maps it to the skill in this set that covers it in
+depth, and corrects the attribution.
+
+**Read this when** you are about to cite one of these studies, or someone has just quoted one at you.
 
 ---
 
@@ -30,16 +33,15 @@ work the cleaner evidence is Madrian & Shea (2001) on automatic enrolment in ret
 default moved actual behaviour rather than a register entry. The default effect is one of the most robust
 findings in behavioural science. **Evidence: robust.**
 
-**Correction — the "70–90% never change defaults" figure.** The video gives no source and I could not find
-one for that range. The closest real number is Jared Spool's survey of Microsoft Word users, where **fewer
+**Correction — the "70–90% never change defaults" figure.** No source exists for that range. The closest real number is Jared Spool's survey of Microsoft Word users, where **fewer
 than 5% had changed any setting at all**. That is a single informal study of one product, not a general law —
 useful as an illustration, not as a statistic to quote. Cite Johnson & Goldstein for the principle, and if
 you want a software number, cite Spool's <5% and say where it came from.
 
-**Correction — the jam study.** The video attributes the choice-overload finding to Columbia, which is
+**Correction — the jam study.** The choice-overload finding is usually credited to Columbia, which is
 roughly fair (Sheena Iyengar was at Columbia, Mark Lepper at Stanford; Iyengar & Lepper, 2000). The numbers
-are right: 24 flavours → 3% purchased, 6 flavours → 30%. **But it states the finding flatly, and it should
-not.** Scheibehenne, Greifeneder & Todd (2010) meta-analysed 63 conditions across 50 studies and 5,036
+are right: 24 flavours → 3% purchased, 6 flavours → 30%. **But it is almost always stated flatly, and it should
+not be.** Scheibehenne, Greifeneder & Todd (2010) meta-analysed 63 conditions across 50 studies and 5,036
 participants and found the average choice-overload effect to be **essentially zero (d = 0.02)**. The effect
 is real in some conditions and reverses in others; the moderators matter more than the main effect.
 **Evidence: contested.**
@@ -70,10 +72,9 @@ because signing up was reframed as step one rather than treated as a separate pr
 Moving the starting line moves the whole curve. LinkedIn's profile-strength meter is the canonical product
 example — it is never at zero.
 
-**Correction — this is not a Columbia study.** The car-wash experiment is **Nunes & Drèze (2006), "The
+**Correction — commonly miscredited to Columbia.** The car-wash experiment is **Nunes & Drèze (2006), "The
 Endowed Progress Effect: How Artificial Advancement Increases Effort," *Journal of Consumer Research*
-32(4)**. Joseph Nunes was at **USC Marshall**, Xavier Drèze at **UCLA Anderson**. The video appears to have
-carried "Columbia" over from the jam study. The result is as described: an 8-stamp card starting empty was
+32(4)**. Joseph Nunes was at **USC Marshall**, Xavier Drèze at **UCLA Anderson**. The Columbia attribution appears to be carried over from the jam study, which genuinely is Columbia's. The result is as described: an 8-stamp card starting empty was
 completed by **19%** of customers, while a 10-stamp card with 2 stamps pre-applied — identical real effort —
 was completed by **34%**. Roughly double. **Evidence: robust**, and the goal-gradient effect it builds on
 (Kivetz, Urminsky & Zheng, 2006) replicates well.
@@ -98,11 +99,10 @@ report.*
 
 **Why it works.** Reciprocity — receiving creates an unconscious sense of obligation. Cialdini's *Influence*
 (1984) treats it as among the most powerful levers in persuasion; Regan (1971) is the classic lab
-demonstration. **Evidence: robust.** The video's framing — a restaurant asking for your credit card before
+demonstration. **Evidence: robust.** The usual framing — a restaurant asking for your credit card before
 showing you the menu — is a good one, and the blurred-results pattern really is that.
 
-**Correction — the "free samples increase sales 2,000%" figure.** Not a study, and not a number I could
-source. The most-cited real figures come from sampling firm Interactions via *The Atlantic* (2014):
+**Correction — the "free samples increase sales 2,000%" figure.** Not a study, and not a sourceable number. The most-cited real figures come from sampling firm Interactions via *The Atlantic* (2014):
 **beer +71%, wine +300%, cosmetics +500%, frozen pizza +600%**. Those are trade figures, not peer-reviewed,
 and they are a decade old. The 2,000% appears to be a loose retelling. State the mechanism, not the number.
 
@@ -131,7 +131,7 @@ studies, though effect sizes vary and it depends on the build succeeding — peo
 assembly show no such boost. The weaker sibling, the endowment effect (Kahneman, Knetsch & Thaler, 1990),
 needs only a sense of ownership, not labour.
 
-Duolingo is the product example the video reaches for: you pick a language, set a goal and complete a first
+Duolingo is the canonical product example: you pick a language, set a goal and complete a first
 lesson before an account is ever mentioned.
 
 **Covered in depth by:** `onboarding-activation`.
@@ -155,7 +155,7 @@ the user's actual files named, and a dismissal option that states the consequenc
 **Why it works.** Prospect theory (Kahneman & Tversky, 1979) and status quo bias (Samuelson & Zeckhauser,
 1988). People defend what they already have.
 
-**Correction — two loose claims.** Kahneman's 2002 Nobel was awarded for integrating psychological research
+**Correction — two claims that are routinely overstated.** Kahneman's 2002 Nobel was awarded for integrating psychological research
 into economics broadly, not "for proving loss aversion"; Tversky had died in 1996 and was ineligible. And
 the "**twice** as powerful" figure is the λ ≈ 2.25 estimate from Tversky & Kahneman (1992) — a parameter
 fitted in a specific lab paradigm, not a universal constant. Gal & Rucker (2018), "The Loss of Loss
@@ -165,7 +165,7 @@ solid ground; say "exactly twice" and someone who has read the literature will c
 
 **Covered in depth by:** `persuasive-copy` (framing) and `habit-loop-design` (streaks as loss aversion).
 
-**⚠ Watch out — this is the principle in the set most likely to get you in legal trouble.** The video's
+**⚠ Watch out — this is the principle in the set most likely to get you in legal trouble.** This framing's
 example adds a countdown timer to a screen listing files the user is about to lose. Two hard lines:
 
 - **A countdown that isn't real is unlawful in the EU** (Unfair Commercial Practices Directive as amended by
@@ -195,7 +195,7 @@ the most replicated findings in the field.
 
 **Covered in depth by:** `persuasive-copy` (anchoring and pricing presentation).
 
-**Watch out.** The video also gestures at decoy pricing — a tier that exists only to make another look
+**Watch out.** This area also shades into decoy pricing — a tier that exists only to make another look
 better. **Decoy/asymmetric-dominance replications are mixed**, so build pricing on anchoring and clear
 value differentiation rather than on a decoy tier, and don't promise a stakeholder a decoy will work.
 Anchoring against a *fabricated* "was" price is a different matter again: fake reference pricing is
@@ -205,7 +205,7 @@ regulated in both the EU and US.
 
 ## Summary of corrections
 
-| Video says | Actually |
+| Commonly said | Actually |
 |---|---|
 | Car-wash loyalty study was Columbia | **Nunes (USC) & Drèze (UCLA), 2006.** Columbia is the jam study. 19% → 34% completion. |
 | Jam study proves fewer choices convert better | Real numbers (3% vs 30%), but **Scheibehenne et al. (2010) meta-analysis: average effect ≈ zero (d = 0.02)** across 50 studies. Contested. |
@@ -214,15 +214,15 @@ regulated in both the EU and US.
 | Kahneman won a Nobel for proving loss aversion | Nobel (2002) was for integrating psychology into economics generally. Tversky died in 1996, ineligible. |
 | Losing hurts exactly twice as much as gaining feels good | λ ≈ 2.25 from a specific 1992 lab paradigm. Direction robust; **magnitude contested** (Gal & Rucker, 2018). |
 
-The video's *advice* survives all six corrections — the before/afters are sound and worth building from.
+The *advice* survives all six corrections — the before/afters are sound and worth building from.
 What doesn't survive is the confident statistics. Use the mechanisms, drop the numbers.
 
-## What the video doesn't cover
+## What this framing leaves out
 
-Its six principles are all acquisition- and conversion-facing. Four things this skill set adds that you'll
+These six are all acquisition- and conversion-facing. Four things this skill set adds that you'll
 need for real products:
 
-- **Retention beyond the first session** — the video stops at signup. `habit-loop-design`.
+- **Retention beyond the first session** — the framing stops at signup. `habit-loop-design`.
 - **Whether any of it worked** — none of these techniques come with a way to detect the backfire.
   `behavioral-metrics`, especially guardrail metrics.
 - **Where the eye actually goes** — every before/after assumes the user sees the change.

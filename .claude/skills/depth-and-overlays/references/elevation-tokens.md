@@ -52,7 +52,16 @@ for anything with a table in it.
 }
 
 .card      { background: var(--color-surface-raised); border: 1px solid var(--color-border-subtle); }
-.card:hover{ background: var(--color-surface-overlay); border-color: var(--color-border); }
+.card:hover{
+  /* A state layer, not a different surface token. In light themes `--color-surface`,
+     `-raised` and `-overlay` are all white, so swapping between them is a no-op —
+     the surface ladder carries elevation in DARK mode only. Mixing toward the text
+     colour darkens in light and lightens in dark, which is the behaviour you want in
+     both. See `ui-signifiers-and-states` for the --state-* deltas. */
+  background: color-mix(in oklab, var(--color-surface-raised),
+                        var(--color-text-primary) var(--state-hover, 8%));
+  border-color: var(--color-border);
+}
 ```
 
 Hover in this style is a **border + background** change, not a lift. That is a feature: it costs no

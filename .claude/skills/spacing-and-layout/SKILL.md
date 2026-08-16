@@ -37,8 +37,8 @@ pixel values it implies). `ui-craft` is the router for the whole craft set.
 Six answers determine every number below. Write them into the project's CSS as tokens on day one; retrofitting
 a scale into a codebase with 300 arbitrary values is a week of work nobody funds.
 
-1. **Density.** Marketing/editorial (space is the design — base rhythm 24/48/96), product default
-   (16/24/48), or data-dense tool (8/12/24 with 4px half-steps). Density is a legitimate product decision,
+1. **Density.** The three in `ui-craft`: editorial (space is the design — base rhythm 24/48/96), product
+   default (16/24/48), or dense tool (8/12/24 with 4px half-steps). Density is a legitimate product decision,
    not a failure — a trading screen with generous whitespace is unusable. Pick one per surface. A marketing
    site and its admin console are different densities and should not share a spacing scale wholesale.
 2. **Primary input: touch or pointer?** Touch sets a 44px floor on interactive height and forces bigger gaps
@@ -397,16 +397,9 @@ img, video, svg, canvas    { max-inline-size: 100%; block-size: auto; }
 
 **WCAG 1.4.12 Text Spacing (AA).** No loss of content or functionality when the user overrides: line height
 **≥1.5× font size**, spacing after paragraphs **≥2×**, letter spacing **≥0.12×**, word spacing **≥0.16×**.
-This is the criterion that fixed-height boxes fail. Test it by pasting this into devtools:
-
-```css
-* { line-height: 1.5 !important;
-    letter-spacing: 0.12em !important;
-    word-spacing: 0.16em !important; }
-p { margin-block-end: 2em !important; }
-```
-
-Then look for clipped text. The fixes are all spacing decisions:
+This is the criterion that fixed-height boxes fail. Paste the devtools override snippet from
+`typography-system` move 5 — text spacing is a type property, so that skill states the criterion in full and
+owns the one canonical copy — then look for clipped text. The fixes are all spacing decisions:
 
 - **`min-height`, never `height`,** on buttons, chips, badges, nav items, table rows, cards.
 - **Size by padding + line-height,** not by a magic pixel height. `padding-block: 0.625rem` with

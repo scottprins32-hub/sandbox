@@ -38,7 +38,8 @@ router for this set.
 
 Six answers fix every number below. Settle them once, write them into `@theme` or `:root` on day one.
 
-1. **Density, from the archetype** (table in `ux-psychology`). A marketing or editorial surface wants **at
+1. **Density** — pick one of the three named in `ui-craft` (editorial / product / dense tool); the archetype
+   table in `ux-psychology` tells you which surface you are on. An editorial surface wants **at
    most about six sizes across a wide range** — 14px to 64px — because size *is* the hierarchy when there are
    eight things on screen. A dashboard wants **about five sizes in a tight range, rarely exceeding 24px**,
    because there are four hundred things on screen and density is the product. Marketing sizes in a dashboard
