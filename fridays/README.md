@@ -72,8 +72,10 @@ genuinely good, and this rebuild uses it rather than replacing it.
 
 **1. The menu is a matrix and every surface flattens it.**
 The printed menu is eleven cuts against seven formats: `regular, large, caesar salad,
-plain, sandwich, wrap, kapsalon`. That is seventy-seven prices in a shape you can read in
-one glance, and it is the single most distinctive thing about how the business works. The
+plain, sandwich, wrap, kapsalon`. Seventy-seven cells, eighteen of which are combinations
+the kitchen does not do, leaving fifty-nine real ways to order a plate and sixty-eight
+printed prices. It is a shape you can read in one glance, and the single most distinctive
+thing about how the business works. The
 website shows eight "signatures" as a flat list. The full menu is a 1.5 MB JPEG scan of an
 A4 poster, which cannot be searched, translated, tapped, or read by a screen reader.
 
@@ -127,14 +129,15 @@ you find out at the hatch. Papiamentu, Dutch and English, switchable.
 
 **The app is the window in your pocket.** A different posture from the site: operational,
 tight, built around one object. Your order becomes a live fire ticket with a timeline and a
-collection code, and instead of reporting a status it gives an instruction, "leave in six
-minutes", computed from the queue and how far away you are. **Trempan** is the loyalty
-mechanic: book a slot between 19:30 and 21:30 and the kitchen guarantees twelve minutes and
-takes Cg 2 off, because an empty grill is worth more to them than a full one. Loyalty that
+collection code, and instead of reporting a status it gives an instruction: the minute to
+walk out of the door, computed from the queue and how far away you are. **Trempan** is the loyalty
+mechanic: book a collection slot in the first two hours after the grill lights, 21:00 to
+23:00, and the kitchen guarantees twelve minutes and takes Cg 2 off, because an empty grill
+is worth more to them than a full one. Loyalty that
 moves demand beats loyalty that stamps a card.
 
 **The ordering system is the window's grammar.** Four questions in the truck's own order:
-*Ki karni?* which cut. *Kon bo ke?* how do you want it. *Batata o pan?* fries or bread.
+*Ki karni?* which cut. *Kon bo ke?* how do you want it. *Batata òf pan?* fries or bread.
 *Ku sous?* with sauce. Including **mitar mitar**, half and half, which is the most requested
 thing at a truk window and which no ordering system on the island supports. Behind it, the
 half nobody designs: a kitchen rail that groups tickets by cut so the grill cook fires four
@@ -159,22 +162,42 @@ and differ in posture, which is what makes each one right for its job.
 
 ## What is real and what is modelled
 
-**Real.** Every price, format, opening hour, address, phone number and email is transcribed
-from the December 2024 printed menu and from fridays.cw. The photography is Fridays' own.
-The three reviews are the ones on their site, under the names given there.
+**Real.** Every plate price, format, opening hour, address, phone number and email is
+transcribed from the December 2024 printed menu and from fridays.cw. The photography is
+Fridays' own. The three reviews are the ones on their site, under the names given there.
 
 **Modelled.** Queue depth and fire time are simulated from a curve peaking between 22:30
-and 01:00. They run against real Curaçao time, so the pages genuinely read differently at
-nine in the evening and at two in the morning, but no live kitchen feeds them. Trempan, the
-fire ticket, the rail and the governor are proposals, not existing features.
+and 01:00, using one shared formula so all three surfaces quote the same number at the same
+instant. They run against real Curaçao time, so the pages genuinely read differently at nine
+in the evening and at two in the morning, but no live kitchen feeds them. Trempan, the fire
+ticket, the rail and the governor are proposals, not existing features. So are the prices
+the printed menu does not carry, and they are labelled as such on the hub: sides at Cg 2,
+the mitar mitar second grill pass at Cg 3, extra batata at Cg 4, delivery at Cg 8, and the
+Cg 2 Trempan credit.
 
-**Needs a native pass.** The Papiamentu was written from sourced vocabulary and checked
-against dictionaries, not by a native speaker. A Curaçao copywriter should go through it
-line by line before anything ships. Two menu details are also worth confirming with the
-kitchen: the printed menu shows two prices for chicken at Regular (read here as a small and
-a large), and lists Surf & Turf Deluxe inside the Premium table rather than as its own item.
+**Needs a native pass.** The Papiamentu was written from sourced vocabulary, corrected once
+in review (`preis` not `prijs`, `Djadumingu` not `Djadomingo`, `òf` not `o`, `tum'é` and
+`tres'é` for the elided object clitic), and still not checked by a native speaker. A Curaçao
+copywriter should go through it line by line before anything ships.
+
+**Worth asking the owner.** The banner on the side of the truck, visible in their own
+photography, reads "closed on Thuesday", while fridays.cw lists all seven days open. The
+hours used here follow the website; the photograph used beside the hours table is cropped
+above the banner rather than quietly showing a contradiction. The printed menu also shows
+two prices for chicken at Regular (read here as a small and a large) and files Surf & Turf
+Deluxe inside the Premium table rather than as its own line.
 
 ---
 
 Concept work, not affiliated with Fridays Baby Truck. No payment is taken anywhere and
 none of these pages are live.
+
+## How it was checked
+
+Every page was driven in a headless browser rather than reviewed by eye: session boundaries
+at 20:59, 21:00, 01:59, 02:01, 02:59, 03:01, 03:59, 04:01 and 05:00 across all three
+surfaces; the order flow built end to end in both currencies; and a sweep for sideways
+scroll, clipped elements, console errors, document language and a main landmark at eight
+widths from 320 to 1920. The design, accessibility, code, UX, craft and factual accuracy of
+all four pages were then put through an adversarial review, and the thirty-one findings that
+survived verification are fixed here.

@@ -35,6 +35,7 @@ body{
   -webkit-font-smoothing:antialiased; overflow-x:hidden;
 }
 img{max-width:100%; display:block}
+figure{margin:0}   /* the UA default is 1em 40px, which no grid here wants */
 a{color:inherit; text-decoration:none}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:2px}
@@ -187,9 +188,10 @@ p{margin:0}
   font-size:.86rem; font-weight:500; transition:.28s var(--ease); position:relative}
 .gloss button:hover,.gloss button[aria-expanded="true"]{background:var(--amber);
   border-color:var(--amber); color:#241A05}
-.gloss button i{font-style:normal; font-family:var(--f-quote); font-style:italic;
-  color:var(--smoke); margin-left:8px; transition:color .28s}
-.gloss button:hover i,.gloss button[aria-expanded="true"] i{color:#5A4410}
+.gloss-out{margin-top:14px; min-height:1.5em; font-family:var(--f-quote); font-style:italic;
+  font-size:1.05rem; color:var(--bone-2)}
+.gloss-out b{font-style:normal; font-family:var(--f-body); font-weight:600; color:var(--amber);
+  margin-right:8px; font-size:.88rem}
 
 /* ---------------------------------------------------------------- the matrix */
 .matrix-note{display:flex; gap:var(--s3); align-items:flex-start; padding:14px 16px;
@@ -202,7 +204,7 @@ p{margin:0}
 .mx-scroll{overflow-x:auto; scrollbar-width:thin}
 table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 .mx-t th,.mx-t td{text-align:right; padding:0; border-bottom:1px solid var(--line)}
-.mx-t thead th{position:sticky; top:0; z-index:2; background:var(--ink-3);
+.mx-t thead th{background:var(--ink-3);
   padding:14px 12px; font-size:.66rem; font-weight:700; letter-spacing:.13em;
   text-transform:uppercase; color:var(--smoke); white-space:nowrap;
   border-bottom:1px solid var(--line-2)}
@@ -210,7 +212,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
   font-weight:500; text-transform:none; margin-top:3px}
 .mx-t th.rowh{text-align:left; position:sticky; left:0; z-index:1;
   background:var(--ink-2); padding:0; min-width:172px}
-.mx-t thead th.rowh{z-index:3; background:var(--ink-3)}
+.mx-t thead th.rowh{z-index:2; background:var(--ink-3)}
 .mx-t tbody tr:last-child td,.mx-t tbody tr:last-child th{border-bottom:0}
 .mx-t tbody tr:hover th.rowh,.mx-t tbody tr:hover td{background:var(--ink-3)}
 .rowh-in{display:block; padding:13px 16px}
@@ -234,7 +236,8 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 .cell u{text-decoration:none; font-family:var(--f-body); font-size:.6rem; font-weight:600;
   letter-spacing:.10em; text-transform:uppercase; color:var(--smoke); transition:color .22s}
 .cell:hover u{color:#5A4410}
-.cell-off{min-height:64px; display:grid; place-items:center; color:#72695F; font-size:1.1rem}
+.cell-off{min-height:64px; display:flex; align-items:center; justify-content:flex-end;
+  padding:11px 14px; color:#72695F; font-size:1.1rem}
 .mx-foot{display:flex; justify-content:space-between; align-items:center; gap:var(--s4);
   padding:14px 18px; background:var(--ink-3); font-size:.78rem; color:var(--smoke);
   flex-wrap:wrap}
@@ -274,7 +277,8 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
     rgba(12,11,9,.42) 55%,rgba(12,11,9,.06) 85%)}
 .sig-txt{position:absolute; inset:auto 0 0; z-index:2; padding:var(--s5); display:flex;
   align-items:flex-end; justify-content:space-between; gap:var(--s4)}
-.sig-txt h3{font-size:clamp(1.3rem,2.1vw,1.95rem); max-width:12ch}
+.sig-txt h3{font-size:clamp(1.3rem,2.1vw,1.95rem); max-width:12ch; text-wrap:balance}
+.sig-e .sig-txt h3{max-width:26ch}
 .sig-txt p{font-size:.78rem; color:var(--bone-2); margin-top:6px; max-width:34ch}
 .sig-price{font-family:var(--f-display); font-weight:800; font-size:1.7rem; color:var(--amber);
   letter-spacing:.02em; flex:none; line-height:1}
@@ -309,7 +313,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
   gap:var(--s5)}
 .rev{padding:var(--s6) var(--s5); border:1px solid var(--line); border-radius:16px;
   background:var(--ink-2); display:flex; flex-direction:column; gap:var(--s4)}
-.rev:nth-child(2){transform:translateY(var(--s5))}
+.rev:nth-child(2){margin-top:var(--s5)}
 .rev-stars{display:flex; gap:3px; color:var(--amber); font-size:.85rem}
 .rev q{font-family:var(--f-quote); font-style:italic; font-size:1.25rem; line-height:1.34;
   quotes:none; letter-spacing:-.01em}
@@ -398,8 +402,8 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
   .sheet .lang button{padding:9px 16px; font-size:.78rem}
   .burger{display:grid; place-items:center; width:40px; height:40px; border-radius:10px;
     border:1px solid var(--line-2); font-size:1.1rem}
-  .mx-scroll{display:none} .mx{border:0; background:none} .mx-m{display:block}
-  .rev:nth-child(2){transform:none}
+  .mx-scroll,.mx-foot{display:none} .mx{border:0; background:none} .mx-m{display:block}
+  .rev:nth-child(2){margin-top:0}
   .hero{padding-bottom:var(--s6)}
   .sec-head{margin-bottom:var(--s6)}
 }
@@ -534,6 +538,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
           <button type="button" data-def="half and half, two proteins on one plate">mitar mitar</button>
           <button type="button" data-def="delicious, and the highest compliment available">dushi</button>
         </div>
+        <p class="gloss-out" id="glossOut" role="status"></p>
       </div>
       <figure class="story-fig rv rv-d1">
         <img src="{{IMG:truck_wide}}" alt="The Fridays Baby Truck lit up at night under string lights, staff working the service window" loading="lazy">
@@ -569,7 +574,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
       </div>
       <div class="mx-foot">
         <span data-i18n="menu.foot1">Add cheese to any burger, Cg 1.</span>
-        <span data-i18n="menu.foot2">Mix platters, wraps and beverages below.</span>
+        <span data-i18n="menu.foot2">Mix platters and beverages at the window.</span>
       </div>
     </div>
 
@@ -605,17 +610,17 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
         </div>
       </a>
       <a class="sig sig-c rv" href="#menu">
-        <img src="{{IMG:shrimp_sq}}" alt="Garlic shrimps finishing in a pan on the grill" loading="lazy">
-        <div class="sig-txt">
-          <div><h3 data-i18n="sig.4h">Surf and turf deluxe</h3><p data-i18n="sig.4p">Picanha and shrimps, the most expensive thing on the truck and the fastest to sell out.</p></div>
-          <div class="sig-price">38<small>Cg</small></div>
-        </div>
-      </a>
-      <a class="sig sig-d rv rv-d1" href="#menu">
-        <img src="{{IMG:kapsalon_wide}}" alt="A loaded kapsalon box of fries, meat, cheese and salad" loading="lazy">
+        <img src="{{IMG:kapsalon_sq}}" alt="A loaded kapsalon box of fries, meat, cheese and salad" loading="lazy">
         <div class="sig-txt">
           <div><h3 data-i18n="sig.3h">Chicken kapsalon</h3><p data-i18n="sig.3p">Dutch invention, island portion.</p></div>
           <div class="sig-price">22<small>Cg</small></div>
+        </div>
+      </a>
+      <a class="sig sig-d rv rv-d1" href="#menu">
+        <img src="{{IMG:shrimp_wide}}" alt="Garlic shrimps finishing in a pan on the grill" loading="lazy">
+        <div class="sig-txt">
+          <div><h3 data-i18n="sig.4h">Surf and turf deluxe</h3><p data-i18n="sig.4p">Picanha and shrimps, the most expensive thing on the truck and the fastest to sell out.</p></div>
+          <div class="sig-price">38<small>Cg</small></div>
         </div>
       </a>
       <a class="sig sig-e rv" href="#menu">
@@ -643,7 +648,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
         <div class="ways">
           <div class="way">
             <span class="way-ic">{{ICON:sun-horizon}}</span>
-            <div><b data-i18n="wait.w1h">Order before 21:30</b><p data-i18n="wait.w1p">The grill is hot and empty. Guaranteed twelve minutes, and Cg 2 off the ticket.</p></div>
+            <div><b data-i18n="wait.w1h">Collect before 22:00</b><p data-i18n="wait.w1p">The first hour after the grill lights, the coals are hot and the rail is empty. Twelve minutes guaranteed, and Cg 2 off.</p></div>
             <div class="way-time">12<small data-i18n="wait.min">min</small></div>
           </div>
           <div class="way">
@@ -674,17 +679,17 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
     </div>
     <div class="revs">
       <figure class="rev rv">
-        <div class="rev-stars" aria-label="Five out of five">{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}</div>
+        <div class="rev-stars" role="img" aria-label="Rated five out of five">{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}</div>
         <q>Love love love this place. Anything you get will always taste good. 100% recommended.</q>
         <cite>J. Hodge</cite>
       </figure>
       <figure class="rev rv rv-d1">
-        <div class="rev-stars" aria-label="Five out of five">{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}</div>
+        <div class="rev-stars" role="img" aria-label="Rated five out of five">{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}</div>
         <q>When I don't feel like cooking, I open the app and place my order. Best chicken caesar on the island. For real.</q>
         <cite>S. Sander</cite>
       </figure>
       <figure class="rev rv rv-d2">
-        <div class="rev-stars" aria-label="Five out of five">{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}{{ICON:star}}</div>
+        <div class="rev-stars" role="img" aria-label="Rated five out of five">{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}{{ICON:star-fill}}</div>
         <q>I've been to many food trucks around the world, but this, I mean Fridays in Curacao, is the best food truck in the world swa!</q>
         <cite>I. Isidora</cite>
       </figure>
@@ -721,7 +726,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
         </div>
       </div>
       <figure class="visit-fig rv rv-d1">
-        <img src="{{IMG:crew_wide}}" alt="The crew working inside the truck with the menu boards lit behind them" loading="lazy">
+        <img src="{{IMG:crew_win}}" alt="The crew working inside the truck with the menu boards lit behind them" loading="lazy">
       </figure>
     </div>
   </div>
@@ -757,6 +762,14 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
             <li><a href="https://www.instagram.com/fridaysbabytruck" rel="noopener">Instagram</a></li>
           </ul>
         </div>
+        <div>
+          <h4 data-i18n="ft.rest">Rest of the concept</h4>
+          <ul>
+            <li><a href="03-ordering.html" data-i18n="ft.order">Ordering system</a></li>
+            <li><a href="02-app.html" data-i18n="ft.app">The app</a></li>
+            <li><a href="index.html" data-i18n="ft.research">Research notes</a></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="ft-base">
@@ -768,13 +781,16 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 
 <div class="tray" id="tray" role="status">
   <div><b id="trayItem">Steak, regular</b><span id="trayMeta">Ready 22:41, Cg 21</span></div>
-  <a class="btn btn-hot btn-sm" href="#">{{ICON:arrow-right}}<span data-i18n="tray.cta">Continue</span></a>
+  <a class="btn btn-hot btn-sm" href="03-ordering.html">{{ICON:arrow-right}}<span data-i18n="tray.cta">Continue</span></a>
   <button class="tray-x" id="trayX" aria-label="Dismiss">{{ICON:x}}</button>
 </div>
 
 <script>
 (function(){
 "use strict";
+// The artifact wrapper supplies <html>, not its lang. setLang() keeps this in
+// step from here on; this line covers the state before anyone switches.
+document.documentElement.lang="en";
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -783,13 +799,20 @@ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
    Caribbean guilder. `null` means the kitchen does not serve that combination.
    Two numbers mean the menu prints a small and a large.                     */
 const FORMATS=[
- {id:"regular", en:"Regular",      pap:"Regular",      nl:"Regulier",   sub:"with fries"},
- {id:"large",   en:"Large",        pap:"Grandi",       nl:"Groot",      sub:"bigger plate"},
- {id:"caesar",  en:"Caesar salad", pap:"Salada caesar",nl:"Caesarsalade",sub:"on salad"},
- {id:"plain",   en:"Plain",        pap:"Simpel",       nl:"Naturel",    sub:"meat only"},
- {id:"sandwich",en:"Sandwich",     pap:"Pan ku…",      nl:"Broodje",    sub:"in a bun"},
- {id:"wrap",    en:"Wrap",         pap:"Wrap",         nl:"Wrap",       sub:"rolled"},
- {id:"kapsalon",en:"Kapsalon",     pap:"Kapsalon",     nl:"Kapsalon",   sub:"over fries"}
+ {id:"regular", en:"Regular",      pap:"Regular",      nl:"Regulier",
+  sub:{en:"with fries",  pap:"ku batata",     nl:"met friet"}},
+ {id:"large",   en:"Large",        pap:"Grandi",       nl:"Groot",
+  sub:{en:"bigger plate",pap:"tayo mas grandi",nl:"groter bord"}},
+ {id:"caesar",  en:"Caesar salad", pap:"Salada caesar",nl:"Caesarsalade",
+  sub:{en:"on salad",    pap:"riba salada",   nl:"op salade"}},
+ {id:"plain",   en:"Plain",        pap:"Simpel",       nl:"Naturel",
+  sub:{en:"meat only",   pap:"karni so",      nl:"alleen vlees"}},
+ {id:"sandwich",en:"Sandwich",     pap:"Pan ku…",      nl:"Broodje",
+  sub:{en:"in a bun",    pap:"den pan",       nl:"in een broodje"}},
+ {id:"wrap",    en:"Wrap",         pap:"Wrap",         nl:"Wrap",
+  sub:{en:"rolled",      pap:"lorá",          nl:"gerold"}},
+ {id:"kapsalon",en:"Kapsalon",     pap:"Kapsalon",     nl:"Kapsalon",
+  sub:{en:"over fries",  pap:"riba batata",   nl:"op friet"}}
 ];
 const PROTEINS=[
  {id:"chicken", tier:"basic",  en:"Chicken",    pap:"Galiña",  nl:"Kip",         img:"t_baste",
@@ -831,13 +854,13 @@ const T={
   "story.lede":"Kada isla tin un kos ku e ta hasi mei anochi. Kòrsou ta grill.",
   "story.pull":"Un hende a kòrta un bentana den un trùk di pan i a pone un grill di karbon bou di dje.",
   "story.p1":"Den añanan '70 e trùknan di pan tabata kaba nan ronda mainta i keda pará henter anochi. Chofùrnan a kuminsá sende karbon patras i bende na ken ku ainda tabata pafó. Esei ta un trùk 'i pan, i kuarenta aña despues ta ainda asina e isla ta kome despues di skur.",
-  "story.p2":"E reglanan no a kambia hopi. E ta habri ora restaurantnan ta sera. Nada no ta kushiná promé. Bo ta òrdena na un bentana, bo ta warda kaminda bo ta pará, i e kontesta riba tur pregunta ta òf batata òf pan.",
-  "story.p3":"Fridays a yega lat na e tradishon ei, na 2018, i ta tuma né serio sufisiente pa pone rib eye, picanha i karkó riba un tayo di papel pa dos or di mainta.",
+  "story.p2":"E reglanan no a kambia hopi. E ta habri ora restaurantnan ta sera. Nada no ta kushiná promé. Bo ta òrdena na un bentana, bo ta warda kaminda bo ta pará, i e kontesta riba tur pregunta ta batata òf pan.",
+  "story.p3":"Fridays a yega lat na e tradishon ei, na 2018, i ta tum'é serio sufisiente pa pone rib eye, picanha i karkó riba un tayo di papel pa dos or di mainta.",
   "story.cap":"E bentana, Caracasbaaiweg 216, mayoria anochi rònt di dies or.",
   "menu.kicker":"Henter e menu","menu.h":"Diesun karni.<br>Shete manera.",
   "menu.lede":"Skohe e karni, despues skohe kiko e ta yega aden. Esei ta henter e sistema, i nunka e no a kaba den un lista.",
-  "menu.note":"Preisnan den florin karibense (Cg), e moneda di e isla for di 31 di mart 2025. Primi kualke prijs pa kuminsá un òrdu. Un kaha bashí ta nifiká ku kushina no ta hasi esei, i ta bisa bo esei awor en bes di na e bentana.",
-  "menu.foot1":"Agregá keshi na kualke burger, Cg 1.","menu.foot2":"Mix platter, wrap i bebida abou.",
+  "menu.note":"Preisnan den florin karibense (Cg), e moneda di e isla for di 31 di mart 2025. Primi kualke preis pa kuminsá un òrdu. Un kaha bashí ta nifiká ku kushina no ta hasi esei, i ta bisa bo esei awor en bes di na e bentana.",
+  "menu.foot1":"Agregá keshi na kualke burger, Cg 1.","menu.foot2":"Mix platter i bebida na e bentana.",
   "sig.kicker":"Pafó di e matris","sig.h":"Esnan ku hende<br>ta kore henter<br>isla p'e",
   "sig.1h":"Ribs Jack Daniels","sig.1p":"Bastí riba e grill, no promé. Ta bini ku batata.",
   "sig.2h":"Caesar ku steak","sig.2p":"E motibu ku hende ta òrdena salada un or di mainta.",
@@ -847,16 +870,17 @@ const T={
   "sig.from":"for di Cg",
   "wait.kicker":"Tempu di kandela","wait.h":"Sí, tin un liña.<br>Aki ta kuantu<br>eksaktamente.",
   "wait.p":"Nada no ta pará bou di un lampi. Bo steak ta bai riba e karbon ora bo tiket ta bai, i p'esei un djasabra yen ta yega te kuarenta minüt na e bentana. En bes di skonde esei, nos ta publik'é bibu i ta duna bo tres manera pa evit'é.",
-  "wait.w1h":"Òrdena promé ku 21:30","wait.w1p":"E grill ta kayente i bashí. Diesdos minüt garantisá, i Cg 2 menos.",
-  "wait.w2h":"Òrdena promé den e app","wait.w2p":"Skohe bo ora, nos ta bisa bo ki ora sali di kas, i bo ta kana direkt na e hatch.",
-  "wait.w3h":"Laga trese né","wait.w3p":"Entrega den Willemstad i e peninsula di Caracasbaai miéntras e grill ta sendé.",
+  "wait.w1h":"Buska promé ku 22:00","wait.w1p":"E promé ora despues ku e grill sende, e karbon ta kayente i e rail ta bashí. Diesdos minüt garantisá, i Cg 2 menos.",
+  "wait.w2h":"Òrdena promé den e app","wait.w2p":"Skohe bo ora, nos ta bisa bo ki ora sali di kas, i bo ta kana direkt na e bentana.",
+  "wait.w3h":"Laga tres'é","wait.w3p":"Entrega den Willemstad i e peninsula di Caracasbaai miéntras e grill ta sendé.",
   "wait.min":"min","wait.wait":"espera",
   "rev.kicker":"Kiko hende ta bisa","rev.h":"Reseña, den<br>ingles di isla","rev.cta":"Laga un reseña",
   "visit.kicker":"Buska e bentana","visit.h":"Caracasbaaiweg<br>216",
   "visit.note":"Òrdu por wòrdu pone for di 19:30, nobenta minüt promé ku e grill sende.",
-  "visit.route":"Ruta di maneho","visit.phone":"Òrdu pa telefon for di 19:30","visit.mail":"Catering i evento privá",
+  "visit.route":"Kon yega","visit.phone":"Òrdu pa telefon for di 19:30","visit.mail":"Catering i evento privá",
   "ft.eat":"Kome","ft.know":"Sa","ft.reach":"Kontaktá","ft.mix":"Mix platter","ft.delivery":"Entrega",
   "ft.what":"Kiko ta un trùk 'i pan","ft.fire":"Kon tempu di kandela ta funshoná","ft.hours":"Ora di habri",
+  "ft.rest":"Resto di e konsepto","ft.order":"Sistema di òrdu","ft.app":"E app","ft.research":"Nota di investigashon",
   "ft.concept":"Rediseño konseptual. No ta e sitio bibu.","tray.cta":"Sigui"
  },
  nl:{
@@ -878,7 +902,7 @@ const T={
   "menu.kicker":"Het hele menu","menu.h":"Elf stukken.<br>Zeven manieren.",
   "menu.lede":"Kies het vlees, kies dan waarin het komt. Dat is het hele systeem, en het heeft nooit in een lijstje gepast.",
   "menu.note":"Prijzen in Caribische gulden (Cg), de munt van het eiland sinds 31 maart 2025. Tik op een prijs om te bestellen. Een leeg vakje betekent dat de keuken die combinatie niet maakt, en zegt dat nu in plaats van bij het luik.",
-  "menu.foot1":"Kaas op elke burger, Cg 1.","menu.foot2":"Mixschotels, wraps en dranken hieronder.",
+  "menu.foot1":"Kaas op elke burger, Cg 1.","menu.foot2":"Mixschotels en dranken aan het luik.",
   "sig.kicker":"Buiten de matrix","sig.h":"Waar mensen het<br>hele eiland voor<br>doorrijden",
   "sig.1h":"Jack Daniels ribs","sig.1p":"Op de grill gelakt, niet ervoor. Met friet.",
   "sig.2h":"Steak caesar","sig.2p":"De reden dat mensen om een uur 's nachts salade bestellen.",
@@ -888,7 +912,7 @@ const T={
   "sig.from":"vanaf Cg",
   "wait.kicker":"Vuurtijd","wait.h":"Ja, er is een rij.<br>Dit is precies<br>hoe lang.",
   "wait.p":"Er ligt niets onder een warmhoudlamp. Je steak gaat op de kolen wanneer je bon binnenkomt, en daarom loopt een drukke zaterdag op tot veertig minuten aan het luik. In plaats van dat te verbergen publiceren we het live en geven we je drie manieren eromheen.",
-  "wait.w1h":"Bestel voor 21:30","wait.w1p":"De grill is heet en leeg. Gegarandeerd twaalf minuten, en Cg 2 korting.",
+  "wait.w1h":"Haal op voor 22:00","wait.w1p":"Het eerste uur na het aansteken zijn de kolen heet en is het rek leeg. Gegarandeerd twaalf minuten, en Cg 2 korting.",
   "wait.w2h":"Bestel vooruit in de app","wait.w2p":"Kies je tijdslot, hoor wanneer je moet vertrekken, loop door naar het afhaalluik.",
   "wait.w3h":"Laat het brengen","wait.w3p":"Bezorging in Willemstad en op het schiereiland Caracasbaai zolang de grill brandt.",
   "wait.min":"min","wait.wait":"wachten",
@@ -898,6 +922,7 @@ const T={
   "visit.route":"Route","visit.phone":"Telefonisch bestellen vanaf 19:30","visit.mail":"Catering en besloten feesten",
   "ft.eat":"Eten","ft.know":"Weten","ft.reach":"Bereiken","ft.mix":"Mixschotels","ft.delivery":"Bezorging",
   "ft.what":"Wat een trùk 'i pan is","ft.fire":"Hoe vuurtijd werkt","ft.hours":"Openingstijden",
+  "ft.rest":"Rest van het concept","ft.order":"Bestelsysteem","ft.app":"De app","ft.research":"Onderzoeksnotities",
   "ft.concept":"Conceptueel herontwerp. Niet de live site.","tray.cta":"Verder"
  }
 };
@@ -908,17 +933,20 @@ Object.assign(EN,{
  "win.open":"Open","win.opens":"Opens",
  "note.busy":"Busy right now. Ordering ahead skips the line.",
  "note.calm":"Cooked to order. Nothing is sitting under a lamp.",
- "mx.no":"Not served","mx.small":"small / large","mx.ready":"Ready","mx.with":"Not served with"
+ "mx.no":"Not served","mx.small":"small / large","mx.ready":"Ready","mx.with":"Not served with",
+ "hrs.to":"to","hrs.today":"today"
 });
 Object.assign(T.pap,{
  "note.busy":"Yen awor aki. Òrdena promé ta pasa e liña.",
  "note.calm":"Kushiná na òrdu. Nada no ta pará bou di un lampi.",
- "mx.no":"No ta sirbí","mx.small":"chikí / grandi","mx.ready":"Kla","mx.with":"No ta sirbí ku"
+ "mx.no":"No ta sirbí","mx.small":"chikí / grandi","mx.ready":"Kla","mx.with":"No ta sirbí ku",
+ "hrs.to":"pa","hrs.today":"awe"
 });
 Object.assign(T.nl,{
  "note.busy":"Nu druk. Vooruit bestellen slaat de rij over.",
  "note.calm":"Op bestelling gegrild. Er ligt niets onder een lamp.",
- "mx.no":"Niet geserveerd","mx.small":"klein / groot","mx.ready":"Klaar","mx.with":"Niet geserveerd met"
+ "mx.no":"Niet geserveerd","mx.small":"klein / groot","mx.ready":"Klaar","mx.with":"Niet geserveerd met",
+ "hrs.to":"tot","hrs.today":"vandaag"
 });
 const t=k=>(LANG==="en"?EN:Object.assign({},EN,T[LANG]))[k];
 let LANG="en";
@@ -936,13 +964,17 @@ $$(".lang button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.l
 const money=v=>Array.isArray(v)? v[0]+" / "+v[1] : String(v);
 const fmtName=p=> LANG==="pap"? p.pap : LANG==="nl"? p.nl : p.en;
 const fmtFmt =f=> LANG==="pap"? f.pap : LANG==="nl"? f.nl : f.en;
+const fmtSub =f=> f.sub[LANG] || f.sub.en;
+/* In Papiamentu the row name is already the Papiamentu word, so the second line
+   carries the English instead of printing the same word twice. */
+const fmtAlt =p=> LANG==="pap" ? p.en : p.pap;
 
 /* ------------------------------------------------------------- the matrix */
 function drawMatrix(){
   const head=$("#mxHead"), body=$("#mxBody");
   if(!head) return;
   head.innerHTML='<th class="rowh" scope="col"><span class="sr">Cut</span></th>'+
-    FORMATS.map(f=>`<th scope="col">${fmtFmt(f)}<small>${f.sub}</small></th>`).join("");
+    FORMATS.map(f=>`<th scope="col">${fmtFmt(f)}<small>${fmtSub(f)}</small></th>`).join("");
   const GRP={basic:{en:"Basic",pap:"Basic",nl:"Basic",
                sub:{en:"the everyday cuts",pap:"e kòrtenan di tur dia",nl:"de alledaagse stukken"}},
              premium:{en:"Premium",pap:"Premium",nl:"Premium",
@@ -964,7 +996,7 @@ function drawMatrix(){
         ${money(v)}${two?'<u>'+t("mx.small")+'</u>':""}</button></td>`;
     }).join("");
     return head+`<tr><th class="rowh" scope="row"><span class="rowh-in">
-      <b>${fmtName(p)}</b><span>${p.pap}</span></span></th>${cells}</tr>`;
+      <b>${fmtName(p)}</b><span>${fmtAlt(p)}</span></span></th>${cells}</tr>`;
   }).join("");
 }
 
@@ -973,18 +1005,26 @@ function drawMobile(){
   const nav=$("#mxPick"), list=$("#mxList");
   if(!nav) return;
   nav.innerHTML=PROTEINS.map(p=>`<button type="button" data-p="${p.id}"
-    aria-pressed="${p.id===pick}"><b>${fmtName(p)}</b><span>${p.pap}</span></button>`).join("");
+    aria-pressed="${p.id===pick}"><b>${fmtName(p)}</b><span>${fmtAlt(p)}</span></button>`).join("");
   const p=PROTEINS.find(x=>x.id===pick);
   list.innerHTML=FORMATS.map(f=>{
     const v=p.p[f.id], off=v==null;
     return `<button class="mx-li" ${off?"disabled":""} data-p="${p.id}" data-f="${f.id}">
-      <span><b>${fmtFmt(f)}</b><span>${off?t("mx.with")+" "+fmtName(p).toLowerCase():f.sub}</span></span>
+      <span><b>${fmtFmt(f)}</b><span>${off?t("mx.with")+" "+fmtName(p).toLowerCase():fmtSub(f)}</span></span>
       <em>${off?"-":"Cg "+money(v)}</em></button>`;
   }).join("");
 }
 document.addEventListener("click",e=>{
   const nav=e.target.closest("#mxPick button");
-  if(nav){pick=nav.dataset.p; drawMobile(); return;}
+  if(nav){
+    pick=nav.dataset.p;
+    drawMobile();
+    // drawMobile() replaced the button that was just pressed, so put focus back
+    // on its stand-in rather than dropping the keyboard user on <body>.
+    const again=$(`#mxPick button[data-p="${pick}"]`);
+    if(again && document.activeElement===document.body) again.focus();
+    return;
+  }
   const cell=e.target.closest(".cell, .mx-li:not(:disabled)");
   if(cell) addToTray(cell.dataset.p, cell.dataset.f);
 });
@@ -995,8 +1035,10 @@ function addToTray(pid,fid){
   const p=PROTEINS.find(x=>x.id===pid), f=FORMATS.find(x=>x.id===fid);
   const v=p.p[f.id]; if(v==null) return;
   $("#trayItem").textContent=fmtName(p)+", "+fmtFmt(f).toLowerCase();
-  const ready=new Date(Date.now()+state.fire*60000);
-  $("#trayMeta").textContent=t("mx.ready")+" "+hhmm(ready)+", Cg "+money(v);
+  const ready=islandNow().mins + state.fire;
+  $("#trayMeta").textContent = state.open
+    ? t("mx.ready")+" "+fromMin(ready)+", Cg "+money(v)
+    : t("win.note")+" Cg "+money(v);
   tray.classList.add("up");
 }
 $("#trayX").addEventListener("click",()=>tray.classList.remove("up"));
@@ -1013,9 +1055,8 @@ const HOURS=[ /* index 0 = Sunday, matching Date#getDay */
 const DAYNAMES={
  en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
  nl:["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"],
- pap:["Djadomingo","Djaluna","Djamars","Djarason","Djaweps","Djabièrnè","Djasabra"]
+ pap:["Djadumingu","Djaluna","Djamars","Djarason","Djaweps","Djabièrnè","Djasabra"]
 };
-const ORDERS_OPEN="19:30";
 
 function islandNow(){
   const p=new Intl.DateTimeFormat("en-GB",{timeZone:"America/Curacao",weekday:"short",
@@ -1025,7 +1066,6 @@ function islandNow(){
   return {day, mins:(+g("hour"))*60 + (+g("minute"))};
 }
 const toMin=s=>(+s.slice(0,2))*60 + (+s.slice(3));
-const hhmm=d=>String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
 const fromMin=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
 
 const state={open:false, fire:18, queue:7};
@@ -1040,8 +1080,8 @@ function tick(){
   state.open = inLateNight || inTonight;
 
   // Queue depth peaks between 22:30 and 01:00, which is when the wait bites.
-  const h=now.mins/60;
-  const peak = state.open ? Math.max(0, 1 - Math.abs(((h<6? h+24 : h)) - 23.75)/3.4) : 0;
+  const h=now.mins/60, hh = h<6 ? h+24 : h;
+  const peak = state.open ? Math.max(0, 1 - Math.abs(hh-23.75)/3.4) : 0;
   state.queue = state.open ? Math.round(1 + peak*11) : 0;
   state.fire  = state.open ? Math.round(9 + peak*29) : 12;
 
@@ -1069,24 +1109,26 @@ function drawHours(){
   const names=DAYNAMES[LANG]||DAYNAMES.en;
   const order=[1,2,3,4,5,6,0];
   tb.innerHTML=order.map(d=>`<tr class="${d===now.day?"now":""}">
-    <th scope="row">${names[d]}</th><td class="num">${HOURS[d].open} to ${HOURS[d].close}</td></tr>`).join("");
+    <th scope="row">${names[d]}${d===now.day?`<span class="sr"> (${t("hrs.today")})</span>`:""}</th>
+    <td class="num">${HOURS[d].open} ${t("hrs.to")} ${HOURS[d].close}</td></tr>`).join("");
 }
 
 /* -------------------------------------------------------------- glossary */
+/* One shared panel below the chips. The definition used to be written into the
+   button's own label under an aria-expanded that controlled nothing. */
+$$("#gloss button").forEach(b=>{
+  b.dataset.word=b.textContent.trim();
+  b.setAttribute("aria-expanded","false");
+  b.setAttribute("aria-controls","glossOut");
+});
 $("#gloss").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
-  const open=b.getAttribute("aria-expanded")==="true";
-  $$("#gloss button").forEach(x=>{
-    x.setAttribute("aria-expanded","false");
-    if(x.dataset.word) x.textContent=x.dataset.word;
-  });
-  if(!open){
-    b.dataset.word=b.dataset.word||b.textContent;
-    b.setAttribute("aria-expanded","true");
-    b.innerHTML=b.dataset.word+' <i>'+b.dataset.def+'</i>';
-  }
+  const was=b.getAttribute("aria-expanded")==="true";
+  $$("#gloss button").forEach(x=>x.setAttribute("aria-expanded","false"));
+  if(was){ $("#glossOut").textContent=""; return; }
+  b.setAttribute("aria-expanded","true");
+  $("#glossOut").innerHTML=`<b>${b.dataset.word}</b>${b.dataset.def}`;
 });
-$$("#gloss button").forEach(b=>{b.dataset.word=b.textContent; b.setAttribute("aria-expanded","false")});
 
 /* ------------------------------------------------------------ chrome, motion */
 const hdr=$("#hdr");

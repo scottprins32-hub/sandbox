@@ -28,6 +28,7 @@ body{margin:0; background:var(--page); color:var(--bone); font-family:var(--f-bo
 body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(90% 55% at 50% -8%, rgba(226,82,27,.16), transparent 62%)}
 img{max-width:100%; display:block}
+figure{margin:0}   /* the UA default is 1em 40px, which no grid here wants */
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 a{color:inherit; text-decoration:none}
 :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:3px}
@@ -209,9 +210,9 @@ p{margin:0}
 .tl::before{content:""; position:absolute; left:12px; top:20px; bottom:-2px; width:2px;
   background:var(--line)}
 .tl:last-child::before{display:none}
-.tl-dot{width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
+.tl .tl-dot{width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
   background:var(--raise); color:var(--dim); font-size:.75rem; z-index:1;
-  border:1px solid var(--line)}
+  border:1px solid var(--line); position:relative}
 .tl.done .tl-dot{background:rgba(143,186,104,.18); color:#A6D07E; border-color:transparent}
 .tl.live .tl-dot{background:var(--ember); color:#fff; border-color:transparent}
 .tl.live .tl-dot::after{content:""; position:absolute; inset:-5px; border-radius:50%;
@@ -310,10 +311,17 @@ p{margin:0}
   .move .then{grid-column:2; margin-top:6px}
   .vs{grid-template-columns:1fr}
 }
-@media (max-width:420px){ .phone{width:100%; padding:8px; border-radius:34px}
-  .screen{border-radius:27px; height:640px} }
+/* On a narrow screen the phone fills the width, so an inner scroller would
+   swallow every vertical swipe. Let the screen grow and the page scroll. */
+@media (max-width:560px){
+  .phone{width:100%; padding:8px; border-radius:34px}
+  .screen{border-radius:27px; height:auto}
+  .view{overflow:visible; overscroll-behavior:auto; max-height:none}
+  .tabs{position:sticky; bottom:0}
+}
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important}
+  *,*::before,*::after{animation-duration:.001ms !important;
+    animation-iteration-count:1 !important; transition-duration:.001ms !important}
 }
 </style>
 
@@ -324,6 +332,7 @@ p{margin:0}
   <p class="lede">Fridays currently rides on a white-label of a shared island ordering platform. It works, but the brand is a skin on someone else's checkout, and the app answers the wrong question. Nobody opens a food app at half past eleven to browse. They open it to find out how long, and when to leave the house.</p>
 </div>
 
+<main>
 <section class="sec">
   <div class="wrap">
     <div class="sec-head">
@@ -351,7 +360,7 @@ p{margin:0}
         <span class="move-n">{{ICON:sun-horizon}}</span>
         <div>
           <h3 class="h3">It pays you to come early</h3>
-          <p>Trempan is a lane, not a discount code. Book a slot between 19:30 and 21:30 and the kitchen guarantees twelve minutes and takes Cg 2 off, because an empty grill is worth more to them than a full one.</p>
+          <p>Trempan is a lane, not a discount code. Book a collection slot in the first two hours after the grill lights, 21:00 to 23:00, and the kitchen guarantees twelve minutes and takes Cg 2 off, because an empty grill is worth more to them than a full one.</p>
         </div>
         <p class="then"><b>Why it matters</b>The truck's only real problem is that everyone arrives between 22:30 and 01:00. Loyalty that moves demand beats loyalty that stamps a card.</p>
       </div>
@@ -364,7 +373,7 @@ p{margin:0}
     <div class="sec-head">
       <p class="kicker">The screens</p>
       <h2 class="h2">Live, not mocked</h2>
-      <p class="body">Every phone below is a working interface. The tab bars switch, the builder builds, the ticket counts down against island time. Tap around.</p>
+      <p class="body">Every phone below is a working interface. The tab bars switch, the builder builds, and the fire times are computed against real Curacao time, so these screens read differently at nine in the evening and at two in the morning. Tap around.</p>
     </div>
     <div class="rail" id="rail"></div>
   </div>
@@ -401,6 +410,8 @@ p{margin:0}
   </div>
 </section>
 
+</main>
+
 <footer class="ft">
   <div class="wrap ft-in">
     <span>Fridays Baby Truck app concept. Not a shipping product.</span>
@@ -411,7 +422,8 @@ p{margin:0}
 <script>
 (function(){
 "use strict";
-const IMG={{IMGJSON:t_caesar,t_ribs,t_kapsalon,t_shrimp,t_bag}};
+document.documentElement.lang="en";   // the artifact wrapper supplies <html>, not its lang
+const IMG={{IMGJSON:t_caesar,t_ribs,t_kapsalon,t_shrimp}};
 const ICONS={
   fire:`{{ICON:fire}}`, basket:`{{ICON:basket}}`, ticket:`{{ICON:ticket}}`,
   user:`{{ICON:user}}`, check:`{{ICON:check}}`, timer:`{{ICON:timer}}`,
@@ -433,8 +445,9 @@ function island(){
   return {day:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(g("weekday")),
           h:+g("hour"), m:+g("minute"), mins:(+g("hour"))*60+(+g("minute"))};
 }
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const pad=n=>String(n).padStart(2,"0");
-const clock=m=>pad(Math.floor((m%1440)/60))+":"+pad(m%60);
+const clock=m=>{const x=((m%1440)+1440)%1440; return pad(Math.floor(x/60))+":"+pad(x%60);};
 const OPENS=21*60;
 const CLOSE=[120,120,120,180,120,240,240];   // by weekday, minutes past midnight
 function fireState(){
@@ -443,8 +456,10 @@ function fireState(){
   // which is why the day index has to shift back one.
   const late  = t.mins < CLOSE[(t.day+6)%7];
   const open  = late || t.mins >= OPENS;
-  const h     = t.h<6 ? t.h+24 : t.h;
-  const peak  = open ? Math.max(0, 1-Math.abs(h-23.75)/3.4) : 0;
+  // Fractional hours, matching the website and the ordering system exactly, so
+  // the three surfaces cannot quote different fire times at the same instant.
+  const h     = t.mins/60, hh = h<6 ? h+24 : h;
+  const peak  = open ? Math.max(0, 1-Math.abs(hh-23.75)/3.4) : 0;
   return {open, late, closes: late ? CLOSE[(t.day+6)%7] : CLOSE[t.day],
           queue: open? Math.round(1+peak*11):0, fire: open? Math.round(9+peak*29):12, t};
 }
@@ -477,7 +492,7 @@ function vTonight(){
       <div class="u-top">
         <div><span class="note" style="letter-spacing:.12em; text-transform:uppercase; font-size:.6rem; font-weight:700">Bo usual</span>
           <b class="u-name">Steak, regular</b>
-          <p class="u-mods">Ku sous, sin pika. Extra batata.</p></div>
+          <p class="u-mods">Ku sous, sin pika.</p></div>
         <span class="u-price">21</span>
       </div>
       <button class="btn btn-hot" data-go="ticket">${ICONS.fire}Order it again</button>
@@ -517,28 +532,50 @@ function options(ci){
   });
   return out;
 }
+const SIDES=[["Batata","soft-fried chips"],["Pan","on a bun"],
+             ["Aros moro","rice and beans"],["Funchi","cornmeal"]];
+const SAUCES=[["Pika","onion relish, hot"],["Salsa rosada","mayo and ketchup"],
+              ["Sous di pinda","peanut"],["Chimichurri","herb and garlic"]];
 function vOrder(st){
   const ci=st.cut??2, s=fireState();
   const opts=options(ci);
   const active=opts.find(o=>o.key===st.fmt && o.price!=null) || opts.find(o=>o.price!=null);
-  return `<div class="appbar"><div><h2>Òrdena</h2><span class="sub">step 2 of 4</span></div></div>
-    <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=2?"on":""}"></i>`).join("")}</div>
-    <p class="qline">Ki karni?</p><p class="qsub">which cut</p>
-    <div class="grid2" data-set="cut">
+  const side=st.side??0, sauces=st.sauces||new Set([0]);
+  const answered=2+(st.side!=null?1:0)+(st.sauces?1:0);
+  const q=(a,b)=>`<p class="qline">${a}</p><p class="qsub">${b}</p>`;
+  return `<div class="appbar"><div><h2>Òrdena</h2>
+      <span class="sub">${answered} of 4 answered</span></div></div>
+    <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=answered?"on":""}"></i>`).join("")}</div>
+
+    ${q("Ki karni?","which cut")}
+    <div class="grid2" data-set="cut" role="group" aria-label="Which cut">
       ${CUTS.map((c,i)=>`<button class="chip" aria-pressed="${i===ci}" data-i="${i}">
         <b>${c.en}</b><span>${c.pap}</span></button>`).join("")}
     </div>
     <hr class="hr">
-    <p class="qline">Kon bo ke?</p><p class="qsub">how do you want it</p>
-    <div class="grid2" data-set="fmt">
+    ${q("Kon bo ke?","how do you want it")}
+    <div class="grid2" data-set="fmt" role="group" aria-label="How do you want it">
       ${opts.map(o=>`<button class="chip" ${o.price==null?"disabled":""}
         aria-pressed="${o.key===active?.key}" data-k="${o.key}">
         <b>${FMTS[o.i][0]}${o.size?` <small>${o.size}</small>`:""}</b>
         <span>${o.price==null?"not served":"Cg "+o.price}</span></button>`).join("")}
     </div>
+    <hr class="hr">
+    ${q("Batata òf pan?","fries or bread")}
+    <div class="grid2" data-set="side" role="group" aria-label="Fries or bread">
+      ${SIDES.map((x,i)=>`<button class="chip" aria-pressed="${i===side}" data-i="${i}">
+        <b>${x[0]}</b><span>${x[1]}</span></button>`).join("")}
+    </div>
+    <hr class="hr">
+    ${q("Ku sous?","with sauce")}
+    <div class="grid2" data-set="sauce" role="group" aria-label="With sauce">
+      ${SAUCES.map((x,i)=>`<button class="chip" aria-pressed="${sauces.has(i)}" data-i="${i}">
+        <b>${x[0]}</b><span>${x[1]}</span></button>`).join("")}
+    </div>
     <div class="bar">
-      <div class="bl"><b>Cg ${active?.price ?? "-"}</b><span>ready ${clock(s.t.mins+s.fire)}, ${s.fire} min</span></div>
-      <button class="btn btn-hot btn-sm" data-go="ticket">Batata o pan?${ICONS.arrowR}</button>
+      <div class="bl"><b>Cg ${active?.price ?? "-"}</b>
+        <span>${s.open?`ready ${clock(s.t.mins+s.fire)}, ${s.fire} min`:"the grill lights at 21:00"}</span></div>
+      <button class="btn btn-hot btn-sm" data-go="ticket">${ICONS.fire}Send it</button>
     </div>`;
 }
 
@@ -577,32 +614,32 @@ function vTicket(){
         <span class="rl"><b>Steak, regular</b><span>Ku sous, sin pika. Extra batata.</span></span><em>21</em></div>
       <div class="row"><span class="row-ic">${ICONS.drop}</span>
         <span class="rl"><b>Juice lamunchi</b><span>Refreskante</span></span><em>5</em></div>
-      <div class="row"><span class="row-ic">${ICONS.gift}</span>
-        <span class="rl"><b>Trempan credit</b><span>Booked before 21:30</span></span><em>-2</em></div>
+      <div class="row"><span class="row-ic">${ICONS.money}</span>
+        <span class="rl"><b>Paid on the Maestro</b><span>Ending 4471</span></span><em>26</em></div>
     </div>
     <button class="btn btn-line">${ICONS.pin}Open the driving route</button>`;
 }
 
 function vTrempan(){
-  const bars=[["19:30",22,"early"],["20:00",26,"early"],["20:30",34,"early"],["21:00",48,"early"],
-              ["21:30",64,""],["22:00",82,""],["22:30",96,"peak"],["23:00",100,"peak"],
-              ["23:30",97,"peak"],["00:00",88,"peak"],["00:30",70,""],["01:00",52,""]];
+  const bars=[["21:00",24,"early"],["21:30",31,"early"],["22:00",46,"early"],["22:30",68,""],
+              ["23:00",88,"peak"],["23:30",100,"peak"],["00:00",94,"peak"],["00:30",78,"peak"],
+              ["01:00",58,""],["01:30",41,""],["02:00",27,""],["02:30",16,""]];
   return `<div class="appbar"><div><h2>Trempan</h2><span class="sub">the early lane</span></div>
-      <span class="pill amber">Cg 2 off</span></div>
+      <span class="pill amber">21:00 to 23:00</span></div>
     <div class="card">
       <div class="card-hd"><h3>When the truck is busy</h3></div>
       <div class="chart">${bars.map(b=>`<div class="${b[2]}" style="height:${b[1]}%"></div>`).join("")}</div>
-      <div class="chart-x"><span>19:30</span><span>22:30</span><span>01:00</span></div>
-      <p class="note" style="margin-top:10px">Book any slot in the green stretch and the kitchen holds twelve minutes for you, because an empty grill costs them more than a discount does.</p>
+      <div class="chart-x"><span>21:00</span><span>23:30</span><span>02:30</span></div>
+      <p class="note" style="margin-top:10px">The grill lights at 21:00 and the rail is empty for the first hour. Book a slot in the green stretch and the kitchen holds twelve minutes for you, because an empty grill costs them more than a discount does.</p>
     </div>
     <div class="card">
-      <div class="card-hd"><h3>Tomorrow's slots</h3><span class="note">Sunday</span></div>
+      <div class="card-hd"><h3>Tomorrow's slots</h3><span class="note">${DAYS[(island().day+1)%7]}</span></div>
       <div class="slotgrid">
-        <button aria-pressed="false">19:30</button><button aria-pressed="true">19:45</button>
-        <button aria-pressed="false">20:00</button><button aria-pressed="false">20:15</button>
-        <button aria-pressed="false">20:30</button><button disabled>20:45</button>
-        <button aria-pressed="false">21:00</button><button aria-pressed="false">21:15</button>
-        <button disabled>21:30</button>
+        <button aria-pressed="false">21:00</button><button aria-pressed="true">21:15</button>
+        <button aria-pressed="false">21:30</button><button aria-pressed="false">21:45</button>
+        <button aria-pressed="false">22:00</button><button disabled>22:15</button>
+        <button aria-pressed="false">22:30</button><button aria-pressed="false">22:45</button>
+        <button disabled>23:00</button>
       </div>
       <p class="note" style="margin-top:12px">Two slots gone already. Greyed times are full.</p>
     </div>
@@ -629,7 +666,7 @@ function vAccount(){
     <div class="card">
       <div class="card-hd"><h3>How you pay</h3></div>
       <div class="pay">${ICONS.card}<span class="rl"><b>Maestro, ending 4471</b><span>Default</span></span><span class="ok">${ICONS.check}</span></div>
-      <div class="pay">${ICONS.bank}<span class="rl"><b>Bank transfer</b><span>MCB, Girobank and Orco</span></span></div>
+      <div class="pay">${ICONS.bank}<span class="rl"><b>Bank transfer</b><span>MCB, Banco di Caribe and Orco</span></span></div>
       <div class="pay">${ICONS.money}<span class="rl"><b>Cash at the window</b><span>Cg and USD, no card fee</span></span></div>
     </div>
     <div class="card">
@@ -650,7 +687,7 @@ const VIEWS={
 const SLOTS=[
   {view:"tonight", title:"Anochi",  note:"The home screen is a status board. Grill state, fire time, queue depth, and your usual one tap away. No carousel of things you were never going to order."},
   {view:"order",   title:"Òrdena",  note:"The builder asks the same four questions the window asks, in the same order and the same language. Cut, format, batata or pan, then sauce."},
-  {view:"ticket",  title:"Bo tiket",note:"The whole point. A live fire timeline, a collection code, and an instruction rather than a status: leave in six minutes."},
+  {view:"ticket",  title:"Bo tiket",note:"The whole point. A live fire timeline, a collection code, and an instruction rather than a status: not 'preparing your order' but the minute to walk out of the door."},
   {view:"trempan", title:"Trempan", note:"The early lane. It shows the customer exactly why the discount exists, which is the only way a peak-shifting offer ever gets used."},
   {view:"account", title:"Bo kuenta",note:"Usuals, the payment methods the island actually uses including cash at the window, and Papiamentu at the top of the language list."}
 ];
@@ -659,23 +696,43 @@ function phone(slot,idx){
   const el=document.createElement("div");
   el.className="slot";
   const tabs=Object.entries(VIEWS).map(([k,v])=>
-    `<button role="tab" data-view="${k}" aria-selected="false">${v.icon}<span>${v.label}</span></button>`).join("");
+    `<button role="tab" id="tab-${idx}-${k}" data-view="${k}" aria-selected="false"
+      tabindex="-1" aria-controls="panel-${idx}">${v.icon}<span>${v.label}</span></button>`).join("");
   el.innerHTML=`
     <div class="phone">
       <div class="screen" data-phone="${idx}">
         ${statusbar()}
-        <div class="view" role="tabpanel"></div>
-        <div class="tabs" role="tablist" aria-label="App sections">${tabs}</div>
+        <div class="view" role="tabpanel" id="panel-${idx}" tabindex="0"></div>
+        <div class="tabs" role="tablist" aria-label="Fridays app, ${slot.title}">${tabs}</div>
       </div>
     </div>
     <div class="slot-note"><b>${slot.title}</b><p>${slot.note}</p></div>`;
   const view=el.querySelector(".view");
   const state={step:2};
-  function show(name){
+  function show(name, keepFocusLike){
+    // Re-rendering destroys the control the user just pressed, so remember how to
+    // find its replacement and put focus back on it.
+    const mark = keepFocusLike && {
+      set: keepFocusLike.parentElement.dataset.set,
+      i:   keepFocusLike.dataset.i,
+      k:   keepFocusLike.dataset.k,
+    };
+    const top = keepFocusLike ? view.scrollTop : 0;
     view.innerHTML=VIEWS[name].render(state);
-    view.scrollTop=0;
-    el.querySelectorAll('[role="tab"]').forEach(b=>
-      b.setAttribute("aria-selected", String(b.dataset.view===name)));
+    view.scrollTop=top;
+    el.querySelectorAll('[role="tab"]').forEach(b=>{
+      const on = b.dataset.view===name;
+      b.setAttribute("aria-selected", String(on));
+      b.tabIndex = on ? 0 : -1;             // roving tabindex, per the tab pattern
+      if(on) view.setAttribute("aria-labelledby", b.id);
+    });
+    if(mark){
+      const sel = mark.k!=null
+        ? `[data-set="${mark.set}"] .chip[data-k="${mark.k}"]`
+        : `[data-set="${mark.set}"] .chip[data-i="${mark.i}"]`;
+      const again = view.querySelector(sel);
+      if(again) again.focus({preventScroll:true});
+    }
   }
   el.addEventListener("click",e=>{
     const tab=e.target.closest('[role="tab"]');
@@ -684,20 +741,43 @@ function phone(slot,idx){
     if(go){ show(go.dataset.go); return; }
     const chip=e.target.closest(".chip:not(:disabled)");
     if(chip){
-      if(chip.parentElement.dataset.set==="cut"){
-        state.cut=+chip.dataset.i;
+      const set=chip.parentElement.dataset.set, i=+chip.dataset.i;
+      if(set==="cut"){
+        state.cut=i;
         // keep the chosen box if this cut still does it, otherwise fall back
         const opts=options(state.cut);
         if(!opts.some(o=>o.key===state.fmt && o.price!=null))
           state.fmt=(opts.find(o=>o.price!=null)||{}).key;
-      } else state.fmt=chip.dataset.k;
-      show("order");
+      }
+      else if(set==="fmt")  state.fmt=chip.dataset.k;
+      else if(set==="side") state.side=i;
+      else if(set==="sauce"){
+        state.sauces=state.sauces||new Set([0]);
+        state.sauces.has(i) ? state.sauces.delete(i) : state.sauces.add(i);
+      }
+      show("order", chip);
       return;
     }
     const s=e.target.closest(".slotgrid button:not(:disabled)");
     if(s){ s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed","false"));
       s.setAttribute("aria-pressed","true"); }
   });
+  // Arrow keys move between tabs, which is the half of the pattern a click
+  // handler alone never gives you.
+  el.querySelector('[role="tablist"]').addEventListener("keydown",e=>{
+    const keys={ArrowRight:1, ArrowLeft:-1, Home:"first", End:"last"};
+    if(!(e.key in keys)) return;
+    const list=[...el.querySelectorAll('[role="tab"]')];
+    const at=list.indexOf(document.activeElement);
+    if(at<0) return;
+    e.preventDefault();
+    const step=keys[e.key];
+    const next = step==="first" ? list[0]
+               : step==="last"  ? list[list.length-1]
+               : list[(at+step+list.length)%list.length];
+    next.focus(); show(next.dataset.view);
+  });
+
   show(slot.view);
   return el;
 }

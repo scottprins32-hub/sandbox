@@ -57,9 +57,14 @@ DERIVATIVES = [
     ("kapsalon_sq",  "kapsalon", (1, 1),    760, 70),
     ("kapsalon_wide","kapsalon", (16, 10), 1300, 70),
     ("shrimp_sq",    "shrimp",   (1, 1),    700, 72),
+    ("shrimp_wide",  "shrimp",   (16, 10),  900, 72),
     ("caesar_sq",    "caesar",   (1, 1),    760, 70),
     ("caesar_tall",  "caesar",   (3, 4),    820, 70),
     ("crew_wide",    "crew",     (16, 9),  1300, 70),
+    # The truck's own banner along the bottom of the crew shot reads "CLOSED ON
+    # THUESDAY", which contradicts the seven-day hours table it sits beside.
+    # crew_win keeps the crew and the service window and leaves the banner out.
+    ("crew_win",     "crew",     None,     1300, 72),
     ("menu_tall",    "menu",     None,      900, 72),
     ("t_flames",     "flames",   (1, 1),    380, 66),
     ("t_ribs",       "ribs",     (1, 1),    380, 66),
@@ -101,6 +106,10 @@ GLYPHS = (
 # Phosphor Icons (MIT), fetched at build time and inlined. One library, one
 # weight, so stroke width stays consistent on every surface.
 ICON_CDN = "https://unpkg.com/@phosphor-icons/core@2.1.1/assets/bold/{}-bold.svg"
+# A rating drawn in outline stars reads as zero out of five, so the star that
+# stands for a filled rating comes from the fill weight instead.
+ICON_FILL_CDN = "https://unpkg.com/@phosphor-icons/core@2.1.1/assets/fill/{}-fill.svg"
+ICONS_FILL = ["star"]
 ICONS = [
     "fire", "clock", "map-pin", "phone", "arrow-right", "arrow-left", "arrow-up-right",
     "caret-down", "caret-right", "caret-left", "check", "x", "globe", "basket",
@@ -130,6 +139,20 @@ def fetch(url, path):
     return path
 
 
+# Derivatives that need a hand-placed crop rather than a centred one.
+# name -> (left, top, right, bottom) as fractions of the source.
+MANUAL_CROPS = {
+    "crew_win": (0.06, 0.06, 0.98, 0.62),
+    # A centred square puts the pan of shrimps half out of frame under an
+    # out-of-focus grill, so this one is anchored to the bottom of the shot.
+    "shrimp_sq": (0.0, 0.273, 1.0, 1.0),
+    # The pan sits in the bottom third of the frame, so both the wide card and
+    # the thumbnail crop to that band instead of the empty grill above it.
+    "shrimp_wide": (0.0, 0.52, 1.0, 1.0),
+    "t_shrimp": (0.0, 0.44, 1.0, 1.0),
+}
+
+
 def crop_to(im, ratio):
     if ratio is None:
         return im
@@ -156,7 +179,12 @@ def build_images():
     for name, src, ratio, width, q in DERIVATIVES:
         if src not in opened:
             opened[src] = Image.open(os.path.join(CACHE, "src_" + src)).convert("RGB")
-        im = crop_to(opened[src], ratio)
+        im = opened[src]
+        if name in MANUAL_CROPS:
+            l, t, r, bt = MANUAL_CROPS[name]
+            w, h = im.size
+            im = im.crop((int(w * l), int(h * t), int(w * r), int(h * bt)))
+        im = crop_to(im, ratio)
         if im.width > width:
             im = im.resize((width, max(1, round(im.height * width / im.width))), Image.LANCZOS)
         buf = io.BytesIO()
@@ -220,8 +248,11 @@ def build_fonts():
 def build_icons():
     log("icons")
     out = {}
-    for name in ICONS:
-        path = fetch(ICON_CDN.format(name), os.path.join(CACHE, "icon_" + name + ".svg"))
+    wanted = [(n, ICON_CDN, "icon_" + n) for n in ICONS]
+    wanted += [(n + "-fill", ICON_FILL_CDN, "iconfill_" + n) for n in ICONS_FILL]
+    for name, cdn, slug in wanted:
+        base = name[:-5] if name.endswith("-fill") else name
+        path = fetch(cdn.format(base), os.path.join(CACHE, slug + ".svg"))
         svg = open(path, encoding="utf-8").read().strip()
         # Strip the fixed size so CSS drives it, and mark it decorative by default.
         svg = re.sub(r'\s(width|height)="[^"]*"', "", svg, count=2)

@@ -27,6 +27,7 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0; background:var(--page); color:var(--bone); font-family:var(--f-body);
   font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden}
 img{max-width:100%; display:block}
+figure{margin:0}   /* the UA default is 1em 40px, which no grid here wants */
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 a{color:inherit; text-decoration:none}
 :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:3px}
@@ -111,15 +112,15 @@ p{margin:0}
   text-transform:uppercase; letter-spacing:.03em; line-height:1.08}
 .opt b small{font-family:var(--f-body); font-weight:600; font-size:.6rem; letter-spacing:.11em;
   color:var(--amber); margin-left:5px; vertical-align:.1em}
-.opt[aria-pressed="true"] b small{color:#3D2C06}
+.opt[aria-checked="true"] b small{color:#3D2C06}
 .opt span{display:block; font-family:var(--f-quote); font-style:italic; font-size:.76rem;
   color:var(--smoke); margin-top:1px}
 .opt u{display:block; text-decoration:none; font-size:.72rem; font-weight:600; color:var(--bone-2);
   margin-top:7px; font-variant-numeric:tabular-nums}
-.opt[aria-pressed="true"],.opt[aria-checked="true"]{background:var(--amber); border-color:var(--amber);
+.opt[aria-checked="true"]{background:var(--amber); border-color:var(--amber);
   color:#241A05}
-.opt[aria-pressed="true"] span,.opt[aria-checked="true"] span{color:#5A4410}
-.opt[aria-pressed="true"] u,.opt[aria-checked="true"] u{color:#3D2C06}
+.opt[aria-checked="true"] span{color:#5A4410}
+.opt[aria-checked="true"] u{color:#3D2C06}
 .opt:disabled{opacity:.32; cursor:not-allowed}
 .opt-tick{position:absolute; top:9px; right:10px; font-size:.85rem; opacity:0; transition:opacity .2s}
 .opt[aria-checked="true"] .opt-tick{opacity:1}
@@ -148,6 +149,9 @@ p{margin:0}
 .readback .bits{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; padding-top:12px;
   border-top:1px solid var(--line); font-size:.78rem; color:var(--smoke)}
 .readback .bits b{color:var(--bone-2); font-weight:600; font-variant-numeric:tabular-nums}
+.added{margin:14px 22px 0; padding:0; font-size:.86rem; color:var(--leaf);
+  display:flex; align-items:center; gap:9px; min-height:0}
+.added:empty{display:none}
 .step-foot{display:flex; align-items:center; justify-content:space-between; gap:14px;
   padding:16px 22px; border-top:1px solid var(--line); background:var(--card-2); flex-wrap:wrap;
   margin-top:20px}
@@ -175,7 +179,7 @@ p{margin:0}
 .pill.warm{background:rgba(226,82,27,.20); color:#FF9163}
 .pill.cool{background:rgba(109,155,195,.16); color:#9CC0DE}
 .pill.amber{background:rgba(250,190,76,.17); color:var(--amber)}
-.quote h4{margin:0; font-size:.7rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+.quote .side-h{margin:0; font-size:.7rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
   color:var(--smoke); font-family:var(--f-body)}
 .quote-n{display:flex; align-items:baseline; gap:10px}
 .quote-n b{font-family:var(--f-display); font-weight:800; font-size:3.2rem; line-height:.85;
@@ -227,9 +231,9 @@ p{margin:0}
 .co-opt .ic{font-size:1.15rem; margin:0 auto 6px; color:var(--smoke)}
 .co-opt b{display:block; font-size:.78rem; font-weight:600}
 .co-opt span{display:block; font-size:.67rem; color:var(--smoke); margin-top:2px}
-.co-opt[aria-pressed="true"]{border-color:var(--amber); background:rgba(250,190,76,.10)}
-.co-opt[aria-pressed="true"] .ic{color:var(--amber)}
-.co h5{margin:12px 0 0; font-size:.66rem; font-weight:700; letter-spacing:.15em;
+.co-opt[aria-checked="true"]{border-color:var(--amber); background:rgba(250,190,76,.10)}
+.co-opt[aria-checked="true"] .ic{color:var(--amber)}
+.co .co-h{margin:12px 0 0; font-size:.66rem; font-weight:700; letter-spacing:.15em;
   text-transform:uppercase; color:var(--smoke); font-family:var(--f-body)}
 
 /* ------------------------------------------------------------------- rail */
@@ -259,12 +263,19 @@ p{margin:0}
 .batch b{display:block; font-size:.95rem; font-weight:600}
 .batch span{display:block; font-size:.8rem; color:var(--bone-2)}
 
-/* governor */
-.gov{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:2px;
+/* The governor. Column widths are proportional to how much of a night the truck
+   spends in each state, so the row carries data rather than being three boxes. */
+.gov{display:grid; grid-template-columns:5.5fr 3fr 1.9fr; gap:2px;
   background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden}
-.gov>div{background:var(--card); padding:22px}
-.gov .n{font-family:var(--f-display); font-weight:800; font-size:2.6rem; line-height:.85;
-  letter-spacing:.02em; margin-bottom:10px}
+.gov>div{background:var(--card); padding:20px 22px 22px; min-width:0}
+.gov-bar{display:block; height:6px; border-radius:3px; margin-bottom:16px}
+.gov .g1 .gov-bar{background:var(--leaf)}
+.gov .g2 .gov-bar{background:var(--amber)}
+.gov .g3 .gov-bar{background:var(--ember)}
+.gov .n{font-family:var(--f-display); font-weight:800; font-size:2.2rem; line-height:.85;
+  letter-spacing:.02em; margin-bottom:10px; white-space:nowrap}
+.gov .n small{font-family:var(--f-body); font-size:.5em; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--smoke); margin-left:6px}
 .gov .g1 .n{color:var(--leaf)} .gov .g2 .n{color:var(--amber)} .gov .g3 .n{color:var(--ember)}
 .gov b{display:block; font-size:.92rem; font-weight:600; margin-bottom:6px}
 .gov p{font-size:.84rem; color:var(--smoke)}
@@ -275,6 +286,7 @@ p{margin:0}
 .ft a{color:var(--bone-2)} .ft a:hover{color:var(--amber)}
 
 @media (max-width:1000px){
+  .gov{grid-template-columns:1fr}
   .app{grid-template-columns:1fr}
   .side{border-top:1px solid var(--line)}
   .cart{max-height:none}
@@ -285,7 +297,8 @@ p{margin:0}
   .step,.pane-hd,.stepper,.step-foot{padding-inline:16px}
 }
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important}
+  *,*::before,*::after{animation-duration:.001ms !important;
+    animation-iteration-count:1 !important; transition-duration:.001ms !important}
 }
 </style>
 
@@ -296,6 +309,7 @@ p{margin:0}
   <p class="lede">Today an order goes through a generic embedded widget that was never told what a trùk 'i pan is. It flattens a protein and format grid into a long list, quotes the same wait at eight in the evening and at midnight, and has no idea how deep the queue is. This is the version that knows.</p>
 </div>
 
+<main>
 <section class="sec">
   <div class="wrap">
     <div class="sec-head">
@@ -306,7 +320,7 @@ p{margin:0}
     <div class="faults">
       <div class="fault">{{ICON:list}}
         <b>A grid sold as a list</b>
-        <p>Eleven cuts against seven formats is seventy-seven prices in a shape a customer can read in one glance. Poured into a generic menu it becomes dozens of near-identical rows nobody scrolls to the end of.</p>
+        <p>Eleven cuts against seven formats is seventy-seven cells, eighteen of them things the kitchen does not do, so fifty-nine real ways to order a plate in a shape a customer reads in one glance. Poured into a generic menu it becomes dozens of near-identical rows nobody scrolls to the end of.</p>
       </div>
       <div class="fault">{{ICON:timer}}
         <b>A wait nobody quotes</b>
@@ -337,26 +351,26 @@ p{margin:0}
         <nav class="stepper" id="stepper" aria-label="Order steps"></nav>
 
         <div class="step" data-step="0">
-          <p class="q">Ki karni?</p><p class="q-sub">which cut</p>
-          <div id="cuts"></div>
+          <h3 class="q">Ki karni?</h3><p class="q-sub">which cut</p>
+          <div id="cuts" role="radiogroup" aria-label="Which cut"></div>
         </div>
 
         <div class="step" data-step="1" hidden>
-          <p class="q">Kon bo ke?</p><p class="q-sub">how do you want it</p>
-          <div class="opts" id="fmts"></div>
+          <h3 class="q">Kon bo ke?</h3><p class="q-sub">how do you want it</p>
+          <div class="opts" id="fmts" role="radiogroup" aria-label="How do you want it"></div>
           <div class="hint">{{ICON:info}}<p id="fmtHint">Greyed formats are ones the kitchen does not do with this cut. Better to know here than at the window.</p></div>
         </div>
 
         <div class="step" data-step="2" hidden>
-          <p class="q">Batata o pan?</p><p class="q-sub">fries or bread</p>
-          <div class="opts" id="sides"></div>
+          <h3 class="q">Batata òf pan?</h3><p class="q-sub">fries or bread</p>
+          <div class="opts" id="sides" role="radiogroup" aria-label="Fries or bread"></div>
           <div class="grp-l">Mitar mitar</div>
-          <p class="body" style="font-size:.86rem; margin-bottom:12px">Half and half. Two cuts on one plate, priced at the dearer of the two. The single most requested thing at the window and the one thing no ordering system on the island lets you do.</p>
+          <p class="body" style="font-size:.86rem; margin-bottom:12px">Half and half. Two cuts on one plate, priced at the dearer of the two plus Cg 3 for the second grill pass. The single most requested thing at the window, and the one thing no ordering system on the island lets you do.</p>
           <div class="opts" id="halves"></div>
         </div>
 
         <div class="step" data-step="3" hidden>
-          <p class="q">Ku sous?</p><p class="q-sub">with sauce</p>
+          <h3 class="q">Ku sous?</h3><p class="q-sub">with sauce</p>
           <div class="opts" id="sauces" role="group" aria-label="Sauces"></div>
           <div class="grp-l">How it comes off the grill</div>
           <div class="opts" id="prefs" role="group" aria-label="Preparation"></div>
@@ -366,6 +380,7 @@ p{margin:0}
           </div>
         </div>
 
+        <p class="added" id="added" role="status"></p>
         <div class="readback" id="readback"></div>
 
         <div class="step-foot">
@@ -380,7 +395,7 @@ p{margin:0}
       <aside class="side" aria-label="Your order">
         <div class="quote">
           <div class="quote-top">
-            <h4>Fire time</h4>
+            <h3 class="side-h">Fire time</h3>
             <span class="pill cool" id="openPill"><i></i>Closed</span>
           </div>
           <p class="quote-n"><b id="fireN">18</b><span>minutes<br><span id="readyAt">ready 00:04</span></span></p>
@@ -388,7 +403,7 @@ p{margin:0}
           <p class="quote-note" id="fireNote">Quoted from the live rail, not an average.</p>
         </div>
 
-        <div class="cart" id="cart"></div>
+        <div class="cart" id="cart" aria-live="polite" aria-label="Your order"></div>
 
         <div class="totals">
           <div class="trow"><span>Subtotal</span><span class="num" id="tSub">Cg 0</span></div>
@@ -402,21 +417,33 @@ p{margin:0}
 
         <div class="side-foot">
           <div class="co">
-            <h5 style="margin-top:0">Where</h5>
-            <div class="co-set" data-set="where">
-              <button class="co-opt" aria-pressed="true" data-v="window">{{ICON:storefront}}<b>At the window</b><span>Hatch 2</span></button>
-              <button class="co-opt" aria-pressed="false" data-v="table">{{ICON:users-three}}<b>Sit at the truck</b><span>Terrace</span></button>
-              <button class="co-opt" aria-pressed="false" data-v="delivery">{{ICON:motorcycle}}<b>Delivery</b><span>Cg 8</span></button>
+            <h4 class="co-h" style="margin-top:0">Where</h4>
+            <div class="co-set" data-set="where" role="radiogroup" aria-label="Where">
+              <button class="co-opt" role="radio" aria-checked="true" data-v="window">{{ICON:storefront}}<b>At the window</b><span>Hatch 2</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="table">{{ICON:users-three}}<b>Sit at the truck</b><span>Terrace</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="delivery">{{ICON:motorcycle}}<b>Delivery</b><span>Cg 8</span></button>
             </div>
-            <h5>When</h5>
-            <div class="co-set two" data-set="when">
-              <button class="co-opt" aria-pressed="true" data-v="now">{{ICON:fire}}<b>As soon as it can be</b><span id="whenNow">19 min</span></button>
-              <button class="co-opt" aria-pressed="false" data-v="trempan">{{ICON:sun-horizon}}<b>Trempan slot</b><span>12 min, Cg 2 off</span></button>
+            <h4 class="co-h">When</h4>
+            <div class="co-set two" data-set="when" role="radiogroup" aria-label="When">
+              <button class="co-opt" role="radio" aria-checked="true" data-v="now">{{ICON:fire}}<b>As soon as it can be</b><span id="whenNow">19 min</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="trempan">{{ICON:sun-horizon}}<b>Trempan slot</b><span>12 min, Cg 2 off</span></button>
             </div>
-            <h5>How you pay</h5>
-            <div class="co-set two" data-set="pay">
-              <button class="co-opt" aria-pressed="true" data-v="card">{{ICON:credit-card}}<b>Card</b><span>Maestro, Visa</span></button>
-              <button class="co-opt" aria-pressed="false" data-v="cash">{{ICON:money}}<b>Cash at the window</b><span>Cg and USD</span></button>
+            <div id="addr" hidden>
+              <h4 class="co-h">Where to</h4>
+              <div class="field" style="margin-top:8px">
+                <label for="addrLine">Street and number</label>
+                <input id="addrLine" autocomplete="street-address" placeholder="Kaya, number, district">
+              </div>
+              <div class="field">
+                <label for="addrPhone">Phone for the rider</label>
+                <input id="addrPhone" type="tel" autocomplete="tel" placeholder="+599 9 ...">
+              </div>
+              <p class="quote-note" style="margin-top:8px">Willemstad and the Caracasbaai peninsula while the grill is lit.</p>
+            </div>
+            <h4 class="co-h">How you pay</h4>
+            <div class="co-set two" data-set="pay" role="radiogroup" aria-label="How you pay">
+              <button class="co-opt" role="radio" aria-checked="true" data-v="card">{{ICON:credit-card}}<b>Card</b><span>Maestro, Visa</span></button>
+              <button class="co-opt" role="radio" aria-checked="false" data-v="cash">{{ICON:money}}<b>Cash at the window</b><span>Cg and USD</span></button>
             </div>
             <button class="btn btn-hot btn-full" style="margin-top:14px" id="place">{{ICON:fire}}<span id="placeLabel">Send it to the grill</span></button>
             <p class="quote-note" style="text-align:center" id="placeNote">Nothing is charged. This is a concept.</p>
@@ -450,15 +477,24 @@ p{margin:0}
       <p class="body">Every ordering system on earth quotes twenty minutes and hopes. This one watches the rail and changes its own behaviour three times on the way up.</p>
     </div>
     <div class="gov">
-      <div class="g1"><p class="n">1 to 6</p><b>Quote and take it</b>
-        <p>Tickets on the rail. Fire time is quoted straight, orders flow, nothing is throttled. Most of the night sits here.</p></div>
-      <div class="g2"><p class="n">7 to 12</p><b>Quote honestly and offer the early lane</b>
-        <p>The quote climbs with the rail. Trempan slots for the following night surface in the flow, so the peak starts flattening itself.</p></div>
-      <div class="g3"><p class="n">13 up</p><b>Stop promising</b>
-        <p>New tickets get a range rather than a number, delivery pauses, and the truck says so on the site and the app instead of quietly taking money for a forty minute wait.</p></div>
+      <div class="g1">
+        <span class="gov-bar"></span>
+        <p class="n">1 to 6 <small>tickets</small></p><b>Quote it and take it</b>
+        <p>Fire time is quoted straight, orders flow, nothing is throttled.</p></div>
+      <div class="g2">
+        <span class="gov-bar"></span>
+        <p class="n">7 to 12 <small>tickets</small></p><b>Quote honestly, open the early lane</b>
+        <p>The quote climbs with the rail, and Trempan slots for the next night surface in the flow so the peak starts flattening itself.</p></div>
+      <div class="g3">
+        <span class="gov-bar"></span>
+        <p class="n">13 up <small>tickets</small></p><b>Stop promising</b>
+        <p>New tickets get a range rather than a number, delivery pauses, and the truck says so instead of quietly taking money for a forty minute wait.</p></div>
     </div>
+    <p class="quote-note" style="margin-top:14px">Band widths are how much of a Saturday night the truck actually spends in each state.</p>
   </div>
 </section>
+
+</main>
 
 <footer class="ft">
   <div class="wrap ft-in">
@@ -470,6 +506,7 @@ p{margin:0}
 <script>
 (function(){
 "use strict";
+document.documentElement.lang="en";   // the artifact wrapper supplies <html>, not its lang
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const IC={check:`{{ICON:check}}`, x:`{{ICON:x}}`, minus:`{{ICON:minus}}`, plus:`{{ICON:plus}}`,
   trash:`{{ICON:trash}}`, fire:`{{ICON:fire}}`, arrowR:`{{ICON:arrow-right}}`};
@@ -528,7 +565,7 @@ const PREFS=[
  {id:"sinsalu", en:"Sin salu",    sub:"no salt"},
  {id:"welldone",en:"Bon kushiná", sub:"well done"},
  {id:"cut",     en:"Kòrtá",       sub:"sliced for sharing"},
- {id:"extra",   en:"Extra batata",sub:"Cg 4"}
+ {id:"extra",   en:"Extra batata",sub:"plus Cg 4"}
 ];
 const USD=1.79;          // XCG is pegged to the dollar at this rate
 
@@ -543,14 +580,15 @@ function island(){
           h:+g("hour"), mins:(+g("hour"))*60+(+g("minute"))};
 }
 const pad=n=>String(n).padStart(2,"0");
-const clock=m=>pad(Math.floor((m%1440)/60))+":"+pad(m%60);
+const clock=m=>{const x=((m%1440)+1440)%1440; return pad(Math.floor(x/60))+":"+pad(x%60);};
 function fire(){
   const t=island();
   // Before yesterday's closing time we are still inside last night's session.
   const late  = t.mins < CLOSE[(t.day+6)%7];
   const open  = late || t.mins >= OPENS;
-  const h     = t.h<6 ? t.h+24 : t.h;
-  const peak  = open ? Math.max(0,1-Math.abs(h-23.75)/3.4) : 0;
+  // Fractional hours, matching the website and the app exactly.
+  const h     = t.mins/60, hh = h<6 ? h+24 : h;
+  const peak  = open ? Math.max(0,1-Math.abs(hh-23.75)/3.4) : 0;
   return {open, late, closes: late ? CLOSE[(t.day+6)%7] : CLOSE[t.day],
           queue: open? Math.round(1+peak*11) : 0,
           mins: open? Math.round(9+peak*29) : 12, t};
@@ -595,13 +633,15 @@ function keepFormat(){          // after a cut change, land on something orderab
   if(optOf(cut(), S.fmt)?.price == null){
     S.fmt = (options(cut()).find(o=>o.price!=null) || {}).key ?? null;
   }
+  // half and half against itself is not a thing, and it was still charging Cg 3
+  if(S.half === S.cut) S.half = null;
   if(S.half && optOf(CUTS.find(x=>x.id===S.half), S.fmt)?.price == null) S.half=null;
 }
 const money=(v,cur=S.cur)=> cur==="usd" ? "USD "+(v/USD).toFixed(2) : "Cg "+v;
 
 /* ------------------------------------------------------------------ steps */
 const STEPS=[{b:"Cut",s:"ki karni"},{b:"Format",s:"kon bo ke"},
-             {b:"Side",s:"batata o pan"},{b:"Sauce",s:"ku sous"}];
+             {b:"Side",s:"batata òf pan"},{b:"Sauce",s:"ku sous"}];
 function drawStepper(){
   $("#stepper").innerHTML=STEPS.map((s,i)=>
     `<button data-s="${i}" ${i===S.step?'aria-current="step"':""} class="${i<S.step?"done":""}">
@@ -617,8 +657,8 @@ function drawCuts(){
     out+=`<p class="grp-l">${tr==="basic"?"Basic":"Premium"}</p><div class="opts">`;
     out+=CUTS.filter(c=>c.tier===tr).map(c=>{
       const from=Math.min(...Object.values(c.p).flat().filter(v=>v!=null));
-      return `<button class="opt" data-cut="${c.id}" aria-pressed="${c.id===S.cut}">
-        <b>${c.en}</b><span>${c.pap}</span><u>from Cg ${from}</u></button>`;
+      return `<button class="opt" role="radio" data-cut="${c.id}" aria-checked="${c.id===S.cut}">
+        <b>${c.en}</b><span>${c.pap}</span><u>from ${money(from)}</u></button>`;
     }).join("");
     out+="</div>";
   });
@@ -628,10 +668,10 @@ function drawFmts(){
   const c=cut();
   $("#fmts").innerHTML=options(c).map(o=>{
     const off=o.price==null;
-    return `<button class="opt" data-fmt="${o.key}" ${off?"disabled":""}
-      aria-pressed="${o.key===S.fmt && !off}">
+    return `<button class="opt" role="radio" data-fmt="${o.key}" ${off?"disabled":""}
+      aria-checked="${o.key===S.fmt && !off}">
       <b>${o.f.en}${o.size?` <small>${o.size}</small>`:""}</b><span>${o.f.pap}</span>
-      <u>${off?"not served":"Cg "+o.price}</u></button>`;
+      <u>${off?"not served":money(o.price)}</u></button>`;
   }).join("");
   const missing=FORMATS.filter(f=>c.p[f.id]==null).map(f=>f.en.toLowerCase());
   $("#fmtHint").textContent = missing.length
@@ -640,11 +680,11 @@ function drawFmts(){
 }
 function drawSides(){
   $("#sides").innerHTML=SIDES.map(s=>
-    `<button class="opt" data-side="${s.id}" aria-pressed="${s.id===S.side}">
-      <b>${s.en}</b><span>${s.sub}</span>${s.d?`<u>plus Cg ${s.d}</u>`:""}</button>`).join("");
+    `<button class="opt" role="radio" data-side="${s.id}" aria-checked="${s.id===S.side}">
+      <b>${s.en}</b><span>${s.sub}</span>${s.d?`<u>plus ${money(s.d)}</u>`:""}</button>`).join("");
   $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && optOf(c,S.fmt)?.price!=null).map(c=>
     `<button class="opt" data-half="${c.id}" aria-pressed="${c.id===S.half}">
-      <b>${c.en}</b><span>${c.pap}</span><u>plus Cg 3</u></button>`).join("")
+      <b>${c.en}</b><span>${c.pap}</span><u>plus ${money(3)}</u></button>`).join("")
     || `<p class="body" style="font-size:.86rem">No second cut works in this format.</p>`;
 }
 function drawSauces(){
@@ -703,13 +743,15 @@ function drawQuote(){
   const pill=$("#openPill");
   pill.className="pill "+(f.open? (f.queue>7?"warm":"on") : "cool");
   pill.lastChild.textContent = f.open ? (f.queue>7?"Busy":"Open") : "Closed";
-  $("#fireN").textContent=mins;
-  $("#fireN").className = mins>25 ? "warm" : "";
-  $("#readyAt").textContent = "ready "+clock(f.t.mins+mins);
-  $("#fireBar").style.width = Math.min(100, mins/45*100)+"%";
-  $("#whenNow").textContent = f.mins+" min";
+  // A closed truck has no fire time. Quoting one next to a "Closed" pill was the
+  // page contradicting itself.
+  $("#fireN").textContent = f.open ? mins : "-";
+  $("#fireN").className = f.open && mins>25 ? "warm" : "";
+  $("#readyAt").textContent = f.open ? "ready "+clock(f.t.mins+mins) : "opens 21:00";
+  $("#fireBar").style.width = f.open ? Math.min(100, mins/45*100)+"%" : "0%";
+  $("#whenNow").textContent = f.open ? f.mins+" min" : "at 21:00";
   $("#fireNote").textContent = !f.open
-    ? "The grill is cold. Orders queue for 21:00 and the quote firms up then."
+    ? "The grill is cold. Orders placed now queue for 21:00, and the quote firms up when the coals are lit."
     : S.when==="trempan"
       ? "Trempan slot. Twelve minutes is held for you, and the kitchen eats the cost if it slips."
       : f.queue>7
@@ -720,6 +762,15 @@ function drawQuote(){
 /* --------------------------------------------------------------- the rail */
 function drawRail(){
   const f=fire(), now=f.t.mins;
+  // No tickets run on a cold grill. Inventing six of them at three in the
+  // afternoon contradicted the panel above.
+  if(!f.open){
+    $("#batchLine").textContent="The rail is empty.";
+    $("#batchSub").textContent="The grill lights at 21:00. Tickets and the batch hint appear once it does.";
+    $("#railGrid").innerHTML=`<p class="cart-empty" style="grid-column:1/-1">
+      Nothing on the rail. Come back after nine.</p>`;
+    return;
+  }
   const TICKETS=[
     {code:"F-038", in:now-14, due:now-1, items:[[2,"Chicken, regular","ku sous, sin salu"],[1,"Loaded fries","beef"]]},
     {code:"F-039", in:now-11, due:now+2, items:[[1,"Ribs, large","Jack Daniels"],[1,"Chicken, caesar",""]]},
@@ -803,7 +854,7 @@ document.addEventListener("click",e=>{
   if(co){ const set=co.parentElement.dataset.set;
     S[set]=co.dataset.v;
     co.parentElement.querySelectorAll(".co-opt").forEach(b=>
-      b.setAttribute("aria-pressed", String(b===co)));
+      b.setAttribute("aria-checked", String(b===co)));
     render(); return; }
 
   const inc=e.target.closest("[data-inc]"), dec=e.target.closest("[data-dec]"),
@@ -814,6 +865,7 @@ document.addEventListener("click",e=>{
   if(del){ S.cart.splice(+del.dataset.del,1); drawCart(); return; }
 });
 
+let addedTimer=0;
 $("#note").addEventListener("input",drawReadback);
 $("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; render();} });
 $("#next").addEventListener("click",()=>{
@@ -821,11 +873,20 @@ $("#next").addEventListener("click",()=>{
   S.cart.push({cut:S.cut, fmt:S.fmt, side:S.side, half:S.half,
     sauces:[...S.sauces], prefs:[...S.prefs], note:$("#note").value.trim(),
     price:base(), qty:1});
+  const added=`${cut().en}, ${label(S.cut,S.fmt)}`;
   // Full reset. Carrying sides and sauces forward silently adds paid extras to
   // the next plate that nobody asked for.
   S.half=null; S.side="batata"; S.sauces=new Set(); S.prefs.clear();
   $("#note").value=""; S.step=0;
   render();
+
+  // On a narrow screen the ticket is a long way below the builder, so say so
+  // here as well as showing it there.
+  const n=S.cart.reduce((a,b)=>a+b.qty,0);
+  $("#added").innerHTML=`${IC.check}<span>${added} added. ${n} item${n===1?"":"s"} on the ticket, ${money(
+    S.cart.reduce((t,it)=>t+it.price*it.qty,0))}.</span>`;
+  clearTimeout(addedTimer);
+  addedTimer=setTimeout(()=>{$("#added").textContent="";},6000);
 });
 $("#place").addEventListener("click",()=>{
   const n=S.cart.reduce((a,b)=>a+b.qty,0);
@@ -860,9 +921,24 @@ function drawReadback(){
     </div>`;
 }
 function render(){
+  // Every draw call below replaces a container wholesale, so note what had focus
+  // and hand it back to the equivalent control afterwards.
+  const a=document.activeElement;
+  const mark = a && a.closest && a.closest(".step, .side")
+    ? ["cut","fmt","side","half","sauce","pref","v","cur"]
+        .map(k=>a.dataset && a.dataset[k]!=null ? `[data-${k}="${a.dataset[k]}"]` : null)
+        .find(Boolean)
+    : null;
+
   drawStepper(); drawCuts(); drawFmts(); drawSides(); drawSauces();
   $("#footPrice").textContent=money(base());
   drawReadback(); drawCart(); drawQuote();
+  $("#addr").hidden = S.where!=="delivery";
+
+  if(mark){
+    const again=document.querySelector(mark);
+    if(again && document.activeElement===document.body) again.focus({preventScroll:true});
+  }
 }
 render(); drawRail();
 setInterval(()=>{drawQuote(); drawRail();},30000);

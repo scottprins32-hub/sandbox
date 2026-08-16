@@ -21,6 +21,7 @@
 body{margin:0; background:var(--ink); color:var(--bone); font-family:var(--f-body);
   font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden}
 img{max-width:100%; display:block}
+figure{margin:0}   /* the UA default is 1em 40px, which no grid here wants */
 a{color:inherit; text-decoration:none}
 :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:3px}
 .ic{width:1em; height:1em; flex:none; display:block}
@@ -72,6 +73,9 @@ p{margin:0}
 .door:hover .go .ic{transform:translateX(4px)}
 .door-fig{border-radius:14px; overflow:hidden; aspect-ratio:16/10; background:var(--raise)}
 .door-fig img{width:100%; height:100%; object-fit:cover}
+/* order:-1 puts the figure in column one, so the even cards need the wider
+   track first or the middle photo comes out narrower than its neighbours. */
+.door:nth-child(even){grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)}
 .door:nth-child(even) .door-fig{order:-1}
 
 .tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px}
@@ -120,6 +124,7 @@ p{margin:0}
 }
 </style>
 
+<main>
 <section class="hero">
   <div class="hero-bg"><img src="{{IMG:flames_wide}}" alt=""></div>
   <div class="wrap">
@@ -139,8 +144,8 @@ p{margin:0}
       <h2>Five things worth<br>rebuilding around</h2>
     </div>
     <div class="finds">
-      <div class="find"><b>77</b><i>prices in a grid</i>
-        <p>Eleven cuts against seven formats. The real menu is a matrix, and every surface Fridays owns flattens it into a list or a photograph of a poster.</p></div>
+      <div class="find"><b>59</b><i>ways to order one plate</i>
+        <p>Eleven cuts against seven formats is seventy-seven cells, eighteen of which are things the kitchen does not do, leaving fifty-nine real combinations and sixty-eight printed prices. Every surface Fridays owns flattens that shape into a list or a photograph of a poster.</p></div>
       <div class="find"><b>40</b><i>minutes at the window</i>
         <p>The wait reviewers report on a busy night. No site, app or checkout anywhere quotes it, so the surprise lands at the hatch.</p></div>
       <div class="find"><b>1</b><i>page, one language</i>
@@ -165,7 +170,7 @@ p{margin:0}
         <div>
           <h3>The website</h3>
           <div class="tags"><span>Papiamentu, Dutch, English</span><span>Live fire time</span><span>The menu as a matrix</span></div>
-          <p>Night-black and lit by their own fire photography. A live window card answers the only question that matters at eleven at night, the full seventy-seven price grid is tappable rather than scanned, and the trùk 'i pan story finally gets told.</p>
+          <p>Night-black and lit by their own fire photography. A live window card answers the only question that matters at eleven at night, the full price grid is tappable rather than scanned, and the trùk 'i pan story finally gets told.</p>
           <span class="go">Open the site{{ICON:arrow-right}}</span>
         </div>
         <figure class="door-fig"><img src="{{IMG:truck_wide}}" alt="The Fridays truck lit up at night" loading="lazy"></figure>
@@ -202,14 +207,18 @@ p{margin:0}
     </div>
     <div class="note">
       <b>Real</b>
-      <p>Every price, format, opening hour, address and phone number is transcribed from Fridays' own December 2024 printed menu and from fridays.cw. The photography is theirs. The three reviews are the ones on their site, under the names given there. The Caribbean guilder changeover, the trùk 'i pan history and the Papiamentu vocabulary are sourced and cited in the README.</p>
+      <p>Every plate price, format, opening hour, address, phone number and review is transcribed from Fridays' own December 2024 printed menu and from fridays.cw. The photography is theirs. The Caribbean guilder changeover, the trùk 'i pan history and the Papiamentu vocabulary are sourced and cited in the README.</p>
       <b style="margin-top:16px">Modelled</b>
-      <p>Queue depth and fire time are simulated from a plausible curve that peaks between 22:30 and 01:00. They move with real Curacao time, so the pages read differently at nine in the evening and at two in the morning, but no live kitchen is feeding them. Trempan, the fire ticket and the rail are proposals, not features that exist today.</p>
+      <p>Queue depth and fire time are simulated from a curve peaking between 22:30 and 01:00. They move with real Curacao time, so the pages read differently at nine in the evening and at two in the morning, but no live kitchen is feeding them. Trempan, the fire ticket, the kitchen rail and the governor are proposals, not features that exist today. The prices for things the printed menu does not price are proposed too, and are marked as such: sides at Cg 2, the mitar mitar second grill pass at Cg 3, extra batata at Cg 4, delivery at Cg 8, and the Cg 2 Trempan credit.</p>
       <b style="margin-top:16px">Needs a native pass</b>
-      <p>The Papiamentu was written from sourced vocabulary and checked against dictionaries, not by a native speaker. Before anything ships, a Curacao copywriter should go through it line by line. The menu also prints two prices for chicken at Regular, read here as a small and a large; that one is worth confirming with the kitchen.</p>
+      <p>The Papiamentu was written from sourced vocabulary, corrected once in review, and still not checked by a native speaker. Before anything ships, a Curacao copywriter should go through it line by line.</p>
+      <b style="margin-top:16px">Worth asking the owner</b>
+      <p>The banner on the truck itself reads "closed on Thuesday", while fridays.cw lists all seven days open. The hours here follow the website. The printed menu also shows two prices for chicken at Regular, read here as a small and a large, and files Surf and Turf Deluxe inside the Premium table rather than as its own line.</p>
     </div>
   </div>
 </section>
+
+</main>
 
 <footer class="ft">
   <div class="wrap ft-in">
@@ -217,3 +226,5 @@ p{margin:0}
     <span><a href="https://www.fridays.cw/" rel="noopener">The current site</a></span>
   </div>
 </footer>
+
+<script>document.documentElement.lang="en";</script>
