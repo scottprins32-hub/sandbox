@@ -655,7 +655,14 @@ function drawStepper(){
     `<button data-s="${i}" ${i===S.step?'aria-current="step"':""} class="${i<S.step?"done":""}">
       <b>${s.b}</b><span lang="pap">${s.s}</span></button>`).join("");
   $$(".step").forEach(el=>{el.hidden = +el.dataset.step !== S.step});
+  // Back disables itself at step 0, and a disabled button drops focus to <body>.
+  // Hand it to the step it just landed on instead.
+  const backHadFocus = document.activeElement === $("#back");
   $("#back").disabled = S.step===0;
+  if(backHadFocus && $("#back").disabled){
+    const here=$('#stepper button[aria-current="step"]');
+    (here || $("#next")).focus({preventScroll:true});
+  }
   $("#next").innerHTML = S.step===3 ? "Add to order"+IC.check : "Next"+IC.arrowR;
 }
 
