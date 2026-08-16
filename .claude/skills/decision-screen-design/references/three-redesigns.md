@@ -284,8 +284,9 @@ than recognition, and both are arithmetic assigned to a human: the extraneous-lo
 EUR 445 is the number leaving their account. Putting it on the button means the user commits to a figure they
 have read. And when 445 ≠ 5 × 89, the discrepancy becomes visible — which is correct. The fees exist either
 way; the only decision available is whether the user meets them now or at step four of checkout. Meeting them
-at step four is drip pricing, which is a named unfair practice, an expensive source of abandonment, and the
-thing the Consumer Rights Directive's price-transparency and payment-obligation rules exist to prevent.
+at step four is drip pricing, which is assessed as a misleading omission under UCPD Art. 7 — case by case,
+not on the Annex I blacklist — and as a CRD Art. 6 total-price problem, as well as being an expensive source
+of abandonment.
 
 **The cancellation line answers the top objection where hesitation happens.** "Free cancellation before 26
 March" changes the decision from *"is this the right place?"* — which needs research the user has not done —
@@ -381,8 +382,9 @@ change that, measure, iterate. If the whole redesign genuinely has to ship at on
 migration — then say out loud that it is a redesign, not an experiment, and do not report it as evidence for
 any individual element.
 
-**Measure the right thing.** On a paywall, trial→paid is not the metric; day-30 still-subscribed net of
-refunds and chargebacks is, and the day-5 reminder is designed to trade the first for the second. On a
+**Measure the right thing.** On a paywall, trial-start is never the metric. Trial→paid is necessary but not
+sufficient: the one that decides it is day-30 still-subscribed net of refunds and chargebacks, and the day-5
+reminder is designed to trade away some of the first to buy more of the second. On a
 comparison screen, selection rate is not the metric; completed transactions net of disputes is. Define the
 guardrail before the test, not after the result (→ `behavioral-metrics`).
 

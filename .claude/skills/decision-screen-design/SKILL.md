@@ -164,17 +164,24 @@ considered purchase, so this is not a general law of pricing screens; the wider 
 points the same way without giving you a number. A sound mechanism and a hypothesis, not a coefficient.
 
 **The non-negotiable condition: send the reminder.** A promised warning that never arrives is a lie rendered
-in a timeline component, and for auto-renewing subscriptions a regulatory problem in several markets —
-reminder and pre-charge disclosure duties sit in US state auto-renewal laws and the negative-option picture
-under ROSCA and FTC Act §5, and in the EU under the Consumer Rights Directive and UCPD. Verify per market;
+in a timeline component, and for auto-renewing subscriptions a regulatory problem in several markets. Split
+the jurisdictions, because they differ more than most teams assume: **reminder** duties sit in US state
+auto-renewal laws (California's amended ARL, in force 1 July 2025, requires notice 3–21 days before a
+promotional period longer than 31 days ends), alongside material-terms-before-billing duties under ROSCA and
+FTC Act §5. **The EU has no general pre-charge reminder duty today** — the Consumer Rights Directive covers
+pre-contractual information and the payment-obligation button, not reminders, and the UCPD catches deception
+rather than mandating notices. Reminders and opt-in auto-renewal are on the table in the Commission's
+Digital Fairness Act work, which is proposed rather than enacted. So a day-5 email sits *above* today's legal
+floor almost everywhere — and in the direction the floor is moving. Verify per market;
 see `ethical-persuasion-audit` on forced continuity. Engineering rule: **the timeline reads its dates from
 the same record the billing job reads.** If the reminder is a marketing email another team can switch off,
 the screen is promising something your system does not deliver.
 
 ### 3. Choose the verb by the commitment it implies
 
-The first word of a button is read as the **category of act** the user is about to perform, and that
-categorisation happens before the rest of the label is processed. **"Subscribe"** names a recurring contract,
+The first word of a button sets the **category of act** the user thinks they are performing, and trailing
+words rarely undo it. Treat that as a design heuristic worth testing, not a measured effect about reading
+order. **"Subscribe"** names a recurring contract,
 and carries everything the user has ever felt about
 subscriptions, including cancelling them. **"Start"** names a beginning, and beginnings are cheap and assumed
 stoppable. **"Continue"** names nothing, which is its own problem on a screen that charges money. Softening a
@@ -241,7 +248,11 @@ and `color-and-theming`.
 ### 6. One number beats a range
 
 Three ride options priced $13–17, $17–22, $16–21 present six numbers and three simultaneous unknowns. People
-do not mentally average a range: they anchor near the top and read the spread as risk. So the screen asks
+do not appear to mentally average a range. The likely mechanism is anchoring composed with loss framing: for
+a cost, you plan against the top of the range and read the spread as exposure. Treat that as a reasonable
+composition of two established effects, not as a single named finding — it is a mechanism, not a result.
+Note also that the ranges here *overlap* ($16–21 against $17–22), which defeats any simple comparison rule
+and is the actual defect in the screen. So it asks
 *how much am I willing to risk?* three times, and then asks the user to compare the three risks. A single
 price per option turns all of that into *which one do you want?*
 
@@ -320,13 +331,17 @@ on your screen or somewhere else.
 ### 10. Put the total on the button
 
 "Reserve" asks *how much, total, really?* — and the user knows from experience that the number shown is not
-the number they will pay. "Reserve · EUR 445 total" answers it before it is asked. Removing end-of-funnel
-surprise is usually the single largest conversion lever on a booking or checkout screen, and increasingly not
-an optimisation at all but an obligation.
+the number they will pay. "Reserve · EUR 445 total" answers it before it is asked. Late-appearing fees are a
+well-documented source of checkout abandonment and the reason the disclosure rules below exist, so on most
+booking and checkout screens this is worth testing first — but treat it as a hypothesis like everything else
+here, not a ranked effect size. Increasingly it is not an optimisation at all but an obligation.
 
-- **EU** — the Consumer Rights Directive requires the total price including all charges before the consumer
-  is bound, and an order button that makes the payment obligation unambiguous. Drip pricing — fees appearing
-  only at the final step — is a misleading omission under the UCPD (2005/29/EC as amended by (EU) 2019/2161).
+- **EU** — the Consumer Rights Directive requires the total price inclusive of taxes and all additional
+  charges *where they can reasonably be calculated in advance*; where they cannot, it requires stating that
+  such charges may be payable and how they are calculated — plus an order button that makes the payment
+  obligation unambiguous. Drip pricing — fees appearing only at the final step — is generally treated as a
+  misleading omission under UCPD Art. 7, assessed case by case rather than sitting on the Annex I blacklist,
+  and as a CRD Art. 6 total-price problem.
 - **US** — FTC Act §5 covers unfair and deceptive practices generally, and the FTC's **Rule on Unfair or
   Deceptive Fees (16 CFR Part 464)**, effective 12 May 2025, requires clear and conspicuous disclosure of the
   **total price** including all mandatory fees whenever a price is offered, displayed or advertised for
@@ -364,10 +379,23 @@ the oldest anchoring move there is (Tversky & Kahneman, 1974; `persuasive-copy` 
 craft), it works, and it is the **most legally constrained technique in this skill**. This section is part of
 the implementation, not a compliance appendix.
 
-**EU — the specific rule you build to.** Article 6a of the Price Indication Directive (98/6/EC), as inserted
-by the Omnibus Directive (EU) 2019/2161, requires that **any announcement of a price reduction indicates the
-prior price**, and defines the prior price as **the lowest price applied by the trader during a period of at
-least 30 days before the reduction**. The CJEU confirmed in **C-330/23 (*Aldi Süd*, 26 September 2024)** that
+**EU — the specific rule you build to, and exactly what it covers.** Article 6a of the Price Indication
+Directive (98/6/EC), as inserted by the Omnibus Directive (EU) 2019/2161, requires that **any announcement of
+a price reduction indicates the prior price**, and defines the prior price as **the lowest price applied by
+the trader during a period of at least 30 days before the reduction**.
+
+**Check the scope before you cite it.** The Price Indication Directive governs *goods*; the Commission's
+guidance on Article 6a (OJ C 526, 29 December 2021) reads "products" as excluding services and digital
+content. That matters enormously here, because the screens this skill is about — subscriptions, SaaS plans,
+game paywalls, hotel bookings — are mostly services and digital content, and therefore mostly **outside**
+Article 6a. Citing it at a booking listing is citing the wrong instrument. For services and digital content
+the governing rule is the **UCPD** (2005/29/EC) misleading-actions prohibition on fictitious reference
+prices, plus any national reference-pricing regime: a made-up "was" price is unlawful, but the 30-day-low
+arithmetic is not imposed. The CPC network's coordinated action produced EU-wide commitments from
+Booking.com and Expedia covering precisely discounts, reference prices and availability claims, so the
+enforcement interest in services pricing is real even without Article 6a.
+
+The CJEU confirmed in **C-330/23 (*Aldi Süd*, 26 September 2024)** that
 the reduction itself — the percentage, the "was/now" comparison — must be **calculated on that prior price**,
 not merely displayed alongside it. So a `-31%` badge computed from €129 when €99 was the lowest price you
 charged in the previous 30 days is not a presentation choice; it is the thing the rule prohibits — the badge
@@ -398,8 +426,12 @@ const pct   = prior && prior > price ? Math.round((1 - price / prior) * 100) : n
 
 Which means price history is a **first-class table** — product, price, effective from, effective to, market —
 not something reconstructed from order lines when a regulator asks. If you cannot answer "what was the lowest
-price we charged for this in the last 30 days" with a query, you cannot lawfully show a discount badge in the
-EU, and should not show one anywhere.
+price we charged for this in the last 30 days" with a query, you cannot show a defensible discount badge.
+For goods sold in the EU that is a legal requirement. For services, digital content, and everywhere outside
+the EU it is a prudential standard rather than a statute — but it is the standard that keeps you clear of the
+UCPD's fictitious-reference-price prohibition, and it costs nothing extra once the table exists. Build the
+strict version once and apply it everywhere; the alternative is a per-market conditional in your pricing
+code, which is how mistakes ship.
 
 **This is not legal advice.** Requirements differ by market, by product category and by whether you are the
 seller or the platform, and they change. Verify the current text for each market you serve before launch, and
@@ -489,7 +521,10 @@ Run against the screen, the design, or the diff.
 
 **Discounts**
 - [ ] Every strikethrough is a price actually charged, derived by query from a price-history table, with the
-      percentage calculated against the lowest price in at least the prior 30 days.
+      percentage calculated against the lowest price in at least the prior 30 days. Legally required for
+      goods in the EU (Art. 6a); a prudential standard for services and digital content, which the UCPD
+      still forbids attaching a fictitious reference price to. Build the strict version once, apply it
+      everywhere.
 - [ ] No qualifying prior price in the window → no badge, no strikethrough.
 - [ ] Current requirements verified per market served, and the check is dated.
 
@@ -519,7 +554,9 @@ Run against the screen, the design, or the diff.
   price-reduction announcement must indicate the prior price, defined as the lowest applied in a period of at
   least 30 days before the reduction, with member-state options for perishables, goods sold under 30 days and
   progressive reductions. **CJEU C-330/23 (*Aldi Süd*, 26 September 2024)**: the reduction must be *calculated
-  on* that prior price, not merely shown beside it. Commission guidance on Art. 6a is the practical reference.
+  on* that prior price, not merely shown beside it. **Scope: goods only** — Commission guidance on Art. 6a
+  (OJ C 526, 29 December 2021) reads "products" as excluding services and digital content, so subscriptions,
+  SaaS and bookings fall outside it and are governed by the UCPD's misleading-actions rule instead.
 - **EU unfair practices** — UCPD 2005/29/EC as amended by (EU) 2019/2161; Consumer Rights Directive
   2011/83/EU for total-price disclosure and the order-button requirement.
 - **US fees** — FTC Act §5; FTC *Rule on Unfair or Deceptive Fees*, 16 CFR Part 464, effective 12 May 2025 —
