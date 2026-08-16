@@ -355,6 +355,25 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
   border-color:rgba(143,186,104,.34)}
 .leave.calm .lv-n{color:#A6D07E}
 
+/* The queue through a night, drawn from the same curve the quote is read off.
+   These three rules went missing in a rewrite, which left the app's headline
+   mechanic opening as a 2700px blank column. */
+.chart{display:flex; align-items:flex-end; gap:4px; height:88px; margin:4px 0 7px}
+.chart div{flex:1; min-width:0; border-radius:4px 4px 2px 2px; background:var(--raise)}
+.chart div.early{background:linear-gradient(to top,rgba(143,186,104,.8),rgba(143,186,104,.34))}
+.chart div.peak{background:linear-gradient(to top,var(--ember),rgba(226,82,27,.4))}
+.chart div.at{outline:2px solid var(--bone); outline-offset:1px}
+.chart-x{display:flex; justify-content:space-between; font-size:.66rem; color:var(--smoke);
+  letter-spacing:.04em}
+.slotgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:4px}
+.slotgrid button{padding:11px 4px; border:1px solid var(--line-2); border-radius:11px;
+  font-family:var(--f-display); font-weight:800; font-size:1.02rem; letter-spacing:.03em;
+  font-variant-numeric:tabular-nums; transition:.22s}
+.slotgrid button:hover:not(:disabled){border-color:var(--bone)}
+.slotgrid button[aria-checked="true"]{background:var(--leaf); border-color:var(--leaf);
+  color:#15200C}
+.slotgrid button:disabled{color:var(--smoke); border-style:dashed; cursor:not-allowed}
+
 /* ---------------------------------------------------------------- overlays */
 .scrim{position:absolute; inset:0; background:rgba(6,5,4,.62); animation:fade .25s var(--ease) both}
 @keyframes fade{from{opacity:0} to{opacity:1}}
@@ -556,12 +575,12 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
           <button class="mini live" data-jump="live" aria-pressed="false">Live</button>
           <button class="mini" data-jump="1270" aria-pressed="false">21:10, early lane</button>
           <button class="mini" data-jump="1420" aria-pressed="true">23:40, the peak</button>
-          <button class="mini" data-jump="1610" aria-pressed="false">02:50, last hour</button>
+          <button class="mini" data-jump="last" aria-pressed="false">Last hour</button>
         </div>
       </div>
     </div>
    </div>
-   <p class="plinth-note">The phone runs on <b>Curacao time</b>, which never shifts for daylight saving. Left on Live it shows the truck as it is right now, which for most of the day is a cold grill, so the dial scrubs a night instead. Fire time, queue depth, the Trempan lane and the ticket all move with it.</p>
+   <p class="plinth-note">The phone runs on <b>Curaçao time</b>, which never shifts for daylight saving. Left on Live it shows the truck as it is right now, which for most of the day is a cold grill, so the dial scrubs a night instead. Fire time, queue depth, the Trempan lane and the ticket all move with it.</p>
   </div>
 
   <div class="stage-more">
@@ -607,7 +626,7 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
       <div class="now">
         <h3>ON THE SHARED PLATFORM</h3>
         <ul>
-          <li>{{ICON:x}}<span>The menu arrives as a flat list, so the cut and format grid the kitchen actually runs on is flattened into hundreds of near-duplicate lines.</span></li>
+          <li>{{ICON:x}}<span>The menu arrives as a flat list, so the cut and format grid the kitchen actually runs on is flattened into fifty-nine near-duplicate lines.</span></li>
           <li>{{ICON:x}}<span>No queue depth, so the quoted time is the same at 20:00 and at midnight.</span></li>
           <li>{{ICON:x}}<span>The customer belongs to the platform. Fridays cannot message a regular or see who they are.</span></li>
           <li>{{ICON:x}}<span>English and Dutch only, on an island whose first language is Papiamentu.</span></li>
@@ -618,7 +637,7 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
         <h3>ON THEIR OWN APP</h3>
         <ul>
           <li>{{ICON:check}}<span>The builder mirrors the window: pick the cut, pick the format, batata or pan, then sauce, with the cells the kitchen refuses saying so.</span></li>
-          <li>{{ICON:check}}<span>Fire time is quoted from the live rail, so a busy Saturday quotes the high thirties and a quiet Tuesday quotes about ten.</span></li>
+          <li>{{ICON:check}}<span>Fire time is quoted from the live rail, so the peak quotes the high thirties and the first hour after lighting quotes about ten.</span></li>
           <li>{{ICON:check}}<span>Fridays keeps the relationship, the order history and the reason someone stopped coming.</span></li>
           <li>{{ICON:check}}<span>Papiamentu first, with Dutch and English behind it. The website next door switches all three live.</span></li>
           <li>{{ICON:check}}<span>Card fees only, and a cash-at-the-window option that costs nothing.</span></li>
@@ -705,6 +724,7 @@ const PREFS=[["Sin salu","no salt",0],["Bon kushiná","well done",0],
              ["Kòrtá","sliced for sharing",0],["Extra batata","more chips",4]];
 const ORIGINS=[["Punda",8],["Otrobanda",11],["Jan Thiel",16]];
 const USD=1.79, HALF_ADD=3, SHIP=8, TREMPAN_OFF=2;
+const RIDE=14;          // modelled ride leg, truck to door, across Willemstad
 
 /* ------------------------------------------------------------ session time
    The app thinks in session minutes: 1260 is 21:00 and 1560 is 02:00 the next
@@ -738,6 +758,8 @@ function fire(){
     queue: open ? Math.round(1+peak*14) : 0,
     mins:  open ? Math.round(9+peak*29) : 12};
 }
+// ten minutes before this night's own closing time, which differs by weekday
+const lastHour=()=>1440+CLOSE[sessionDay()]-10;
 function nextSlot(){
   const t=now();
   if(t>=OPENS && t<LANE_SHUT){
@@ -748,7 +770,7 @@ function nextSlot(){
 }
 
 /* ------------------------------------------------------------------ state */
-const USUAL={cut:"steak", fmt:"regular", side:0, sauces:[0], prefs:[], half:null, note:"",
+const USUAL={cut:"steak", fmt:"regular", side:0, sauces:[1], prefs:[], half:null, note:"",
              name:"Steak, regular", mods:"Ku sous, sin pika.", price:21};
 const S={
   ticket:null, sheet:null, cover:null, system:null, banner:null,
@@ -773,6 +795,16 @@ function options(c){
   return out;
 }
 const optOf=(c,key)=>options(c).find(o=>o.key===key) || null;
+/* "regular:s" and "regular:l" are the same box printed at two sizes. A second
+   cut has to be matched on the family, or steak plus galiña, the most ordinary
+   mitar mitar at any window, has no partner in either direction. */
+const fam=k=>String(k||"").split(":")[0];
+function famOpt(c,key){
+  const f=fam(key), opts=options(c);
+  return opts.find(o=>o.key===key && o.price!=null)
+      || opts.find(o=>o.key===f && o.price!=null)
+      || opts.find(o=>o.key.startsWith(f+":") && o.price!=null) || null;
+}
 /* Steak is Steak in both languages, and printing it under itself reads as a bug. */
 const altSpan=(main,alt)=> String(alt).toLowerCase()===String(main).toLowerCase() ? ""
   : `<span lang="pap">${alt}</span>`;
@@ -782,18 +814,21 @@ const boxName=(cutId,key)=>{
 };
 function orderPrice(o){
   let v=optOf(cutOf(o.cut),o.fmt)?.price ?? 0;
-  if(o.half) v=Math.max(v, optOf(cutOf(o.half),o.fmt)?.price ?? 0) + HALF_ADD;
+  if(o.half) v=Math.max(v, famOpt(cutOf(o.half),o.fmt)?.price ?? 0) + HALF_ADD;
   v += SIDES[o.side][2];
   const pr=o.prefs.has ? [...o.prefs] : o.prefs;
   pr.forEach(i=>{ v += PREFS[i][2]; });
   return v;
 }
 function keepFormat(){
-  const o=S.order;
-  if(optOf(cutOf(o.cut),o.fmt)?.price==null)
-    o.fmt=(options(cutOf(o.cut)).find(x=>x.price!=null)||{}).key ?? null;
+  const o=S.order, opts=options(cutOf(o.cut));
+  if(optOf(cutOf(o.cut),o.fmt)?.price==null){
+    // keep the box the customer chose if the new cut serves it at any size
+    const same=famOpt(cutOf(o.cut), o.fmt);
+    o.fmt=(same || opts.find(x=>x.price!=null) || {}).key ?? null;
+  }
   if(o.half===o.cut) o.half=null;
-  if(o.half && optOf(cutOf(o.half),o.fmt)?.price==null) o.half=null;
+  if(o.half && famOpt(cutOf(o.half),o.fmt)?.price==null) o.half=null;
 }
 function plateWords(o){
   const bits=[cutOf(o.cut).en.toLowerCase()];
@@ -817,7 +852,10 @@ function orderTotals(){
 /* ------------------------------------------------------------- the ticket */
 function makeTicket(opts){
   const f=fire(), t=now(), o=opts||{};
-  const startAt = o.startAt ?? (S.when==="trempan" ? (S.slot ?? nextSlot().at) : (f.open ? t : OPENS));
+  let startAt = o.startAt ?? (S.when==="trempan" ? (S.slot ?? nextSlot().at) : (f.open ? t : OPENS));
+  // 21:00 is 1260 in session minutes, so ordering at 02:50 for the next opening
+  // lands six hours in the past unless it is rolled into the coming night
+  if(startAt < t) startAt += 1440;
   const cook = o.cook ?? (S.when==="trempan" ? 12 : (f.open ? f.mins : 12));
   const tt = orderTotals();
   return {
@@ -847,6 +885,8 @@ function rootState(){
   if(S.ticket){
     if(S.ticket.collected) return "collected";
     const left=S.ticket.readyAt-now();
+    // nobody leaves the house for a delivery, so that state does not exist here
+    if(S.ticket.where==="delivery") return left<=0 ? "ready" : "firing";
     if(left<=0) return "ready";
     if(left<=driveMin()) return "leave";
     return "firing";
@@ -884,7 +924,7 @@ function windowCard(f){
         f.open?(f.queue>7?"Busy":"Open"):"Closed"}</span></div>
     <div class="stats">
       <div class="stat"><b class="num ${f.open&&f.mins>25?"warm":""}">${f.open?f.mins:"-"}</b><span>min fire</span></div>
-      <div class="stat"><b class="num">${f.queue}</b><span>on grill</span></div>
+      <div class="stat"><b class="num">${f.queue}</b><span>on rail</span></div>
       <div class="stat"><b class="num">${f.open?clock(f.shut):clock(OPENS)}</b><span>${f.open?"closes":"opens"}</span></div>
     </div>
     <p class="note" style="margin-top:11px">${note}</p>
@@ -908,7 +948,7 @@ function trempanCard(){
     <div class="card-hd"><h3 lang="pap">Trempan</h3>
       <span class="pill amber">${clock(OPENS)} to ${clock(LANE_SHUT)}</span></div>
     <p class="note">${held
-      ? `Slot held at ${clock(S.slot)}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
+      ? `Slot held at ${clock(S.slot)} ${S.slot>=now()?"tonight":"tomorrow"}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
       : `Collect in the first two hours after the grill lights and the kitchen guarantees twelve minutes and takes ${cg(TREMPAN_OFF)} off, because an empty grill costs them more than a discount does.`}</p>
     <button class="btn btn-line" style="margin-top:12px" data-open="trempan">${I.sun}${
       held ? "Change the slot" : `Book ${s.when==="tomorrow"?"tomorrow's":"tonight's"} lane`}</button>
@@ -946,14 +986,33 @@ function ticketBlock(st){
       ? {at:K.readyAt, b:"With the rider", s:"On the way to you", ic:I.moto}
       : {at:K.readyAt, b:"At the window", s:"Hatch 2, show the code", ic:I.storefront}
   ];
-  const liveAt=stages.findIndex(s=>s.at>t);
+  // a cold grill has started nothing, so no stage may pulse and none is done
+  const liveAt = fire().open ? stages.findIndex(s=>s.at>t) : -2;
 
   let call="";
-  if(st==="firing"){
+  if(K.where==="delivery" && st!=="collected"){
+    const arr=left+RIDE, at=clock(K.readyAt+RIDE);
+    call = left>0
+      ? `<div class="leave"><span class="lv-n">${arr}</span>
+         <b>Arriving about ${at}</b>
+         <span>Off the coals at ${clock(K.readyAt)}, then about ${RIDE} minutes to your door.</span></div>`
+      : arr>0
+      ? `<div class="leave"><span class="lv-n">${arr}</span>
+         <b>The rider has it</b><span>Arriving about ${at}.</span></div>`
+      : `<div class="leave calm"><span class="lv-n" aria-hidden="true">${I.check}</span>
+         <b>At your door</b><span>${K.code} was handed over around ${at}.</span></div>`;
+  }else if(st==="firing"){
     const n=Math.max(0,left-drive);
-    call=`<div class="leave"><span class="lv-n">${n}</span>
-      <b>Leave in ${n} ${n===1?"minute":"minutes"}</b>
-      <span>${drive} minute drive from ${ORIGINS[S.origin][0]}. We will tell you when.</span></div>`;
+    // a countdown is right for the last hour and absurd for the next eighteen
+    call = n>180
+      ? `<div class="card"><div class="row" style="padding-top:0">
+         <span class="row-ic">${I.timer}</span>
+         <span class="rl"><b>Collect at ${clock(K.readyAt)}${K.readyAt>=1440?" tomorrow":" tonight"}</b>
+         <span>Too far out for a countdown. The phone counts you down in the last hour.</span></span>
+         </div></div>`
+      : `<div class="leave"><span class="lv-n">${n}</span>
+         <b>Leave in ${n} ${n===1?"minute":"minutes"}</b>
+         <span>${drive} minute drive from ${ORIGINS[S.origin][0]}. We will tell you when.</span></div>`;
   }else if(st==="leave"){
     call=`<div class="leave"><span class="lv-n" aria-hidden="true">${I.car}</span>
       <b lang="pap">Sali awor</b>
@@ -977,7 +1036,8 @@ function ticketBlock(st){
     <div class="perf" aria-hidden="true"><i></i></div>
     <div class="tk-body"><div class="timeline">
       ${stages.map((s,i)=>{
-        const cls = liveAt<0 ? "done" : i<liveAt ? "done" : i===liveAt ? "live" : "";
+        const cls = liveAt===-2 ? "" : liveAt<0 ? "done"
+          : i<liveAt ? "done" : i===liveAt ? "live" : "";
         return `<div class="tl ${cls}"><span class="tl-dot">${s.ic}</span>
           <div><b>${s.b}</b><span>${s.s}</span></div><time class="num">${clock(s.at)}</time></div>`;
       }).join("")}
@@ -1016,6 +1076,13 @@ function renderRoot(){
   paintChrome(st,f);
 }
 function thumbHTML(st,f){
+  if(S.ticket && S.ticket.where==="delivery" && st!=="collected"){
+    const K=S.ticket, arr=K.readyAt-now()+RIDE;
+    return arr>0
+      ? `<a class="btn btn-line" href="tel:+59995113297">${I.pin}Call the truck</a>
+         <button class="btn btn-quiet" data-addplate>Add another plate</button>`
+      : `<button class="btn btn-hot" data-here>${I.check}It arrived</button>`;
+  }
   if(st==="cold") return S.slot!=null
     ? `<button class="btn btn-hot" data-open="order">${I.basket}Build a plate for ${clock(S.slot)}</button>
        <button class="btn btn-quiet" data-open="trempan">Change the slot</button>`
@@ -1025,8 +1092,10 @@ function thumbHTML(st,f){
     <button class="btn btn-quiet" data-open="order">Build something else</button>`;
   const K=S.ticket, left=K.readyAt-now(), drive=driveMin();
   if(st==="firing") return `<a class="btn btn-line" href="${MAP}" rel="noopener">${I.pin}Open the driving route</a>
+    <button class="btn btn-quiet" data-addplate>Add another plate</button>
     <p class="sub">Leave in ${Math.max(0,left-drive)} min. The phone will say so.</p>`;
   if(st==="leave") return `<a class="btn btn-fire" href="${MAP}" rel="noopener">${I.car}Leave now, open the route</a>
+    <button class="btn btn-quiet" data-addplate>Add another plate</button>
     <p class="sub">${clock(K.readyAt)} at hatch 2.</p>`;
   if(st==="ready") return `<button class="btn btn-hot" data-open="code">${I.ticket}Show the code</button>
     <button class="btn btn-quiet" data-here>I am at the window</button>`;
@@ -1047,8 +1116,13 @@ function paintChrome(st,f){
   $("#dial").setAttribute("aria-valuetext",
     clock(now())+(SIM==null ? ", the real island clock" : " on the island clock"));
   $("#dial").value = SIM!=null ? SIM : Math.min(1710, Math.max(1200, now()));
-  $$(".mini").forEach(b=>b.setAttribute("aria-pressed",
-    String(b.dataset.jump==="live" ? SIM==null : SIM!=null && +b.dataset.jump===SIM)));
+  const last=$('[data-jump="last"]');
+  if(last) last.textContent=clock(lastHour())+", last hour";
+  $$(".mini").forEach(b=>{
+    const want = b.dataset.jump==="last" ? lastHour() : +b.dataset.jump;
+    b.setAttribute("aria-pressed",
+      String(b.dataset.jump==="live" ? SIM==null : SIM===want));
+  });
 }
 
 /* ================================================================= overlays
@@ -1086,7 +1160,7 @@ function orderBody(){
         dearer of the two plus ${cg(HALF_ADD)} for the second pass on the grill.</span></span>
         <span class="sw" aria-hidden="true"></span></button>
       ${o.halfOn?`<div class="grid2" style="margin-top:10px" role="radiogroup" aria-label="Second cut">
-        ${CUTS.filter(x=>x.id!==o.cut && optOf(x,o.fmt)?.price!=null).map(x=>
+        ${CUTS.filter(x=>x.id!==o.cut && famOpt(x,o.fmt)?.price!=null).map(x=>
           `<button class="chip" role="radio" data-half="${x.id}" aria-checked="${x.id===o.half}">
             <b>${x.en}</b>${altSpan(x.en,x.pap)}</button>`).join("")
         || `<p class="note">No second cut works in this box.</p>`}</div>`:""}`;
@@ -1114,7 +1188,9 @@ function orderFoot(){
     <div style="display:flex; gap:8px">
       <button class="btn btn-line btn-sm" data-oback ${o.step===0?"disabled":""}>${I.caretL}Back</button>
       <button class="btn btn-hot" style="flex:1" data-onext>${
-        o.step<3 ? "Next"+I.arrowR : "<span lang=\"pap\">Kla</span>"+I.check}</button>
+        o.step<3 ? "Next"+I.arrowR
+        : S.adding ? "Add to "+S.ticket.code+I.check
+        : "<span lang=\"pap\">Kla</span>"+I.check}</button>
     </div>`;
 }
 function confirmBody(){
@@ -1130,8 +1206,11 @@ function confirmBody(){
                    ["table",I.users,"Sit at the truck","Terrace"],
                    ["delivery",I.moto,"Delivery",cg(SHIP)]])}
     <h3 class="seg-h">When</h3>
-    ${seg("when",[["now",I.fire,"As soon as it can be", f.open?f.mins+" min":"at "+clock(OPENS)],
-                  ["trempan",I.sun,"Trempan", clock(S.slot ?? s.at)+", "+cg(TREMPAN_OFF)+" off"]])}
+    ${seg("when",[["now",I.fire,"As soon as it can be",
+                    f.open ? f.mins+" min" : clock(OPENS)+" "+(now()<OPENS?"tonight":"tomorrow")],
+                  ["trempan",I.sun,"Trempan",
+                    clock(S.slot ?? s.at)+" "+(S.slot!=null ? (S.slot>=now()?"tonight":"tomorrow") : s.when)
+                    +", "+cg(TREMPAN_OFF)+" off"]])}
     <h3 class="seg-h">How you pay</h3>
     ${seg("pay",[["card",I.card,"Card","Maestro, Visa"],
                  ["cash",I.money,"Cash at the window","Cg, USD"]])}
@@ -1153,26 +1232,35 @@ function confirmFoot(){
            : S.pay==="cash" ? "Send it, pay at the window" : "Send it to the grill"}</button>
     <p class="note" style="text-align:center; margin-top:8px">Nothing is charged. This is a prototype.</p>`;
 }
-const BARS=[["21:00",24,"early"],["21:30",31,"early"],["22:00",46,"early"],["22:30",68,""],
-            ["23:00",88,"peak"],["23:30",100,"peak"],["00:00",94,"peak"],["00:30",78,"peak"],
-            ["01:00",58,""],["01:30",41,""],["02:00",27,""],["02:30",16,""]];
+/* Drawn from the same curve the quote is read off rather than hand-drawn to
+   look like it. Height is queue depth; the class is the governor's own band. */
+const BARS=Array.from({length:12},(_,i)=>{
+  const m=OPENS+i*30, h=m/60;
+  const q=Math.round(1+Math.max(0,1-Math.abs(h-23.75)/3.4)*14);
+  return [clock(m), Math.max(8, Math.round(q/15*100)), q<=6?"early":q<=12?"":"peak"];
+});
 const FULL=[5,8];      // slots already taken tonight
 function trempanBody(){
   const at=Math.floor((now()-OPENS)/30);
-  const slots=Array.from({length:9},(_,i)=>OPENS+i*15);
+  // the header is driven by nextSlot(), so the grid honours the same lead time
+  // and the same upper bound, or the two disagree on one screen
+  const earliest=Math.ceil((now()+20)/15)*15;
+  const slots=Array.from({length:8},(_,i)=>OPENS+i*15);
   return `<div class="card" style="margin-bottom:11px">
       <div class="card-hd"><h3>When the truck is busy</h3></div>
       <div class="chart" role="img" aria-label="Queue depth through the night: shallow from 21:00 to about 22:30, deepest between 23:00 and 00:30, easing again after 01:00. Trempan covers the shallow stretch.">
         ${BARS.map((b,i)=>`<div class="${b[2]}${i===at?" at":""}" style="height:${b[1]}%"></div>`).join("")}</div>
       <div class="chart-x"><span>21:00</span><span>23:30</span><span>02:30</span></div>
-      <p class="note" style="margin-top:9px">The rail stays shallow until about 23:00. Book inside
-      that window and the kitchen holds twelve minutes for you.</p>
+      <p class="note" style="margin-top:9px">The rail stays shallow until about 22:00 and the lane
+      runs to 23:00. Book inside it and the kitchen holds twelve minutes whatever the rail is
+      doing, which is the part worth having at the peak.</p>
     </div>
     <p class="qsub" style="margin-bottom:8px">${nextSlot().when==="tomorrow"?"Tomorrow":"Tonight"}, ${DAYS[(sessionDay()+(nextSlot().when==="tomorrow"?1:0))%7]}</p>
     <div class="slotgrid" role="radiogroup" aria-label="Collection slot">${slots.map((m,i)=>
-      `<button role="radio" data-slot="${m}" ${FULL.includes(i)?"disabled":""}
+      `<button role="radio" data-slot="${m}" ${FULL.includes(i)||(now()<LANE_SHUT&&m<earliest)?"disabled":""}
         aria-checked="${S.slotPick===m}" class="num">${clock(m)}</button>`).join("")}</div>
-    <p class="note" style="margin-top:10px">Greyed times are already held by somebody else.</p>
+    <p class="note" style="margin-top:10px">Greyed times are held by somebody else, or too close
+    to now for the kitchen to promise twelve minutes.</p>
     <div class="card" style="margin-top:12px">
       <div class="row" style="padding-top:0"><span class="row-ic">${I.seal}</span>
         <span class="rl"><b>Twelve minutes, guaranteed</b><span>More than five minutes late and the plate is free.</span></span></div>
@@ -1198,7 +1286,7 @@ function accountBody(){
       <div class="row" style="padding-top:0"><span class="row-ic">${I.receipt}</span>
         <span class="rl"><b>F-038, last Saturday</b><span>Steak caesar and a lamunchi. Collected 23:52.</span></span><em class="num">28</em></div>
       <div class="row"><span class="row-ic">${I.receipt}</span>
-        <span class="rl"><b>F-011, two weeks ago</b><span lang="pap">Mix 3 basic, mitar mitar. Trempan slot, 21:30.</span></span><em class="num">45</em></div>
+        <span class="rl"><b>F-011, two weeks ago</b><span lang="pap">Mix 3 basic, mitar mitar. Trempan slot, 21:30.</span></span><em class="num">46</em></div>
     </div>
     <div class="card"><div class="card-hd"><h3>How you pay</h3></div>
       <div class="row" style="padding-top:0"><span class="row-ic">${I.card}</span>
@@ -1236,8 +1324,9 @@ function coverBits(){
     label:"Order sent",
     body:`<span class="seal">${I.check}</span>
       <h2>Sent to the grill</h2>
-      <p class="note" style="max-width:28ch">Your ticket is on the rail. The phone will tell you
-      when to leave, ${driveMin()} minutes before it comes off the coals.</p>
+      <p class="note" style="max-width:28ch">${K.where==="delivery"
+        ? `Your ticket is on the rail. The rider leaves when it comes off the coals, around ${clock(K.readyAt)}.`
+        : `Your ticket is on the rail. The phone will tell you when to leave, ${driveMin()} minutes before it comes off the coals.`}</p>
       <p style="font-family:var(--f-display); font-weight:800; font-size:3rem; letter-spacing:.04em;
         color:var(--amber); line-height:1">${K.code}</p>
       <p class="note">Ready around <b class="num" style="color:var(--bone)">${clock(K.readyAt)}</b></p>`,
@@ -1254,6 +1343,9 @@ function pushContent(){
   const f=fire(), K=S.ticket;
   if(K && !K.collected){
     const left=K.readyAt-now(), d=driveMin();
+    if(K.where==="delivery") return left>0
+      ? {t:`${K.code} is on the coals`, b:`The rider leaves at ${clock(K.readyAt)}, with you about ${clock(K.readyAt+RIDE)}.`}
+      : {t:"The rider has it", b:`${K.code} is with you about ${clock(K.readyAt+RIDE)}.`};
     if(left<=0) return {t:"Ready at hatch 2", b:`${K.code} is off the coals. Show the code at the window.`};
     if(left<=d) return {t:"Sali awor", pap:true,
       b:`Leave now. ${K.code} is ready at ${clock(K.readyAt)}, ${d} minutes from ${ORIGINS[S.origin][0]}.`};
@@ -1369,6 +1461,7 @@ function openOverlay(kind,name,from){
   paint();
 }
 function closeTop(){
+  if(S.sheet==="order") S.adding=false;
   if(S.system) S.system=null;
   else if(S.cover) S.cover=null;
   else if(S.sheet) S.sheet = S.sheet==="confirm" ? "order" : null;
@@ -1422,7 +1515,8 @@ document.addEventListener("click",e=>{
   const way=hit("[data-way]");
   if(way){ runWay(way.dataset.way, way); return; }
   const jump=hit("[data-jump]");
-  if(jump){ setClock(jump.dataset.jump==="live" ? null : +jump.dataset.jump); return; }
+  if(jump){ setClock(jump.dataset.jump==="live" ? null
+                   : jump.dataset.jump==="last" ? lastHour() : +jump.dataset.jump); return; }
 
   if(hit("[data-close]") || hit("[data-closecover]")){ closeTop(); return; }
   if(hit("[data-unlock]")){ S.system=null; paint(); return; }
@@ -1455,7 +1549,7 @@ document.addEventListener("click",e=>{
   if(c){ o.cut=c.dataset.cut; keepFormat(); refreshSheet(); return; }
   const b=hit("[data-box]:not(:disabled)");
   if(b && S.sheet==="order"){ o.fmt=b.dataset.box;
-    if(o.half && optOf(cutOf(o.half),o.fmt)?.price==null) o.half=null;
+    if(o.half && famOpt(cutOf(o.half),o.fmt)?.price==null) o.half=null;
     refreshSheet(); return; }
   const sd=hit("[data-side]");
   if(sd){ o.side=+sd.dataset.side; refreshSheet(); return; }
@@ -1474,8 +1568,19 @@ document.addEventListener("click",e=>{
   if(stp){ o.step=+stp.dataset.step; refreshSheet(); return; }
   if(hit("[data-oback]")){ o.step=Math.max(0,o.step-1); refreshSheet(); return; }
   if(hit("[data-onext]")){
-    if(o.step<3){ o.step++; refreshSheet(); }
-    else { S.sheet="confirm"; renderOverlay(); }
+    if(o.step<3){ o.step++; refreshSheet(); return; }
+    // a plate joining a ticket already on the rail needs no second answer about
+    // where it goes, when it is wanted or how it is paid for
+    if(S.adding && S.ticket && !S.ticket.collected){
+      const K=S.ticket, price=orderPrice(o);
+      K.items.push({cut:o.cut, fmt:o.fmt, side:o.side, sauces:[...o.sauces],
+        prefs:[...o.prefs], half:o.half, note:o.note, price, qty:1});
+      K.sub+=price; K.total+=price;
+      S.adding=false; S.sheet=null; paint();
+      say(`Added to ${K.code}. ${cg(K.total)} on the ticket.`);
+      return;
+    }
+    S.sheet="confirm"; renderOverlay();
     return;
   }
   const set=hit("[data-set]");
@@ -1492,6 +1597,12 @@ document.addEventListener("click",e=>{
   if(hit("[data-send]")){
     S.ticket=makeTicket(); S.cover="placed"; S.sheet=null; paint();
     say(`Ticket ${S.ticket.code}, ready around ${clock(S.ticket.readyAt)}`); return;
+  }
+  if(hit("[data-addplate]")){
+    S.adding=true;
+    Object.assign(S.order,{step:0, half:null, halfOn:false,
+      sauces:new Set([1]), prefs:new Set(), note:""});
+    openOverlay("sheet","order",T.closest("button")); return;
   }
   if(hit("[data-here]")){ S.ticket.collected=true; S.toast=""; paint();
     say("Collected"); return; }

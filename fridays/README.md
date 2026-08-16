@@ -210,15 +210,32 @@ none of these pages are live.
 
 ## How it was checked
 
-Every page was driven in a headless browser rather than reviewed by eye: session boundaries
-at 20:59, 21:00, 01:59, 02:01, 02:59, 03:01, 03:59, 04:01 and 05:00 across all three
-surfaces; the order flow built end to end in both currencies; and a sweep for sideways
-scroll, clipped elements, console errors, document language and a main landmark at eight
-widths from 320 to 1920. The design, accessibility, code, UX, craft and factual accuracy of
-all four pages were then put through two adversarial review rounds, six independent lenses
-each, with every finding handed to a skeptic told to refute it. Thirty-one findings survived
-the first round and thirteen the second, four of the second round's being regressions
-introduced by the first round's fixes. All are fixed here.
+Nothing here was reviewed by eye alone. Both products are driven in a headless browser:
+twelve session boundaries from 15:00 through 20:59, 21:00, 23:45, midnight, 01:59, 02:00 and
+04:01, checked for agreement *between* the two products rather than only within each; the
+order flow built end to end in both currencies and all three languages; a structural sweep at
+ten widths from 320 to 1920 across every route and every app state, for sideways scroll,
+clipped text, unnamed controls, duplicate ids, heading order and one tab stop per radio group;
+a keyboard-only walkthrough of both order flows; and a contrast pass measured from **rendered
+pixels** rather than computed from CSS, after the CSS-derived audit was caught reading
+mid-animation opacity and reporting failures that were not there.
+
+The design, accessibility, code, UX, craft and factual accuracy were then put through three
+adversarial review rounds, six independent lenses each, every finding handed to a separate
+skeptic instructed to refute it and to default to refuted when unsure. Thirty-one findings
+survived the first round, thirteen the second, and forty-three the third against twenty-nine
+refuted. All are fixed here.
+
+The third round is the one worth reading, because the two products had just been rewritten and
+it found the class of fault a rewrite produces. A whole sheet, the app's headline Trempan
+mechanic, had lost its three CSS rules in the rewrite and was opening as a 2700px blank column.
+Half-and-half was unreachable for steak plus galiña, the most ordinary order at any truck
+window, because the second cut was matched on a size-suffixed key rather than on the format
+family. The kitchen rail subtracted clock-face minutes and gained a whole day every night at
+midnight, on the one screen whose entire purpose is a minutes-left number. A ticket ordered
+after closing was born already collected. A delivery charged Cg 8 and then told the customer
+to drive to the truck. A review printed under a real name had been quietly reworded to delete
+the competitor it named, which is the one finding here that was not a bug but a small dishonesty.
 
 Two findings were rejected with reasons. "Juice lamunchi" is not our mis-ordered Papiamentu:
 it is transcribed verbatim from the truck's printed menu, as is the Cg 5 it costs and the
