@@ -865,6 +865,36 @@ document.addEventListener("click",e=>{
   if(del){ S.cart.splice(+del.dataset.del,1); drawCart(); return; }
 });
 
+/* role="radio" promises one tab stop per group and arrow keys inside it. Adding
+   the role without the behaviour is worse than plain buttons, because now the
+   screen reader announces "radio, 3 of 11" and the arrows do nothing. */
+function wireRadios(){
+  $$('[role="radiogroup"]').forEach(g=>{
+    const radios=[...g.querySelectorAll('[role="radio"]')].filter(r=>!r.disabled);
+    if(!radios.length) return;
+    let at=radios.findIndex(r=>r.getAttribute("aria-checked")==="true");
+    if(at<0) at=0;
+    radios.forEach((r,i)=>{ r.tabIndex = i===at ? 0 : -1; });
+  });
+}
+document.addEventListener("keydown",e=>{
+  const r=e.target.closest && e.target.closest('[role="radio"]');
+  if(!r) return;
+  const g=r.closest('[role="radiogroup"]');
+  if(!g) return;
+  const step={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1,Home:"first",End:"last"}[e.key];
+  if(step===undefined) return;
+  e.preventDefault();
+  const list=[...g.querySelectorAll('[role="radio"]')].filter(x=>!x.disabled);
+  const at=list.indexOf(r);
+  if(at<0) return;
+  const next = step==="first" ? list[0]
+             : step==="last"  ? list[list.length-1]
+             : list[(at+step+list.length)%list.length];
+  next.focus();
+  next.click();          // in a radio group, moving focus selects
+});
+
 let addedTimer=0;
 $("#note").addEventListener("input",drawReadback);
 $("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; render();} });
@@ -934,6 +964,7 @@ function render(){
   $("#footPrice").textContent=money(base());
   drawReadback(); drawCart(); drawQuote();
   $("#addr").hidden = S.where!=="delivery";
+  wireRadios();
 
   if(mark){
     const again=document.querySelector(mark);
