@@ -131,7 +131,8 @@ attribute specified." Browsers and screen readers handle the violation inconsist
 unreachable. Two patterns work. **A — stretched link**: one real link in the identifying cell, its hit area stretched over the
 row, actions raised above it. Two costs. The overlay swallows text selection, so nobody can drag-select an ID out of a row.
 And **it does not work on `<tr>` in WebKit** — Safari does not make a relatively positioned table row a containing block
-(WebKit bug 240961), so the `::after` resolves against the nearest ancestor that is one, usually the scroll container: every
+(WebKit bug 240961, fixed in 2026 — so any older Safari still in your support matrix behaves this way),
+so the `::after` resolves against the nearest ancestor that is one, usually the scroll container: every
 row's overlay covers the whole table, the last row wins every click, and the region stops scrolling. In table markup the
 containing block has to be the *cells*, which every engine honours:
 
@@ -189,9 +190,9 @@ an export instead of pretending.
 ```css
 .table-scroll { --sticky-head: 3rem; overflow: auto;
                 scroll-padding-block-start: var(--sticky-head); }
-thead th { position: sticky; top: 0; z-index: 2; background: var(--surface);
-           box-shadow: inset 0 -1px 0 var(--border-subtle); }   /* with border-collapse: separate */
-tbody th[scope="row"] { position: sticky; left: 0; z-index: 2; background: var(--surface); }
+thead th { position: sticky; top: 0; z-index: 2; background: var(--color-surface);
+           box-shadow: inset 0 -1px 0 var(--color-border-subtle); }   /* with border-collapse: separate */
+tbody th[scope="row"] { position: sticky; left: 0; z-index: 2; background: var(--color-surface); }
 thead th.col-identity  { left: 0; z-index: 3; }   /* the corner pins in BOTH axes, above both */
 
 /* the scroll target is the focused control, not the row */
@@ -222,7 +223,7 @@ server-side** — not per session or per device, or the operator re-picks it eve
 
 That last column is the whole argument: compact shows half again as many rows per screen, which is a third fewer
 scroll-and-reorient cycles a day. It costs target size, scan comfort under fatigue, and tolerance for long values. The
-padding that goes with each mode belongs to `spacing-and-layout` — its `references/spacing-tokens.md` has a Tables block;
+padding that goes with each mode belongs to `spacing-and-layout` — `spacing-and-layout/references/spacing-tokens.md` has a Tables block;
 take the numbers from there rather than inventing a second set here.
 
 **Compact still has a floor, and it is an accessibility floor.** WCAG 2.2 SC 2.5.8 Target Size (Minimum, AA) wants pointer
@@ -235,7 +236,8 @@ read-only row can reach 28px. Do not buy rows by shrinking text below 13px — s
 [data-density="comfortable"] { --row-h: 48px; --row-size: 0.875rem;  --row-line: 1.43; }
 [data-density="compact"]     { --row-h: 32px; --row-size: 0.8125rem; --row-line: 1.38; }
 td, th { height: var(--row-h);                                  /* on a cell, height is a floor — see below */
-         padding: var(--cell-pad-y) var(--cell-pad-x);          /* spacing-and-layout's table tokens */
+         padding: var(--cell-pad-y, 12px) var(--cell-pad-x, 16px);  /* values: spacing-and-layout/
+                                                                    references/spacing-tokens.md, Tables */
          font-size: var(--row-size); line-height: var(--row-line); }
 ```
 

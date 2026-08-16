@@ -150,7 +150,9 @@ SELECT id FROM work_items                      SELECT id FROM work_items
  ORDER BY queue_key LIMIT 1;   -- 8842          ORDER BY queue_key LIMIT 1;   -- 8842
 
 UPDATE work_items SET claimed_by = 'a',        UPDATE work_items SET claimed_by = 'b',
-       state = 'claimed' WHERE id = 8842;             state = 'claimed' WHERE id = 8842;
+       state = 'claimed', claimed_at = now(),          state = 'claimed', claimed_at = now(),
+       claim_expires_at = now() + :lease               claim_expires_at = now() + :lease
+ WHERE id = 8842;                               WHERE id = 8842;
 ```
 
 Both workers get 8842. This is not a bug in anyone's isolation level — under `READ COMMITTED` the `SELECT`
@@ -161,7 +163,8 @@ database says B does.
 **Adding the predicate to the `UPDATE` closes the correctness hole but not the throughput hole:**
 
 ```sql
-UPDATE work_items SET claimed_by = :me, state = 'claimed'
+UPDATE work_items SET claimed_by = :me, state = 'claimed', claimed_at = now(),
+       claim_expires_at = now() + :lease   -- claim_is_complete requires both, always
  WHERE id = :id AND state = 'available'
 RETURNING id;                    -- zero rows = you lost the race
 ```
@@ -551,7 +554,7 @@ question answerable and the illegal combinations impossible.
 | `blocked` | Cannot proceed, waiting on something outside the queue | Explicit operator action | `blocked_reason`, `blocked_owner`, `blocked_until` |
 | `done` | Terminal, successful | Explicit operator action | `resolved_by`, `resolved_at`, `outcome` |
 | `failed` | This attempt failed; will retry | Error path | `attempts`, `last_error`, new `available_at` |
-| `dead` | Out of attempts; needs a human | Retry exhaustion | `resolved_by` = system, `last_error` |
+| `dead` | Out of attempts; needs a human | Retry exhaustion | `resolved_by` = system, `resolved_at`, `last_error` |
 
 Two rules on top of the table:
 

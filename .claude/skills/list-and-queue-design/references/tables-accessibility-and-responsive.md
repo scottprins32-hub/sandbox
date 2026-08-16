@@ -38,7 +38,7 @@ conveyed visually must be programmatically determinable. Native table markup is 
           <input type="checkbox" id="select-page">
           <label for="select-page" class="sr-only">Select all rows on this page</label>
         </th>
-        <th scope="col">Request</th>
+        <th scope="col" class="col-identity">Request</th>
         <th scope="col" aria-sort="descending">
           <button type="button" data-sort="age">Age<span aria-hidden="true" class="sort-glyph">↓</span></button>
         </th>
@@ -79,8 +79,12 @@ Details in there that are load-bearing:
   the checkbox in column 1 gets no association from a row header in column 2. That is why the row checkbox
   carries its own label. Putting the checkbox inside the `<th scope="row">` alongside the ID is the other
   valid answer and removes a column.
-- **`aria-sort="none"` is set explicitly on every sortable header**, not just omitted. Its presence is the cue
-  that the column is sortable at all; `Status` and `Request` carry no `aria-sort` because they are not.
+- **The `<button>` is what announces the column as sortable**, not `aria-sort`. `none` is `aria-sort`'s
+  default value, so writing it explicitly tells assistive technology nothing extra — the APG's sortable-table
+  example carries `aria-sort` on the sorted column alone, and adds an off-screen note to the caption
+  explaining that the header buttons sort. Setting `none` on the other sortable headers is a harmless
+  convention that turns moving the sort into one attribute rewrite instead of an add-and-remove; `Status` and
+  `Request` carry no `aria-sort` because they are not sortable, and that absence is equally silent.
 - **The empty actions header still needs a name.** A blank `<th>` reads as nothing and the column has no
   identity.
 
@@ -119,8 +123,8 @@ That single-tab-stop rule is the whole commitment. Adding `role="grid"` tells as
 keys navigate cells here and Tab will leave this widget". If you have not written the roving-tabindex focus
 manager, the user presses Down expecting the next row, nothing happens, then Tab walks them through 400
 focusable cells one at a time — which is worse than plain markup, because plain markup at least never made
-the promise. **`role="grid"` bolted onto a table with no keyboard implementation is a regression, and it is
-one of the most common ARIA mistakes in shipped admin tools.**
+the promise. **`role="grid"` bolted onto a table with no keyboard implementation is a regression** — and a
+common one in shipped admin tools.
 
 Choose grid only when both hold: the table has enough interactive cells that a 300-stop tab sequence is
 genuinely hostile, *and* you are building the full APG grid pattern — arrow navigation, Home/End,
@@ -240,12 +244,13 @@ Debouncing is not optional here. Shift-clicking a range of 40 rows fires 40 stat
 debounce a screen-reader user hears the counter tick past every one of them and cannot hear anything else.
 Announce the settled count.
 
-### `aria-selected` belongs to the grid pattern only
+### `aria-selected` only means something in a grid
 
-`aria-selected` is valid on `row` inside `grid` and `treegrid`, and on `option`, `tab`, `gridcell`,
-`columnheader`, `rowheader` and `treeitem`. It is **not** valid on a `<tr>` in a plain `<table>`, where it is
-ignored — so a table that shows selection with `aria-selected` and no checkbox has no programmatic selection
-state at all.
+`aria-selected` is a supported state of `row`, and of `option`, `tab`, `gridcell`, `columnheader`,
+`rowheader` and `treeitem`. So it is *allowed* on a `<tr>` and no validator will flag it — it just buys
+nothing there. Selection belongs to the grid interaction model, and a `table` is a static structure rather
+than a widget, so assistive technology does not surface a selected row inside one. A table that shows
+selection with `aria-selected` and no checkbox has no selection state any user can perceive non-visually.
 
 In a checkbox-driven table the checkbox *is* the selection state, and it is already announced. Do not add
 `aria-selected` alongside it; you get two sources of truth that drift, and some screen readers announce both.
@@ -379,7 +384,7 @@ technique and it removes real functionality. Decide with the costs on the table,
   locate an order number, and it is the fastest path they have — you are removing a tool they already know in
   exchange for one they have to learn.
 - **Select-all and copy.** `Cmd+A` then copy yields the visible slice. So does dragging a selection. Anyone
-  who exports to a spreadsheet by copy-pasting the table — which is most operations teams — silently gets
+  who exports to a spreadsheet by copy-pasting the table — and many operations teams do — silently gets
   partial data.
 - **Print, and browser translation.** Both operate on the DOM.
 - **Focus.** A focused row scrolled out of range gets unmounted and focus falls to `<body>`. The keyboard user
@@ -390,16 +395,7 @@ technique and it removes real functionality. Decide with the costs on the table,
 
 **Mitigations, in order of value:**
 
-1. **Try `content-visibility: auto` first.** It skips rendering off-screen content while keeping it in the DOM
-   and the accessibility tree, so find-in-page, copy and AT still work. Pair with `contain-intrinsic-size` to
-   stop the scrollbar jumping. Chromium exposes skipped content to find-in-page; Safari currently does not,
-   so this improves the situation rather than fully solving it.
-
-   ```css
-   tbody tr { content-visibility: auto; contain-intrinsic-size: auto 44px; }
-   ```
-
-2. **Set the real counts** so AT reports the dataset, not the slice. `aria-rowcount` on the table (`-1` if the
+1. **Set the real counts** so AT reports the dataset, not the slice. `aria-rowcount` on the table (`-1` if the
    total is genuinely unknown), `aria-rowindex` on every row — 1-based, and the header row counts as row 1,
    so the first body row is 2.
 
@@ -416,15 +412,33 @@ technique and it removes real functionality. Decide with the costs on the table,
    These are meaningful on `table`, `grid` and `treegrid`. They are the *only* thing that makes a virtualised
    table honest to assistive technology, and they are almost always missing.
 
-3. **Never unmount the focused row.** Keep it in the mounted set regardless of scroll position, or restore
+2. **Never unmount the focused row.** Keep it in the mounted set regardless of scroll position, or restore
    focus to the nearest mounted row on unmount. Overscan by a screenful in both directions.
-4. **Replace find-in-page deliberately.** A prominent filter/search that queries the *server* over the whole
+3. **Replace find-in-page deliberately.** A prominent filter/search that queries the *server* over the whole
    dataset, positioned where the user will find it, and labelled so it reads as the search for this table.
    Intercepting `Ctrl/Cmd-F` is defensible only if your replacement matches across the full dataset,
    highlights hits, supports Enter / Shift-Enter for next and previous, and closes on Escape. If it does
    less than native find-in-page, leave the shortcut alone.
-5. **Offer a real export.** If people copy-paste the table to get data out, a CSV/XLSX export removes the
+4. **Offer a real export.** If people copy-paste the table to get data out, a CSV/XLSX export removes the
    need and works regardless of how you render.
+
+**`content-visibility: auto` is not the cheap escape here, whatever you have read.** On a list of block-level
+rows it does exactly what it advertises — skips rendering off-screen content while keeping it in the DOM and
+the accessibility tree, so copy and AT still work — but on table markup it is inert. `content-visibility`
+applies only to elements for which layout containment can apply, and per CSS Containment Level 2 layout
+containment has no effect when the principal box is an internal table box other than a table-cell. A `<tr>`
+generates a table-row box, so `tbody tr { content-visibility: auto }` — the rule everyone reaches for — does
+nothing at all. Moving it to `tbody td` clears that bar, but *size* containment has no effect on any internal
+table box, including cells, so `contain-intrinsic-size` cannot be honoured, the row still has to be laid out
+to find its height, and engines disagree about what survives. Where it genuinely pays is the card list of
+section 7's pattern B, or any other list built from block-level rows:
+
+```css
+.queue-cards > li { content-visibility: auto; contain-intrinsic-size: auto 96px; }
+```
+
+Even there it is a partial win: Chromium finds text inside skipped content, Safari does not do so reliably,
+so it improves the situation rather than solving it.
 
 **When virtualisation is worth its cost:** an unbounded or streaming dataset the user genuinely scans
 continuously — log tails, event streams, audit trails, time series — where pagination would break the mental
@@ -474,7 +488,7 @@ thirty lines.
   scroll-padding-block-start: var(--sticky-head);
 }
 .table-scroll:focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: -2px;                    /* drawn inside; the container clips its own overflow */
 }
 
@@ -484,9 +498,9 @@ thirty lines.
   min-width: 46rem;                        /* below this the columns wrap into unreadable slivers */
 }
 .table-scroll :is(th, td) {
-  border-block-end: 1px solid var(--border-subtle);
+  border-block-end: 1px solid var(--color-border-subtle);
   white-space: nowrap;
-  background: var(--surface);              /* mandatory on sticky cells; harmless elsewhere */
+  background: var(--color-surface);              /* mandatory on sticky cells; harmless elsewhere */
 }
 
 /* Header row pins vertically. */
@@ -496,11 +510,13 @@ thirty lines.
 .table-scroll .col-select        { position: sticky; inset-inline-start: 0; z-index: 2;
                                    inline-size: var(--col-select-w); }
 .table-scroll th[scope="row"]    { position: sticky; inset-inline-start: var(--col-select-w); z-index: 2;
-                                   border-inline-end: 1px solid var(--border-subtle); }
+                                   border-inline-end: 1px solid var(--color-border-subtle); }
 
-/* The corner cells are sticky in both axes and must sit above both. */
-.table-scroll thead .col-select,
-.table-scroll thead th[scope="row"] { z-index: 3; }
+/* The corner cells are sticky in both axes and must sit above both. Note the identity header is a
+   `th[scope="col"]` like every other header — pinning it needs its own class, not `[scope="row"]`,
+   which never matches inside `thead`. */
+.table-scroll thead .col-select     { z-index: 3; }
+.table-scroll thead th.col-identity { inset-inline-start: var(--col-select-w); z-index: 3; }
 ```
 
 Three things bite here every time:
@@ -562,8 +578,8 @@ point — a card of bare values is worse than the table it replaced.
 - **Column comparison is gone.** Vertical alignment is what makes "which of these is the outlier" a
   half-second glance; stacked cards make it an act of memory. If comparing across rows is the job, this
   pattern breaks it.
-- **Scanning density collapses.** A card list runs four to six times taller than the rows it replaces, so
-  pagination that was comfortable now needs many more swipes.
+- **Scanning density collapses.** A card list typically runs several times taller than the rows it replaces —
+  measure yours — so pagination that was comfortable now needs many more swipes.
 - **Two components to maintain**, which drift. Every new column has to be added twice or it vanishes on
   mobile.
 
@@ -621,8 +637,9 @@ Assigning the tiers is the same judgement as deciding which columns earn a place
 - **Hide the `<th>` and the matching `<td>`s together**, or the header row desynchronises from the body.
 - **`colspan` on the detail cell can stay at the full column count**; browsers clamp a `colspan` larger than
   the number of columns actually present, so it survives columns being hidden.
-- **`aria-expanded` on the trigger, `aria-controls` on the detail row**, and the chevron must actually rotate
-  — `ui-signifiers-and-states` owns that state.
+- **`aria-expanded` and `aria-controls` both on the trigger**, with `aria-controls` pointing at the detail
+  row's `id` — as the markup above does. The chevron must actually rotate; `ui-signifiers-and-states` owns
+  that state.
 - **The disclosure repeats the labels**, because outside the table body the column headers no longer apply.
 - Expanding does **not** move focus; `aria-expanded` on the trigger is the announcement. Announce nothing.
 
@@ -692,11 +709,23 @@ viewport terms.
 - Re-run the 2.4.11 check at this zoom — it fails here long before it fails at 100%.
 - Nothing is clipped or overlapped, and no control has become unreachable.
 
-Also worth running once per project, though they are not table-specific: SC 1.4.4 Resize Text at 200% and the
-SC 1.4.12 text-spacing overrides, both covered in `ui-signifiers-and-states`. Fixed row `height` is what
-breaks under 1.4.12 — use `min-height` and padding.
+Also worth running once per project, though they are not table-specific: SC 1.4.4 Resize Text at 200%
+(`typography-system`) and the SC 1.4.12 text-spacing overrides (`spacing-and-layout`,
+`ui-signifiers-and-states`). What breaks under 1.4.12 is a fixed `height` on a block box wrapping text, which
+clips it. Table cells are the exception: CSS 2.1 §17.5.3 makes a row's height the maximum of the row's
+`height`, each cell's `height` and the content's minimum height, so `height` on a `<tr>` or `<td>` is a floor
+the text can push past rather than a cap — while `min-height` on rows and cells is left undefined and is
+widely ignored, which is why the intuitive spelling is the one that silently does nothing. Set the row floor
+with `height` on the row; keep `min-height` for the block boxes inside the cells.
 
-Automated tooling catches roughly a third of this. axe-core will find a missing accessible name on a
+Expect automated tooling to catch a minority of this. axe-core will find a missing accessible name on a
 checkbox and an invalid ARIA attribute; it will not tell you that focus went to `<body>` after a delete, that
 your select-all selects a different set than its label promises, or that the sticky header hides the focused
 row. Run it in CI and do not treat a green report as a pass.
+
+**Claims deliberately not made here:** no share of accessibility defects that automated tooling catches —
+published figures disagree and depend entirely on what is being counted — and no measured height ratio
+between a card list and the table it replaces. The 46rem table minimum, the 34/44/30rem container-query
+breakpoints, the 2.75rem sticky-header offset and the 500ms selection debounce are conventions with their
+reasoning attached, not findings. Nothing here ranks ARIA mistakes or operator habits by frequency; where a
+practice is called common, that is a judgement drawn from shipped code rather than a count.
