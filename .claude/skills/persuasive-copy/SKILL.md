@@ -436,9 +436,6 @@ After:  "Invited ana@example.com as an Editor. She has 7 days to accept; we'll e
          Resend or revoke from Settings → Members."
 ```
 
-Full copy patterns for each error class, each empty state and each confirmation are in
-`references/microcopy-patterns.md`.
-
 **The peak-end rule (Kahneman, Fredrickson, Schreiber & Redelmeier, 1993; Redelmeier & Kahneman, 1996).**
 Remembered experience is dominated by its most intense moment and its ending, and is surprisingly insensitive
 to duration. This has a direct, cheap consequence: **the last screen of a flow is disproportionately what the
@@ -449,6 +446,9 @@ what you make the ending, because a satisfaction survey shown after the success 
 the ending. Two caveats: peak-end is a well-supported description of remembered utility in its original
 paradigms, but "end on a high note" is a loose extrapolation — do not manufacture a celebration on a task
 someone performs forty times a day, where the memorable ending is the one that got out of the way.
+
+Copy patterns for each error class, empty state, confirmation, destructive dialog, permission prompt and
+notification subject line are in `references/microcopy-patterns.md`.
 
 ### 9. Plain language, reading level, and register — including across languages
 
@@ -491,7 +491,7 @@ The concrete case: an app with an **English admin console**, a **Romanian public
 
 ```
 Worker portal — before (English marketing voice, translated literally, informal):
-  "Grozav! Ai finalizat tura ta! 🎉 Continuă tot așa!"
+  "Grozav! Ai terminat tura! 🎉 Continuă tot așa!"
   ("Great! You finished your shift! Keep it up!") — reads as a manager patronising an adult.
 
 Worker portal — after (plain, formal, certainty-first):

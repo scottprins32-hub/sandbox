@@ -98,20 +98,11 @@ Tailwind v4, CSS-first — `--spacing` is the multiplier all numeric utilities d
 }
 ```
 
-Layer semantic aliases on top for the handful of relationships that repeat across the product, so a density
-change is one edit rather than a find-and-replace (this is the primitive/semantic split `ui-craft` describes,
-applied to space):
-
-```css
-:root {
-  --gap-field:   var(--space-2xs); /* label → input */
-  --gap-fields:  var(--space-lg);  /* field → field */
-  --gap-group:   var(--space-xl);  /* fieldset → fieldset */
-  --gap-section: var(--space-3xl); /* section → section */
-  --pad-card:    var(--space-lg);
-  --pad-control: var(--space-sm) var(--space-md);
-}
-```
+Layer **semantic aliases** on top for the relationships that repeat — `--gap-field: var(--space-2xs)`,
+`--gap-fields: var(--space-lg)`, `--gap-section: var(--space-3xl)`, `--pad-card: var(--space-lg)`. Components
+reference those, never the primitives, so a density change is one edit rather than a find-and-replace. This
+is the primitive/semantic split `ui-craft` describes, applied to space; complete sets for three densities are
+in `references/spacing-tokens.md`.
 
 **Use `rem`, not `px`.** Browser *zoom* scales both, but a user who raised their default font size in browser
 settings gets a proportionally larger layout only from `rem`. A `px` scale keeps a 16px gap around 24px text
@@ -136,16 +127,14 @@ explains nothing. Three real reasons:
 **When to break the scale** — legitimately, and only these:
 
 - **Optical alignment.** Round shapes, triangles and glyphs with asymmetric sidebearings need 1–2px nudges to
-  *look* centred. Trust your eye over the number; a mathematically centred play triangle looks left-heavy.
-- **Icon centring in an odd box.** A 24px icon in a 40px button leaves 8px each side. A 20px icon leaves 10.
-  Either resize the icon or accept the 10.
-- **1px borders.** A 16px padding plus a 1px border is 17px of visual inset unless `box-sizing: border-box`
-  is set (it should be, globally). For a border that must not change the box, use `outline` or
-  `box-shadow: inset 0 0 0 1px`.
-- **Type leading.** `line-height` is a unitless ratio (1.4–1.6 for body), not a spacing step. Do not force it
-  to land on the grid; see move 8.
-- **Percentages and fractions.** `1fr`, `50%`, `minmax()` are not scale violations. The scale governs gaps
-  and padding, not track sizes.
+  *look* centred. A mathematically centred play triangle looks left-heavy. Trust the eye over the number.
+- **Icon centring in an odd box.** A 20px icon in a 40px button leaves 10px each side. Resize the icon or
+  accept the 10.
+- **1px borders.** 16px padding plus a 1px border is 17px of inset unless `box-sizing: border-box` is set
+  globally (it should be). For a border that must not change the box, use `outline` or an inset `box-shadow`.
+- **Type leading.** `line-height` is a unitless ratio (1.4–1.6 for body), not a spacing step — see move 6.
+- **Percentages and fractions.** `1fr`, `50%`, `minmax()` are not violations; the scale governs gaps and
+  padding, not track sizes.
 
 How it fails: a scale defined in tokens and then bypassed with arbitrary values in the markup. If
 `p-[13px]` and `style="margin-top: 22px"` appear in the diff, the scale is decorative. Ban arbitrary spacing
@@ -172,19 +161,15 @@ ambiguous; the eye cannot resolve it and the grouping information is lost.
 
 Each step is 2–6× the one above it. That is what makes the structure readable before a word is.
 
-**The equidistant-label bug.** The most common spacing defect in shipped software, and it is invisible until
-you look for it:
-
-```css
-/* BROKEN — one gap for everything. */
-form > * + * { margin-block-start: 12px; }
-```
+**The equidistant-label bug.** The most common spacing defect in shipped software, invisible until you look
+for it:
 
 ```html
+<style> form > * + * { margin-block-start: 12px; } /* BROKEN — one gap for everything */ </style>
+
 <label for="email">Email</label>
 <input id="email">
-<p class="hint">We only use this for receipts.</p>   <!-- 12px from the input above,
-                                                          12px from the label below -->
+<p class="hint">We only use this for receipts.</p>   <!-- 12px above, 12px below -->
 <label for="company">Company</label>
 <input id="company">
 ```
@@ -218,14 +203,9 @@ a page where everything is 8px apart. Differential space is the point; more spac
 it does not own, the last one needs a reset, and the value has to be re-litigated at every reuse site.
 
 ```css
-/* Good: the layout owns the rhythm. */
-.stack   { display: grid; gap: var(--space-lg); }
-.cluster { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
-```
+.stack { display: grid; gap: var(--space-lg); }   /* good: the layout owns the rhythm */
 
-```css
-/* Bad: every reuse of .card fights this. */
-.card { margin-bottom: 24px; }
+.card { margin-bottom: 24px; }                    /* bad: every reuse of .card fights this */
 .card:last-child { margin-bottom: 0; }
 ```
 
@@ -251,166 +231,79 @@ directions produce collapsed margins you cannot reason about. Use logical proper
 How it fails: `gap` on a flex container also spaces *wrapped* rows, which surprises people who wanted
 horizontal-only spacing. Use `column-gap` explicitly if the row gap should differ.
 
-### 4. Think in primitives, not columns — *convention*
+### 4. Structure: primitives first, grids where they earn it, container queries for components — *convention*
 
-Column counts encode a viewport assumption (`col-md-4` means "one third, at this breakpoint, on this page").
-Primitives encode a *relationship*, which stays true at every size. Six cover almost all layout (the
-vocabulary is from *Every Layout*, Heydon Pickering & Andy Bell):
+Three related corrections, in the order they bite.
+
+**Think in primitives, not columns.** `col-md-4` encodes a viewport assumption ("one third, at this
+breakpoint, on this page"). A primitive encodes a *relationship*, which stays true at every size. Six cover
+almost all layout (vocabulary from *Every Layout*, Heydon Pickering & Andy Bell):
+
+| Primitive | What it means | Core declaration |
+|---|---|---|
+| **Stack** | Vertical flow, one rhythm | `display: grid; gap: X` |
+| **Cluster** | A row that wraps gracefully — toolbars, tags, button groups | `display: flex; flex-wrap: wrap; gap: X` |
+| **Sidebar** | Fixed-ish side + fluid main, collapses on its own | `flex: 1 1 18rem` / `flex: 999 1 30rem` |
+| **Switcher** | N across above a threshold, stacked below — no query | `flex: 1 1 calc((40rem - 100%) * 999)` |
+| **Grid** | As many as fit, never below a minimum | `repeat(auto-fit, minmax(min(18rem,100%), 1fr))` |
+| **Center** | The page container | `max-inline-size: X; margin-inline: auto` |
 
 ```css
-/* Stack — vertical flow with one rhythm. */
-.stack { display: grid; gap: var(--space, var(--space-lg)); }
-
-/* Cluster — things that sit in a row and wrap gracefully. Toolbars, tag lists, button groups. */
+.stack   { display: grid; gap: var(--space, var(--space-lg)); }
 .cluster { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
-
-/* Sidebar — fixed-ish side, fluid main, collapses on its own when there is no room. */
-.sidebar { display: flex; flex-wrap: wrap; gap: var(--space-xl); }
-.sidebar > :first-child { flex: 1 1 18rem; }            /* the sidebar */
-.sidebar > :last-child  { flex: 999 1 30rem; min-width: 0; } /* main: needs 30rem or it wraps */
-
-/* Switcher — N across above a threshold, stacked below it. No media query. */
-.switcher { display: flex; flex-wrap: wrap; gap: var(--space-lg); }
-.switcher > * { flex: 1 1 calc((40rem - 100%) * 999); min-width: 0; }
-
-/* Grid — as many as fit, never narrower than the minimum. */
-.grid {
-  display: grid;
-  gap: var(--space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
-}
-
-/* Center — the page container. */
-.center {
-  box-sizing: content-box;
-  max-width: var(--content-max, 72rem);
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
+.grid    { display: grid; gap: var(--space-lg);
+           grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
+.center  { box-sizing: content-box; max-inline-size: var(--content-max, 72rem);
+           margin-inline: auto; padding-inline: var(--gutter); }
 ```
 
-Two details that are load-bearing and get missed:
+Two lines that are load-bearing and always missing: **`min-inline-size: 0` on flex and grid children** (the
+default `min-width: auto` refuses to shrink below the content's intrinsic minimum — one long URL and the page
+scrolls sideways; this is the single most common 320px reflow failure), and **the `min()` guard inside
+`minmax()`** — bare `minmax(18rem, 1fr)` overflows any container narrower than 18rem.
 
-- **`min-width: 0` on flex and grid children.** The initial `min-width: auto` means a child refuses to shrink
-  below its content's intrinsic minimum — one long URL, an unbreakable table, a `<pre>` block — and the whole
-  layout overflows horizontally. This is the single most common cause of a 320px reflow failure (move 9).
-- **`min(18rem, 100%)` inside `minmax()`.** Bare `minmax(18rem, 1fr)` overflows any container narrower than
-  18rem. The `min()` guard is what makes `auto-fit` safe on a phone.
-
-How it fails: reaching for a primitive when the content genuinely has a designed composition. A bespoke
-landing section that aligns to nothing is fine — see move 5.
-
-### 5. Grids earn their keep on repeating content, not on every section — *convention, commonly over-applied*
-
-The 12-column grid is a **convention inherited from print and popularised by Bootstrap**, not a law. Twelve
-is chosen because it factors into 2, 3, 4 and 6 — that is the entire rationale. Plenty of good custom
-landing sections align to no column grid at all and are better for it.
-
-**Use a column grid when:**
-
-- Content is repeating and routine — card lists, galleries, blog indexes, product grids, dashboards of
-  equal-weight tiles, tables.
-- Multiple people or teams build pages that must feel like one product.
-- You need predictable responsive collapse across many templates.
-
-**Skip it when:** the section is a one-off composition — a hero, a pull-quote, an editorial image/text pair,
-a pricing table with an emphasised middle plan. Align those to the **page gutter and max-width**, which is
-the part that must stay consistent, and compose freely inside.
-
-The responsive convention worth knowing is **12 columns desktop / 8 tablet / 4 mobile** (Material Design's
-layout grid). It is a sensible default because 12, 8 and 4 share factors, so a "4 of 12" item maps to "4 of
-8" and "4 of 4" without re-authoring. Treat it as a starting point, not a requirement — and note that for
-*components* (as opposed to page regions) container queries are the better modern answer (move 6).
-
-What actually needs to be consistent across every page:
+**Grids earn their keep on repeating content, not on every section.** The 12-column grid is a convention from
+print, popularised by Bootstrap — twelve because it factors into 2, 3, 4 and 6, which is the entire
+rationale. Use one for repeating, routine content (card lists, galleries, blog indexes, product grids,
+equal-weight dashboard tiles, tables) and when several teams build pages that must feel like one product.
+Skip it for one-off compositions — a hero, a pull-quote, an editorial image/text pair, a pricing table with
+an emphasised middle plan. Those align to the **page gutter and max-width**, which is the part that must stay
+consistent, and compose freely inside:
 
 ```css
-:root {
-  --gutter:      clamp(1rem, 5vw, 3rem);  /* page edge inset, fluid */
-  --content-max: 72rem;                   /* ~1152px */
-  --measure:     68ch;                    /* prose column */
-}
+:root { --gutter: clamp(1rem, 5vw, 3rem); --content-max: 72rem; --measure: 68ch; }
 ```
 
-The breakout grid — one container that gives you a constrained column plus full-bleed escapes, with no
-negative margins:
+The **12 desktop / 8 tablet / 4 mobile** convention (Material Design's layout grid) is a sensible default
+because the three counts share factors, so a "4 of 12" item maps to "4 of 8" and "4 of 4" without
+re-authoring. Swap the count in one rule; never put column classes in the markup.
+
+**Container queries are the modern answer to "8 columns on tablet".** A component's layout should depend on
+the space *it* has. A card 320px wide in a sidebar and 320px wide on a phone should look identical; with
+media queries it will not.
 
 ```css
-.layout {
-  display: grid;
-  grid-template-columns:
-    [full-start] minmax(var(--gutter), 1fr)
-    [content-start] min(100% - (var(--gutter) * 2), var(--content-max)) [content-end]
-    minmax(var(--gutter), 1fr) [full-end];
-}
-.layout > *          { grid-column: content; }
-.layout > .full-bleed{ grid-column: full; }
+.card-host { container: card / inline-size; }   /* a wrapper — an element cannot query itself */
+.card      { display: grid; gap: var(--space-md); }
+
+@container card (width >= 24rem) { .card { grid-template-columns: 8rem 1fr; } }
+@container card (width >= 40rem) { .card { grid-template-columns: 12rem 1fr auto; } }
 ```
 
-For a genuine column grid, name the lines so the markup stops counting:
+`cqi` units (1% of container inline size) scale type and padding to the component:
+`clamp(1rem, 0.9rem + 1cqi, 1.5rem)`. Tailwind v4 ships both — `<div class="@container">` with
+`@md:grid-cols-[8rem_1fr]` on the child. Support is universal (Chrome/Edge 105 Aug 2022, Safari 16 Sep 2022,
+Firefox 110 Feb 2023; Baseline Widely Available 2025); where it is absent the unqualified narrow layout
+applies, which is why you write that one first.
 
-```css
-.grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gutter); }
-@media (width < 60rem) { .grid-12 { grid-template-columns: repeat(8, 1fr); } }
-@media (width < 40rem) { .grid-12 { grid-template-columns: repeat(4, 1fr); } }
-```
+Keep **page-level** regions on media queries — nav collapsing, sidebar visibility and gutters are viewport
+decisions. One container per reusable component that renders at more than one width, not one per div.
 
-How it fails: forcing bespoke content onto columns produces the "template" look — everything a third or a
-half, nothing at an interesting width. And a 12-column grid with a 24px gutter on a 360px phone gives 8px
-columns, which is why the mobile grid is 4 columns, not 12 squeezed.
+How it fails: `container-type: inline-size` makes the container a containing block for absolutely positioned
+descendants, so an overlay that expected to escape the card gets clipped. And `container-type: size` collapses
+to zero unless you also set a height — `inline-size` is what you want almost always.
 
-### 6. Container queries are the real answer to "8 columns on tablet" — *convention, now safe to use*
-
-A component's layout should depend on **the space it has**, not on the viewport. A card that is 320px wide in
-a sidebar and 320px wide on a phone should look identical; with media queries it will not.
-
-```css
-.card-host {                 /* the wrapper, not the card itself */
-  container-type: inline-size;
-  container-name: card;
-}
-
-.card { display: grid; gap: var(--space-md); }
-
-@container card (width >= 24rem) {
-  .card { grid-template-columns: 8rem 1fr; align-items: start; }
-}
-@container card (width >= 40rem) {
-  .card { grid-template-columns: 12rem 1fr auto; gap: var(--space-lg); }
-}
-```
-
-Container query units (`cqi` = 1% of the container's inline size) let type and space scale to the component:
-
-```css
-.card__title { font-size: clamp(1rem, 0.9rem + 1cqi, 1.5rem); }
-```
-
-Tailwind v4 ships this as first-class utilities:
-
-```html
-<div class="@container">
-  <article class="grid gap-4 @md:grid-cols-[8rem_1fr] @xl:grid-cols-[12rem_1fr_auto]">…</article>
-</div>
-```
-
-Support: `@container` is in every current browser (Chrome/Edge 105, Safari 16, Firefox 110 — Feb 2023) and
-reached Baseline Widely Available in 2025. It needs no fallback for evergreen targets.
-
-Three gotchas:
-
-- **An element cannot query itself.** You need a wrapper with `container-type`, and the styled element must
-  be a descendant. Forgetting this is the usual "my container query does nothing".
-- **`container-type: inline-size` applies size and layout containment.** The container becomes a containing
-  block for absolutely positioned descendants and its block size no longer depends on its inline-size
-  containment — mostly invisible, but it can break an absolutely positioned overlay that expected to escape.
-- **Keep page-level regions on media queries.** Nav collapsing, sidebar showing/hiding and page gutters are
-  viewport decisions, not container decisions.
-
-How it fails: containerising everything. One container per reusable component that appears in more than one
-width context — not one per div.
-
-### 7. Size intrinsically: `clamp()`, `min()`, `max()` — with the zoom trap — *convention + one law*
+### 5. Size intrinsically: `clamp()`, `min()`, `max()` — with the zoom trap — *convention + one law*
 
 Fluid values replace breakpoint stair-steps for anything continuous: gutters, section rhythm, type.
 
@@ -446,7 +339,7 @@ How it fails: a `clamp()` minimum below the readable floor. Set the min to the s
 usable (≥16px for body text on mobile, or iOS Safari zooms the page on input focus), not to whatever makes
 the curve look smooth.
 
-### 8. Where type meets space: measure, leading, and the vertical-rhythm myth — *convention + taste*
+### 6. Where type meets space: measure, leading, and the vertical-rhythm myth — *convention + taste*
 
 `typography-system` owns the type scale — sizes, weights, tracking. This move covers only the places where
 type decisions *are* spacing decisions, which is where the two skills touch.
@@ -462,7 +355,7 @@ type decisions *are* spacing decisions, which is where the two skills touch.
   line at 1.4. If you cannot shorten the measure, raise the leading.
 - **The baseline-grid myth.** Forcing every text block onto a strict baseline grid (as print does) is
   expensive on the web and pays almost nothing: dynamic content, variable fonts, user zoom, text-spacing
-  overrides (move 9) and mixed embedded content all break the alignment the moment it ships. Align *space
+  overrides (move 7) and mixed embedded content all break the alignment the moment it ships. Align *space
   between blocks* to the scale; let leading be a ratio. This is taste, and typographers will argue — but the
   cost/benefit on a responsive, user-restylable medium is clear.
 
@@ -474,7 +367,7 @@ h2 { margin-block: 1.6em 0.5em; line-height: 1.2; text-wrap: balance; }
 p  { max-width: var(--measure); text-wrap: pretty; }
 ```
 
-### 9. Survive the user's settings: reflow and text-spacing — *law*
+### 7. Survive the user's settings: reflow and text-spacing — *law*
 
 Two success criteria that spacing decisions break more often than any others, and both are Level AA.
 
@@ -484,25 +377,17 @@ horizontally-scrolling content), "except for parts of the content which require 
 usage or meaning" — data tables, maps, complex diagrams. 320px equivalent is what you get at **1280px wide,
 400% browser zoom**, which is how to test it on a desktop.
 
-What breaks it, in order of frequency:
+What breaks it, in order of frequency: flex/grid children with the default `min-width: auto` refusing to
+shrink; fixed pixel widths on containers; unbreakable strings; media without `max-width`; and `100vw`, which
+includes the scrollbar.
 
 ```css
-/* 1. Flex/grid children refusing to shrink (min-width:auto). Fix everywhere. */
-.flex-child, .grid-child { min-width: 0; }
-
-/* 2. Fixed pixel widths on containers. */
-.panel { width: 480px; }        /* → width: min(100%, 30rem); */
-
-/* 3. Unbreakable content: long URLs, tokens, code. */
-.break { overflow-wrap: anywhere; }
-
-/* 4. Wide content that legitimately cannot reflow — scroll it inside its own box,
-      never let it scroll the page. */
-.table-wrap { overflow-x: auto; }
-.table-wrap table { min-width: 40rem; }
-
-/* 5. Media. */
-img, video, svg, canvas { max-width: 100%; height: auto; }
+.flex-child, .grid-child   { min-inline-size: 0; }              /* the #1 cause */
+.panel                     { inline-size: min(100%, 30rem); }   /* not width: 480px */
+.long-url                  { overflow-wrap: anywhere; }
+img, video, svg, canvas    { max-inline-size: 100%; block-size: auto; }
+.table-wrap                { overflow-x: auto; }                /* scroll the box… */
+.table-wrap table          { min-inline-size: 40rem; }          /* …never the page */
 ```
 
 **WCAG 1.4.12 Text Spacing (AA).** No loss of content or functionality when the user overrides: line height
@@ -524,7 +409,7 @@ Then look for clipped text. The fixes are all spacing decisions:
 - **No `overflow: hidden` on text containers** unless you also accept the clipping. Single-line truncation
   with ellipsis is allowed by 1.4.12 only where the full text is available another way.
 
-### 10. Edges: safe areas, target size, and focus that survives sticky bars — *law*
+### 8. Edges: safe areas, target size, and focus that survives sticky bars — *law*
 
 **Target size.** WCAG 2.2 **2.5.8 Target Size (Minimum), Level AA: at least 24×24 CSS px**, with exceptions
 for *spacing* (undersized targets whose 24px-diameter centred circles do not intersect another target's),
@@ -546,17 +431,14 @@ Check that the expanded areas do not overlap each other — overlapping hit area
 failure the spacing exception exists to prevent.
 
 **Safe areas.** On notched and gesture-bar devices, content under the home indicator or in the corner
-curvature is untappable. `env()` returns 0 unless the viewport opts in:
-
-```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-```
+curvature is untappable. `env()` returns 0 unless the viewport opts in with
+`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`:
 
 ```css
-.app-shell { padding-inline: max(var(--space-md), env(safe-area-inset-left),
-                                                  env(safe-area-inset-right)); }
-.bottom-bar { padding-block-end: calc(var(--space-sm) + env(safe-area-inset-bottom)); }
-.full-height { min-block-size: 100svh; }   /* svh/dvh, not vh — vh ignores mobile browser chrome */
+.app-shell   { padding-inline: max(var(--space-md), env(safe-area-inset-left),
+                                                    env(safe-area-inset-right)); }
+.bottom-bar  { padding-block-end: calc(var(--space-sm) + env(safe-area-inset-bottom)); }
+.full-height { min-block-size: 100svh; }  /* svh/dvh, not vh — vh ignores mobile browser chrome */
 ```
 
 **WCAG 2.2 2.4.11 Focus Not Obscured (Minimum), Level AA:** when a component receives keyboard focus it must
@@ -573,21 +455,10 @@ html { scroll-padding-block-start: calc(var(--header-h) + var(--space-md));
 a 2px ring with a 2px offset needs 4px of clearance, so a control flush against a container edge will have
 its ring clipped by any ancestor with `overflow: hidden`.
 
-### 11. Before and after: a cluttered card, fixed with spacing alone — *worked example*
+### 9. Before and after: a cluttered card, fixed with spacing alone — *worked example*
 
-Same markup, same colours, same type, same borders. Only spacing changes.
-
-```html
-<article class="card">
-  <span class="badge">New</span>
-  <h3>Quarterly revenue report</h3>
-  <p class="byline">Updated 12 minutes ago by Dana Whitfield</p>
-  <p class="summary">Revenue grew 8.2% against a forecast of 6.5%, driven by renewals in
-     the enterprise segment and a shorter average sales cycle.</p>
-  <button class="primary">Open report</button>
-  <button class="ghost">Share</button>
-</article>
-```
+A card holding six children — badge, title, byline, summary, and two buttons. Same colours, same type, same
+border throughout; only spacing changes.
 
 ```css
 /* BEFORE — one gap for six items, padding smaller than the internal gap. */
@@ -614,22 +485,13 @@ divider, a background tint on the meta block, a bolder title — adds ink to sol
 .card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }       /* 8 */
 ```
 
-```html
-<article class="card">
-  <div class="card__meta">
-    <span class="badge">New</span>
-    <h3>Quarterly revenue report</h3>
-    <p class="byline">Updated 12 minutes ago by Dana Whitfield</p>
-  </div>
-  <p class="card__summary">…</p>
-  <div class="card__actions">…</div>
-</article>
-```
+The only markup change is three wrappers — `.card__meta` around badge/title/byline, `.card__summary`,
+`.card__actions` around the buttons — so the CSS has zones to space.
 
-What changed measurably: perceived groups 6 → 3; intra-group gap to inter-group gap ratio 1:1 → 1:6; padding
-to internal gap ratio 1:1 → 1:1 at 24px (frame no longer smaller than the gaps); measure capped at 60ch. No
-new borders, tints, weights or colours. This is what "spend whitespace before you spend ink" means in
-practice, and it is the first thing to try on any card, row or panel that "feels cluttered".
+What changed measurably: perceived groups 6 → 3; intra-group to inter-group gap ratio 1:1 → 1:6; padding no
+longer smaller than the internal gaps; measure capped at 60ch. No new borders, tints, weights or colours.
+This is what "spend whitespace before you spend ink" means in practice, and it is the first thing to try on
+any card, row or panel that "feels cluttered".
 
 ## Anti-patterns
 
@@ -708,9 +570,11 @@ Run against the screen or the PR diff.
 - **Layout primitives** — Heydon Pickering & Andy Bell, *Every Layout* (Stack, Cluster, Sidebar, Switcher,
   Grid, Center, Cover, Frame, Reel, Imposter). The source of the composition-over-columns framing and of the
   breakpoint-free Sidebar and Switcher techniques.
-- **Typography** — Robert Bringhurst, *The Elements of Typographic Style* (measure, the 66-character line);
-  Matthew Butterick, *Practical Typography* (line length, leading, and the argument against over-precise
-  vertical grids on the web); Ellen Lupton, *Thinking with Type* (grid systems and their limits).
+- **Typography** — Robert Bringhurst, *The Elements of Typographic Style* (measure: 45–75 characters
+  satisfactory, 66 widely regarded as ideal); Matthew Butterick, *Practical Typography* (line length and line
+  spacing, with a wider recommended range than Bringhurst's); Ellen Lupton, *Thinking with Type* (grid
+  systems and their limits). The argument against strict web baseline grids in move 6 is this skill's
+  judgment, not a claim from any of them.
 - **Grids** — Josef Müller-Brockmann, *Grid Systems in Graphic Design* (1981), the origin of the modular grid
   in modern practice, and worth reading for the part everyone skips: grids serve repeating, systematic
   content and are a means, not an aesthetic.
