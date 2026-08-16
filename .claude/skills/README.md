@@ -1,64 +1,101 @@
-# UX psychology skill set
+# Design and UX skill set
 
-Eight skills that turn behavioural science into interface decisions. They are project-agnostic — written to
+Fifteen skills covering interface work end to end, in three layers. They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
-Claude loads these automatically when a task matches a skill's `description`. You can also invoke one
-directly by name.
+Claude loads a skill automatically when a task matches its `description`. You can also invoke one by name.
 
-## The set
+## The three layers
 
-| Skill | The question it answers |
+Each layer answers a different question. Real work usually needs all three, and the most common failure is
+using one where another was needed — a spacing tweak will not fix a screen that asks the user a question
+they cannot answer.
+
+| Layer | Question | Router |
+|---|---|---|
+| **Behaviour** | Why does this work on a human? | `ux-psychology` |
+| **Commitment** | What question does each element make the user ask? | `decision-screen-design` |
+| **Craft** | What are the actual values — px, ratios, states? | `ui-craft` |
+
+### Behaviour — 8 skills
+
+| Skill | Answers |
 |---|---|
-| **ux-psychology** | Router and master principle catalogue. **Start here.** Forces a product diagnosis before any technique gets picked, then points at the right specialist. |
-| **attention-and-hierarchy** | Where does the eye go on this screen, and is that where it needs to be? Preattentive features, Gestalt grouping, whitespace, scan patterns, contrast and accessibility as hierarchy tools. |
-| **friction-and-flow** | Why do people abandon a flow they meant to finish? Cognitive load, Hick's/Fitts's laws, form design, defaults and choice architecture, and perceived performance — because waiting is friction. |
-| **persuasive-copy** | Does the wording change the decision? Framing, anchoring, social proof, CTA labels, error messages, pricing presentation. Cheapest lever in the set. |
-| **onboarding-activation** | How fast does a new user reach the moment the product's value becomes real? Time-to-value, progressive disclosure, endowed progress, deferred signup, empty states that teach. |
-| **habit-loop-design** | Why would they come back tomorrow? Fogg's B=MAP, the Hook model, variable reward, investment and stored value, streaks, notification design — and an honest account of when a habit loop is the wrong goal entirely. |
-| **ethical-persuasion-audit** | Is this persuasion or manipulation, and is it legal? Deceptive-pattern taxonomy with fixes, plus the EU (DSA, GDPR, UCPD, CRD) and US (FTC, ROSCA) layer most developers don't know is enforced. |
-| **behavioral-metrics** | Did any of it work, and what did it break? Activation definition, retention curves, guardrail metrics, honest A/B testing, and what to do when you don't have the traffic for one. |
+| **ux-psychology** | Router and 71-entry principle catalogue. **Start here.** Forces a product diagnosis before any technique is picked. |
+| **attention-and-hierarchy** | Where does the eye land, and is that where it needs to be? Preattentive salience, Gestalt, whitespace, scan patterns, contrast. |
+| **friction-and-flow** | Why do people abandon a task they meant to finish? Cognitive load, Hick's/Fitts's, forms, defaults, and perceived performance — waiting is friction. |
+| **persuasive-copy** | Does the wording move the decision? Framing, anchoring, social proof, CTA labels, errors, pricing language. |
+| **onboarding-activation** | How fast does a new user reach the moment value becomes real? Time-to-value, deferred signup, endowed progress, empty states that teach. |
+| **habit-loop-design** | Why would they come back tomorrow? B=MAP, the Hook model, variable reward, stored value, streaks, notification budgets — and when a habit loop is the wrong goal entirely. |
+| **ethical-persuasion-audit** | Is this persuasion or manipulation, and is it lawful? Pattern taxonomy with fixes, plus the EU and US legal layer. |
+| **behavioral-metrics** | Did it work, and what did it break? Activation, retention curve shape, guardrail metrics, honest A/B testing. |
+
+### Commitment — 1 skill
+
+| Skill | Answers |
+|---|---|
+| **decision-screen-design** | The moment someone decides to pay, book, subscribe or pick a plan. Its spine is an element-by-element question audit; it also owns pricing display and the law around reference pricing and auto-renewal. |
+
+### Craft — 6 skills
+
+| Skill | Answers |
+|---|---|
+| **ui-craft** | Router, plus the design-token layer (primitive vs semantic) that makes the other five one system rather than five sets of preferences. |
+| **typography-system** | Typefaces, the size scale with tracking and line-height per step, measure, tabular figures, webfont loading. Start here on a new project — most of a UI is text. |
+| **spacing-and-layout** | The spacing scale and why, space within a group vs between groups as numbers, grids and when they don't apply, container queries, reflow. |
+| **color-and-theming** | Brand hue to 50–950 ramps in OKLCH, semantic tokens, contrast as a generation constraint, dark mode as re-derivation not inversion. |
+| **depth-and-overlays** | Elevation scale, layered shadows, dark-mode depth via lightness, and text over imagery with guaranteed contrast. |
+| **ui-signifiers-and-states** | Affordances, and the full state matrix — rest, hover, active, focus-visible, disabled, loading, selected, expanded, error, empty. |
 
 ## How to use them
 
-**Building something new** — read `ux-psychology` first. Its diagnosis step (voluntary or assigned use? in
-fast or out fast? how often? who pays? where is the value moment?) determines which of the others apply.
-Skipping it is how consumer-app engagement mechanics end up in a tool someone's employer handed them.
+**Building something new** — read `ux-psychology` first. Its diagnosis (voluntary or assigned use? in fast or
+out fast? how often? who pays? where does value become real?) decides which of the rest apply. Skipping it is
+how consumer-app engagement mechanics end up in a tool someone's employer handed them. Then `ui-craft` for
+the values, in its stated order.
 
-**Fixing something broken** — go to `behavioral-metrics` to find where the funnel actually leaks before
-reaching for techniques. The most common failure in this domain is optimising a step that wasn't the problem.
+**Fixing something broken** — go to `behavioral-metrics` first to find where the funnel actually leaks. The
+most common failure in this field is optimising a step that wasn't the problem.
 
-**Reviewing a PR** — each skill ends with a ship checklist written to be run against a screen or a diff.
+**A screen with a price on it** — `decision-screen-design`, then `ethical-persuasion-audit` as a gate.
 
-**Shipping anything persuasive** — `ethical-persuasion-audit` is a gate, not an appendix. Several patterns it
-covers are unlawful in the EU, which is often the more useful argument to have in a review.
-
-## The source framing
-
-This set was built from a video teaching six principles: smart defaults, never start the user at zero, give
-value before asking, let users build before they commit, frame the ask as a loss, and control the first
-number. All six are covered, distributed across the skills that own them.
-`ux-psychology/references/six-principles.md` keeps that framing intact — each principle with its before/after
-example, the skill that covers it in depth, and a corrected citation.
-
-Four statistics the video quotes did not survive checking: the car-wash loyalty study is Nunes & Drèze (USC
-and UCLA), not Columbia; the jam study's choice-overload effect averages near zero across 50 replications;
-the "70–90% never change defaults" and "free samples increase sales 2,000%" figures have no locatable source.
-The advice holds regardless — the corrections are in that file so the numbers don't get repeated in a design
-review or an interview.
+**Reviewing a PR** — each skill ends with a ship checklist written to run against a screen or a diff.
 
 ## Evidence quality
 
-These skills cite named researchers and studies, and deliberately flag the findings that are contested or
-that failed replication rather than repeating them as fact. Ego depletion, the Zeigarnik effect, the decoy
-effect, choice overload and charm pricing all carry caveats; `ux-psychology/references/principles.md` grades
-every entry as Robust / Mixed / Contested / Folklore and closes with a list of commonly repeated claims that
-don't hold up — useful when someone cites folklore in a design review.
+These skills cite named researchers and studies, and deliberately flag findings that are contested or failed
+replication rather than repeating them as fact. `ux-psychology/references/principles.md` grades all 71
+entries Robust / Mixed / Contested / Folklore, and closes with commonly repeated claims that don't hold up —
+useful when someone cites folklore in a design review. The grading applies to *the claim as designers usually
+state it*, not the underlying science: Miller's 7±2 is excellent research about digit span and folklore about
+menu length, and appears as the latter.
 
 Where a claim could not be attributed to a source, it is stated qualitatively rather than with an invented
-number.
+number. Several skills close by naming the statistics they deliberately refused to quote.
+
+## Source material and corrections
+
+Built from three videos, each mapped to the layer it belongs to, with its citations checked:
+
+- `ux-psychology/references/six-principles.md` — video one's six principles. Four of its statistics did not
+  survive checking: the car-wash loyalty study is Nunes & Drèze (USC/UCLA), not Columbia; the jam study's
+  choice-overload effect averages near zero across 50 replications; the "70–90% never change defaults" and
+  "free samples +2,000%" figures have no locatable source.
+- `ui-craft/references/source-mapping.md` — video two's craft topics. Mostly accurate; corrections cover
+  semantic colour presented as universal when it is a Western convention (and the red/green axis it relies on
+  is the most common colour-vision deficiency), the 8pt grid's real justification, and button padding.
+- `decision-screen-design/references/three-redesigns.md` — video three's three redesigns, marked as reasoning
+  rather than evidence: they carry no published data and each changes a dozen variables at once, so nothing
+  can be attributed to any single change.
+
+## Accessibility
+
+Not an appendix. WCAG floors are enforced inline throughout the craft skills — contrast (1.4.3, 1.4.11),
+never colour alone (1.4.1), visible keyboard focus (2.4.7), target size (2.5.8), reflow (1.4.10), text
+spacing (1.4.12), and `prefers-reduced-motion`. This is the largest gap in the source material: a UI built
+exactly to video two's standards can look polished and still be unusable by keyboard.
 
 ## Portability
 
-Copy the whole `.claude/skills/` directory into another repo and it works there unchanged. Nothing in these
-skills depends on this project's stack; code examples use React/Tailwind for illustration only.
+Copy `.claude/skills/` into another repo and it works unchanged. Nothing depends on this project's stack;
+code examples use CSS, Tailwind v4 and React for illustration only.
