@@ -941,7 +941,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
       </div>
       <div class="mx-foot">
         <span data-i18n="menu.foot1">Add cheese to any burger, Cg 1.</span>
-        <span data-i18n="menu.foot2">Mix platters and beverages at the window.</span>
+        <span data-i18n="menu.foot2">Burgers, mix platters and beverages are ordered at the window.</span>
       </div>
     </div>
 
@@ -989,10 +989,10 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
           <div class="sig-price">38<small>Cg</small></div>
         </div>
       </a>
-      <a class="sig sig-e rv" href="#/order?cut=ribs&amp;fmt=large">
+      <a class="sig sig-e rv" href="#menu">
         <img src="{{IMG:baste_wide}}" alt="A basting brush working sauce across meat on the grill bars" loading="lazy">
         <div class="sig-txt">
-          <div><h3 data-i18n="sig.5h">Mix platters, for two to four</h3><p data-i18n="sig.5p">Pick two, three or four proteins on one tray. Basic from Cg 32, premium from Cg 50.</p></div>
+          <div><h3 data-i18n="sig.5h">Mix platters, for two to four</h3><p data-i18n="sig.5p">Pick two, three or four proteins on one tray. Basic from Cg 32, premium from Cg 50, built at the window.</p></div>
           <div class="sig-price">32<small data-i18n="sig.from">from Cg</small></div>
         </div>
       </a>
@@ -1382,7 +1382,7 @@ const SIDES=[
  {id:"batata", en:"Batata",    sub:{en:"soft-fried chips",  nl:"zachte friet",      pap:"batata hasá"}, d:0},
  {id:"pan",    en:"Pan",       sub:{en:"on a bun",          nl:"op een broodje",    pap:"den pan"},     d:0},
  {id:"aros",   en:"Aros moro", sub:{en:"rice and beans",    nl:"rijst met bonen",   pap:"aros ku bonchi"},d:2},
- {id:"funchi", en:"Funchi",    sub:{en:"cornmeal",          nl:"maismeel",          pap:"mainshi"},     d:2},
+ {id:"funchi", en:"Funchi",    sub:{en:"cornmeal",          nl:"maïsmeel",          pap:"mainshi"},     d:2},
  {id:"salad",  en:"Salada",    sub:{en:"green or macaroni", nl:"groen of macaroni", pap:"berde òf macaroni"},d:2}
 ];
 const SAUCES=[
@@ -1390,7 +1390,7 @@ const SAUCES=[
  {id:"rosada", en:"Salsa rosada", sub:{en:"mayo and ketchup", nl:"mayo en ketchup",  pap:"mayonesa ku ketchup"}},
  {id:"pinda",  en:"Sous di pinda",sub:{en:"peanut",           nl:"pinda",            pap:"pinda"}},
  {id:"chimi",  en:"Chimichurri",  sub:{en:"herb and garlic",  nl:"kruiden en knoflook",pap:"yerba ku knoflok"}},
- {id:"jd",     en:"Jack Daniels", sub:{en:"the house glaze",  nl:"de huisglazuur",   pap:"e glaseado di kas"}},
+ {id:"jd",     en:"Jack Daniels", sub:{en:"the house glaze",  nl:"het huisglazuur",   pap:"e glaseado di kas"}},
  {id:"none",   en:"Sin sous",     sub:{en:"nothing on it",    nl:"niets erop",       pap:"nada riba dje"}}
 ];
 const PREFS=[
@@ -1426,13 +1426,13 @@ const T={
   "menu.kicker":"Henter e menu","menu.h":"Diesun karni.<br>Shete manera.",
   "menu.lede":"Skohe e karni, despues skohe kiko e ta yega aden. Esei ta henter e sistema, i nunka e no a kaba den un lista.",
   "menu.note":"Preisnan den florin karibense (Cg), e moneda di e isla for di 31 di mart 2025. Primi kualke preis pa kuminsá un òrdu. Un kaha bashí ta nifiká ku kushina no ta hasi esei, i ta bisa bo esei awor en bes di na e bentana.",
-  "menu.foot1":"Agregá keshi na kualke burger, Cg 1.","menu.foot2":"Mix platter i bebida na e bentana.",
+  "menu.foot1":"Agregá keshi na kualke burger, Cg 1.","menu.foot2":"Burger, mix platter i bebida ta wòrdu òrdená na e bentana.",
   "sig.kicker":"Pafó di e matris","sig.h":"Esnan ku hende<br>ta kore henter<br>isla p'e",
   "sig.1h":"Ribs Jack Daniels","sig.1p":"Bastí riba e grill, no promé. Ta bini ku batata.",
   "sig.2h":"Caesar ku steak","sig.2p":"E motibu ku hende ta òrdena salada un or di mainta.",
   "sig.3h":"Kapsalon di galiña","sig.3p":"Invenshon hulandes, porshon di isla.",
   "sig.4h":"Surf and turf deluxe","sig.4p":"Picanha ku kamaron, e kos mas karu riba e trùk i esun ku ta kaba mas lihé.",
-  "sig.5h":"Mix platter, pa dos te kuater","sig.5p":"Skohe dos, tres òf kuater karni riba un tayo. Basic for di Cg 32, premium for di Cg 50.",
+  "sig.5h":"Mix platter, pa dos te kuater","sig.5p":"Skohe dos, tres òf kuater karni riba un tayo. Basic for di Cg 32, premium for di Cg 50, trahá na e bentana.",
   "sig.from":"for di Cg",
   "wait.kicker":"Tempu di kandela","wait.h":"Sí, tin un liña.<br>Aki ta kuantu<br>eksaktamente.",
   "wait.p":"Nada no ta pará bou di un lampi. Bo steak ta bai riba e karbon ora bo tiket ta bai, i p'esei un djasabra yen ta yega te kuarenta minüt na e bentana. En bes di skonde esei, nos ta publik'é bibu i ta duna bo tres manera pa evit'é.",
@@ -1471,7 +1471,7 @@ const T={
   "ft.what":"Kiko ta un trùk 'i pan","ft.fire":"Kon tempu di kandela ta funshoná","ft.hours":"Ora di habri",
   "ft.rail":"E rail, bista di personal","ft.app":"E app di Fridays",
   "ft.concept":"Rediseño konseptual. No ta e sitio bibu.","tray.cta":"Kuminsá e òrdu aki",
-  "have.t":"Tiket {code} ta kaba riba e rail.","have.link":"Sigui e","kit.now":"Awor aki",
+  "have.t":"Tiket {code} ta kaba riba e rail.","have.link":"Sigui e","kit.now":"Awor aki","of4":"di",
   "hrs.to":"te","hrs.today":"awe",
   "mx.no":"No ta sirbí","mx.small":"chikí / grandi","mx.ready":"Kla","mx.with":"No ta sirbí ku",
   "note.busy":"Yen awor aki. Òrdena promé ta pasa e liña.",
@@ -1535,27 +1535,27 @@ const T={
   "cta.call":"Bellen","cta.order":"Bestellen",
   "hero.l1":"Niets goeds","hero.l2":"gebeurt voor","hero.l3":"negen.","hero.em":"bon nochi",
   "hero.since":"Op de kolen sinds 2018",
-  "hero.sub":"De late uurtjes van Curacao draaien op houtskool. De onze brandt sinds 2018 elke nacht aan de Caracasbaaiweg. Klein van formaat. Enorm in smaak.",
+  "hero.sub":"De late uurtjes van Curaçao draaien op houtskool. De onze brandt sinds 2018 elke nacht aan de Caracasbaaiweg. Klein van formaat. Enorm in smaak.",
   "win.title":"Het luik","win.closed":"Gesloten","win.open":"Open","win.fire":"Vuurtijd",
   "win.grill":"Op de grill","win.tickets":"bonnen","win.closes":"Sluit","win.opens":"Opent",
   "win.cta":"Begin een bestelling","win.note":"Bestellen kan vanaf 19:30. De grill gaat aan om 21:00.",
   "story.kicker":"Trùk 'i pan","story.h":"Een broodwagen<br>die nooit<br>thuiskwam",
-  "story.lede":"Elk eiland doet iets om middernacht. Curacao grilt.",
+  "story.lede":"Elk eiland doet iets om middernacht. Curaçao grilt.",
   "story.pull":"Iemand zaagde een luik in de zijkant van een broodwagen en schroefde er een houtskoolgrill onder.",
   "story.p1":"In de jaren zeventig waren de broodwagens 's ochtends klaar met hun ronde en stonden ze de hele nacht stil. Chauffeurs begonnen achterin houtskool aan te steken en verkochten aan wie nog buiten was. Dat is een trùk 'i pan, letterlijk een broodwagen, en veertig jaar later eet het eiland na donker nog steeds zo.",
   "story.p2":"De regels zijn nauwelijks veranderd. Het gaat open als de restaurants sluiten. Niets is voorgekookt. Je bestelt aan een luik, je wacht waar je staat, en het antwoord op elke vraag is batata of pan.",
-  "story.p3":"Fridays kwam laat bij die traditie, in 2018, en neemt het serieus genoeg om om twee uur 's nachts rib eye, picanha en karko op een papieren bord te leggen.",
+  "story.p3":"Fridays kwam laat bij die traditie, in 2018, en neemt het serieus genoeg om om twee uur 's nachts rib eye, picanha en karkó op een papieren bord te leggen.",
   "story.cap":"Het luik, Caracasbaaiweg 216, de meeste avonden rond elf uur.",
   "menu.kicker":"Het hele menu","menu.h":"Elf stukken.<br>Zeven manieren.",
   "menu.lede":"Kies het vlees, kies dan waarin het komt. Dat is het hele systeem, en het heeft nooit in een lijstje gepast.",
   "menu.note":"Prijzen in Caribische gulden (Cg), de munt van het eiland sinds 31 maart 2025. Tik op een prijs om te bestellen. Een leeg vakje betekent dat de keuken die combinatie niet maakt, en zegt dat nu in plaats van bij het luik.",
-  "menu.foot1":"Kaas op elke burger, Cg 1.","menu.foot2":"Mixschotels en dranken aan het luik.",
+  "menu.foot1":"Kaas op elke burger, Cg 1.","menu.foot2":"Burgers, mixschotels en dranken worden aan het luik besteld.",
   "sig.kicker":"Buiten de matrix","sig.h":"Waar mensen het<br>hele eiland voor<br>doorrijden",
   "sig.1h":"Jack Daniels ribs","sig.1p":"Op de grill gelakt, niet ervoor. Met friet.",
   "sig.2h":"Steak caesar","sig.2p":"De reden dat mensen om een uur 's nachts salade bestellen.",
   "sig.3h":"Kipkapsalon","sig.3p":"Nederlandse uitvinding, eilandportie.",
   "sig.4h":"Surf and turf deluxe","sig.4p":"Picanha en garnalen, het duurste op de truck en het eerste uitverkocht.",
-  "sig.5h":"Mixschotels, voor twee tot vier","sig.5p":"Kies twee, drie of vier soorten vlees op een schaal. Basic vanaf Cg 32, premium vanaf Cg 50.",
+  "sig.5h":"Mixschotels, voor twee tot vier","sig.5p":"Kies twee, drie of vier soorten vlees op een schaal. Basic vanaf Cg 32, premium vanaf Cg 50, samengesteld aan het luik.",
   "sig.from":"vanaf Cg",
   "wait.kicker":"Vuurtijd","wait.h":"Ja, er is een rij.<br>Dit is precies<br>hoe lang.",
   "wait.p":"Er ligt niets onder een warmhoudlamp. Je steak gaat op de kolen wanneer je bon binnenkomt, en daarom loopt een drukke zaterdag op tot veertig minuten aan het luik. In plaats van dat te verbergen publiceren we het live en geven we je drie manieren eromheen.",
@@ -1594,7 +1594,7 @@ const T={
   "ft.what":"Wat een trùk 'i pan is","ft.fire":"Hoe vuurtijd werkt","ft.hours":"Openingstijden",
   "ft.rail":"Het rek, keukenscherm","ft.app":"De Fridays-app",
   "ft.concept":"Conceptueel herontwerp. Niet de live site.","tray.cta":"Begin deze bestelling",
-  "have.t":"Bon {code} staat al op het rek.","have.link":"Volg hem","kit.now":"Nu",
+  "have.t":"Bon {code} staat al op het rek.","have.link":"Volg hem","kit.now":"Nu","of4":"van",
   "hrs.to":"tot","hrs.today":"vandaag",
   "mx.no":"Niet geserveerd","mx.small":"klein / groot","mx.ready":"Klaar","mx.with":"Niet geserveerd met",
   "note.busy":"Nu druk. Vooruit bestellen slaat de rij over.",
@@ -1648,7 +1648,7 @@ const T={
   "k.gov":"De bandbreedtes zijn het aandeel van een vrijdag- of zaterdagsessie, 21:00 tot 04:00, dat de gemodelleerde rij in elke toestand doorbrengt: ongeveer 41, 41 en 17 procent. De opgelichte band is die waar de truck nu in zit.",
   "r.order":"Bestellen","r.ticket":"Je bon","r.kitchen":"Het rek",
   "about.p1":"Dit is een conceptueel herontwerp, niet de live site, en er wordt hier niets afgeschreven. De truck, het adres, het telefoonnummer, de fotografie en het menu zijn echt. Prijzen zijn overgenomen van de eigen gedrukte menukaart van december 2024 en omgerekend naar de Caribische gulden, die op 1 juli 2025 de Antilliaanse gulden als wettig betaalmiddel verving.",
-  "about.p2":"De vuurtijd, de diepte van het rek en de bonnen op het keukenscherm zijn <b>gemodelleerd</b>, niet gemeten. Ze volgen een curve die piekt tussen 22:30 en 01:00, omdat recensies daar de langste wachttijden beschrijven. De openingstijden, de eilandklok en de logica van de nachtsessie zijn echt en draaien op America/Curacao, waar geen zomertijd geldt.",
+  "about.p2":"De vuurtijd, de diepte van het rek en de bonnen op het keukenscherm zijn <b>gemodelleerd</b>, niet gemeten. Ze volgen een curve die piekt tussen 22:30 en 01:00, omdat recensies daar de langste wachttijden beschrijven. De openingstijden, de eilandklok en de logica van de nachtsessie zijn echt en draaien op America/Curaçao, waar geen zomertijd geldt.",
   "about.p3":"Twee dingen hebben een mens nodig. Het Papiaments moet langs een moedertaalspreker voordat hier iets van live gaat. En het bord op de truck zelf, dat “closed on Thuesday” zegt, spreekt elke vermelding tegen die zeven dagen open toont, dus de urentabel hier volgt de vermeldingen en het verschil is aan de eigenaar om uit te zoeken."
  }
 };
@@ -1704,7 +1704,7 @@ const EN_EXTRA={
  "k.left":"{n} min left","k.over":"{n} min over","k.mine":"Yours",
  "k.cleared":"Rail cleared. The next tickets land in a moment.",
  "k.gov":"Band widths are the share of a Friday or Saturday session, 21:00 to 04:00, that the modelled queue spends in each state: roughly 41, 41 and 17 per cent. The lit band is the one the truck is in right now.",
- "sz.small":"small","sz.large":"large","kit.now":"Right now",
+ "sz.small":"small","sz.large":"large","kit.now":"Right now","of4":"of",
  "r.order":"Order","r.ticket":"Your ticket","r.kitchen":"The rail",
  "have.t":"Ticket {code} is already on the rail.","have.link":"Track it"
 };
@@ -1902,7 +1902,14 @@ function route(first){
   }
   if(anchor){
     const el=document.getElementById(anchor);
-    if(el) requestAnimationFrame(()=>el.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"}));
+    if(el){
+      // scrolling without moving focus leaves a keyboard user where they were
+      el.tabIndex=-1;
+      requestAnimationFrame(()=>{
+        el.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"});
+        if(!first) el.focus({preventScroll:true});
+      });
+    }
   }else if(!first){
     scrollTo(0,0);
     if(changed){
@@ -1946,7 +1953,8 @@ function drawMatrix(){
       const v=c.p[f.id];
       if(v==null) return `<td><div class="cell-off"><span class="sr">${tx("mx.no")}</span>
         <span aria-hidden="true">-</span></div></td>`;
-      return `<td><button class="cell" data-p="${c.id}" data-f="${f.id}">
+      return `<td><button class="cell" data-p="${c.id}" data-f="${f.id}"
+        aria-label="${cutName(c)}, ${fmtName(f).toLowerCase()}, Cg ${pair(v)}">
         ${pair(v)}${Array.isArray(v)?'<u>'+tx("mx.small")+'</u>':""}</button></td>`;
     }).join("");
     return lead+`<tr><th class="rowh" scope="row"><span class="rowh-in">
@@ -2012,7 +2020,15 @@ $("#gloss").addEventListener("click",e=>{
 /* the tray: a soft handoff, so tapping a price to compare does not throw you
    into a checkout you did not ask for */
 const tray=$("#tray");
-let trayTarget="#/order";
+let trayTarget="#/order", trayFrom=null;
+function closeTray(back){
+  tray.classList.remove("up");
+  if(back && trayFrom){
+    const again=document.querySelector(trayFrom);
+    if(again) again.focus({preventScroll:true});
+  }
+  trayFrom=null;
+}
 function openTray(pid,fid){
   const c=cutOf(pid), f=FORMATS.find(x=>x.id===fid), v=c.p[f.id];
   if(v==null) return;
@@ -2023,9 +2039,16 @@ function openTray(pid,fid){
     ? tx("mx.ready")+" "+clock(fr.t.mins+fr.mins)+", Cg "+pair(v)
     : tx("win.note")+" Cg "+pair(v);
   tray.classList.add("up");
+  // it sits after the footer in the DOM, so without this it is unreachable by
+  // keyboard until you have tabbed past the whole page
+  trayFrom=`.cell[data-p="${c.id}"][data-f="${f.id}"], .mx-li[data-p="${c.id}"][data-f="${f.id}"]`;
+  requestAnimationFrame(()=>$("#trayGo").focus({preventScroll:true}));
 }
-$("#trayGo").addEventListener("click",()=>{ tray.classList.remove("up"); go(trayTarget); });
-$("#trayX").addEventListener("click",()=>tray.classList.remove("up"));
+$("#trayGo").addEventListener("click",()=>{ closeTray(false); go(trayTarget); });
+$("#trayX").addEventListener("click",()=>closeTray(true));
+addEventListener("keydown",e=>{
+  if(e.key==="Escape" && tray.classList.contains("up")) closeTray(true);
+});
 
 /* =============================================================== order view */
 const STEPS=[{k:"s.cut",s:"ki karni"},{k:"s.fmt",s:"kon bo ke"},
@@ -2035,6 +2058,8 @@ function drawStepper(){
     `<button data-s="${i}" ${i===S.step?'aria-current="step"':""} class="${i<S.step?"done":""}">
       <b>${tx(s.k)}</b><span lang="pap">${s.s}</span></button>`).join("");
   $$("#v-order .step").forEach(el=>{el.hidden = +el.dataset.step !== S.step});
+  const q=$(`#v-order .step[data-step="${S.step}"] .q`);
+  if(q) q.tabIndex=-1;
   // Back disables itself at step 0, and a disabled button drops focus to <body>.
   // Hand it to the step it just landed on instead.
   const backHadFocus = document.activeElement === $("#back");
@@ -2283,7 +2308,7 @@ document.addEventListener("click",e=>{
   if(cell){ openTray(cell.dataset.p, cell.dataset.f); return; }
 
   const st=e.target.closest("#stepper button");
-  if(st){ S.step=+st.dataset.s; renderOrder(); return; }
+  if(st){ gotoStep(+st.dataset.s); return; }
 
   const c=e.target.closest("[data-cut]");
   if(c){ S.cut=c.dataset.cut; keepFormat(); renderOrder(); return; }
@@ -2338,18 +2363,27 @@ document.addEventListener("click",e=>{
 });
 
 let addedTimer=0;
+/* #added is itself role="status", so announcing through #live as well made every
+   cart change arrive twice. */
 function flash(msg){
   $("#added").innerHTML=`${IC.check}<span>${msg}</span>`;
   clearTimeout(addedTimer);
   addedTimer=setTimeout(()=>{$("#added").textContent="";},7000);
-  say(msg);
 }
 $("#note").addEventListener("input",drawReadback);
 $("#addrLine").addEventListener("input",drawCart);
 $("#addrPhone").addEventListener("input",drawCart);
-$("#back").addEventListener("click",()=>{ if(S.step>0){S.step--; renderOrder();} });
+/* Moving between questions has to move the reader too, or a screen reader user
+   presses Next and hears nothing change. */
+function gotoStep(n){
+  S.step=n; renderOrder();
+  const q=$(`#v-order .step[data-step="${n}"] .q`);
+  if(q){ q.focus({preventScroll:true}); q.scrollIntoView({block:"nearest", behavior:reduce?"auto":"smooth"}); }
+  say(`${tx(STEPS[n].k)}, ${n+1} ${tx("of4")} 4`);
+}
+$("#back").addEventListener("click",()=>{ if(S.step>0) gotoStep(S.step-1); });
 $("#next").addEventListener("click",()=>{
-  if(S.step<3){ S.step++; renderOrder(); return; }
+  if(S.step<3){ gotoStep(S.step+1); return; }
   S.cart.push({cut:S.cut, fmt:S.fmt, side:S.side, half:S.half,
     sauces:[...S.sauces], prefs:[...S.prefs], note:$("#note").value.trim(),
     price:base(), qty:1});
@@ -2503,7 +2537,11 @@ const POOL=[
   {items:[[3,"Chicken, regular","mitar mitar ku chorizo"]]},
   {items:[[1,"Karkó, plain","salsa rosada"],[1,"Wings, small","buffalo"]]},
   {items:[[1,"Surf and turf, large",""],[1,"Arizona",""]]},
-  {items:[[2,"Steak, kapsalon","extra pika"]]}
+  {items:[[2,"Steak, kapsalon","extra pika"]]},
+  {items:[[1,"Lomitu, caesar","sin salu"],[1,"Juice lamunchi",""]]},
+  {items:[[1,"Chorizo, sandwich","ku sous"],[2,"Batata, grandi",""]]},
+  {items:[[1,"Ribs, regular","Jack Daniels, kòrtá"]]},
+  {items:[[1,"Galiña, wrap","salsa rosada"],[1,"Pòrkchòp, caesar",""]]}
 ];
 function renderKitchen(){
   const f=fire(), now=f.t.mins;

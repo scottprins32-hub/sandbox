@@ -154,7 +154,7 @@ p{margin:0}
 /* the island carries the live activity, so a glance at the top of the phone is
    enough while the ticket is on the coals */
 .island{position:absolute; top:11px; left:50%; transform:translateX(-50%); height:23px;
-  min-width:86px; background:#000; border-radius:14px; z-index:7; display:flex;
+  min-width:86px; background:#080706; border-radius:14px; z-index:7; display:flex;
   align-items:center; justify-content:center; gap:7px; padding:0;
   transition:min-width .35s var(--ease), padding .35s var(--ease)}
 .island.live{min-width:0; padding:0 13px}
@@ -877,7 +877,7 @@ function appbar(st,f){
 }
 function windowCard(f){
   const note = !f.open
-    ? `The grill lights at ${clock(OPENS)}. An order placed now joins the queue for then.`
+    ? `Nothing is pre-cooked, so nothing is on the coals yet. An order placed now joins the queue for the moment it lights.`
     : f.queue>7
       ? `The rail is ${f.queue} deep, which is where that number comes from. A Trempan slot runs twelve minutes flat.`
       : `Quoted off the rail, not off an average. Nothing is sitting under a lamp.`;
@@ -914,7 +914,7 @@ function trempanCard(){
       ? `Slot held at ${clock(S.slot)}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
       : `Collect in the first two hours after the grill lights and the kitchen guarantees twelve minutes and takes ${cg(TREMPAN_OFF)} off, because an empty grill costs them more than a discount does.`}</p>
     <button class="btn btn-line" style="margin-top:12px" data-open="trempan">${I.sun}${
-      held ? "Change the slot" : `Book the ${s.when==="tomorrow"?"next":"next"} lane`}</button>
+      held ? "Change the slot" : `Book ${s.when==="tomorrow"?"tomorrow's":"tonight's"} lane`}</button>
   </div>`;
 }
 function tonightCard(){
@@ -1006,7 +1006,7 @@ function ticketBlock(st){
 
 function renderRoot(){
   const st=rootState(), f=fire();
-  const keep=view.scrollTop;
+  const keep=view.scrollTop, mark=markFocus();
   let body;
   if(st==="cold")      body=windowCard(f)+trempanCard()+usualCard()+tonightCard();
   else if(st==="lit")  body=windowCard(f)+usualCard()+trempanCard()+tonightCard();
@@ -1015,11 +1015,15 @@ function renderRoot(){
   thumb.innerHTML=thumbHTML(st,f);
   view.scrollTop=keep;
   wireRadios(view);
+  restoreFocus(mark);
   paintChrome(st,f);
 }
 function thumbHTML(st,f){
-  if(st==="cold") return `<button class="btn btn-hot" data-open="trempan">${I.sun}Book a Trempan slot</button>
-    <p class="sub">Nothing is on the coals until ${clock(OPENS)}.</p>`;
+  if(st==="cold") return S.slot!=null
+    ? `<button class="btn btn-hot" data-open="order">${I.basket}Build a plate for ${clock(S.slot)}</button>
+       <button class="btn btn-quiet" data-open="trempan">Change the slot</button>`
+    : `<button class="btn btn-hot" data-open="trempan">${I.sun}Book a Trempan slot</button>
+       <p class="sub">Twelve minutes flat, and ${cg(TREMPAN_OFF)} off.</p>`;
   if(st==="lit") return `<button class="btn btn-hot" data-order="usual">${I.fire}Order it again, ${cg(USUAL.price)}</button>
     <button class="btn btn-quiet" data-open="order">Build something else</button>`;
   const K=S.ticket, left=K.readyAt-now(), drive=driveMin();
@@ -1043,6 +1047,8 @@ function paintChrome(st,f){
   }else{ isl.className="island"; isl.innerHTML=""; }
   $("#dialTime").textContent=clock(now());
   $("#dialState").textContent = SIM==null ? "Live" : "Simulated";
+  $("#dial").setAttribute("aria-valuetext",
+    clock(now())+(SIM==null ? ", the real island clock" : " on the island clock"));
   $("#dial").value = SIM!=null ? SIM : Math.min(1710, Math.max(1200, now()));
   $$(".mini").forEach(b=>b.setAttribute("aria-pressed",
     String(b.dataset.jump==="live" ? SIM==null : SIM!=null && +b.dataset.jump===SIM)));
@@ -1109,7 +1115,7 @@ function orderFoot(){
       <span>${f.open ? `${f.mins} min, ready ${clock(now()+f.mins)}`
                      : `the grill lights at ${clock(OPENS)}`}</span></div>
     <div style="display:flex; gap:8px">
-      ${o.step>0?`<button class="btn btn-line btn-sm" data-oback>${I.caretL}Back</button>`:""}
+      <button class="btn btn-line btn-sm" data-oback ${o.step===0?"disabled":""}>${I.caretL}Back</button>
       <button class="btn btn-hot" style="flex:1" data-onext>${
         o.step<3 ? "Next"+I.arrowR : "<span lang=\"pap\">Kla</span>"+I.check}</button>
     </div>`;
@@ -1270,13 +1276,34 @@ function pushCard(cls,action){
     </span></button>`;
 }
 
-let ovlKey="", returnTo=null;
+/* Every redraw destroys the control the user just pressed. Build the selector
+   from whatever data attributes it carries, rather than from a list of keys that
+   somebody has to remember to extend. */
+function focusSel(el){
+  if(!el || el===document.body || !el.dataset) return null;
+  const parts=[];
+  for(const k in el.dataset){
+    const v=el.dataset[k];
+    parts.push(v==="" ? `[data-${k}]` : `[data-${k}="${v}"]`);
+  }
+  return parts.length ? parts.join("") : (el.id ? "#"+el.id : null);
+}
+function markFocus(){ return focusSel(document.activeElement); }
+function restoreFocus(sel, fallback){
+  if(document.activeElement!==document.body) return;
+  let again = sel ? document.querySelector(sel) : null;
+  // the control can come back disabled, as Back does at the first question
+  if(again && again.disabled) again=null;
+  if(!again) again=fallback || null;
+  if(again) again.focus({preventScroll:true});
+}
+let ovlKey="", returnSel=null;
 function overlayShell(){
-  if(S.system==="lock") return `<div class="lock" id="ovlIn" role="dialog" aria-modal="true"
+  if(S.system==="lock") return `<div class="lock" id="ovlIn" role="dialog"
     aria-label="Lock screen" tabindex="-1"></div>`;
   if(S.cover){
     const c=coverBits();
-    return `<div class="cover ${S.cover==="code"?"codecard":""}" role="dialog" aria-modal="true"
+    return `<div class="cover ${S.cover==="code"?"codecard":""}" role="dialog"
       aria-label="${c.label}" tabindex="-1">
       <div class="cover-bd" id="ovlIn"></div><div class="cover-ft" id="ovlFt"></div></div>`;
   }
@@ -1284,7 +1311,7 @@ function overlayShell(){
     const s=SHEETS[S.sheet];
     return `<div class="sheet-wrap">
       <button class="scrim" data-close aria-label="Close ${s.t}"></button>
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" tabindex="-1">
+      <div class="sheet" role="dialog" aria-labelledby="shTitle" tabindex="-1">
         <span class="grab" aria-hidden="true"></span>
         <div class="sheet-hd"><h2 id="shTitle" ${s.pap?'lang="pap"':""}>${s.t}</h2>
           <button class="x" data-close aria-label="Close">${I.x}</button></div>
@@ -1293,29 +1320,14 @@ function overlayShell(){
   }
   return "";
 }
-const FOCUS_KEYS=["cut","box","side","half","sauce","pref","step","v","origin","slot","open"];
 function overlayFill(){
   const inn=$("#ovlIn"), ft=$("#ovlFt");
   if(!inn) return;
   // refilling destroys the control the user just pressed, so remember how to
   // find its replacement first and hand focus back afterwards
-  const keep=inn.scrollTop;
-  const a=document.activeElement;
-  let mark=null;
-  if(a && a.dataset) for(const k of FOCUS_KEYS){
-    if(a.dataset[k]!=null){
-      mark = k==="v" ? `[data-set="${a.dataset.set}"][data-v="${a.dataset.v}"]`
-                     : `[data-${k}="${a.dataset[k]}"]`;
-      break;
-    }
-  }
-  const after=()=>{
-    inn.scrollTop=keep;
-    if(mark && document.activeElement===document.body){
-      const again=ovl.querySelector(mark);
-      if(again) again.focus({preventScroll:true});
-    }
-  };
+  const keep=inn.scrollTop, mark=markFocus();
+  const after=()=>{ inn.scrollTop=keep;
+    restoreFocus(mark, ovl.querySelector("[data-onext]") || ovl.querySelector(".sheet-hd .x")); };
   if(S.system==="lock"){
     inn.innerHTML=`<p class="lk-time num">${clock(now())}</p>
       <p class="lk-date">${DAYS[sessionDay()]}, Caracasbaaiweg</p>
@@ -1353,7 +1365,7 @@ function renderBanner(){
 function paint(){ renderRoot(); renderOverlay(); renderBanner(); }
 
 function openOverlay(kind,name,from){
-  returnTo = from || document.activeElement;
+  returnSel = focusSel(from || document.activeElement);
   if(kind==="sheet"){ S.sheet=name; S.cover=null; }
   else if(kind==="cover"){ S.cover=name; }
   else { S.system=name; }
@@ -1364,8 +1376,10 @@ function closeTop(){
   else if(S.cover) S.cover=null;
   else if(S.sheet) S.sheet = S.sheet==="confirm" ? "order" : null;
   paint();
-  if(!S.sheet && !S.cover && !S.system && returnTo && document.contains(returnTo)){
-    returnTo.focus({preventScroll:true}); returnTo=null;
+  if(!S.sheet && !S.cover && !S.system && returnSel){
+    const back=document.querySelector(returnSel);
+    if(back) back.focus({preventScroll:true});
+    returnSel=null;
   }
 }
 let sayTimer=0;
@@ -1544,7 +1558,7 @@ function runWay(w,from){
   paint();
   if(S.system){
     const box=ovl.querySelector('[role="dialog"]');
-    returnTo=from;
+    returnSel=focusSel(from);
     if(box) requestAnimationFrame(()=>requestAnimationFrame(()=>box.focus({preventScroll:true})));
   }
 }
@@ -1552,7 +1566,11 @@ function runWay(w,from){
 /* ------------------------------------------------------------------- boot */
 keepFormat();
 paint();
-setInterval(()=>{ if(SIM==null){ maybeNotify(); paint(); } },20000);
+setInterval(()=>{
+  if(SIM!=null) return;                       // the dial is holding the clock still
+  if(app.contains(document.activeElement)) return;   // somebody is using the phone
+  maybeNotify(); paint();
+},20000);
 })();
 </script>
 
