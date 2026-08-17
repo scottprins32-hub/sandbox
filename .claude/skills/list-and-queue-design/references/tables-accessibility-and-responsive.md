@@ -136,6 +136,35 @@ two buttons per row is not, and is better served by a native table plus the row-
 `role="grid"` is compatible with native markup: `<table role="grid">` keeps `<th scope>` associations while
 switching the interaction model. If you commit, do it that way rather than rebuilding on divs.
 
+### Clickable rows, and why the stretched link breaks on `<tr>`
+
+`list-and-queue-design/SKILL.md` move 2 decides which pattern an ops tool ships and carries the code for the
+preferred one. This is the mechanism behind that choice, and the workaround if you ship the other one anyway.
+
+Wrapping the row in an `<a>` and putting buttons inside it is invalid — the `<a>` content model forbids an
+interactive descendant — so a clickable row is built either by stretching one link's hit area over the row
+(**A**) or by adding a guarded pointer handler beside a real link (**B**).
+
+Pattern A's stretched link is `position: absolute; inset: 0` on a pseudo-element, which resolves against the
+nearest positioned ancestor. **WebKit does not make a relatively positioned `<tr>` a containing block**
+(WebKit bug 240961, fixed in WebKit in April 2026 and shipped first in Safari Technology Preview 243, so
+every stable Safari in the field today still behaves this way). The overlay then resolves against whatever
+*is* positioned — usually the scroll container — so every row's overlay covers the whole table, the last row
+in the DOM wins every click, and the region stops scrolling. In table markup the containing block has to be
+the **cells**, which every engine honours:
+
+```css
+.row > :is(td, th) { position: relative; }                             /* NOT .row — Safari ignores it on <tr> */
+.row-title-link::after { content: ""; position: absolute; inset: 0; }  /* covers its own cell */
+.row-actions { position: relative; z-index: 1; }                       /* raised above the overlay */
+```
+
+That buys a clickable identifying *cell*, not a clickable row. Covering the whole row means one overlay per
+cell, each `aria-hidden="true" tabindex="-1"` so the row still exposes exactly one link — at which point
+pattern B is less machinery for the same result. The overlay also swallows text selection, so nobody can
+drag-select an ID out of a row, which operators do constantly. Pattern A is unqualified only where the row is
+an `<li>` or a grid `<div>`, because `position: relative` on those works everywhere.
+
 ## 2. Sortable headers
 
 The pattern, in full: a `<button>` inside the `<th>`, `aria-sort` on the **`<th>`** (never on the button),
@@ -363,6 +392,11 @@ html { scroll-padding-top: 3.5rem; }
 `scroll-padding` on the container and `scroll-margin` on the target both feed sequential focus navigation
 scrolling and `scrollIntoView()`. Use whichever you control; setting both is cheap and covers the case where
 a parent becomes the scroller at a different breakpoint.
+
+**Put `scroll-margin` on the control, not the `<tr>`.** Both mechanisms apply to the box actually being
+scrolled into view, and that box is the link or button inside the cell — the row only qualifies when rows
+themselves are focusable, as in the roving-`tabindex` grid model. A `scroll-margin` on `tr` is the version
+that looks right in the stylesheet and does nothing at runtime.
 
 Two things this does not fix, so check them by hand:
 

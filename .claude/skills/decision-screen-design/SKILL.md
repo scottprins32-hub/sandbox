@@ -261,9 +261,11 @@ wrong (Dhar, 1997, *Consumer Preference for a No-Choice Option*, showing deferra
 has a decisive advantage). On a commitment screen, deferral is abandonment with a politer name.
 
 Note what this argument deliberately does *not* rest on: **choice overload**. The famous jam study does not
-survive meta-analysis (Scheibehenne, Greifeneder & Todd, 2010, mean effect near zero) and is graded contested
-in `ux-psychology/references/principles.md`. The problem with three ranges is not that three is too many; it
-is that each option is individually hard to evaluate. Fix evaluability, not cardinality.
+survive meta-analysis (Scheibehenne, Greifeneder & Todd, 2010, mean effect near zero), and
+`ux-psychology/references/principles.md` grades it **Mixed** — a real effect that shows up reliably only
+under specific moderators (complex choice set, difficult task, unclear preferences, no articulated goal),
+none of which is "three options". The problem with three ranges is not that three is too many; it is that
+each option is individually hard to evaluate. Fix evaluability, not cardinality.
 
 **The generalisable rule: when you can compute a number, show the number.** A range transfers your
 uncertainty onto the user, and uncertainty is the most expensive thing on a decision screen — the one cost
@@ -362,7 +364,7 @@ presentation rather than by the task.
 | 28 Mar – 2 Apr | Fri 28 Mar – Wed 2 Apr · 5 nights |
 | €49/seat, 12 seats | €49/seat × 12 = €588/month |
 | Billed annually at €588 | €588 today · renews 1 Sept 2027 |
-| 20% off | €129 → €89 · you save €40 |
+| 31% off | €129 → €89 · you save €40 |
 | Trial ends in 7 days | Trial ends Sun 23 Aug · first charge Mon 24 Aug |
 | 500 GB included | Enough for about 40,000 photos |
 
@@ -376,37 +378,10 @@ the oldest anchoring move there is (Tversky & Kahneman, 1974; `persuasive-copy` 
 craft), it works, and it is the **most legally constrained technique in this skill**. This section is part of
 the implementation, not a compliance appendix.
 
-**EU — the specific rule you build to, and exactly what it covers.** Article 6a of the Price Indication
-Directive (98/6/EC), as inserted by the Omnibus Directive (EU) 2019/2161, requires that **any announcement of
-a price reduction indicates the prior price**, and defines the prior price as **the lowest price applied by
-the trader during a period of at least 30 days before the reduction**.
-
-**Check the scope before you cite it.** The Price Indication Directive governs *goods*; the Commission's
-guidance on Article 6a (OJ C 526, 29 December 2021) reads "products" as excluding services and digital
-content. That matters enormously here, because the screens this skill is about — subscriptions, SaaS plans,
-game paywalls, hotel bookings — are mostly services and digital content, and therefore mostly **outside**
-Article 6a. Citing it at a booking listing is citing the wrong instrument. For services and digital content
-the governing rule is the **UCPD** (2005/29/EC) misleading-actions prohibition on fictitious reference
-prices, plus any national reference-pricing regime: a made-up "was" price is unlawful, but the 30-day-low
-arithmetic is not imposed. The CPC network's coordinated action produced EU-wide commitments from
-Booking.com and Expedia covering precisely discounts, reference prices and availability claims, so the
-enforcement interest in services pricing is real even without Article 6a.
-
-The CJEU confirmed in **C-330/23 (*Aldi Süd*, 26 September 2024)** that
-the reduction itself — the percentage, the "was/now" comparison — must be **calculated on that prior price**,
-not merely displayed alongside it. So a `-31%` badge computed from €129 when €99 was the lowest price you
-charged in the previous 30 days is not a presentation choice; it is the thing the rule prohibits — the badge
-has to read against €99. Member states may set specific regimes for goods
-that deteriorate or expire rapidly, goods on sale under 30 days, and progressive reductions, so national
-implementation matters. Alongside it: fake reference pricing and drip pricing are misleading practices under
-the UCPD, and Omnibus added transparency duties on ranking parameters, paid placement and review
-authenticity — which is where "recommended" and "most popular" badges land.
-
-**US.** FTC Act §5 covers unfair or deceptive acts and practices, and the FTC has pursued deceptive
-reference-pricing and fee-concealment cases under it; the fee rule in move 10 applies to live-event tickets
-and short-term lodging specifically. Several states have their own reference-pricing and junk-fee statutes.
-Work from the current text per market — enforcement outcomes are jurisdiction- and date-specific and are the
-fastest way for a document like this to become wrong.
+Where a reference-price rule binds, it binds on the arithmetic and not just the display: the reduction is
+**computed on the lowest price you actually charged in at least the preceding 30 days**. A `-31%` badge
+derived from €129 when €99 was that lowest price is exactly what the rule prohibits — against €99 the badge
+reads −10%.
 
 **The plain engineering rule that satisfies all of it:** *a strikethrough price must be a price you actually
 charged, and the reference period must be checkable from your own data.*
@@ -424,43 +399,29 @@ const pct   = prior && prior > price ? Math.round((1 - price / prior) * 100) : n
 Which means price history is a **first-class table** — product, price, effective from, effective to, market —
 not something reconstructed from order lines when a regulator asks. If you cannot answer "what was the lowest
 price we charged for this in the last 30 days" with a query, you cannot show a defensible discount badge.
-For goods sold in the EU that is a legal requirement. For services, digital content, and everywhere outside
-the EU it is a prudential standard rather than a statute — but it is the standard that keeps you clear of the
-UCPD's fictitious-reference-price prohibition, and it costs nothing extra once the table exists. Build the
-strict version once and apply it everywhere; the alternative is a per-market conditional in your pricing
-code, which is how mistakes ship.
+Build that strict version once and apply it everywhere; the alternative is a per-market conditional in your
+pricing code, which is how mistakes ship.
 
-**This is not legal advice.** Requirements differ by market, by product category and by whether you are the
-seller or the platform, and they change. Verify the current text for each market you serve before launch, and
-route anything contested to counsel rather than to a code review.
+Which instrument binds depends on what you sell and where —
+`references/reference-pricing-law.md` has the scope analysis per market: EU Article 6a and *Aldi Süd* for
+goods, the UCPD's fictitious-reference-price prohibition for services and digital content, FTC Act §5 and
+the state statutes in the US. Verify the current text per market before launch and date the check; this is
+not legal advice.
 
-## How much any of this is worth
+## What these moves are worth
 
-The three case studies behind these moves are presented as tested wins. They come with **no published data,
-no sample sizes and no effect sizes**, and each redesign changed many variables at once — headline, imagery,
-layout, button verb, microcopy, pricing display. Even if the numbers existed, no lift could be attributed to
-any single change, because nothing was isolated. So **treat every move above as a well-reasoned hypothesis to
-test on your own product, not as an established effect size.** The mechanisms are sound and several have
-independent support; the magnitudes are unknown and will differ by product, audience and traffic quality.
-Anyone quoting a percentage for "putting the total on the button" is quoting a number that does not exist.
+The three case studies behind them are presented as tested wins and come with **no published data, no sample
+sizes and no effect sizes**, and each redesign changed many variables at once. So **treat every move above as
+a well-reasoned hypothesis to test on your own product** — the mechanisms are sound, the magnitudes are
+unknown. Testing them is `behavioral-metrics`' job, including the uncomfortable part: a decision screen's
+conversion event is rare, required sample scales with the inverse square of the effect, and most teams
+therefore need sequencing, holdouts and qualitative evidence rather than a clean A/B test.
 
-Testing them is `behavioral-metrics`' job, and it starts with the uncomfortable part: most teams lack the
-traffic for a clean A/B test on a decision screen, because the conversion event is rare and required sample
-scales with the inverse square of the effect you hope to detect. That skill covers the alternatives —
-sequencing changes and reading the funnel, before/after with holdouts, qualitative evidence used as evidence
-— and the guardrails (refund rate, cancellation rate, trial-to-paid, support contacts) that catch a "win"
-that was really a confusion.
-
-## The synthesis worth making
-
-Across all three cases the higher-converting screen is also the more honest one. It warns you before it
-charges you, shows the total, states the cancellation policy where you decide, and gives a real number
-instead of a hedge. That alignment is real and worth naming in a review, because it turns an ethics argument
-into a design argument. It is not a law. Plenty of manipulative patterns convert well in the short term —
-which is exactly why they exist, why `ethical-persuasion-audit` exists, and why guardrail metrics are not
-optional. The defensible version is narrower and still useful: **on a commitment screen the user's dominant
-emotion is uncertainty, and honesty is the cheapest way to remove uncertainty.** Where the two diverge — and
-over one quarter they sometimes do — you are choosing between a metric and a refund rate, so measure both.
+One pattern across all three is worth naming in a review because it turns an ethics argument into a design
+argument: **on a commitment screen the user's dominant emotion is uncertainty, and honesty is the cheapest
+way to remove it.** That is a tendency, not a law — manipulative patterns convert in the short term, which is
+why `ethical-persuasion-audit` and guardrail metrics exist. Where the two diverge you are choosing between a
+conversion number and a refund rate, so measure both.
 
 ## Anti-patterns
 
@@ -517,13 +478,11 @@ Run against the screen, the design, or the diff.
 - [ ] No arithmetic left to the user: durations, totals, renewal dates, per-unit maths, unit translation.
 
 **Discounts**
-- [ ] Every strikethrough is a price actually charged, derived by query from a price-history table, with the
-      percentage calculated against the lowest price in at least the prior 30 days. Legally required for
-      goods in the EU (Art. 6a); a prudential standard for services and digital content, which the UCPD
-      still forbids attaching a fictitious reference price to. Build the strict version once, apply it
-      everywhere.
+- [ ] Every strikethrough is a price actually charged, derived by query from a price-history table.
+- [ ] The percentage is calculated against the lowest price in at least the prior 30 days.
 - [ ] No qualifying prior price in the window → no badge, no strikethrough.
-- [ ] Current requirements verified per market served, and the check is dated.
+- [ ] Requirements verified for every market served (`references/reference-pricing-law.md`), and the check is
+      dated.
 
 **After**
 - [ ] Guardrails instrumented before launch: trial-to-paid (not trial-start), refund and chargeback rate,
@@ -543,17 +502,14 @@ Run against the screen, the design, or the diff.
   *Consumer Preference for a No-Choice Option*, *JCR* 24(2), 215–231: deferral rises when no alternative has
   a decisive advantage.
 - **Choice overload — deliberately not relied on.** Iyengar & Lepper (2000); near-zero mean effect in
-  Scheibehenne, Greifeneder & Todd (2010); graded contested in `ux-psychology/references/principles.md`.
+  Scheibehenne, Greifeneder & Todd (2010); real under the moderators in Chernev, Böckenholt & Goodman (2015),
+  which is why `ux-psychology/references/principles.md` grades it Mixed rather than contested.
 - **Anchoring** — Tversky & Kahneman (1974), *Science*; among the better-replicated effects here.
   **Commitment and consistency** — Cialdini, *Influence* (1984); **foot-in-the-door**, Freedman & Fraser
   (1966), modest and heavily moderated.
-- **EU price reductions** — Directive 98/6/EC Art. 6a, inserted by Directive (EU) 2019/2161 (Omnibus): a
-  price-reduction announcement must indicate the prior price, defined as the lowest applied in a period of at
-  least 30 days before the reduction, with member-state options for perishables, goods sold under 30 days and
-  progressive reductions. **CJEU C-330/23 (*Aldi Süd*, 26 September 2024)**: the reduction must be *calculated
-  on* that prior price, not merely shown beside it. **Scope: goods only** — Commission guidance on Art. 6a
-  (OJ C 526, 29 December 2021) reads "products" as excluding services and digital content, so subscriptions,
-  SaaS and bookings fall outside it and are governed by the UCPD's misleading-actions rule instead.
+- **Reference pricing and discounts** — Directive 98/6/EC Art. 6a (Omnibus), CJEU C-330/23 (*Aldi Süd*), the
+  goods-only scope in the Commission's Art. 6a guidance, and the UCPD rule that governs services and digital
+  content instead: all cited in full in `references/reference-pricing-law.md`.
 - **EU unfair practices** — UCPD 2005/29/EC as amended by (EU) 2019/2161; Consumer Rights Directive
   2011/83/EU for total-price disclosure and the order-button requirement.
 - **US fees** — FTC Act §5; FTC *Rule on Unfair or Deceptive Fees*, 16 CFR Part 464, effective 12 May 2025 —
@@ -571,3 +527,7 @@ a named source it is described qualitatively.
   option picker and a hotel booking screen, each audited element by element with the before/after and the
   question every change replaced. Read it before running the audit on your own screen for the first time, or
   when you need to show a stakeholder what its output looks like.
+- `references/reference-pricing-law.md` — read before shipping any strikethrough, "was/now" or discount
+  badge: which instrument binds per market and product category (EU Art. 6a and *Aldi Süd* for goods, the
+  UCPD for services and digital content, FTC Act §5 and state statutes in the US), and the one
+  implementation that satisfies all of them.

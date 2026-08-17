@@ -143,18 +143,33 @@ Structure: **what went wrong → how to fix it → (if useful) why we need it.**
 | Server error mid-flow | "Something broke on our side. Your details are saved — try again." (and mean it) |
 | Session expired | Restore the form, then say "You were signed out. Sign in again and we'll pick up where you left off." |
 
-Accessibility wiring, per field:
+Accessibility wiring, per field. `aria-invalid` carries the state and `aria-describedby` attaches the message
+to the field's accessible description, so it is read when focus lands there — which is exactly where the
+submit handler puts it:
 
 ```html
 <label for="email">Email address</label>
 <input id="email" name="email" type="email" autocomplete="email"
        aria-invalid="true" aria-describedby="email-error">
-<p id="email-error" role="alert">Enter an email address in the format name@example.com</p>
+<p id="email-error">Enter an email address in the format name@example.com</p>
 ```
 
-On submit failure, render an error summary at the top with in-page links to each bad field, move focus to
-the summary, and set the page title so the failure is announced. Never signal an error with colour alone —
-pair it with an icon and text.
+**No `role="alert"` on the per-field message.** It is wrong in both directions: on a message that stays in the
+DOM it re-announces on every render, and one injected only on failure frequently announces nothing, because a
+live region has to exist before its text changes in order to be watched. Announce the submit result instead
+from a single empty polite region mounted with the form:
+
+```html
+<!-- rendered empty, on mount, so it is already being watched when submit fails -->
+<p id="form-status" role="status" class="sr-only"></p>
+```
+
+On submit failure: write the count into that region ("3 fields need attention"), move focus to the first
+invalid field, and render a visible error summary at the top with in-page links to each bad field. If the
+submit is a server round-trip, set the page title as well — it is announced on load, before the user reaches
+the summary, and no live region survives the navigation. Never signal an error with colour alone — pair it
+with an icon and text. Live-region mechanics in full, including why `display: none` breaks them:
+`ui-signifiers-and-states/references/announcing-state.md`.
 
 ## Multi-step flows
 

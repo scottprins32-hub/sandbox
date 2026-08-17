@@ -1,6 +1,6 @@
 ---
 name: typography-system
-description: Settles the actual type values for a product — which typefaces, the size scale with tracking and line-height baked in per step, measure, weight as a hierarchy lever, tabular figures, webfont loading, and the WCAG floors for resize and text spacing. Use this whenever a type decision is being made or reviewed — even if the user never says "typography", "font" or "type scale" — including "what font should I use", "pick a type scale", "my headings look wrong", "this looks like a Word document", "our numbers jump around in the table", "the page jumps when fonts load", "how big should body text be", or any diff touching `font-size`, `line-height`, `letter-spacing` or `@font-face`. Use it alongside `depth-and-overlays`, which owns text set over a photograph or a scrim, and `color-and-theming`, which owns text colour and contrast tokens; this skill owns the faces, sizes, spacing-per-step and measure. On a new project settle type before spacing, because the type sizes determine what the spacing scale has to accommodate.
+description: Settles the actual type values for a product — which typefaces, the size scale with tracking and line-height baked in per step, measure, weight as a hierarchy lever, tabular figures, webfont loading, and the WCAG floors for resize and text spacing. Use this whenever a type decision is being made or reviewed — even if the user never says "typography", "font" or "type scale" — including "what font should I use", "pick a type scale", "my headings look wrong", "this looks like a Word document", "our numbers jump around in the table", "the page jumps when fonts load", "how big should body text be", or any diff touching `font-size`, `line-height`, `letter-spacing` or `@font-face`. Sized for paper rather than a screen — pt and mm, a legibility floor set by viewing distance — is `print-and-physical-artefacts`. Use it alongside `depth-and-overlays`, which owns text set over a photograph or a scrim, and `color-and-theming`, which owns text colour and contrast tokens; this skill owns the faces, sizes, spacing-per-step and measure. On a new project settle type before spacing, because the type sizes determine what the spacing scale has to accommodate.
 ---
 
 # Typography system
@@ -571,14 +571,13 @@ Run against the screen or the PR diff.
 
 ## Sources
 
-- **WCAG 2.2** (W3C Recommendation). SC **1.4.1 Use of Color** (A). SC **1.4.3 Contrast (Minimum)** (AA):
-  4.5:1 normal text, 3:1 large text, where large = 18pt / 14pt bold ≈ 24px / 18.66px CSS px. SC **1.4.4
-  Resize Text** (AA): 200% without loss of content or functionality. SC **1.4.8 Visual Presentation** (AAA):
+- **WCAG 2.2** (W3C Recommendation). The criteria this skill's checklist enforces are 1.4.1, 1.4.3, 1.4.4,
+  1.4.10, 1.4.11, 1.4.12, 2.4.7 and 2.4.11, cited inline where they bite; the shared floor with full
+  definitions is in `ui-craft` §The accessibility floor. Two things belong to this skill and are not stated
+  there. SC **1.4.8 Visual Presentation** (AAA) is the only criterion that touches type composition directly:
   line length ≤80 characters (40 for CJK), line spacing ≥1.5 within paragraphs, paragraph spacing ≥1.5× line
-  spacing, text not justified. SC **1.4.10 Reflow** (AA): 320 CSS px. SC **1.4.11 Non-text Contrast** (AA):
-  3:1. SC **1.4.12 Text Spacing** (AA): no loss of content at line-height 1.5×, paragraph spacing 2×, letter
-  spacing 0.12×, word spacing 0.16× of font size. SC **2.4.7 Focus Visible** (AA) and **2.4.11 Focus Not
-  Obscured (Minimum)** (AA, new in 2.2). WCAG specifies **no minimum font size**.
+  spacing, and text not justified. And WCAG specifies **no minimum font size** anywhere — every size floor in
+  this file is platform guidance or judgment, not law.
 - **Robert Bringhurst**, *The Elements of Typographic Style* — 45–75 characters is a satisfactory measure, 66
   widely regarded as ideal; letterspace all strings of capitals and small caps.
 - **Matthew Butterick**, *Practical Typography* — body text 15–25px on screen; line spacing 120–145% of size;

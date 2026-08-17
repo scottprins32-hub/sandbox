@@ -1,6 +1,6 @@
 ---
 name: color-and-theming
-description: Settles the actual colour values — brand hue to full 50–950 ramps generated in OKLCH, semantic tokens (surface, surface-raised, border-subtle, text-muted), the contrast number every step must hit, and dark mode as a re-derivation of the palette rather than an inversion. Use this whenever the user is choosing colours, building a palette or design tokens, adding or repairing dark mode, or theming anything — even if they never say "colour", "palette" or "theme" — including "what colour should this button be", "our brand blue fails contrast", "dark mode looks washed out / muddy / harsh / neon", "the cards vanish on the dark background", "this looks garish", "set up design tokens", or any question about hex codes, OKLCH vs HSL, `prefers-color-scheme`, theme toggles, or the flash of the wrong theme on load. Use it alongside `attention-and-hierarchy`, which owns *why* contrast steers the eye; this skill owns the values that make it comply.
+description: Settles the actual colour values — brand hue to full 50–950 ramps generated in OKLCH, semantic tokens (surface, surface-raised, border-subtle, text-muted), the contrast number every step must hit, and dark mode as a re-derivation of the palette rather than an inversion. Use this whenever the user is choosing colours, building a palette or design tokens, adding or repairing dark mode, or theming anything — even if they never say "colour", "palette" or "theme" — including "what colour should this button be", "our brand blue fails contrast", "dark mode looks washed out / muddy / harsh / neon", "the cards vanish on the dark background", "this looks garish", "set up design tokens", or any question about hex codes, OKLCH vs HSL, `prefers-color-scheme`, theme toggles, or the flash of the wrong theme on load. What the palette becomes on paper — monochrome first, because most operational printing is black and white — is `print-and-physical-artefacts`. Use it alongside `attention-and-hierarchy`, which owns *why* contrast steers the eye; this skill owns the values that make it comply.
 ---
 
 # Colour and theming
@@ -336,8 +336,10 @@ light — warm grey (`h≈70`), deep green (`h≈150`) and plum (`h≈320`) all 
 
 This is the deliverable. Components reference **only** the `--color-*` semantic tokens; ramps stay in the
 primitive layer. Written with `light-dark()`, so every colour is defined once and all three theme states fall
-out of `color-scheme` in three lines. If you need to support browsers older than Chrome 123 / Safari 17.5, move
-8 has the equivalent two-block media-query form.
+out of `color-scheme` in three lines. If you need to support browsers older than Chrome 123 / Safari 17.5,
+`references/theme-switching.md` has the equivalent two-block media-query form and the `@supports` fallback —
+and the reason the fallback everyone reaches for first makes the page *worse* than shipping `light-dark()`
+alone.
 
 ```css
 :root {
@@ -440,80 +442,20 @@ declarations — this is the whole mechanism behind the token set in move 7:
 :root[data-theme="dark"]  { color-scheme: dark;  }       /* force dark on a light system     */
 ```
 
-**The media-query form**, for deeper browser compatibility or a token file you would rather not write with
-`light-dark()`. Define the complete light palette on bare `:root`; redefine only the changed tokens in two dark
-blocks — a media query guarded against an explicit light override, and an explicit dark attribute. **Never give
-a colour its only definition inside a media query**, or it is undefined for everyone not in that state.
-
-```css
-:root { color-scheme: light; /* full light palette — the default and the universal fallback */ }
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; /* dark values */ }
-}
-:root[data-theme="dark"] { color-scheme: dark; /* the same dark values, repeated */ }
-```
-
-CSS cannot union a plain selector with one inside a media query, so those two dark blocks are genuinely
-duplicated. Emit them from one source — a Sass mixin, a PostCSS plugin, or your token pipeline — rather than
-maintaining two hand-edited copies that will drift. Avoiding that duplication is the main reason move 7 uses
-`light-dark()`.
-
-**The flash of wrong theme.** The stored preference lives in `localStorage`, which JavaScript reads — and if
-that JavaScript runs after first paint, the page renders in the wrong theme and snaps. It is worst in SSR and
-static frameworks, where the server has no idea what the user chose. The only reliable fix is a **small
-synchronous script in `<head>`, before any stylesheet that depends on the attribute**:
-
-```html
-<script>
-  // Must be inline, synchronous, and in <head>. Any defer/async reintroduces the flash.
-  try {
-    var t = localStorage.getItem('theme');            // 'light' | 'dark' | null (= system)
-    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
-  } catch (e) {}
-</script>
-```
-
-Then the toggle writes the attribute and the storage together, and removing the attribute returns to system:
-
-```js
-function setTheme(mode) {                    // 'light' | 'dark' | 'system'
-  const root = document.documentElement;
-  if (mode === 'system') { delete root.dataset.theme; localStorage.removeItem('theme'); }
-  else { root.dataset.theme = mode; localStorage.setItem('theme', mode); }
-}
-```
+**The flash of wrong theme.** The stored preference lives in `localStorage`, which only JavaScript can read,
+so the theme attribute cannot be applied by the server or by CSS. The single reliable fix is an **inline
+synchronous script in `<head>`, before any stylesheet that depends on the attribute** — anything deferred,
+async, or in a `useEffect` runs after first paint and the page snaps. Note what the three-state structure
+buys: users on follow-system, the majority since it is the default, resolve entirely in CSS and cannot flash
+at all. Only a stored explicit override depends on that script.
 
 Expose all three in the UI, and label the third **"System"** rather than "Auto" — it tells the user where the
 setting comes from.
 
-Note what this structure buys: users on "follow system" — the majority, since it is the default — resolve
-entirely in CSS and cannot flash at all. Only users with a stored explicit override depend on that script.
-
-**Two more that get forgotten.** `<meta name="theme-color">` colours mobile browser chrome and needs a `media`
-attribute per scheme, or the address bar stays light behind a dark page. The `media` form follows the *system*,
-so `setTheme()` must also rewrite the tag's `content` when the user overrides. And any animated theme
-transition must respect `prefers-reduced-motion` — a full-page colour crossfade is exactly the kind of
-large-area change that triggers discomfort (`design-motion-principles` owns the timing).
-
-```html
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15171C" media="(prefers-color-scheme: dark)">
-```
-
-**The `light-dark()` support caveat.** Chrome 123 (Mar 2024), Firefox 120 (Nov 2023), Safari 17.5 (May 2024);
-Baseline newly available, reaching "widely available" only in **November 2026**. That is comfortable for most
-products in 2026 and not for all of them. If your support matrix reaches further back, either use the
-media-query form above or declare a plain fallback immediately before each token, which older engines keep and
-newer ones override:
-
-```css
---color-surface: #FFFFFF;                                         /* older engines stop here */
---color-surface: light-dark(oklch(1 0 0), oklch(0.205 0.01 264));
-```
-
-`references/theme-switching.md` has the framework-specific versions (React/Next.js/SSR), forced-colors mode,
-images and charts in dark mode, and print.
+`references/theme-switching.md` has the implementations: the head script and `setTheme()`, the React and
+Next.js/SSR versions with the cookie alternative, cross-tab and system-change sync, the two-block
+media-query token structure and the `@supports` fallback for engines without `light-dark()`,
+`<meta name="theme-color">` per scheme, forced-colors mode, images and charts in dark mode, and print.
 
 ## Anti-patterns
 
@@ -576,12 +518,12 @@ Run against the palette file and the rendered screen, in both themes.
 
 ## Sources
 
-- **WCAG 2.2** (W3C Recommendation) — the law-like layer. **1.4.1 Use of Color** (A); **1.4.3 Contrast
-  (Minimum)** (AA — 4.5:1 text, 3:1 large text, large defined as ≥18pt/24px or ≥14pt/18.66px bold);
-  **1.4.11 Non-text Contrast** (AA — 3:1 for UI component boundaries required for identification, their
-  states, and graphical objects required to understand content); **1.4.6 Contrast (Enhanced)** (AAA — 7:1 /
-  4.5:1); **2.4.7 Focus Visible** (AA); **2.4.11 Focus Not Obscured (Minimum)** (AA, new in 2.2). Disabled
-  controls are explicitly exempt from 1.4.3 and 1.4.11.
+- **WCAG 2.2** (W3C Recommendation) — the law-like layer. The criteria this skill's checklist enforces are
+  1.4.1, 1.4.3, 1.4.11, 2.4.7 and 2.4.11, cited inline where they bite; the shared floor with full definitions
+  is in `ui-craft` §The accessibility floor. Three specifics belong to this skill and are not stated there:
+  **1.4.6 Contrast (Enhanced)** is the AAA tier at 7:1 / 4.5:1; disabled controls are explicitly exempt from
+  both 1.4.3 and 1.4.11, which is a licence to look disabled rather than to be unreadable; and 1.4.11's 3:1
+  applies to a component's *states*, not only its resting boundary.
 - **WCAG 3 / APCA status** — visual contrast was moved out of the WCAG 3 Working Draft in July 2023 for further
   evaluation; as of April 2026 the WCAG 3 contrast algorithm remains undetermined and APCA is a candidate
   method rather than an adopted standard. WCAG 3 is not expected to reach Recommendation before 2028. Meet
@@ -630,9 +572,10 @@ colour, which circulates widely with no locatable primary source.
 
 - `references/palette-tokens.md` — read when setting up or auditing a palette: the full 50–950 ramps for six
   hues with hex fallbacks, the complete measured contrast matrix for every text × surface pair in both themes,
-  the ramp generator (Python and JS), a Tailwind v4 `@theme` version of the whole token set, and a staged
-  migration recipe for a codebase already full of hardcoded hexes.
-- `references/theme-switching.md` — read when implementing or debugging a theme toggle: the three-state
-  pattern in vanilla JS, React and Next.js/SSR, the flash-of-wrong-theme fix in each, cross-tab and
-  system-change synchronisation, `forced-colors` / Windows High Contrast mode, images, illustrations, charts
-  and syntax highlighting in dark mode, iframes and embeds, and print styles.
+  the ramp generator (runnable JS, no dependencies), a Tailwind v4 `@theme` version of the whole token set,
+  and a staged migration recipe for a codebase already full of hardcoded hexes.
+- `references/theme-switching.md` — read when implementing or debugging a theme toggle: the token structures
+  for engines without `light-dark()` (media-query and `@supports` forms, and why the two-declaration fallback
+  breaks the page), the three-state pattern in vanilla JS, React and Next.js/SSR, the flash-of-wrong-theme fix
+  in each, cross-tab and system-change synchronisation, `forced-colors` / Windows High Contrast mode, images,
+  illustrations, charts and syntax highlighting in dark mode, iframes and embeds, and print styles.

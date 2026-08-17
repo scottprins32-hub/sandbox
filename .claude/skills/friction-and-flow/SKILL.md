@@ -397,30 +397,20 @@ categories, not the number of items. A 200-item country list with type-ahead is 
 list of "regions" that makes you guess which one contains yours. **Structure beats truncation.** Reach for
 grouping, ordering by likelihood, search, and progressive disclosure before you reach for deletion.
 
-**Miller's 7±2 (Miller, 1956) does not limit menu length, and saying it does is a well-known
-misapplication.** Miller's paper is about the span of immediate memory for unrelated items held in mind —
-digits, words, tones — and Miller wrote about the number half-jokingly. Later work (Cowan, 2001) puts the
-real chunk capacity closer to four. Either way it is irrelevant to a menu, because a menu is on the screen:
-the user is *recognising*, not *recalling*, and nothing is being held in working memory. Navigation depth is
-governed by search and comprehension, not memory span — and empirically, broad-and-shallow menu structures
-tend to beat narrow-and-deep ones, which is the opposite of what "keep it to 7 items" implies. If someone
-cites 7±2 in a design review, this paragraph is the reply.
+**Three folklore claims get cited to justify deleting options, and the verdict on each is the same — don't.**
+Miller's 7±2 measured memory span for items held in mind, not menu length, and a menu is on the screen, where
+the user recognises rather than recalls. Choice overload is small and conditional, not a licence to cut a
+catalogue. Ego depletion failed replication, and the parole-board "decision fatigue" study usually paired with
+it has unresolved confound critiques about case ordering. The full replies, with the study each claim actually
+rests on, are in `ux-psychology/references/principles.md` §Commonly repeated claims that do not hold up; the
+Sources block below carries the replication citations for a review where someone cites one.
 
-**Choice overload is real but small and conditional.** The Iyengar & Lepper (2000) jam study is the famous
-one; the 50-study meta-analysis by Scheibehenne, Greifeneder & Todd (2010) found a mean effect near zero,
-with the effect appearing under specific conditions (no prior preference, hard-to-compare options, time
-pressure) and vanishing otherwise. So: don't cut your catalogue on the strength of the jam study. Do make
-options comparable, name a recommended one, and support filtering — which is what actually helps.
-
-**Sequencing hard decisions.** Order the flow so cheap, confidence-building, low-stakes choices come before
-expensive irreversible ones, and so that each choice's inputs are already known when it's asked. Two honest
-caveats on the popular framing here: **ego depletion has largely failed replication** (Hagger et al.'s 2016
-multi-lab registered replication found no effect) — do not build on the "willpower is a depletable resource"
-model. And the famous **judges-and-parole "decision fatigue" study** (Danziger, Levav & Avnaim-Pesso, 2011)
-has serious confound critiques (Weinshall-Margel & Shapard, 2011; Glöckner, 2016) about case ordering. The
-practical advice — don't stack five consequential decisions on one screen, put the hardest one where the
-user has the most context, let people save and resume — stands on plainer ground: working memory limits,
-interruption risk, and the fact that abandonment probability accumulates with every step.
+**What to do instead of deleting.** Make the options comparable, name a recommended one, and support
+filtering. Then order the flow so cheap, confidence-building, low-stakes choices come before expensive
+irreversible ones, and so each choice's inputs are already known by the time it is asked: put the hardest
+decision where the user has the most context, never stack five consequential ones on one screen, and let
+people save and resume. That sequencing rests on working-memory limits, interruption risk, and abandonment
+probability accumulating with every step — plainer ground than any of the three claims above.
 
 ### 8. Jakob's law: conventions are free speed
 
@@ -556,8 +546,8 @@ Run this against the screen or the diff:
   Weinshall-Margel & Shapard (2011) and Glöckner (2016).
 - **Response-time thresholds** — Robert B. Miller (1968), *Response time in man-computer conversational
   transactions*; popularised by Nielsen, *Usability Engineering* (1993).
-- **Doherty threshold** — Doherty & Thadani, *The Economic Value of Rapid Response Time*, IBM Systems
-  Journal (1982); ~400ms.
+- **Doherty threshold** — Doherty & Thadani, *The Economic Value of Rapid Response Time*, IBM technical
+  report GE20-0752-0, November 1982; ~400ms.
 - **Inline validation** — Wroblewski with Etre, *A List Apart* (2009), n=22. Small single study.
 - **Skeleton screens** — Viget (2017), n=136, found skeletons worst on perceived duration; other comparisons
   report the opposite. Evidence is genuinely mixed; the commonly quoted "20–30% faster" figures have no

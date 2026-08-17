@@ -174,8 +174,11 @@ example adds a countdown timer to a screen listing files the user is about to lo
   Naming files they'll lose access to is honest *if the loss is a real consequence of the plan they chose*.
   Manufacturing that loss to create leverage is a different thing entirely.
 
-Run the asymmetry, transparency and retrospect tests in `ethical-persuasion-audit` on any loss-framed screen
-before it ships. Loss framing is legitimate; loss *manufacturing* is not.
+Run the **five** tests in `ethical-persuasion-audit/SKILL.md` on any loss-framed screen before it ships —
+asymmetry, transparency, retrospect, evidence (what your own refund, complaint and support data already say),
+and the subject test. Tests 1–4 all assume a person who can walk away; test 5 replaces them when they cannot,
+which is the case for anything an employer hands a worker. Loss framing is legitimate; loss *manufacturing*
+is not.
 
 ---
 
@@ -193,7 +196,11 @@ most recent reference point, not absolute. Restaurants price one very expensive 
 look reasonable; estate agents show the overpriced house first. **Evidence: robust for anchoring**, one of
 the most replicated findings in the field.
 
-**Covered in depth by:** `persuasive-copy` (anchoring and pricing presentation).
+**Covered in depth by:** `persuasive-copy` (anchoring and pricing presentation) and
+`decision-screen-design/SKILL.md` move 12, "Anchoring, and the line where it becomes illegal" — where the
+number sits on the screen, and the reference-pricing law: the 30-day-lowest-price rule covers goods, so
+subscriptions and bookings fall under the UCPD instead, and CJEU C-330/23 requires the discount percentage to
+be computed against the prior price rather than merely displayed beside it.
 
 **Watch out.** This area also shades into decoy pricing — a tier that exists only to make another look
 better. **Decoy/asymmetric-dominance replications are mixed**, so build pricing on anchoring and clear

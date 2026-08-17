@@ -3,7 +3,8 @@
 Read this when setting up a new project's depth system, or when auditing a codebase that already has
 forty bespoke `box-shadow` declarations and needs to be pulled onto a scale.
 
-`SKILL.md` move 4 has the default scale. This file has the two alternatives, the per-component
+`SKILL.md` move 4 has the default scale, and this file does not repeat it. What is here: how to choose
+between the three system styles, complete token files for the two alternatives, the per-component
 assignment table, the comparison against Material and Tailwind, and the migration recipe.
 
 ---
@@ -13,7 +14,7 @@ assignment table, the comparison against Material and Tailwind, and the migratio
 | Style | Use when | Resting card | Shadow budget |
 |---|---|---|---|
 | **A. Flat / bordered** | Dense data tools, admin consoles, tables, anything with >8 boxes on screen | `border` only, `--elevation-0` | Levels 3–5 only. Menus and modals float; nothing else does. |
-| **B. Soft product** | General web apps, SaaS dashboards, marketing-adjacent product surfaces | `--elevation-1` + subtle border | All six levels. The default in `SKILL.md`. |
+| **B. Soft product** | General web apps, SaaS dashboards, marketing-adjacent product surfaces | `--elevation-1` + subtle border | All six levels. The default; tokens live in `SKILL.md` moves 4, 5 and 9. |
 | **C. Dark-first** | Products that ship dark as the primary theme | Surface step, `--elevation-0` | Surface ladder carries elevation; shadows only separate overlays. |
 
 Mixing styles per surface is fine and often right — a marketing page in style B and its admin console
@@ -68,6 +69,23 @@ Hover in this style is a **border + background** change, not a lift. That is a f
 paint area, works identically in dark mode, and survives forced-colors.
 
 ---
+
+## Style B — soft product (the `SKILL.md` default)
+
+Not repeated here, because it is the scale the rest of the skill is written against and a second copy would
+fork the moment either is edited. Assemble it from three places in `SKILL.md`:
+
+- **Move 4** — the six light-mode tokens, `--elevation-0` through `--elevation-5`, plus the Tailwind v4
+  `@theme` block that turns them into `shadow-e1` … `shadow-e5` and `inset-shadow-well`.
+- **Move 5** — `--shadow-hsl: 222 40% 11%` and the per-section overrides (`.section--brand`, `.section--warm`)
+  that keep a shadow from reading as dirt on a saturated block. This is the token every level resolves
+  through, so redefining it under a section or a theme selector re-tints the whole scale at once.
+- **Move 9** — the dark-theme overrides: `--shadow-hsl: 222 60% 2%`, levels 1–2 dropped to `none` because the
+  surface ladder carries them, levels 3–4 rebuilt at 40–65% alpha in two layers, and `--edge-highlight`.
+
+Resting cards sit at `--elevation-1` **with** `--color-border-subtle`, not instead of it: the border is what
+survives forced-colors mode, where `box-shadow` is forced to `none`. Everything else about the style is the
+component assignment table below.
 
 ## Style C — dark-first
 

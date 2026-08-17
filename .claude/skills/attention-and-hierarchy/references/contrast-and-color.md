@@ -143,8 +143,10 @@ states: `ui-signifiers-and-states`.
   inspector has a "check for issues → contrast" sweep across a whole page.
 - **In CI:** `axe-core` (via `@axe-core/playwright`, `jest-axe`, or `cypress-axe`) catches contrast, missing
   labels, and colour-only errors on rendered pages. Pa11y and Lighthouse's accessibility audit are workable
-  alternatives. Automated tools catch roughly a third of real accessibility issues — they are a floor and a
-  regression guard, not an audit.
+  alternatives. Automated tooling catches a minority of real accessibility issues; no share is quoted here
+  because the published figures disagree on what they count — machine-testable WCAG success criteria in one
+  accounting, defects found in real audits in another — so any single percentage is unusable as a target.
+  Treat these tools as a floor and a regression guard, not an audit.
 - **On the palette itself:** compute ratios for every text-token × surface-token pair as a unit test, so a
   palette change cannot silently break a theme. A runnable version, with the luminance formula and the fixture
   covering both themes, is in `color-and-theming/references/palette-tokens.md` under "The contrast unit test" —

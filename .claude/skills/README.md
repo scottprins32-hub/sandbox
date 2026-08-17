@@ -1,6 +1,6 @@
 # Design and UX skill set
 
-Sixteen skills covering interface work end to end, in three layers. They are project-agnostic — written to
+Seventeen skills covering interface work end to end, in three layers. They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
 The agent loads a skill automatically when a task matches its `description`. You can also invoke one by name.
@@ -35,18 +35,19 @@ they cannot answer.
 
 | Skill | Answers |
 |---|---|
-| **decision-screen-design** | The moment someone decides to pay, book, subscribe or pick a plan. Its spine is an element-by-element question audit; it also owns pricing display and the law around reference pricing and auto-renewal. |
+| **decision-screen-design** | The moment someone decides to pay, book, subscribe or pick a plan. Its spine is an element-by-element question audit; it also owns pricing *display* and the mechanics of reference pricing and auto-renewal (Art. 6a and what it does not cover). Whether a specific claim on the screen is true and lawful is `ethical-persuasion-audit` move 4 — that split is stated here and nowhere else. |
 
-### Craft — 6 skills
+### Craft — 7 skills
 
 | Skill | Answers |
 |---|---|
-| **ui-craft** | Router, plus the design-token layer (primitive vs semantic) that makes the other five one system rather than five sets of preferences. |
+| **ui-craft** | Router, plus the design-token layer (primitive vs semantic) that makes the other five one system rather than five sets of preferences. Holds the density contract the five presets are named by, the field-and-outdoor modifier, and the degraded-case check. |
 | **typography-system** | Typefaces, the size scale with tracking and line-height per step, measure, tabular figures, webfont loading. Start here on a new project — most of a UI is text. |
 | **spacing-and-layout** | The spacing scale and why, space within a group vs between groups as numbers, grids and when they don't apply, container queries, reflow. |
 | **color-and-theming** | Brand hue to 50–950 ramps in OKLCH, semantic tokens, contrast as a generation constraint, dark mode as re-derivation not inversion. |
 | **depth-and-overlays** | Elevation scale, layered shadows, dark-mode depth via lightness, and text over imagery with guaranteed contrast. |
 | **ui-signifiers-and-states** | Affordances, and the full state matrix — rest, hover, active, focus-visible, disabled, loading, selected, expanded, error, empty. |
+| **print-and-physical-artefacts** | What happens when the output stops being a screen: paper geometry, type sized from viewing distance, monochrome-first colour, QR module size and error correction, and forms people fill in with a pen. |
 
 ## How to use them
 
@@ -56,11 +57,27 @@ how consumer-app engagement mechanics end up in a tool someone's employer handed
 the values, in its stated order.
 
 **Fixing something broken** — go to `behavioral-metrics` first to find where the funnel actually leaks. The
-most common failure in this field is optimising a step that wasn't the problem.
+most common failure in this field is optimising a step that wasn't the problem. If your whole user base fits
+on one screen of a spreadsheet there is no funnel to read, so skip to its moves 7 and 8 — *when you don't
+have the traffic* and *qualitative methods that beat weak quantitative ones at small scale*. At n=2 the
+instruction is to go and watch them, and reading the whole metrics skill front to back instead will convince
+you the set doesn't fit you.
 
 **A screen with a price on it** — `decision-screen-design`, then `ethical-persuasion-audit` as a gate.
 
-**Reviewing a PR** — each skill ends with a ship checklist written to run against a screen or a diff.
+**A surface nobody's design blog covers** — a phone used outdoors or with gloves, a tool someone's employer
+handed them, a public page reached from a QR code, an interface in two languages, a screen that gets printed
+(`print-and-physical-artefacts` owns that one outright).
+The vocabulary these arrive in is missing from most of the seventeen `description` fields, which were written
+from consumer and SaaS symptoms, so auto-triggering on a term like *offline*, *field worker* or *no-account
+page* lands on the two routers rather than the specialist. That is the intended path: name the surface to
+`ux-psychology` for the posture and `ui-craft` for the values, and let them route. Invoke a specialist by
+name if you already know which layer owns it.
+
+**Reviewing a PR** — each of the fifteen specialist skills ends with a ship checklist written to run against
+a screen or a diff. The two routers end with a checklist of a different kind: `ux-psychology`'s diagnosis
+checklist, run before you open anything, and `ui-craft`'s system checklist, run against the token file and
+the seams between layers rather than any one screen.
 
 ## Evidence quality
 
@@ -121,4 +138,4 @@ skills deliberately refuse to answer themselves.
   sequential ramps monotonic in lightness (viridis, cividis), direct labels at line ends, and a non-hue
   encoding on every series.
 
-Everything else — all sixteen skills and their references — resolves inside this directory.
+Everything else — all seventeen skills and their references — resolves inside this directory.

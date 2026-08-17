@@ -2,7 +2,8 @@
 
 Read this when implementing or debugging a theme toggle, or when something on the page refuses to follow the
 theme — images, charts, native controls, embeds, print, or Windows High Contrast mode. SKILL.md move 8 has the
-CSS structure; this has the implementations and the surfaces that CSS alone does not reach.
+three `color-scheme` declarations; this has the implementations, the token structures for engines without
+`light-dark()`, and the surfaces that CSS alone does not reach.
 
 ## The three states, restated as a contract
 
@@ -15,6 +16,61 @@ CSS structure; this has the implementations and the surfaces that CSS alone does
 Label the third option **"System"** in the UI, not "Auto" — it tells the user where the setting comes from and
 where to change it. Three radio buttons or a segmented control beats a two-state switch, which cannot express
 "follow the system" at all and silently strands anyone who never touches it.
+
+## Token structure without `light-dark()`
+
+`light-dark()` shipped in Chrome 123 (Mar 2024), Firefox 120 (Nov 2023) and Safari 17.5 (May 2024); Baseline
+newly available, reaching widely available in November 2026. If your support matrix reaches further back,
+there are exactly two correct structures — and one popular incorrect one.
+
+**The media-query form.** Define the complete light palette on bare `:root`; redefine only the changed tokens
+in two dark blocks — a media query guarded against an explicit light override, and the explicit dark
+attribute. **Never give a colour its only definition inside a media query**, or it is undefined for everyone
+not in that state.
+
+```css
+:root { color-scheme: light; /* full light palette — the default and the universal fallback */ }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; /* dark values */ }
+}
+:root[data-theme="dark"] { color-scheme: dark; /* the same dark values, repeated */ }
+```
+
+CSS cannot union a plain selector with one inside a media query, so those two dark blocks are genuinely
+duplicated. Emit them from one source — a Sass mixin, a PostCSS plugin, or your token pipeline — rather than
+maintaining two hand-edited copies that will drift. Avoiding that duplication is the main reason SKILL.md
+move 7 uses `light-dark()`.
+
+**The `@supports` form**, if you want `light-dark()` where it exists and a static palette where it does not.
+The feature query is the load-bearing part: the declarations inside it apply only when the test passes, so a
+non-supporting engine never overwrites the plain value.
+
+```css
+:root { --color-surface: #FFFFFF; }                        /* every engine gets a real colour */
+
+@supports (color: light-dark(#fff, #000)) {
+  :root { --color-surface: light-dark(oklch(1 0 0), oklch(0.205 0.01 264)); }
+}
+```
+
+**Why the two-declaration fallback does not work — and is worse than shipping `light-dark()` alone.**
+
+```css
+--color-surface: #FFFFFF;                                  /* BROKEN — this does not survive */
+--color-surface: light-dark(oklch(1 0 0), oklch(0.205 0.01 264));
+```
+
+That pattern works for ordinary properties, where an engine rejects a value it cannot parse and keeps the
+previous declaration. Custom properties are not ordinary properties: their grammar is `<declaration-value>`,
+an almost-anything token stream, so an engine with no `light-dark()` **accepts** the second declaration,
+it wins the cascade, and the `#FFFFFF` is discarded. The failure surfaces one step later, at substitution:
+`background: var(--color-surface)` expands to an unparseable colour, which makes the declaration invalid at
+computed-value time, and — per MDN — "when the browser encounters an invalid `var()` substitution, then the
+initial or inherited value of the property is used", because "by the time the user agent realizes a property
+value is invalid, it has already thrown away the other cascaded values". So `background-color` resolves to
+its initial value, `transparent`, and the old browser you were trying to protect loses its surface colours
+entirely. Use `@supports`, or two distinct token names, or the media-query form.
 
 ## Vanilla: the complete implementation
 
@@ -64,6 +120,19 @@ syncMeta();
 
 The `storage` listener is the difference between a toggle that feels like a product setting and one that feels
 like a page setting. It fires only in *other* tabs, which is exactly the behaviour you want.
+
+Ship the static pair in the markup as well, so the address bar is right on the first paint for the majority
+who never override. `<meta name="theme-color">` colours mobile browser chrome; without a `media` attribute
+per scheme it stays light behind a dark page. The `media` form follows the **system**, which is why
+`syncMeta()` above has to rewrite the tag whenever the user overrides:
+
+```html
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171C" media="(prefers-color-scheme: dark)">
+```
+
+Any animated theme transition must respect `prefers-reduced-motion` — a full-page colour crossfade is exactly
+the kind of large-area change that triggers discomfort (`design-motion-principles` owns the timing).
 
 ## React
 

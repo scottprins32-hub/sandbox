@@ -1,6 +1,6 @@
 ---
 name: list-and-queue-design
-description: Designs the screen operators live in — tables, data grids, lists, inboxes and work queues — and the decisions that make or break one: the default sort and filter, which columns earn a place, row actions and drawers, density modes, bulk-selection scope, pagination, and stability under live data. Use this whenever a screen shows many records as repeating rows: admin panels, search results, dashboards with a table on them, ticket and moderation queues, file browsers, activity feeds — and for "we need a bulk action", "how should sorting work", "this table is unusable on mobile", "operators can't find anything", "the list jumps while I'm clicking", or "should this open a modal". Distinct from `friction-and-flow`, which owns completing one task or one form, and from `attention-and-hierarchy`, which owns where the eye lands on a composed screen: this skill owns what the list *does* — what sits at the top, what a row does when clicked, and what happens when someone selects four thousand records. Reach for it the moment a design contains a repeating row, even when the request arrives phrased as a styling question.
+description: Designs the screen operators live in — tables, data grids, lists, inboxes and work queues — and the decisions that make or break one: the default sort and filter, which columns earn a place, row actions and drawers, density modes, bulk-selection scope, pagination, stability under live data, and queues worked offline on an intermittent connection. Use this whenever a screen shows many records as repeating rows: admin panels, search results, dashboards with a table on them, ticket and moderation queues, file browsers, activity feeds — and for "we need a bulk action", "how should sorting work", "this table is unusable on mobile", "operators can't find anything", "the list jumps while I'm clicking", "should this open a modal", "it has to work with no signal", or "the photos never uploaded". Distinct from `friction-and-flow`, which owns completing one task or one form, and from `attention-and-hierarchy`, which owns where the eye lands on a composed screen: this skill owns what the list *does* — what sits at the top, what a row does when clicked, and what happens when someone selects four thousand records. Reach for it the moment a design contains a repeating row, even when the request arrives phrased as a styling question.
 ---
 
 # List and queue design
@@ -22,8 +22,11 @@ on the accident.
   clicking", "why does it forget my filters".
 - Choosing between a modal, a drawer and a full page for a row action, or between pagination, load-more and infinite scroll.
   A queue that will not drain, or two people working the same item.
+- A queue worked on a phone with no signal — rows claimed, completed and photographed offline and synced later (move 13 and
+  `references/queue-patterns.md` §8).
 
-Go elsewhere when: the question is **one form or one task** → `friction-and-flow`, which owns cognitive load, field-level
+Go elsewhere when: the table gets **printed or exported to PDF** — a fixed page has no scroll, so column
+priority and page-break behaviour are decided differently → `print-and-physical-artefacts`. the question is **one form or one task** → `friction-and-flow`, which owns cognitive load, field-level
 form design, the perceived-performance thresholds, and undo-over-confirmation as a general principle; this skill owns how
 those apply to many rows at once. **How a row or control is styled per state** → `ui-signifiers-and-states`. **Where the eye
 lands** → `attention-and-hierarchy`. **Padding values** → `spacing-and-layout`; this skill owns the density *modes*, that one
@@ -128,24 +131,10 @@ speed win on the screen.
 **The whole-row-clickable problem.** Making the row a link and putting buttons in it is invalid: the content model of `<a>` is
 "Transparent, but there must be no interactive content descendant, `a` element descendant, or descendant with the `tabindex`
 attribute specified." Browsers and screen readers handle the violation inconsistently and the nested control often becomes
-unreachable. Two patterns work. **A — stretched link**: one real link in the identifying cell, its hit area stretched over the
-row, actions raised above it. Two costs. The overlay swallows text selection, so nobody can drag-select an ID out of a row.
-And **it does not work on `<tr>` in WebKit** — Safari does not make a relatively positioned table row a containing block
-(WebKit bug 240961, fixed in 2026 — so any older Safari still in your support matrix behaves this way),
-so the `::after` resolves against the nearest ancestor that is one, usually the scroll container: every
-row's overlay covers the whole table, the last row wins every click, and the region stops scrolling. In table markup the
-containing block has to be the *cells*, which every engine honours:
-
-```css
-.row > :is(td, th) { position: relative; }                             /* NOT .row — Safari ignores it on <tr> */
-.row-title-link::after { content: ""; position: absolute; inset: 0; }  /* covers its own cell */
-.row-actions { position: relative; z-index: 1; }                       /* raised above the overlay */
-```
-
-That gives you a clickable identifying cell, not a clickable row. To cover the whole row you need one overlay per cell,
-each `aria-hidden="true" tabindex="-1"` so the row still exposes exactly one link — at which point pattern B is less
-machinery for the same result. Pattern A is unqualified only when the row is a `<li>` or a grid `<div>`, where
-`position: relative` on the row works everywhere.
+unreachable. Two patterns work. **A — stretched link** works on `<li>` and grid rows, swallows text selection, and is broken
+on `<tr>` in every stable Safari — a relatively positioned table row is not a containing block there, so every row's overlay
+covers the whole table and the last row wins every click. Use B in an ops tool; the per-cell workaround, if you must ship A
+on a table, is in `references/tables-accessibility-and-responsive.md` §1.
 
 **B — real link plus a guarded row handler.** Preferred for ops tools, because selection survives.
 
@@ -181,35 +170,21 @@ an export instead of pretending.
   put the full value in the drawer. Ellipsis also needs `min-width: 0` on a flex or grid cell or it silently does nothing.
 - **Freeze column widths so they do not reflow as data loads** — `table-layout: fixed` with explicit `<col>` widths, or a grid
   with fixed tracks. Under `auto` layout the browser re-measures on every data change, so skeletons and real rows produce
-  different widths and the header jumps at load, which is why move 12's skeletons only work if you do this.
+  different widths and the header jumps at load, which is why move 12's skeletons only work if you do this. **Set the width
+  per locale, from the longest supported label rather than the English one**, in `ch` or `rem` so it tracks the type:
+  "Awaiting approval" becomes "În așteptarea aprobării", and a track measured on English clips the translation or wraps it
+  into a header twice as tall as its neighbours. Wrap header labels, never truncate them. Fixed widths and long translations
+  only conflict when the width came from English — `persuasive-copy/references/localisation-and-register.md` has the
+  expansion rules and what may be truncated at all.
 - **Sticky header, plus a sticky identifying first column** where horizontal scroll is unavoidable. Apply `position: sticky` to
   the `<th>` cells rather than `<thead>`: sticky on `<thead>`/`<tr>` only became interoperable with Chrome 91 and Safari 14
-  (2021), while cell-level sticky works everywhere. `border-collapse: collapse` drops the header's border when it sticks — the
-  border belongs to a cell that scrolled away — so separate the borders and draw it with a shadow.
-
-```css
-.table-scroll { --sticky-head: 3rem; overflow: auto;
-                scroll-padding-block-start: var(--sticky-head); }
-thead th { position: sticky; top: 0; z-index: 2; background: var(--color-surface);
-           box-shadow: inset 0 -1px 0 var(--color-border-subtle); }   /* with border-collapse: separate */
-tbody th[scope="row"] { position: sticky; left: 0; z-index: 2; background: var(--color-surface); }
-thead th.col-identity  { left: 0; z-index: 3; }   /* the corner pins in BOTH axes, above both */
-
-/* the scroll target is the focused control, not the row */
-.table-scroll :is(a, button, input, select, [tabindex]) { scroll-margin-block-start: var(--sticky-head); }
-```
-
-The corner cell is the one everyone forgets: the header above the identity column is an ordinary `thead th`, sticky
-vertically only, so scrolling right leaves the pinned column headerless. `z-index` here is a matrix, not a line — the
-corner has to beat the header row *and* the pinned column.
-
-The `scroll-padding`/`scroll-margin` pair is most of WCAG 2.2 SC 2.4.11 Focus Not Obscured: a row scrolled under a sticky
-header is focused and invisible. Put the offset on the control, not the `<tr>` — sequential focus navigation and `scrollIntoView()` apply
-`scroll-margin` to the element actually being scrolled into view, which is the link or button inside the cell unless rows
-themselves are focusable (move 10). Two things it does not settle, so check them by hand: the bulk bar appears only when
-rows are selected and changes the required offset (drive both from the same token, and add `scroll-padding-block-end`),
-and at 400% zoom the pinned chrome can take enough of the viewport that the answer is to unpin it. Test by tabbing down a
-long table with the header pinned. `references/tables-accessibility-and-responsive.md` section 7 has the full block.
+  (2021), while cell-level sticky works everywhere. The corner cell is the one everyone forgets — the header above the
+  identity column pins in both axes and must outrank both, or scrolling right leaves the pinned column headerless. And a
+  pinned header hides the row the keyboard just focused, which is a real WCAG 2.2 SC 2.4.11 failure: offset the scroll with
+  `scroll-padding` on the container and `scroll-margin` on the focusable controls, sized from the same token as the header.
+  The CSS block, the `border-collapse` trap, the z-index matrix and what the offsets do *not* settle (a bulk bar that appears
+  on selection, 400% zoom) are in `references/tables-accessibility-and-responsive.md` §5 and §7. Test by tabbing down a long
+  table with the header pinned.
 
 ### 4. Density modes
 
@@ -221,10 +196,18 @@ server-side** — not per session or per device, or the operator re-picks it eve
 | Comfortable — default for occasional readers | 48px | 14px / 20px | 15 |
 | Compact — default for someone who lives here | 32px | 13px / 18px | 22 |
 
-That last column is the whole argument: compact shows half again as many rows per screen, which is a third fewer
-scroll-and-reorient cycles a day. It costs target size, scan comfort under fatigue, and tolerance for long values. The
-padding that goes with each mode belongs to `spacing-and-layout` — `spacing-and-layout/references/spacing-tokens.md` has a Tables block;
-take the numbers from there rather than inventing a second set here.
+That last column is the whole argument: compact shows half again as many rows per screen (22 against 15), which is about a
+third fewer scroll-and-reorient cycles a day. It costs target size, scan comfort under fatigue, and tolerance for long values.
+The padding that goes with each mode belongs to `spacing-and-layout` — `spacing-and-layout/references/spacing-tokens.md` has a
+Tables block; take the numbers from there rather than inventing a second set here.
+
+**Row density is its own axis, and it is not the page density preset.** `spacing-and-layout` owns
+`[data-density="editorial"|"default"|"compact"]` on the root element, which sets the whole surface's gaps, type scale and
+control heights. This skill's `[data-row-density="comfortable"|"compact"]` sets row height inside one table. They are
+independent on purpose: a comfortable table inside a dense-tool page is a legitimate, common combination — the supervisor who
+lives in a console still wants readable rows in the one table she works from — and so is a compact table on an otherwise
+editorial page. Keep them on different attributes and different elements, or the row toggle silently rewrites the page
+preset, `comfortable` matches no page preset at all, and the operator's density choice starts moving the page's gutters.
 
 **Compact still has a floor, and it is an accessibility floor.** WCAG 2.2 SC 2.5.8 Target Size (Minimum, AA) wants pointer
 targets of at least 24×24 CSS px; its spacing exception passes a smaller target only if a 24px-diameter circle centred on each
@@ -233,8 +216,8 @@ a dense row. **32px is the compact floor for any row containing a control** (24�
 read-only row can reach 28px. Do not buy rows by shrinking text below 13px — shrink padding first, then drop a column.
 
 ```css
-[data-density="comfortable"] { --row-h: 48px; --row-size: 0.875rem;  --row-line: 1.43; }
-[data-density="compact"]     { --row-h: 32px; --row-size: 0.8125rem; --row-line: 1.38; }
+[data-row-density="comfortable"] { --row-h: 48px; --row-size: 0.875rem;  --row-line: 1.43; }
+[data-row-density="compact"]     { --row-h: 32px; --row-size: 0.8125rem; --row-line: 1.38; }
 td, th { height: var(--row-h);                                  /* on a cell, height is a floor — see below */
          padding: var(--cell-pad-y, 12px) var(--cell-pad-x, 16px);  /* values: spacing-and-layout/
                                                                     references/spacing-tokens.md, Tables */
@@ -262,7 +245,7 @@ say in each. The bug behind all of them is the same: `rows.length === 0` is the 
 | **Never-had-any** | Zero records exist | Teach what a row is and why it matters; offer the create action as primary. `onboarding-activation` owns this copy |
 | **Filtered to nothing** | Records exist; filters excluded them all | Name every active filter, offer to remove each and clear all, keep the filter UI on screen, state the unfiltered count: "0 of 1,284 visits match" |
 | **Failed to load** | The request errored | Say what failed, offer a retry scoped to the list. **Never render an error as an empty list** — it reads as "no work exists", a silent data-loss bug |
-| **Drained** (queues only) | Records exist; none are yours to do | Say so, with the count cleared and when the next arrives |
+| **Drained** (queues only) | Records exist; none are yours to do — and, where rows carry evidence, nothing is still in the outbox (move 13) | Say so, with the count cleared and when the next arrives |
 
 **Filtered-to-nothing is the one everyone gets wrong**, and specifically: a cheerful onboarding illustration reading "Create
 your first visit!" shown to someone who typed *Buiding B*. They now believe their data is gone, and the next thing they do is
@@ -448,8 +431,9 @@ RETURNING *;              -- zero rows means someone else has it: say so, do not
   touch, breach count. `behavioral-metrics` owns defining and instrumenting these; the point here is only that the success
   metric is drain, not engagement.
 
-Assignment strategies, priority ageing, per-operator WIP limits, SLA and breach handling, retry and dead-letter states, and
-skip-locked claiming are in `references/queue-patterns.md`.
+Assignment strategies, priority ageing, per-operator WIP limits, SLA and breach handling, retry and dead-letter states,
+skip-locked claiming, and **working offline — the outbox, device-generated idempotency keys, claiming a route without a
+network, conflict resolution and visible sync state** — are in `references/queue-patterns.md`.
 
 ### 12. Perceived performance and loading
 
@@ -467,6 +451,37 @@ when optimistic updates are safe. Four things are list-specific.
 - **Prefetch on intent** — fetch the next page when the reader scrolls within a viewport of the bottom, or hovers "Next".
   Cheaper than any loading treatment, because there is nothing to indicate.
 
+### 13. When the row's evidence is a photo or a file
+
+Queues whose completion requires an artefact — a photo of the finished work, a signature, a scanned document — carry a second
+state machine per row, and `has_photo: boolean` is the bug that hides it. The file is captured on a device that may have no
+signal, so the row can be *done* and the evidence not yet anywhere you can read it.
+
+| Row shows | Means | What it must not do |
+|---|---|---|
+| **Proof required** | Nothing captured yet | Read as an error before the visit has happened |
+| **Saved on device** | Captured, queued, not uploaded | Look identical to uploaded — it is the false affordance that costs a repeat visit |
+| **Uploading** | In flight, with a determinate share for anything over a few seconds | Block the row's completion |
+| **Synced** | The server has acknowledged it | Appear before that acknowledgement — never claim storage you have not confirmed |
+| **Retrying** | Failed, backing off, attempt *n* | Retry silently forever, with no visible count and no manual control |
+| **Rejected** | The server refused it — too dark, too large, wrong type, duplicate | Collapse into "upload failed"; name the cause and the fix |
+
+- **A word plus an icon, never colour alone** (SC 1.4.1), and announce transitions politely in the list's `role="status"`
+  region. The capture control's own rest/hover/loading/disabled/error styling is `ui-signifiers-and-states` move 7 and
+  `ui-signifiers-and-states/references/component-state-tables.md` — take those values rather than inventing a second set here.
+- **Completion commits without the file.** Reference the attachment by a client-generated id and let "done" record while the
+  4 MB photo climbs one bar of signal; blocking the state transition on the upload means the work is not recorded at all. The
+  outbox, the device-generated idempotency key that survives a lost response, and conflict handling are in
+  `references/queue-patterns.md` §8.
+- **Retry is automatic with backoff *and* manually available per row**, because the person who can act on the failure is
+  standing in the stairwell, not watching a dashboard. Pair it with the global "N actions waiting to sync · last synced 14:02".
+- **Make it filterable and countable.** "Done, proof missing" is a real work state and needs a facet, or nobody finds the
+  forty visits whose evidence never landed. If the product's promise is the evidence, **drained is not "no rows left" but "no
+  rows left and the outbox is empty"** — say so in the empty state rather than congratulating someone whose morning is still
+  on their phone.
+- **Bulk actions stop at the device boundary.** "Mark 40 done" cannot manufacture forty photos; either exclude items whose
+  proof is missing from the action or state the count that will complete without evidence.
+
 ## Worked example: cleaning visits
 
 **Before** — eleven columns: ID, Building, Unit, Worker, Status, Scheduled, Created, Updated, Photo, Notes, Actions. Sorted
@@ -482,12 +497,13 @@ already there: she keeps a note of where she got to.
 | Default sort | `created_at DESC` | `risk_bucket, scheduled_at ASC NULLS LAST, id` — blocked → overdue → imminent → later |
 | Columns | 11 | 6: **Visit** (building, unit, ref as secondary text) · **Status** · **Worker** · **Scheduled** ("40m overdue", absolute in `<time>`) · **Proof** (icon + text) · **Actions** |
 | Moved to the drawer | — | Created, Updated, Notes (count badge stays in the row), full address, history |
-| Row click | Modal | Drawer at `…&visit=8842` with prev/next; building name is a real link; Reassign and Mark done raised above the row overlay |
+| Row click | Modal | Drawer at `…&visit=8842` with prev/next; building name is a real link; Reassign and Mark done are real buttons the row handler steps around |
 | Pagination | Offset, 50/page | Cursor, 50/page, plus a separately fetched total: "312 visits at risk" |
 | Bulk | Header checkbox = everything, "Reassign" | Header checkbox = the page; interstitial offering all 312; label reads "Reassign 312 visits"; per-row failure summary |
 | Empty states | One | Four: first-run · "0 of 1,284 visits match — Building: B12, Status: Overdue [Clear]" · load failure with retry · "All caught up — 47 cleared, next batch 06:00" |
 | Keyboard | none | `j`/`k`, `Enter`, `Escape`, `Space`, `e` = mark done; focus lands on the next row after every action |
 | Density | fixed 44px | Comfortable 48px for her; compact 32px persisted for the dispatcher who lives in it |
+| Proof | `has_photo` tick | Six states in one cell — required · saved on device · uploading · synced · retrying · rejected — plus a "done, proof missing" facet |
 
 The change that moved the day was not the column cull. It was the default sort plus the drawer's next control: she now opens
 the screen already looking at the most at-risk visit and works down without returning to the list, and the note about where she
@@ -514,42 +530,87 @@ got to is no longer necessary.
   operator opens a row is a complaint you will hear for as long as the tool ships.
 - **Focus falling to the top of the page after every row action.** Re-navigate to your position, four hundred times a day.
 - **Global single-letter shortcuts with no way to disable them** (SC 2.1.4), which also break speech input.
-- **A density argument settled once by whoever built it.** Ship both modes and persist the choice.
+- **A density argument settled once by whoever built it.** Ship both modes and persist the choice. Its neighbour: **a row
+  density toggle that writes the page's `data-density` preset**, so choosing compact rows also shrinks the page gutters.
+- **`has_photo: boolean`.** A photo sitting in a phone's outbox rendered exactly like one the server has acknowledged — the
+  cheapest possible way to lose the evidence a proof-of-work product exists to produce.
 - **Truncating the identifier with only a `title` tooltip as fallback.** Invisible on touch, unreliably announced.
 - **Eleven columns because eleven fields came back from the API.**
 
 ## Ship checklist
 
-Run against the screen or the diff.
+Run against the screen or the diff. One assertion per box, so a partial pass is recordable.
 
-- [ ] You can state in one sentence the question the reader opens this screen to answer, and the default sort and filter follow
-      from it. It is explicitly a list or a queue, and pagination, empty states and the success metric match.
-- [ ] Every sort ends in a unique tiebreaker; null ordering is explicit, not inherited.
-- [ ] The active sort is visible, with `aria-sort` on exactly one header cell; default filters appear as removable chips so
-      nobody mistakes a filtered view for the whole dataset.
-- [ ] Every column passes the one-glance test; numerics are right-aligned with `tabular-nums`; column widths are fixed so
-      nothing reflows as data loads; a sticky header cannot obscure a focused row (2.4.11).
-- [ ] The row's primary action is a real `<a>` or `<button>`, nothing interactive is nested inside a link, and row detail opens
-      in a drawer with its own URL, focus management, `Escape` and prev/next.
-- [ ] Density is a persisted per-user preference; compact rows containing controls are ≥32px and in-row targets meet 24×24 CSS
-      px (2.5.8) rather than leaning on the spacing exception.
-- [ ] All four empty states exist and are distinguishable in code, including "0 of N match" with the active filters named and
-      clearable. An error never renders as an empty list.
-- [ ] The header checkbox selects the page and is tri-state; selecting everything matching is a separate, counted, opt-in act;
-      every bulk action label carries the true count; selection stays visible while scrolled and is cleared — with a message —
-      when the filter changes.
-- [ ] Bulk results report per-row outcomes with a way to re-select just the failures; reversible bulk actions have an undo that
-      restores everything or names what it could not.
-- [ ] Filter, sort, search, page and open-row state all live in the URL and survive open-a-row-and-go-back; pagination is
-      cursor-based wherever the underlying data changes.
-- [ ] New rows are buffered behind an explicit "N new — load"; nothing reorders under the pointer; scroll, selection and focus
-      survive a refresh.
-- [ ] Arrows/`j`/`k`, `Enter`, `Escape`, `Space`, shift-range and one primary-action shortcut work; the list is one tab stop;
-      single-character shortcuts are scoped or disableable (2.1.4).
-- [ ] Focus lands on the next row after a row is actioned, and the outcome is announced in a live region.
-- [ ] Queues have atomic claiming, claim expiry, an explicit done state and a not-actionable state.
-- [ ] Skeletons preserve column widths and row count; the previous page stays visible while the next loads; no optimistic
-      update moves a row across the viewport before the server agrees.
+**Purpose**
+- [ ] The PR states in one sentence the question this screen answers.
+- [ ] The default sort and the default filter are derivable from that sentence.
+- [ ] The screen is labelled list or queue, and pagination matches it — cursor plus a total for a queue, load-more for a
+      browse-y list.
+- [ ] The success metric matches the same choice: drain for a queue, found-it for a list.
+
+**Sort and filter**
+- [ ] Every sort ends in a unique tiebreaker.
+- [ ] Null ordering is written explicitly, not inherited from the engine.
+- [ ] The active sort is visible, with `aria-sort` on exactly one header cell.
+- [ ] Default filters appear as removable chips.
+
+**Columns**
+- [ ] Every column passes the one-glance test — scanned down or sorted by.
+- [ ] Numerics are right-aligned with `tabular-nums`.
+- [ ] Column widths are fixed, so nothing reflows as data loads.
+- [ ] Those widths are sized from the longest supported label in every shipped locale, not the English one.
+- [ ] A sticky header cannot leave a focused row entirely obscured (2.4.11), checked at 100% and 400% zoom.
+
+**Rows**
+- [ ] The row's primary action is a real `<a>` or `<button>`.
+- [ ] Nothing interactive is nested inside a link.
+- [ ] Row detail opens in a drawer with its own URL, focus moved in and returned, `Escape`, and prev/next.
+- [ ] Density is a persisted per-user preference.
+- [ ] The density toggle writes `data-row-density`, never the page's density preset.
+- [ ] Compact rows containing controls are ≥32px.
+- [ ] In-row targets meet 24×24 CSS px (2.5.8) rather than leaning on the spacing exception.
+
+**Empty and error states**
+- [ ] All four empty states exist and are distinguishable in code.
+- [ ] "0 of N match" names every active filter and offers to clear each.
+- [ ] An error never renders as an empty list.
+
+**Selection and bulk**
+- [ ] The header checkbox selects the page, not everything matching.
+- [ ] It is tri-state when the page is partly selected.
+- [ ] Selecting everything matching the filter is a separate, counted, opt-in act.
+- [ ] Every bulk action label carries the true count.
+- [ ] The selection stays visible while scrolled.
+- [ ] The selection is cleared — with a message — when the filter changes.
+- [ ] Bulk results report per-row outcomes.
+- [ ] Failures can be re-selected without rebuilding the set by hand.
+- [ ] Reversible bulk actions have an undo that restores everything or names what it could not.
+
+**State, pagination and live data**
+- [ ] Filter, sort, search, page and open-row state all live in the URL.
+- [ ] All of it survives open-a-row-and-go-back.
+- [ ] Pagination is cursor-based wherever the underlying data changes.
+- [ ] New rows are buffered behind an explicit "N new — load".
+- [ ] Nothing reorders or vanishes under the pointer.
+- [ ] Scroll position, selection and focus survive a refresh.
+
+**Keyboard**
+- [ ] Arrows/`j`/`k`, `Enter`, `Escape`, `Space`, shift-range and one primary-action shortcut all work.
+- [ ] The list is one tab stop, not three hundred.
+- [ ] Single-character shortcuts are scoped to the list or disableable (2.1.4).
+- [ ] Focus lands on the next row after a row is actioned.
+- [ ] The outcome of that action is announced in a live region.
+
+**Queue mechanics**
+- [ ] Claiming is atomic, and claims expire.
+- [ ] There is an explicit done state and an explicit not-actionable state, each recording who and when.
+
+**Loading and evidence**
+- [ ] Skeletons preserve column widths and row count.
+- [ ] The previous page stays visible while the next loads.
+- [ ] No optimistic update moves a row across the viewport before the server agrees.
+- [ ] Captured evidence is never rendered as synced before the server acknowledges it.
+- [ ] "Done, proof missing" is a state the screen can filter to, and drained accounts for the outbox.
 
 ## References
 
@@ -558,7 +619,10 @@ Run against the screen or the diff.
   responsive strategies (column priority, horizontal scroll, card-per-row) with their trade-offs. Go here the moment "this
   table is unusable on mobile" comes up.
 - `references/queue-patterns.md` — read when building an actual work queue: assignment and claiming strategies, priority
-  ageing, per-operator WIP limits, SLA and breach handling, retry and dead-letter states, and the queue-shaped data model.
+  ageing, per-operator WIP limits, SLA and breach handling, retry and dead-letter states, the queue-shaped data model, and
+  §8 **offline and unreliable networks** — why `navigator.onLine` lies, the outbox of intents, device-generated idempotency
+  keys, pre-claiming a route for longer than the shift, conflict resolution and making sync state visible. Read §8 before
+  building anything worked on a phone in a basement.
 
 ## Sources
 
@@ -581,16 +645,19 @@ Run against the screen or the diff.
   `min-height`/`max-height` on tables, table cells, rows and row groups undefined, while §17.5.3 makes a row's height the
   maximum of the row's height, each cell's height and the content's minimum — so on a cell, `height` is a floor.
   `scroll-margin` applies to the box being scrolled into view and `scroll-padding` to the scroll container, and both feed
-  sequential focus navigation scrolling and `scrollIntoView()` (CSS Scroll Snap). WebKit does not treat a relatively
-  positioned `<tr>` as a containing block for absolutely positioned descendants (WebKit bug 240961).
+  sequential focus navigation scrolling and `scrollIntoView()` (CSS Scroll Snap). WebKit did not treat a relatively
+  positioned `<tr>` as a containing block for absolutely positioned descendants (WebKit bug 240961, fixed April 2026 and
+  shipped first in Safari Technology Preview 243), so stable Safari in the field still behaves that way.
 - **Data-layer facts** — PostgreSQL sorts NULL greater than any non-null value (nulls last under `ASC`, first under `DESC`),
   MySQL sorts NULL lowest; `NULLS FIRST`/`NULLS LAST` is standard SQL that MySQL does not implement, hence the `col IS NULL`
   leading key there. The cursor-versus-offset argument is a correctness one that follows from what `OFFSET` means, not a
   benchmark; the performance half is that the engine still walks the skipped rows.
 - **Related skills** — `friction-and-flow` for Fitts's law, undo-over-confirmation and latency thresholds;
-  `ui-signifiers-and-states` for the row state matrix and live-region announcements; `typography-system` for tabular figures;
-  `spacing-and-layout` for the padding scale and reflow; `attention-and-hierarchy` for why each column competes;
-  `habit-loop-design` for investment and stored value; `behavioral-metrics` for queue health.
+  `ui-signifiers-and-states` for the row and control state matrix and live-region announcements; `typography-system` for
+  tabular figures; `spacing-and-layout` for the padding scale, reflow and the page density preset;
+  `attention-and-hierarchy` for why each column competes; `persuasive-copy/references/localisation-and-register.md` for how
+  much a translated label expands and what that does to a fixed column; `habit-loop-design` for investment and stored value;
+  `behavioral-metrics` for queue health.
 
 **Claims deliberately not made here:** no figure for how many columns a reader can scan, how much faster a compact table is to
 work, or what share of operators use keyboard shortcuts. The six-column target, the row-height table and the ~200ms debounce

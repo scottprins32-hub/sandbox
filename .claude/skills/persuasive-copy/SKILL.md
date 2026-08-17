@@ -1,6 +1,6 @@
 ---
 name: persuasive-copy
-description: Writes and reviews the words in an interface — button labels, headings, empty states, error messages, confirmations, pricing pages, notifications and marketing text — so the wording moves the decision instead of just narrating the screen. Use this whenever anyone is writing or reviewing user-facing text, even if they never say "copy" or "microcopy": naming a button, wording a confirmation dialog, writing an error, filling an empty state, drafting a landing or pricing page, phrasing a permission prompt or notification, or translating an interface into another language. Also use it for symptoms like "nobody clicks this", "people don't understand what this does", "this reads as salesy", "what should the button say", or any request to make text clearer, shorter, more honest, or more convincing.
+description: Writes and reviews the words in an interface — button labels, headings, empty states, error messages, confirmations, pricing pages, notifications and marketing text — so the wording moves the decision instead of just narrating the screen. Use this whenever anyone is writing or reviewing user-facing text, even if they never say "copy" or "microcopy": naming a button, wording a confirmation dialog, writing an error, filling an empty state, drafting a landing or pricing page, phrasing a permission prompt or notification, or translating an interface into another language. Also use it for symptoms like "nobody clicks this" when the button is plainly visible and the label is what is failing, "people don't understand what this does", "this reads as salesy", "what should the button say", or any request to make text clearer, shorter, more honest, or more convincing.
 ---
 
 # Persuasive copy
@@ -148,19 +148,15 @@ mechanism, and it is why specificity beats intensity almost everywhere.
 | We take your privacy seriously | We never sell your data. We keep shift photos for 90 days, then delete them. |
 | Save time on admin | Cuts the weekly timesheet reconciliation from ~3 hours to ~20 minutes |
 
-**Give a reason, and make it a real one.** Langer, Blank & Chanowitz (1978) found people granted a
-line-cutting request far more often when *any* reason followed "because" — even a contentless one ("because
-I have to make copies"). Two honest caveats: the effect held for a small request and disappeared for a large
-one (20 pages), and the finding is routinely over-generalised into "just add the word because". The usable
-version: every ask should be accompanied by why you're asking, and the reason should survive scrutiny,
-because your asks are not small. "We need your phone number **so the driver can reach you if the gate is
-locked**" converts a demand into an explanation.
+**Give a reason, and make it a real one.** Compliance rises when *any* reason follows "because" — but that was
+measured on a small request and disappeared on a large one, so the usable version is not "add the word
+because". Every ask carries why you are asking, and the reason has to survive scrutiny, because your asks are
+not small. "We need your phone number **so the driver can reach you if the gate is locked**" converts a demand
+into an explanation.
 
-**Cut.** Morkes & Nielsen's 1997 study for NN/g rewrote the same site five ways and measured concise text,
-scannable layout and objective (non-promotional) language each improving a composite usability score, with
-the combination best of all. Note what it is before quoting the famous "124%": one small study (n=51), a
-composite metric, and 1997. The direction is safe and matches everything since; the number is not a
-constant, so don't put it in a deck.
+**Cut.** Concise text, scannable layout and objective (non-promotional) language each improve usability, and
+the combination beats any one alone. The famous "124%" attached to that finding is one small 1997 study on a
+composite metric — the direction is safe, the number is not a constant, so keep it out of the deck.
 
 Practical cutting rules: delete every sentence that says the screen exists ("This page allows you to…"),
 every intensifier ("very", "really", "simply", "just"), and every instance of "please" that isn't
@@ -179,21 +175,14 @@ kinds, and only two matter for product copy:
   and keep your photos" vs "back up your files or lose your photos"). Reliably the *weakest* of the three.
 - Risky-choice framing (the original) — rarely what a UI is doing.
 
-**Calibrate your expectations.** The risky-choice framing effect replicated in Many Labs 1 (Klein et al.,
-2014) at roughly half the original effect size. But goal framing — which is what "reframe the CTA as a loss"
-actually means — is a much weaker lever than folklore suggests: O'Keefe & Jensen's meta-analyses of health
-messaging (93 studies, N≈21,656 for prevention behaviours; 53 studies, N≈9,145 for detection) found
-gain/loss framing differences that were statistically significant but *tiny* (on the order of r ≈ .03), with
-the direction flipping between prevention and detection contexts. So: framing is worth getting right because
-it is free, not because it will move your conversion rate on its own.
+**Calibrate your expectations.** Goal framing — which is what "reframe the CTA as a loss" actually means — is
+the weakest of the three and moves almost nothing on its own in the meta-analytic evidence. Get framing right
+because it is free, not because it will lift a conversion rate.
 
-**Loss aversion (Kahneman & Tversky, 1979, prospect theory)** — losses loom larger than equivalent gains.
-State this carefully: the *direction* is well supported in risky choice and endowment paradigms, but the
-generality and the size are actively disputed. Gal & Rucker (2018, *Journal of Consumer Psychology*) argued
-the evidence does not support losses being systematically more impactful, provoking a large set of
-commentaries on both sides; Kahneman himself has granted that it is context-dependent rather than a law of
-human nature. Do not quote a "losses hurt twice as much" multiplier — it is a parameter from specific
-gambling experiments, not a property of your checkout.
+**Loss aversion** — losses loom larger than equivalent gains — has a well-supported *direction* and a
+magnitude that is actively disputed. Never quote a "losses hurt twice as much" multiplier: it is a parameter
+fitted to gambling experiments, not a property of your checkout. Effect sizes and the dispute:
+`references/evidence-base.md`.
 
 **What actually works: frame against a reference point the reader already holds.** Loss framing has bite when
 there is a real thing they already have and could lose, and no bite when you invent one.
@@ -229,14 +218,20 @@ Anchors in a product are not just the price. They are the order and range of you
 default position *and its maximum* (a seats slider starting at 5 and maxing at 50 produces different
 self-reported needs than one starting at 50 and maxing at 5,000 — set it to your honest median, not the
 anchor that flatters your ARPU); pre-filled quantities, suggested donation amounts and credit-pack sizes;
-and the struck-through "was" price — which is legally constrained, since the EU Price Indication Directive
-as amended requires a displayed prior price to be the lowest applied in the previous 30 days. An invented
-"was" price is not clever anchoring, it's an offence.
+and the struck-through "was" price, which is legally constrained — and constrained differently depending on
+what you sell. For **goods** in the EU, Article 6a of the Price Indication Directive as amended requires the
+displayed prior price to be the lowest the trader applied in the previous 30 days. For **services and digital
+content** — subscriptions, SaaS, bookings, a cleaning contract — Article 6a does not reach, and the governing
+rule is the UCPD's prohibition on fictitious reference prices, which forbids an invented "was" price without
+imposing the 30-day arithmetic. An invented "was" price is an offence under one instrument or the other; it is
+never clever anchoring. The engineering rule that satisfies both without anyone having to litigate scope in a
+code review: **derive every reference price from a price-history table**, never from a constant. Scope detail
+is `decision-screen-design` move 12.
 
-**Per-unit and temporal reframing.** Gourville (1998, *Journal of Consumer Research*) showed that reframing
-an aggregate cost into a small ongoing one ("pennies a day") can increase willingness to pay, by making the
-amount comparable to trivial daily expenses. It fails when the daily figure is large enough that the
-comparison stops being trivial, and it reads as evasive when the total is hidden. **Always show both**, and
+**Per-unit and temporal reframing.** Reframing an aggregate cost into a small ongoing one ("pennies a day")
+raises willingness to pay by making the amount comparable to trivial daily expenses. It fails once the daily
+figure is large enough that the comparison stops being trivial, and it reads as evasive when the total is
+hidden. **Always show both**, and
 in the EU showing the total payable is required for subscriptions under the Consumer Rights Directive.
 
 ```
@@ -245,14 +240,11 @@ Better:    €49/month, billed annually — €588 today, renews 1 Sept 2027
 Weakest:   "Less than a coffee a day!"   ← the total is missing and the tone is doing the arguing
 ```
 
-**Decoy tiers: don't.** The attraction/asymmetric-dominance effect (Huber, Payne & Puto, 1982) — adding a
-dominated third option to shift share toward a target — is a favourite of pricing blogs and has a **mixed
-replication record**: Frederick, Lee & Baskin (2014) and Yang & Lynn (2014) largely failed to find it with
-realistic stimuli and real products, as opposed to the abstract numeric attributes of the original studies.
-Building a deliberately bad plan on that basis costs you a tier of your pricing page and probably does
-nothing. The **compromise effect** (Simonson, 1989) — middle options gaining share — has held up better, and
-the honest version of the same lever works without any trickery: label a recommendation and say who it's
-for.
+**Decoy tiers: don't.** The attraction effect — adding a deliberately dominated third option to shift share
+toward a target — largely fails to replicate with realistic products, so a bad plan built on it costs you a
+tier of your pricing page and probably does nothing. The **compromise effect**, middle options gaining share,
+has held up better, and the honest version of that lever needs no trickery: label a recommendation and say
+who it is for. Replication record: `references/evidence-base.md`.
 
 ```
 Before: [Starter] [Pro ★ MOST POPULAR] [Enterprise]      ← is "most popular" true? can you prove it?
@@ -265,13 +257,11 @@ A popularity claim must be a query result, not a design decision. Fake "most pop
 commercial practice in the EU and a §5 deception risk in the US, and they're the kind of thing a screenshot
 outlives.
 
-**Charm pricing is weaker than folklore.** Anderson & Simester (2003) ran real catalogue field experiments
-where $9 endings increased demand — in one test the same item sold 21 units at $39 against 16 at $34 and 17
-at $44. Note the unit counts: small samples, and the effect was **stronger for new items** and interacted
-with other discount cues. The left-digit mechanism (Thomas & Morwitz, 2005) is real; the blanket rule
-"always end in 9" is not. A $9 ending also signals *discount*, working against a premium or enterprise
-positioning, and does nothing on a B2B page where procurement is comparing feature matrices. Round numbers
-when you sell on quality; charm endings when you sell on price.
+**Charm pricing is weaker than folklore.** The field evidence for $9 endings is real but small-sample, and
+what it points at is a *signal* — "this is a discount" — rather than a left-digit trick that fires
+everywhere. That signal works against a premium or enterprise positioning, and does nothing on a B2B page
+where procurement is comparing feature matrices. Round numbers when you sell on quality; charm endings when
+you sell on price. Unit counts and citations: `references/evidence-base.md`.
 
 ### 5. Social proof that names someone like the reader
 
@@ -280,27 +270,21 @@ correct. The operative variables are **specificity** and **similarity**, not vol
 is unfalsifiable and describes nobody the reader recognises. "4 buildings on your street use Scara" is
 checkable and describes their exact situation.
 
-**Calibrate the size honestly.** The best evidence here is large and modest: Allcott (2011, *Journal of
-Public Economics*) evaluated OPOWER Home Energy Reports — which compare a household's usage to its
-neighbours' — across 17 randomised field experiments and ~600,000 households, finding an average **2.0%**
-reduction (range 1.4–3.3%). Real, replicated, cheap — and not a doubling. Anyone promising social proof will
-transform a conversion rate is selling something.
+**Calibrate the size honestly.** The best field evidence — utility bills comparing a household against its
+neighbours, across 17 randomised experiments and hundreds of thousands of households — puts the average
+effect at about **two percent**. Real, replicated, cheap, and not a doubling. Anyone promising social proof
+will transform a conversion rate is selling something.
 
-**The famous hotel-towel study, with its caveat.** Goldstein, Cialdini & Griskevicius (2008, *JCR*) found a
-descriptive-norm card ("the majority of guests reuse their towels") produced more reuse than a standard
-environmental appeal (44.1% vs 35.1%), and a *provincial* norm naming guests **in this room** did better
-still (49.3%). It is the canonical citation for "similar-other proof beats generic proof" — and Bohner &
-Schlüter's German replication (2014, *PLOS ONE*, N=724 and N=204) **failed to reproduce it**, with the
-standard message performing as well or better and the room-level norm inconsistent. Baseline reuse in the
-German hotels was 70–90% versus 35–50% in the US, so a ceiling effect is a plausible explanation, but the
-honest summary is: the provincial-norm result is not settled. Cite the mechanism, not the percentages, and
-don't put "49.3%" in a design review.
+**Similar-other proof beats generic proof — cite the mechanism, never the percentages.** The canonical
+hotel-towel result, where a norm naming guests *in this room* beat both a generic environmental appeal and a
+generic descriptive norm, **failed to reproduce** in a later German replication, plausibly on ceiling
+effects. The direction is worth designing around; the figures are not settled and do not belong in a design
+review. Both studies: `references/evidence-base.md`.
 
-**The descriptive-norm backfire is the trap you will actually hit.** Schultz, Nolan, Cialdini, Goldstein &
-Griskevicius (2007, *Psychological Science*) showed households the neighbourhood average: heavy users
-reduced, and **light users increased** — the boomerang. Adding an injunctive cue (approval/disapproval of the
-behaviour) eliminated the increase. Telling people what many others do *normalises it*, including when what
-they do is the thing you want to stop.
+**The descriptive-norm backfire is the trap you will actually hit.** Show households the neighbourhood
+average and heavy users reduce while **light users increase** — the boomerang. Adding an injunctive cue
+(approval or disapproval of the behaviour) eliminates the increase. Telling people what many others do
+*normalises it*, including when what they do is the thing you want to stop.
 
 ```
 Backfires: "Only 12% of teams have enabled two-factor authentication."
@@ -318,9 +302,9 @@ looks like"), or say nothing.
 **What to build:** testimonials with a name, a role, a company and a *specific outcome* ("cut our Friday
 reconciliation from 3 hours to 20 minutes" beats "great product, highly recommend"); counts scoped to the
 reader's segment, industry or geography; real recent activity rather than a rolling ticker; review
-distributions rather than a bare average. Fabricated proof is now explicitly regulated — the FTC's 2024 rule
-on consumer reviews and testimonials bans fake and purchased reviews, and fake reviews and fake "consumer"
-endorsements sit on the EU UCPD Annex I blacklist.
+distributions rather than a bare average. Fabricated proof is prohibited outright on both sides of the
+Atlantic — fake and purchased reviews and fake "consumer" endorsements are blacklist items with no balancing
+test, not a matter of degree. `ethical-persuasion-audit/references/legal-layer.md` owns the instruments.
 
 **When to skip it entirely:** internal and mandated tools. "Trusted by 1,200 teams" means nothing to someone
 whose employer bought the licence. There the only proof that helps is local and operational: "Ana approved
@@ -370,15 +354,10 @@ identical cookies from a full one, and most desirable when the scarcity had just
 Scarcity is read as a signal both of value and of a closing option.
 
 **The line, stated once and not negotiated: the constraint must be real.** This is not a taste preference.
-
-- **EU:** Annex I point 7 of the Unfair Commercial Practices Directive is a *blacklist* item — "falsely
-  stating that a product will only be available for a very limited time, or that it will only be available
-  on particular terms for a very limited time, in order to elicit an immediate decision" is unfair **in all
-  circumstances**, in every member state, with no balancing test. A timer that resets, or an "offer ends
-  today" that doesn't, is squarely inside it.
-- **US:** the FTC's staff report *Bringing Dark Patterns to Light* (September 2022) names baseless countdown
-  timers and false limited-time messages as deceptive practices, and the Commission has brought
-  dark-pattern-based actions with substantial payouts (e.g. the 2022 Vonage matter, $100M).
+Fabricated urgency is unlawful outright in the EU — UCPD Annex I point 7 is a blacklist item, unfair in all
+circumstances in every member state, with no balancing test — and actionable as deception in the US. A timer
+that resets, or an "offer ends today" that doesn't, is squarely inside it. The citations and the enforcement
+record are `ethical-persuasion-audit/references/legal-layer.md`, which owns this layer.
 
 Beyond the legal exposure, the practical argument is stronger than developers expect: fake urgency is a
 **one-shot asset that destroys a permanent one**. The first time a user watches your timer hit zero and
@@ -426,11 +405,20 @@ time, even when the answer is yes. Include a reference code only when support ca
 so. Never surface an exception class or a stack trace to a user.
 
 **Empty states teach, and they are your best-read documentation** — shown at the exact moment of intent, to
-someone who has already decided to do the thing. Three different empty states need three different copies,
-and shipping one for all three is the common bug: **first-run** (say what goes here, why it's worth having,
-one action, offer a seed), **filtered** (say the filter is what's hiding things and offer the escape — never
-"No results found", which reads as "your data is gone"), and **cleared** (confirm the achievement; don't
-sell into it).
+someone who has already decided to do the thing. There are **four** of them. `list-and-queue-design` move 5
+owns the taxonomy and the branch logic; this move owns the wording of each. Shipping one string for all four
+is the common bug, and it is the expensive one:
+
+- **First-run** — nothing has ever existed. Say what goes here, why it's worth having, one action, and offer
+  a seed or a template.
+- **Filtered to nothing** — records exist and the filter excluded them. Name the active filters, offer to
+  clear them, and state the unfiltered count: "0 of 1,284 visits match". A bare "No results found", or worse
+  a first-run illustration, reads as "your data is gone" to someone who mistyped a building name.
+- **Failed to load** — the request errored. Say what failed and offer a retry. Never let an error render as
+  an empty list; the user reads "no work exists" and either files a bug or re-enters records that already
+  exist.
+- **Drained** — records exist, none are theirs to do. Confirm the achievement, give the count cleared and
+  when the next batch arrives. Don't sell into it.
 
 **Success and confirmation close the loop.** "Sent" is a status, not a confirmation. Say what happened, what
 it means, what happens next and when, and how to change or find it.
@@ -441,37 +429,31 @@ After:  "Invited ana@example.com as an Editor. She has 7 days to accept; we'll e
          Resend or revoke from Settings → Members."
 ```
 
-**The peak-end rule (Kahneman, Fredrickson, Schreiber & Redelmeier, 1993; Redelmeier & Kahneman, 1996).**
-Remembered experience is dominated by its most intense moment and its ending, and is surprisingly insensitive
-to duration. This has a direct, cheap consequence: **the last screen of a flow is disproportionately what the
-user will remember and report**, so it deserves your best sentence and the most care, and it is usually the
-one that got the least. Concretely — end into a resolved state, not a dead end; put the reassurance
-(what happens next, when, what they can do now) on the final screen rather than the first; and be careful
-what you make the ending, because a satisfaction survey shown after the success screen makes *the survey*
-the ending. Two caveats: peak-end is a well-supported description of remembered utility in its original
-paradigms, but "end on a high note" is a loose extrapolation — do not manufacture a celebration on a task
-someone performs forty times a day, where the memorable ending is the one that got out of the way.
+**The peak-end rule.** Remembered experience is dominated by its most intense moment and its ending, and is
+surprisingly insensitive to duration. The consequence is cheap and direct: **the last screen of a flow is
+disproportionately what the user will remember and report**, so it deserves your best sentence, and it is
+usually the one that got the least. End into a resolved state, not a dead end; put the reassurance — what
+happens next, when, what they can do now — on the final screen rather than the first; and watch what you make
+*the* ending, because a satisfaction survey shown after the success screen becomes it. "End on a high note"
+is a loose extrapolation from the finding: do not manufacture a celebration on a task someone performs forty
+times a day, where the memorable ending is the one that got out of the way. Citations:
+`references/evidence-base.md`.
 
 Copy patterns for each error class, empty state, confirmation, destructive dialog, permission prompt and
 notification subject line are in `references/microcopy-patterns.md`.
 
 ### 9. Plain language, reading level, and register — including across languages
 
-**Mechanism: processing fluency.** Text that is easier to process is judged more favourably, and its author
-judged more competent. Oppenheimer (2006, *Applied Cognitive Psychology*) manipulated vocabulary complexity
-across four experiments and found needlessly complex writing consistently *lowered* judged intelligence of
-the author, mediated by fluency. Flag the neighbourhood: the broader disfluency literature is shaky — the
-best-known claim that hard-to-read fonts improve reasoning (Alter et al., 2007) failed a large multi-lab
-replication (Meyer et al., 2015) — so lean on the plain-language finding and not on fluency as a universal
-dial.
+**Mechanism: processing fluency.** Text that is easier to process is judged more favourably and its author
+judged more competent — needlessly complex vocabulary consistently *lowers* the writer's judged intelligence.
+Lean on that specific finding rather than on fluency as a universal dial; the wider disfluency literature is
+shaky and its best-known claim failed a multi-lab replication.
 
-**This matters more for expert readers, not less.** Trudeau (2012, *The Public Speaks*, N=376) found
-preference for plain English over legal jargon rose with the reader's expertise, and rose with the
-complexity of the issue. It's a preference survey rather than a comprehension test, so hold it lightly — but
-the mechanism is solid and observable: an expert under time pressure is *skimming for the
-decision-relevant token*, and dense prose defeats skimming. Jargon is only efficient when it is the reader's
-own working vocabulary and it replaces a longer phrase; everywhere else it is an obstacle disguised as
-precision.
+**This matters more for expert readers, not less.** Preference for plain English over jargon rises with the
+reader's expertise and with the complexity of the issue, and the mechanism is observable: an expert under
+time pressure is *skimming for the decision-relevant token*, and dense prose defeats skimming. Jargon is only
+efficient when it is the reader's own working vocabulary and it replaces a longer phrase; everywhere else it
+is an obstacle disguised as precision. The studies and their limits: `references/evidence-base.md`.
 
 Practical rules: lead with the decision; one idea per sentence; name each concept with exactly one word
 everywhere in the product (elegant variation costs a lookup — "member", "user", "seat" and "teammate" for
@@ -561,7 +543,8 @@ Run against the screen, the string file, or the diff:
       undesirable majority.
 - [ ] Errors: no blame, plain language, says what happened, says whether their work survived, gives a next
       action. No stack traces, no bare status codes.
-- [ ] Every empty state is one of first-run / filtered / cleared, and is written for that case specifically.
+- [ ] Every empty state is one of first-run / filtered-to-nothing / failed-to-load / drained, and is written
+      for that case specifically. No error ever renders as an empty list.
 - [ ] Success copy says what happened, what's next and when, and how to undo or find it.
 - [ ] The **last screen of the flow** has been written deliberately, and is a resolved state — and nothing
       (survey, upsell, dead end) has been bolted on after it.
@@ -574,60 +557,29 @@ Run against the screen, the string file, or the diff:
 
 ## Sources
 
-- **Framing** — Tversky & Kahneman (1981), *The Framing of Decisions and the Psychology of Choice*, *Science*.
-  Typology: Levin, Schneider & Gaeth (1998). Replication at roughly half the original effect size:
-  Klein et al., Many Labs 1 (2014). Gain/loss framing in persuasive messaging is *small*: O'Keefe & Jensen
-  meta-analyses (2007, prevention, 93 studies; 2009, detection, 53 studies) — differences around r ≈ .03.
-- **Loss aversion** — Kahneman & Tversky (1979), prospect theory. Direction supported in risky choice and
-  endowment paradigms; generality and magnitude disputed: Gal & Rucker (2018), *Journal of Consumer
-  Psychology*, plus the commentary set it provoked (e.g. Simonson, 2018). No fixed multiplier is quoted here.
-- **Anchoring** — Tversky & Kahneman (1974), *Judgment under Uncertainty*. Among the strongest replications in
-  Many Labs 1 (Klein et al., 2014).
-- **Temporal / per-unit reframing** — Gourville (1998), *Pennies-a-Day*, *Journal of Consumer Research*.
-- **Decoy / attraction effect** — Huber, Payne & Puto (1982). Mixed replication with realistic stimuli:
-  Frederick, Lee & Baskin (2014); Yang & Lynn (2014). **Compromise effect** — Simonson (1989) — holds up
-  better.
-- **Charm pricing** — Anderson & Simester (2003), *Effects of $9 Price Endings on Retail Sales*, *QME*: field
-  experiments; one test sold 21 units at $39 vs 16 at $34 and 17 at $44; effect stronger for new items.
-  Left-digit mechanism: Thomas & Morwitz (2005). Small samples; not a universal rule.
-- **Social proof** — Cialdini, *Influence*. Field magnitude: Allcott (2011), *Journal of Public Economics*,
-  17 RCTs, ~600,000 households, mean **2.0%** reduction. Provincial norms: Goldstein, Cialdini &
-  Griskevicius (2008), *JCR* (35.1% / 44.1% / 49.3%) — **failed to replicate** in Bohner & Schlüter (2014),
-  *PLOS ONE*, N=724 and N=204, plausibly due to ceiling effects. **Boomerang / descriptive-norm backfire**:
-  Schultz, Nolan, Cialdini, Goldstein & Griskevicius (2007), *Psychological Science*.
-- **Source credibility** — Hovland & Weiss (1951), *The Influence of Source Credibility on Communication
-  Effectiveness*.
-- **Reciprocity** — Regan (1971); Strohmetz, Rind, Fisher & Lynn (2002), *Sweetening the Till*, *Journal of
-  Applied Social Psychology* — small field studies; direction only, percentages not quoted.
-- **Scarcity** — Worchel, Lee & Adewole (1975), cookie-jar experiment.
-- **Reasons / "because"** — Langer, Blank & Chanowitz (1978). Effect held for a *small* request only; do not
-  generalise to hollow reasons.
-- **Writing for the web** — Morkes & Nielsen (1997), NN/g, n=51, composite usability metric. Direction sound;
-  the "124%" figure is one small study, not a constant.
-- **Error-message guidance** — Nielsen's usability heuristics (1994), heuristic 9.
-- **Peak-end rule** — Kahneman, Fredrickson, Schreiber & Redelmeier (1993); Redelmeier & Kahneman (1996),
-  colonoscopy field study.
-- **Plain language** — Oppenheimer (2006), *Applied Cognitive Psychology*. Neighbouring disfluency claim
-  (Alter et al., 2007) failed multi-lab replication (Meyer et al., 2015). Expert preference for plain
-  language: Trudeau (2012), *The Public Speaks*, N=376 — a preference survey.
-- **First-person CTA** — Michael Aagaard / Unbounce landing-page test, reported +90% CTR. One unaudited A/B
-  test on one page; cited for the mechanism, not the number.
-- **Law** — EU UCPD (2005/29/EC) Annex I point 7 (false limited-time claims, blacklisted in all
-  circumstances) and Annex I on fake reviews/endorsements; UCPD Art. 7 on material omissions; Price
-  Indication Directive as amended by the Omnibus Directive (prior-price = lowest in the previous 30 days);
-  Consumer Rights Directive on total price for subscriptions. US: FTC Act §5; FTC staff report *Bringing
-  Dark Patterns to Light* (September 2022) on baseless countdown timers; FTC action against Vonage (2022,
-  $100M); FTC rule on consumer reviews and testimonials (2024).
+Every study behind the moves above — what it measured, how large the effect was, and where it failed to
+replicate — is in `references/evidence-base.md`. It is a bibliography, not a working tool: naming a button
+does not require the meta-analysis N, so it loads only when you have to defend or refuse a claim.
+
+The legal layer is not this skill's to state. `ethical-persuasion-audit/references/legal-layer.md` owns the
+citations and the enforcement record; `decision-screen-design` move 12 owns pricing law and its scope limits.
+Where a rule bites at the point of writing a string, the warning is inline above and the citation is there.
 
 Numbers that could not be traced to a named source are stated qualitatively rather than invented. In
 particular: no "X% of users abandon after N seconds" figure appears here, because none of the widely
-circulated ones has a locatable origin.
+circulated ones has a locatable origin. No loss-aversion multiplier, no conversion lift for a first-person
+CTA, and no fine attributed to a named company for a named pattern — enforcement outcomes are
+jurisdiction- and date-specific and are the fastest way for a document like this to become wrong.
 
 ## References
 
 - `references/microcopy-patterns.md` — a copy library to write from: error messages by failure type, empty
   states, confirmations and success, destructive dialogs, permission prompts, notification and email subject
   lines, paywalls and cancellation flows. Read it while you are actually writing strings.
+- `references/evidence-base.md` — the studies behind every move: framing, loss aversion, anchoring, the decoy
+  and compromise effects, charm pricing, social proof and the boomerang, credibility, reciprocity, scarcity,
+  peak-end, plain language, and the first-person CTA. Read it when someone quotes a number at you, or when you
+  need to decide whether a technique is worth building.
 - `references/localisation-and-register.md` — formality and the T–V distinction, choosing a register per
   surface, what breaks when persuasive copy is translated, ICU plurals and interpolation, text expansion,
   and a review process for bilingual products. Read it before localising anything, or when one product

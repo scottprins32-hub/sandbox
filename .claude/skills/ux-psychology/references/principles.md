@@ -15,13 +15,25 @@ Entries are graded, because this field mixes replicated science with folklore th
 A grade applies to the *claim as designers usually state it*, not to the underlying psychology. Miller's 7±2
 is excellent science about digit span and folklore about menu length; it appears here as the latter.
 
-The **Skill** line points at the sibling skill that covers the principle in depth: `attention-and-hierarchy`,
-`friction-and-flow`, `persuasive-copy`, `onboarding-activation`, `habit-loop-design`,
-`decision-screen-design`, `ethical-persuasion-audit`, `behavioral-metrics`.
+The **Skill** line points at the sibling skill that covers the principle in depth. Any skill in the set may
+be named. The nine behaviour skills — `attention-and-hierarchy`, `friction-and-flow`, `persuasive-copy`,
+`onboarding-activation`, `habit-loop-design`, `decision-screen-design`, `list-and-queue-design`,
+`ethical-persuasion-audit`, `behavioral-metrics` — own most entries. The craft skills (`ui-craft` and
+its specialists `typography-system`, `spacing-and-layout`, `color-and-theming`, `depth-and-overlays`,
+`ui-signifiers-and-states`) own the concrete values rather than the mechanism, and they are the right owner
+for several of the interaction laws: a principle about what a control announces belongs with the skill that
+specifies the pixels, not with the nearest behaviour skill.
 
-For the *craft* counterpart — the concrete values rather than the mechanism — see `ui-craft` and its
-specialists (`typography-system`, `spacing-and-layout`, `color-and-theming`, `depth-and-overlays`,
-`ui-signifiers-and-states`).
+Two forms of the line mean specific things, and both are load-bearing:
+
+- **`— none; this entry is the treatment.`** No skill covers this principle in depth. What you are reading is
+  all there is; do not follow a pointer expecting more. Where a sibling *applies* the principle without
+  naming it, the line says so as a **nearest applied home** — useful, but not a treatment of the mechanism.
+- **A second skill after a semicolon or in parentheses** is a secondary owner or a gate, not a synonym. The
+  first name is where the mechanism is explained; the second is where one specific application, one
+  correction, or an ethics check lives. Where a move number is given, go to that move.
+
+Fully qualify any path you follow from here, e.g. `habit-loop-design/SKILL.md`.
 
 ---
 
@@ -83,7 +95,10 @@ processed in parallel across the whole visual field before focused attention arr
 do not pop out — they require serial search.
 **Established by** — Treisman & Gelade (1980), feature-integration theory; extended by Wolfe's guided search.
 **Use it for** — Choosing what carries emphasis. One preattentive channel per meaning: colour for status,
-weight for hierarchy, position for grouping. This is the mechanism under "one loudest thing per screen".
+weight for hierarchy, position for grouping. This is the mechanism under "one loudest thing per screen", and
+it is what actually supports the two applications usually mis-attributed to von Restorff: one visually
+distinct primary action per view, and one highlighted plan in a pricing table. Both ride on pop-out, which is
+a perceptual claim, not on an isolation effect in memory.
 **Evidence** — Robust.
 **Watch out** — Pop-out requires a *unique* value. Six differently-coloured chips means no chip pops out. Also,
 colour-only encodings fail for colour-blind users and in dark mode — pair colour with shape, icon or text.
@@ -105,13 +120,22 @@ field, no amount of colour-coding fixes it. Card borders are usually a patch ove
 
 ### Von Restorff (isolation) effect
 **What it says** — An item that differs from a homogeneous set is better remembered and attended.
-**Established by** — Hedwig von Restorff (1933).
-**Use it for** — One visually distinct primary action per view; one highlighted plan in a pricing table.
-**Evidence** — Robust for a single isolate in an otherwise uniform set.
-**Watch out** — The effect is *relative*, and it dies the moment you have several isolates. Highlighting the
-recommended plan works; highlighting three of four plans does nothing. Also, do not encode the isolation
-purely in colour, or screen-reader and colour-blind users lose it entirely.
-**Skill** — `attention-and-hierarchy`
+**Established by** — Hedwig von Restorff (1933); the standard correction is R. Reed Hunt, "The subtlety of
+distinctiveness: What von Restorff really did", *Psychonomic Bulletin & Review* 2(1), 1995.
+**Use it for** — Something the user must **remember later** and that differs from an otherwise homogeneous
+set: one anomalous row in a report, the one step in a sequence that breaks the pattern, the single exception
+in a settings list. Not for making a button get clicked — see the correction below.
+**Evidence** — Robust for a single isolate in an otherwise uniform set, as a *memory* effect.
+**Watch out** — This is the most mis-cited entry in the catalogue. Hunt (1995) showed von Restorff's own
+design deliberately placed the isolate early in the list *to avoid visual pop-out*: perceptual salience is
+not necessary for the effect, and the effect is not a claim about attention capture. So "the visually
+distinct button gets clicked" is a preattentive-processing claim (see that entry), not a von Restorff one —
+citing von Restorff for it is citing the wrong study for the right advice. What von Restorff genuinely
+contributes is that distinctiveness is *relative to context* and decays with every additional distinct thing:
+highlighting the recommended plan works, highlighting three of four does nothing, and a "New!" badge stops
+working the moment it is on three menu items. Also, do not encode the isolation purely in colour, or
+screen-reader and colour-blind users lose it entirely.
+**Skill** — `attention-and-hierarchy` (move 6 carries the Hunt correction in full)
 
 ### Serial position effect
 **What it says** — In free recall of a list, items at the start (primacy) and end (recency) are remembered
@@ -123,7 +147,12 @@ next-most last, not in the middle of a long list.
 **Watch out** — The lab task is recall of a memorised list. A visible menu is a *recognition* task with the
 items on screen, so the effect is a weak analogy there. Placement in a UI is dominated by scan order,
 salience and Fitts distance, not by primacy/recency. Use it for things people must remember later.
-**Skill** — `attention-and-hierarchy`
+**Watch out** — The place this bites hardest in product work is a list's **default sort**, because primacy is
+spent whether or not anyone chose to spend it. A queue sorted by whichever column had an index gives the top
+positions to an arbitrary ordering; `created_at DESC` on a work queue buries the oldest unhandled item, which
+is the one closest to breaching.
+**Skill** — `attention-and-hierarchy` (ordering within a composed screen); `list-and-queue-design` move 1 for
+what sits at the top of a list of records
 
 ### Banner blindness
 **What it says** — Users learn to ignore regions and visual styles associated with advertising — right rails,
@@ -255,8 +284,11 @@ steps; put recently-used items where they can be picked; make commands discovera
 **Evidence** — Robust.
 **Watch out** — Recognition costs screen space and scanning time, so it is not free for expert users doing a
 task hundreds of times a day — that population wants recall-based shortcuts (typed commands, keyboard paths)
-*in addition to*, not instead of, the recognisable path.
-**Skill** — `friction-and-flow`
+*in addition to*, not instead of, the recognisable path. The subtlest violation is **applied state the user
+cannot see**: a default sort or filter the screen applied silently is a fact the reader has to remember or
+infer, and the usual symptom is someone concluding their records are missing.
+**Skill** — `friction-and-flow` (the general rule); `list-and-queue-design` moves 1 and 7 for making sort and
+filter state visible and individually removable on a list of records
 
 ### Progressive disclosure
 **What it says** — Show the few options most users need, and move the rest behind a clearly labelled second
@@ -282,7 +314,8 @@ re-reading it.
 **Watch out** — Generation costs effort, and effort spent before the user has seen any value is the main
 cause of onboarding abandonment. Use it for the *first real task*, not for a quiz standing between the user
 and the product.
-**Skill** — `onboarding-activation`
+**Skill** — none; this entry is the treatment. Nearest applied home: `onboarding-activation` move 4, "Make
+the first real task the tour", which builds on this without naming it.
 
 ### Spacing effect
 **What it says** — Learning distributed over time produces far better long-term retention than the same total
@@ -293,7 +326,8 @@ Contextual hints at the moment of relevance beat a front-loaded tour, and they a
 **Evidence** — Robust — one of the best-replicated findings in psychology.
 **Watch out** — "Spaced" does not license nagging. Spacing improves retention of things the user is trying to
 learn; it does not make unwanted interruptions welcome.
-**Skill** — `onboarding-activation`
+**Skill** — none; this entry is the treatment. Nearest applied home: `onboarding-activation` move 4's
+just-in-time coach marks, which are spaced by construction.
 
 ### Picture superiority effect
 **What it says** — Pictures are remembered better than words, plausibly because images get encoded both
@@ -305,19 +339,27 @@ screenshots in empty states showing what the filled state looks like.
 **Watch out** — It does not mean "icon instead of label". Abstract UI glyphs are not the concrete pictures the
 research used, and unlabelled icons are a well-documented usability failure. Icon *plus* text is the pattern
 the evidence supports.
-**Skill** — `attention-and-hierarchy`
+**Skill** — none; this entry is the treatment. Nearest applied home: `ui-signifiers-and-states` (craft layer),
+whose icon-only-button rules are where the "icon instead of label" failure actually gets fixed.
 
 ### Zeigarnik effect
 **What it says** — Interrupted or incomplete tasks are remembered better than completed ones.
 **Established by** — Bluma Zeigarnik (1927), in Kurt Lewin's group.
 **Use it for** — At most, a soft argument for showing an incomplete profile or setup checklist.
-**Evidence** — **Contested.** The replication record is poor: reviews of the follow-up literature find that a
-minority of replication attempts reproduced the effect, and later work (e.g. Seifert & Patalano, 1991) found
-it depends heavily on interruption type, task involvement and time spent. The narrow memory claim is what
-fails; the everyday intuition that unfinished things nag at you is not the thing that was tested.
+**Evidence** — **Contested, and now settled against.** The strongest available evidence is Ghibellini & Meier
+(2025), "Interruption, recall and resumption: a meta-analysis of the Zeigarnik and Ovsiankina effects",
+*Humanities and Social Sciences Communications* 12, art. 962 — which found **no memory advantage for
+unfinished tasks**. Set Zeigarnik's own 1927 data aside and interrupted tasks account for almost exactly half
+of what gets recalled, which is what "no effect" looks like. Earlier work pointed the same way: Seifert &
+Patalano (1991) found any effect depends heavily on interruption type, task involvement and time spent. The
+narrow memory claim is what fails; the everyday intuition that unfinished things nag at you is not the thing
+that was tested.
 **Watch out** — Do not justify a design purely with "Zeigarnik". If a completion meter works, it works
 through the goal-gradient and endowed-progress effects, which have far better support. Cite those instead.
-**Skill** — `onboarding-activation`
+And do not silently substitute the Ovsiankina effect either — that one survived the same meta-analysis, but
+it licenses "make resumption trivial", not "engineer a cliffhanger".
+**Skill** — `habit-loop-design` (which carries the meta-analysis); `onboarding-activation` refuses it as a
+justification for setup checklists
 
 ### Ovsiankina effect
 **What it says** — People spontaneously resume an interrupted task when given the opportunity, even without
@@ -325,11 +367,15 @@ being asked.
 **Established by** — Maria Ovsiankina (1928), same research group as Zeigarnik.
 **Use it for** — Preserving and surfacing partial state: saved drafts, "continue where you left off", an
 abandoned cart that still exists. Make resumption possible and one click away.
-**Evidence** — Mixed. Better regarded than the Zeigarnik effect, but from the same thin early-20th-century
-literature and not extensively re-tested with modern methods.
-**Watch out** — The design value here does not depend on the effect being strong: preserving user work is
-correct regardless. Build the resume affordance because losing work is bad, not because of a 1928 study.
-**Skill** — `onboarding-activation`
+**Evidence** — **Robust as a behavioural tendency**, and no longer resting on the 1928 literature. Ghibellini
+& Meier's 2025 meta-analysis (*Humanities and Social Sciences Communications* 12, art. 962) found a general
+tendency to resume interrupted tasks — roughly two-thirds across studies, with no prompt and no reward — in
+the same analysis that found no memory advantage for unfinished tasks. Resumption held; recall did not.
+**Watch out** — This licenses "design for resumption", not "design for nagging incompleteness"; the memory
+half of the pair is the half that failed. The design value also does not depend on the effect size:
+preserving user work is correct regardless, so build the resume affordance because losing work is bad.
+**Skill** — `habit-loop-design` move 7, "Progress, goal gradient, and resumption"; `list-and-queue-design`
+for the interrupted-work case — persisting draft, scroll position, claim and filter state across a break
 
 ### Processing fluency
 **What it says** — Information that is easy to process feels more true, more familiar, more likeable and less
@@ -398,8 +444,12 @@ monthly equivalent, recommended tier before cheaper tiers, a sensible pre-filled
 blatantly arbitrary anchors (random spins, ID digits) are weaker and more context-dependent than the pop
 version suggests.
 **Watch out** — Fake anchors are a compliance problem, not just an ethical one: "was" prices that were never
-charged breach EU price-indication rules and attract FTC attention in the US. Anchor with real numbers.
-**Skill** — `persuasive-copy`
+charged breach EU price-indication rules and attract FTC attention in the US. Anchor with real numbers. Check
+the instrument before you cite it, too — the 30-day-lowest-price rule (Price Indication Directive Art. 6a, as
+inserted by the Omnibus Directive) governs *goods*, so subscriptions, SaaS plans and bookings mostly fall
+under the UCPD's misleading-actions prohibition instead.
+**Skill** — `decision-screen-design` move 12, "Anchoring, and the line where it becomes illegal", which
+carries the reference-pricing law and CJEU C-330/23; `persuasive-copy` move 4 for the word-level framing
 
 ### Loss aversion
 **What it says** — Losses loom larger than equivalent gains, so people work harder to avoid giving something
@@ -427,7 +477,7 @@ reluctant to abandon accumulated work and configuration — is on much safer gro
 theory, and is also plain switching cost.
 **Watch out** — Do not hold user data hostage as an ownership lever. Export must stay easy and complete;
 GDPR portability makes this legal ground, not just an ethical preference.
-**Skill** — `onboarding-activation`
+**Skill** — `habit-loop-design` move 6, "Investment and stored value", which pairs this with the IKEA effect
 
 ### Default effect
 **What it says** — Whichever option is pre-selected is chosen far more often than it would be if the user had
@@ -470,7 +520,14 @@ moderators — high choice-set complexity, difficult decision task, unclear pref
 have clear, varied preferences (nobody wants a supermarket with three products). The safe reading: the
 problem is rarely option *count*, it is the absence of structure — no categories, no comparison, no default,
 no recommendation. Add structure before you delete options.
-**Skill** — `friction-and-flow`
+**Grade note, because this one is cited three ways.** **Mixed is the grade this file holds**, and the two
+common shorthands both overshoot. "Contested / debunked" overshoots because Chernev, Böckenholt & Goodman
+(2015) found the effect appears *reliably* under its moderators — a real effect with conditions is what Mixed
+means. "Fewer options convert better" overshoots the other way and is folklore; it has its own entry under
+§Commonly repeated claims. A sibling skill that declines to build an argument on choice overload is applying
+this grade correctly, not disagreeing with it.
+**Skill** — `friction-and-flow`; `decision-screen-design` deliberately declines to rest on it and argues from
+evaluability instead
 
 ### Decision fatigue
 **What it says** — Making many decisions in sequence degrades decision quality and pushes people toward the
@@ -497,7 +554,8 @@ publication bias. The glucose-restores-willpower variant is in worse shape still
 **Watch out** — It gets invoked to justify both good advice ("don't put ten decisions in a row") and bad
 ("hit them with the upsell when they're worn down"). The good advice stands on cognitive load and task
 complexity, which are far better supported. Make that argument instead.
-**Skill** — `behavioral-metrics` (as a claim to challenge)
+**Skill** — `friction-and-flow` (as a claim to challenge — it carries the Hagger replication and supplies the
+cognitive-load argument that replaces it); `habit-loop-design` and `onboarding-activation` refuse it too
 
 ### Decoy effect (asymmetric dominance)
 **What it says** — Adding a third option that is clearly worse than one existing option but not the other
@@ -526,7 +584,8 @@ explains why annual plans need an immediate sweetener, and why "save 2 hours a w
 **Evidence** — Robust as a description of intertemporal choice.
 **Watch out** — It also predicts users will accept a bad long-term deal for a small immediate gain. If your
 conversion depends on that, you are the entity exploiting the bias, and the churn will find you later.
-**Skill** — `onboarding-activation`
+**Skill** — none; this entry is the treatment. Nearest applied home: `onboarding-activation` move 2, "Budget
+time-to-value in seconds", which is this principle turned into an arithmetic exercise without naming it.
 
 ### Sunk cost fallacy
 **What it says** — People continue investing in something because of what they have already spent, even when
@@ -538,7 +597,9 @@ increases follow-through. It is the honest half of the endowment/IKEA cluster.
 **Watch out** — Deliberately engineering sunk cost — making people enter twenty minutes of data before
 revealing the price — is a classic deceptive pattern ("drip pricing" / "the sunk-cost funnel"), and hidden
 mandatory fees revealed late are actively enforced against by consumer regulators. Show price before effort.
-**Skill** — `ethical-persuasion-audit`
+**Skill** — `ethical-persuasion-audit` covers the *deceptive application* — drip pricing, and why accumulated
+effort is what makes a late fee a misleading omission rather than a layout choice. The phenomenon itself has
+no deeper treatment than this entry.
 
 ### Charm pricing (.99 endings)
 **What it says** — Prices ending in 9 sell better than round prices, attributed to left-digit anchoring —
@@ -629,8 +690,11 @@ visible. Show "2 of 5" rather than an unquantified spinner; show a nearly-comple
 **Evidence** — Robust in its domain, with supporting field data.
 **Watch out** — The gradient only pulls if the goal is one the user actually wants. A progress bar toward
 *your* goal ("complete your profile" when the profile benefits your data model) is noise, and a fake progress
-bar that jumps to 90% then stalls damages trust for a one-time gain.
-**Skill** — `onboarding-activation`
+bar that jumps to 90% then stalls damages trust for a one-time gain. Run in reverse it explains a distinct
+failure: a work queue that displays its true depth has no finish line at all, so there is no gradient to
+climb. That inference is a strong design prior, not a measured result — no published figure for it exists.
+**Skill** — `onboarding-activation`; `habit-loop-design` move 7 for the returning-user case;
+`list-and-queue-design` for the reversed case — bounded batches instead of a backlog count
 
 ### Endowed progress effect
 **What it says** — Giving people artificial head-start progress toward a goal increases the rate at which they
@@ -682,7 +746,8 @@ a quarter, a new project, return from leave — rather than at arbitrary interva
 literature is still thin.
 **Watch out** — Manufacturing fake landmarks ("your new week starts now!") is transparent and cheapens real
 ones. Use landmarks that exist in the user's life, not in your cron schedule.
-**Skill** — `habit-loop-design`
+**Skill** — none; this entry is the treatment. `habit-loop-design` owns re-engagement timing generally but
+does not cover temporal landmarks, so do not go looking there for more than this.
 
 ---
 
@@ -730,7 +795,9 @@ and the "2,000% sales lift from free samples" figure that circulates has no loca
 qualitatively.
 **Watch out** — Reciprocity backfires when the "gift" is obviously instrumental. A gated ebook is not a gift,
 and everyone knows what it costs. The strongest version is value delivered with no ask attached at all.
-**Skill** — `onboarding-activation`
+**Skill** — `persuasive-copy` (which carries Regan and the *Sweetening the Till* field study); see also
+`ethical-persuasion-audit` test 5, where the reciprocity question becomes the whole test — a feature that
+takes from someone who cannot decline and returns nothing to them is extraction with a UI.
 
 ### Scarcity
 **What it says** — Perceived limited availability increases desirability.
@@ -780,7 +847,8 @@ regulable.
 **Evidence** — Robust.
 **Watch out** — It compounds with the curse of knowledge and with survivorship bias in whoever shows up to
 user interviews. The counter is instrumentation and recruiting outside your bubble, not more internal debate.
-**Skill** — `behavioral-metrics`
+**Skill** — none; this entry is the treatment. Nearest applied home: `behavioral-metrics` move 8 on
+qualitative methods, whose sampling-bias warning is this bias arriving through your research panel.
 
 ---
 
@@ -814,7 +882,9 @@ writing effort as the marketing page.
 **Watch out** — It also means negative framing lands harder than you intend. Warning copy written for
 emphasis ("You will permanently lose everything!") can produce anxiety and abandonment in flows where you
 wanted care, not fear.
-**Skill** — `persuasive-copy`
+**Skill** — none; this entry is the treatment. Nearest applied home:
+`persuasive-copy/references/microcopy-patterns.md` §1, "Errors, by failure class" — the place where "the
+worst moment outweighs many small delights" turns into actual sentences.
 
 ### Labour illusion / operational transparency
 **What it says** — Showing the work being done on a user's behalf increases perceived value and satisfaction,
@@ -857,7 +927,9 @@ did not change, and why a single flagship feature can carry perception of a whol
 **Watch out** — It contaminates your research. Users rating a polished prototype will rate its *content*
 higher too. It also runs in reverse: one visibly broken element lowers confidence in your data handling, your
 security and your competence, which is why stale copyright years and broken images cost more than they look.
-**Skill** — `attention-and-hierarchy`
+**Skill** — none; this entry is the treatment. Nearest applied home: `attention-and-hierarchy` move 8, "Know
+that beauty will lie to you in testing", which covers the same bleed from visual quality into judgements of
+trustworthiness and competence, and the research contamination that follows from it.
 
 ---
 
@@ -990,8 +1062,10 @@ that explain themselves.
 **Evidence** — Robust as a conceptual framework; the specific cues are convention-dependent (see Jakob's law).
 **Watch out** — Flat and minimal styling regularly strips signifiers to nothing, producing screens where
 users cannot tell what is clickable. If a control needs a hover to reveal that it exists, it does not exist
-on touch.
-**Skill** — `attention-and-hierarchy`
+on touch. The inverse failure is a *false* affordance — a card with a hover shadow that does nothing, an
+underlined non-link, `cursor: pointer` on dead text — which costs trust rather than discoverability.
+**Skill** — `ui-signifiers-and-states` (craft layer): move 1 is this distinction, move 2 is the hover caveat
+above with the touch and keyboard cases worked out, and it carries the state matrix, contrast floors and CSS.
 
 ### Gulfs of execution and evaluation
 **What it says** — Two gaps separate a user from a system: the gulf of execution (I know what I want but not
@@ -1121,6 +1195,16 @@ context-dependent; test your own page or use contrast reasoning.
 
 **"Users only read 20% of the words on a page."** Nielsen's figure is a *model estimate* derived from
 time-on-page assumptions, not a direct measurement of reading. Directionally useful, not a statistic to quote.
+
+**"X% of users abandon after N seconds."** The most-refused claim in this set — `persuasive-copy`,
+`behavioral-metrics`, `ui-signifiers-and-states`, `onboarding-activation` and `ethical-persuasion-audit` each
+independently decline to quote it, and this is the entry they are declining in favour of. Every version in
+circulation is either untraceable or a single company's report on its own traffic, restated as a law about
+everyone's. There is no per-second abandonment constant: the number depends on what the user came to do, how
+much they have already invested, whether they have an alternative, and what the screen shows while they wait
+— which is why two products with identical load times abandon at different rates. Latency does cost
+conversion (see the 100ms entry below); that is a direction, not a threshold. Measure your own funnel, where
+the number is real and is about your users.
 
 **"Every 100ms of latency costs X% of revenue."** Latency/conversion correlations from Amazon, Google, Akamai
 and the Google/Deloitte "Milliseconds Make Millions" (2020) report are real company analyses, but they are

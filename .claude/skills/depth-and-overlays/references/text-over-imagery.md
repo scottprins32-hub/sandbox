@@ -97,11 +97,13 @@ backgrounds, not one gradient, so each band can be tuned independently.
 background-image: var(--scrim-top), var(--scrim-bottom);
 ```
 
-**Side-anchored** — text in the left third of a wide hero. Use `to right` and a logical-property
-equivalent (`to inline-end`) if you support RTL, or the scrim lands on the wrong side in Arabic.
+**Side-anchored** — text in the left third of a wide hero. `linear-gradient()`'s side keywords are physical
+only: there is no `to inline-end`, and writing one invalidates the whole declaration. Flip it on direction
+instead — `[dir="rtl"] { --scrim-inline: linear-gradient(to left, …) }` — or the scrim lands on the wrong
+side in Arabic.
 
 ```css
---scrim-inline: linear-gradient(to inline-end,
+--scrim-inline: linear-gradient(to right,
   rgb(0 0 0 / 0.66) 0%, rgb(0 0 0 / 0.66) 34%, rgb(0 0 0 / 0.63) 42%,
   rgb(0 0 0 / 0.54) 50%, rgb(0 0 0 / 0.41) 58%, rgb(0 0 0 / 0.26) 66%,
   rgb(0 0 0 / 0.13) 74%, rgb(0 0 0 / 0.04) 82%, rgb(0 0 0 / 0) 90%);

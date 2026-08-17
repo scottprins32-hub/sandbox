@@ -108,7 +108,7 @@ Three gaps, one of them serious.
 **Accessibility, almost entirely.** Input focus states get covered; keyboard focus rings, contrast ratios,
 target sizes and reduced motion generally do not. This is the biggest gap: a UI built to the standard advice
 can look polished and still be unusable by keyboard, illegible at low vision, and non-compliant. The floor is
-in `ui-craft/SKILL.md` and enforced inline throughout the five craft skills — contrast (1.4.3, 1.4.11),
+in `ui-craft/SKILL.md` and enforced inline throughout the craft skills — contrast (1.4.3, 1.4.11),
 never-colour-alone (1.4.1), visible focus (2.4.7), target size (2.5.8), reflow (1.4.10), text spacing
 (1.4.12), and `prefers-reduced-motion`.
 

@@ -53,7 +53,7 @@ tables through to a marketing-ish empty state without a second scale.
 }
 ```
 
-## C. Dense tool / dashboard / ops console — five steps, tight range
+## C. Dense tool / dashboard / ops console — six steps, tight range
 
 Information density is the feature. The top of the scale is 24px and that is deliberate: a 48px heading in a
 screen showing four hundred values steals space from the data and adds nothing, because the user opened this

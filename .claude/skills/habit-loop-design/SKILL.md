@@ -168,7 +168,7 @@ For rewards of the self, the specific thing to build is **evidence of competence
 
 The strongest, most defensible and most user-aligned form of retention is that **the product is materially better for this user than for a new one, because of what they put into it.** Unlike a streak, stored value does not punish absence — it rewards presence, and it is still there when the user comes back after three months.
 
-Two mechanisms make it stick. The **endowment effect** — people value what they possess more than the identical thing unpossessed (Kahneman, Knetsch & Thaler, 1990). And the **IKEA effect** — people place higher value on things they built themselves (Norton, Mochon & Ariely, 2012). Effort invested converts into felt ownership.
+The mechanism is the **endowment effect** — people value what they possess more than the identical thing unpossessed (Kahneman, Knetsch & Thaler, 1990). Applied to retention it is the safest reading of that literature: the workspace, history and configuration a returning user already owns are worth more to them than the same thing offered fresh, which is plain switching cost as much as it is a bias. Its first-run counterpart, the IKEA effect — with the boundary condition that the labour must have *succeeded* before it produces any ownership at all — is `onboarding-activation` move 6.
 
 The categories, roughly in order of durability:
 
@@ -281,19 +281,19 @@ On **re-engagement**, the essential move is to segment by *why* they left, becau
 
 Run against the screen, PR, or spec:
 
-- [ ] I can write the core value moment in one sentence, and this change serves it.
-- [ ] The product's natural usage frequency is stated, and the mechanic matches it.
+- [ ] The core value-moment sentence is pasted in the PR description, and the event that fires on it appears in this diff.
+- [ ] The PR names which row of the frequency table (Diagnose #1) this product sits in, and the mechanic being shipped is the one in that row's "Loop strategy" cell.
 - [ ] The returning-user path lands on the thing they were doing, not a home screen, in under three actions.
 - [ ] A useful session is possible in under ~30 seconds.
-- [ ] The internal trigger sentence is filled in: "when the user feels/encounters ___, they think of us."
+- [ ] Notification-attributed sessions as a share of total is on a dashboard with the value from 90 days ago beside it, and the share is not rising.
 - [ ] Any variance in the reward comes from the world, not from a scheduler I wrote. (Removal test run.)
-- [ ] This action leaves something behind that makes the user's next session better, and it's visible.
+- [ ] The diff writes at least one durable record on the user's behalf — point at the persist call — and a screenshot shows where the accumulated count is displayed back to them.
 - [ ] Stored value is exportable in one obvious action.
 - [ ] Any streak has: forgiveness earned through use, a warning before the break, a persistent `best`, and no shaming copy.
 - [ ] Every notification references a specific object or person, deep-links to it, respects a weekly volume budget and quiet hours, and has a granular off switch.
 - [ ] Push permission is requested after first value, behind a self-explaining pre-prompt.
 - [ ] Engagement metrics are paired with a counter-metric: task-completion speed, regretted-session rate, or notification opt-out rate.
-- [ ] The disclosure card for this mechanic is one I'd actually ship.
+- [ ] The disclosure sentence for this mechanic is pasted verbatim in the PR description, and a reviewer who is not the author has signed that they would ship it in-product.
 - [ ] **ethical-persuasion-audit** has been run on anything involving variable reward, streaks, social pressure, or loss framing.
 
 ## Sources
@@ -305,7 +305,7 @@ Run against the screen, PR, or spec:
 - **Ferster, C. & Skinner, B.F. (1957), *Schedules of Reinforcement*.** Variable-ratio schedules produce high, persistent, extinction-resistant responding.
 - **Schultz, W., Dayan, P. & Montague, P.R. (1997), *Science*.** Dopamine neurons signal reward *prediction error*, not pleasure. **Berridge & Robinson**: "wanting" is dissociable from "liking".
 - **Deci & Ryan, self-determination theory.** Autonomy, competence, relatedness as durable motivators. **Deci, Koestner & Ryan (1999)** meta-analysis on extrinsic rewards undermining intrinsic motivation — contested by **Cameron & Pierce**; treat as a risk, not a law.
-- **Norton, Mochon & Ariely (2012), *Journal of Consumer Psychology*.** IKEA effect: self-assembled things are valued more highly. **Kahneman, Knetsch & Thaler (1990), *JPE*.** Endowment effect.
+- **Kahneman, Knetsch & Thaler (1990), *JPE*.** Endowment effect; the gap is contested (Plott & Zeiler, 2005), but the applied reading — reluctance to abandon accumulated work and configuration — is safe ground. The IKEA effect and its successful-labour boundary condition are cited in `onboarding-activation`.
 - **Hull, C. (1932)**; **Kivetz, Urminsky & Zheng (2006), *JMR*** (café loyalty-card field study). Goal-gradient effect. **Nunes & Dreze (2006), *JCR*** — endowed progress, the car-wash study.
 - **Ghibellini & Meier (2025), *Humanities and Social Sciences Communications*.** Meta-analysis: no reliable memory advantage for unfinished tasks (Zeigarnik does not replicate); spontaneous resumption of interrupted tasks (Ovsiankina) does hold, at roughly two-thirds across studies.
 - **Kahneman & Tversky (1979), *Econometrica*** — prospect theory / loss aversion. **Gal & Rucker (2018), *Journal of Consumer Psychology*** — argue loss aversion is not a general law and is highly context-dependent. Use the qualitative reading only.

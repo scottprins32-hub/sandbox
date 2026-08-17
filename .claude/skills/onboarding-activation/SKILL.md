@@ -169,6 +169,8 @@ Same logic applies to non-OS asks: connecting a bank account, granting a repo sc
 
 ### 8. Treat empty states as the teaching surface, not a dead end
 
+This move owns the **never-had-any** state only. Filtered-to-nothing, failed-to-load and drained are three separate states with three separate jobs, and `list-and-queue-design` move 5 owns the taxonomy; serving this move's teaching copy to any of them is the bug that tells a user their data is gone.
+
 Every list, board, inbox, and dashboard has a zero-item state, and for a new user that is most of the product. A screen that says "No items yet" is a wall. The same screen can be the best tutorial you will ever ship, because the user is *looking at the exact place the thing goes*.
 
 An empty state should carry, in order: what belongs here and why it is useful, the single primary action to create the first one, a lower-commitment path (import, use a template, load a sample), and — if the thing arrives from elsewhere rather than being created — an explanation of what triggers it. Use the real component, styled as a ghost, so the user learns the shape.
@@ -237,8 +239,10 @@ Time-to-value: unbounded — a user who cannot get IT approval for the OAuth ste
 
 Run this against the screen or PR before merging.
 
-- [ ] I can state this product's activation moment in one concrete sentence, and there is a **product-state** event that fires on it.
-- [ ] I know the current time-to-value in seconds and taps, and this change reduces it (or I know why it doesn't).
+- [ ] The activation sentence is pasted in the PR description, in one concrete sentence with a subject, verb and object.
+- [ ] A **product-state** event firing on it exists in this diff, carrying `is_sample_data` and a `seat_type` / arrival-source property on the payload.
+- [ ] The current time-to-value is recorded in the PR as a number of seconds and taps, measured by walking the flow on a real device.
+- [ ] The number after this change is recorded beside it. If it went up, the reason is in the PR.
 - [ ] Every field asked before the value moment changes what the next screen shows. Anything else is deferred or inferred.
 - [ ] No account, credit card, or email verification blocks the first value moment — or there is a specific legal/technical reason it must.
 - [ ] No OS permission dialog fires without an in-app primer first, with a free "Not now".

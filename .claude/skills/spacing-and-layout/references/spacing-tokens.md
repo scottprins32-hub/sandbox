@@ -8,6 +8,12 @@ hundred arbitrary values. `SKILL.md` gives the scale and the reasoning; this giv
 Same eleven-step primitive scale in all three. What changes is which steps the semantic tokens point at.
 Pick one per surface — a marketing site and its admin console are different densities.
 
+`data-density` is the **page** preset and belongs on the root element. It is a different axis from
+`list-and-queue-design`'s `[data-row-density="comfortable"|"compact"]`, which sizes rows inside one table, and
+the two must not share an attribute: a comfortable ops table inside a dense-tool page is a legitimate
+combination, and if a row toggle writes `data-density` it either matches no preset here (`comfortable`) or
+silently swaps the entire page's gaps, padding, control height and measure (`compact`).
+
 ```css
 /* ---- Primitives: identical everywhere. Never referenced by components. ---- */
 :root {
@@ -40,7 +46,7 @@ Space is the design. Wide range, large steps, generous section rhythm.
   --pad-control-y: var(--space-sm);    /* 12 */
   --pad-control-x: var(--space-lg);    /* 24 */
   --control-min-h: 3rem;               /* 48 */
-  --measure:       68ch;
+  --measure:       65ch;               /* typography-system move 4 owns this number in all three presets */
   --content-max:   72rem;
   --gutter:        clamp(1.25rem, 5vw, 4rem);
 }
@@ -60,12 +66,26 @@ The one to start from if you are unsure.
   --pad-card:      var(--space-lg);    /* 24 */
   --pad-control-y: var(--space-sm);    /* 12 */
   --pad-control-x: var(--space-md);    /* 16 */
-  --control-min-h: 2.5rem;             /* 40 */
-  --measure:       66ch;
+  --control-min-h: 2.5rem;             /* 40 — pointer-only; see the coarse-pointer bump below */
+  --measure:       65ch;
   --content-max:   80rem;
   --gutter:        clamp(1rem, 4vw, 2rem);
 }
+
+@media (pointer: coarse) {
+  [data-density="default"] { --control-min-h: 2.75rem; }   /* 44 */
+}
 ```
+
+**Why 40px is allowed here and only here.** It clears WCAG 2.5.8's 24×24 AA floor with room to spare and
+falls short of the 44×44 touch standard (2.5.5 AAA; Apple HIG 44pt, Material 48dp). That is a defensible
+default for a pointer surface — mouse users get a tighter, faster-scanning form — and a defect on the first
+phone, which is what the coarse-pointer bump exists for. Ship the bump with the preset, not later: a preset
+whose `--control-min-h` sits below 44px with no `(pointer: coarse)` rule is the single most common way a
+product-density app ships an undersized tap target. Note also that this preset's own `--pad-control-y` of
+12px around a 20px line box already computes to 44px, so `--control-min-h` binds only on controls whose
+content is shorter than a line of body text — icon buttons, chips, steppers, colour swatches. Those are
+exactly the controls that get missed.
 
 ### Preset C — dense / data tool
 
@@ -82,7 +102,7 @@ Half-steps do the work. Information density is the feature; do not "fix" it with
   --pad-control-y: var(--space-2xs);   /*  4 */
   --pad-control-x: var(--space-xs);    /*  8 */
   --control-min-h: 1.75rem;            /* 28 */
-  --measure:       66ch;
+  --measure:       65ch;
   --content-max:   none;
   --gutter:        var(--space-md);
 }
@@ -203,7 +223,45 @@ problem — pick one, and prefer padding plus a hairline border.
 The heading rule is the one to internalise: the space *above* a heading should be roughly 2.5–3× the space
 below it. Equal space on both sides orphans the heading.
 
-## 3. Tailwind v4, CSS-first
+## 3. Worked example: a cluttered card, fixed with spacing alone
+
+A card holding six children — badge, title, byline, summary, and two buttons. Same colours, same type, same
+border throughout; only spacing changes. The values are Preset B's, from the tables above.
+
+```css
+/* BEFORE — one gap for six items, padding smaller than the internal gap. */
+.card       { padding: 12px; border: 1px solid var(--line); }
+.card > *   { margin-bottom: 12px; }
+.card > *:last-child { margin-bottom: 0; }
+```
+
+Six equally-spaced items means six perceived groups. The badge floats free of the title it modifies, the
+byline is as far from its heading as the summary is from the buttons, and the 12px padding is the same as the
+internal gap so the content reads as pressed against the frame. Every fix reached for at this point — a
+divider, a background tint on the meta block, a bolder title — adds ink to solve a spacing problem.
+
+```css
+/* AFTER — three zones, three gap values, frame ≥ contents. */
+.card {
+  padding: var(--pad-card);              /* 24 — padding ≥ largest inner gap */
+  border: 1px solid var(--line);
+  display: grid;
+  gap: var(--space-lg);                  /* 24 — between zones */
+}
+.card__meta    { display: grid; gap: var(--space-2xs); justify-items: start; } /* 4 */
+.card__summary { max-inline-size: var(--measure); }
+.card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }       /* 8 */
+```
+
+The only markup change is three wrappers — `.card__meta` around badge/title/byline, `.card__summary`,
+`.card__actions` around the buttons — so the CSS has zones to space.
+
+What changed measurably: perceived groups 6 → 3; intra-group to inter-group gap ratio 1:1 → 1:6; padding no
+longer smaller than the internal gaps; measure capped. No new borders, tints, weights or colours. This is
+what "spend whitespace before you spend ink" means in practice, and it is the first thing to try on any card,
+row or panel that "feels cluttered".
+
+## 4. Tailwind v4, CSS-first
 
 ```css
 @import "tailwindcss";
@@ -216,8 +274,8 @@ below it. Equal space on both sides orphans the heading.
   --spacing-gutter:  clamp(1rem, 4vw, 2rem);
   --spacing-section: clamp(3rem, 8vw, 6rem);
 
-  /* Containers: max-w-prose, max-w-content. */
-  --container-prose:   66ch;
+  /* Containers: max-w-prose, max-w-content. Prose measure is typography-system move 4's number. */
+  --container-prose:   65ch;
   --container-content: 80rem;
 
   /* Container-query breakpoints for @md:, @xl: variants. */
@@ -238,7 +296,7 @@ in CI:
 rg -n '\b(p|m|gap|space)[a-z]*-\[' src/ && exit 1 || exit 0
 ```
 
-## 4. Plain CSS, no framework
+## 5. Plain CSS, no framework
 
 ```css
 *, *::before, *::after { box-sizing: border-box; }
@@ -262,7 +320,7 @@ body { margin: 0; }
 .prose > p     { max-inline-size: var(--measure); }
 ```
 
-## 5. Migrating a codebase that already has 100 arbitrary values
+## 6. Migrating a codebase that already has 100 arbitrary values
 
 Do not do this as one pull request. It will not get reviewed and it will not get merged.
 
@@ -291,7 +349,7 @@ author can answer and the reviewer can check.
 **What not to do:** a global find-and-replace of `13px` → `12px`. It will silently alter optical corrections
 and break a handful of layouts in ways nobody traces back for months.
 
-## 6. The audit questions
+## 7. The audit questions
 
 Run these against any screen with a spacing complaint:
 

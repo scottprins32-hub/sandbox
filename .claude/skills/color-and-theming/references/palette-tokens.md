@@ -191,8 +191,11 @@ Success (hue 150, peak chroma 0.17):
 
 ## Tailwind v4, CSS-first
 
-`@theme` generates utilities from the token names, so `bg-surface-raised`, `text-muted`, `border-strong` and
-`ring-focus` all exist without a config file. Keep the primitives out of `@theme` if you want them
+`@theme` generates utilities from the token names, so `bg-surface-raised`, `text-muted` and `ring-focus`
+exist without a config file. Watch the border namespace: a `--color-border-strong` token produces
+`border-border-strong`, not `border-strong`, because the utility carries the property prefix. Either live
+with the doubled name or rename the token to `--color-strong` if the short utility matters more than the
+role name. Keep the primitives out of `@theme` if you want them
 unavailable as utilities — that is a cheap way to enforce "components use roles only".
 
 ```css
@@ -229,7 +232,7 @@ unavailable as utilities — that is a cheap way to enforce "components use role
 }
 ```
 
-Usage stays theme-agnostic — `class="bg-surface-raised text-primary border border-subtle"` is correct in both
+Usage stays theme-agnostic — `class="bg-surface-raised text-primary border border-border-subtle"` is correct in both
 themes with no `dark:` variants anywhere. **A component file containing `dark:` colour variants is a component
 that opted out of the token system**; the only legitimate `dark:` usages are non-colour ones (a different
 image asset, a shadow that must differ structurally).

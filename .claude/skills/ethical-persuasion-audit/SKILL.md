@@ -23,9 +23,14 @@ interface patterns in statute. This is an audit you run, not a position you hold
   link, or a second confirmation step.
 - Before shipping anything from `persuasive-copy` or `habit-loop-design`. Those two skills generate the
   material this one gates.
+- Before shipping anything from `decision-screen-design` moves 2, 7, 8, 10 and 12 — trial timelines, urgency,
+  social proof, fee disclosure and reference prices. That skill names this one as its gate; the relationship
+  runs both ways.
 - **Not** the right skill if the question is "how do I get people to come back" (→ `habit-loop-design`),
-  "why is this converting badly" (→ `friction-and-flow`), "what should the button say" (→ `persuasive-copy`),
-  or "how do I measure whether this hurt anyone" (→ `behavioral-metrics`, which owns guardrail metrics).
+  "why is this converting badly" (→ `friction-and-flow` if it is a form or a multi-step task,
+  `decision-screen-design` if the screen has a price on it), "what should the button say" (→
+  `persuasive-copy`), or "how do I measure whether this hurt anyone" (→ `behavioral-metrics`, which owns
+  guardrail metrics).
 
 **This is an engineering checklist, not legal advice.** Requirements differ by jurisdiction, by whether you
 are a platform or a shop, by company size, and they change. Verify current rules for every market you serve

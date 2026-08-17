@@ -1,6 +1,6 @@
 ---
 name: spacing-and-layout
-description: Settles the actual numbers for space and structure — the spacing scale and its token names, how much gap goes inside a group versus between groups, page gutters and content max-widths, layout primitives, CSS Grid/flexbox gap, container queries, fluid clamp() sizing, and the WCAG floors for reflow, text-spacing overrides and target size. Use this whenever the user is building or reviewing any layout, page, card, form, section, grid, table, nav or responsive behaviour — even if they never say "spacing", "grid" or "layout" — including "this feels cluttered", "it looks cramped/unfinished", "make it breathe", "how much padding", "what should my spacing scale be", "should I use a 12-column grid", "it breaks on mobile", "the sidebar collapses wrong", or any question about px values, gaps, margins, breakpoints or container queries. Use it alongside `attention-and-hierarchy`, which owns *why* proximity groups things; this skill supplies the numbers that make it true.
+description: Settles the actual numbers for space and structure — the spacing scale and its token names, how much gap goes inside a group versus between groups, page gutters and content max-widths, layout primitives, CSS Grid/flexbox gap, container queries, fluid clamp() sizing, and the WCAG floors for reflow, text-spacing overrides and target size. Use this whenever the user is building or reviewing any layout, page, card, form, section, grid, table, nav or responsive behaviour — even if they never say "spacing", "grid" or "layout" — including "this feels cluttered", "it looks cramped/unfinished", "make it breathe", "how much padding", "what should my spacing scale be", "should I use a 12-column grid", "it breaks on mobile", "the sidebar collapses wrong", or any question about px values, gaps, margins, breakpoints or container queries. Use it alongside `attention-and-hierarchy`, which owns *why* proximity groups things; this skill supplies the numbers that make it true. For a data table's column count, density modes and row behaviour go to `list-and-queue-design`; this skill supplies the padding and gap values inside it.
 ---
 
 # Spacing and layout
@@ -24,7 +24,9 @@ whitespace is a hierarchy channel. Read it for the mechanism. Read this for the 
 - A layout that overflows, horizontally scrolls, or clips at small widths or high zoom.
 - Reviewing a diff full of arbitrary values (`p-[13px]`, `margin-top: 22px`, `w-[347px]`).
 
-Go elsewhere when: the layout is a **data table** and the question is column count, density modes or what
+Go elsewhere when: the page has a **fixed physical size** — printed, or rendered to PDF — where there is no
+reflow, no scroll and margins are set by `@page` → `print-and-physical-artefacts`. The layout is a
+**data table** and the question is column count, density modes or what
 happens to it at 320px → `list-and-queue-design` (this skill still supplies the padding and gap values it
 uses). The question is the *type scale itself* — sizes, weights, tracking, typeface choice
 (`typography-system`, which this skill defers to; type sizes drive spacing, so settle them first); *which
@@ -42,7 +44,12 @@ a scale into a codebase with 300 arbitrary values is a week of work nobody funds
 1. **Density.** The three in `ui-craft`: editorial (space is the design — base rhythm 24/48/96), product
    default (16/24/48), or dense tool (8/12/24 with 4px half-steps). Density is a legitimate product decision,
    not a failure — a trading screen with generous whitespace is unusable. Pick one per surface. A marketing
-   site and its admin console are different densities and should not share a spacing scale wholesale.
+   site and its admin console are different densities and should not share a spacing scale wholesale. The
+   presets are selected by `[data-density="editorial"|"default"|"compact"]` on the root — a **page** preset,
+   distinct from `list-and-queue-design`'s `[data-row-density="comfortable"|"compact"]`, which sizes rows
+   inside one table. Two axes, two attributes: a comfortable ops table inside a dense-tool page is a
+   legitimate combination, and collapsing them onto one attribute makes a row toggle silently reset the whole
+   page's spacing scale.
 2. **Primary input: touch or pointer?** Touch sets a 44px floor on interactive height and forces bigger gaps
    between adjacent targets. Pointer allows 24–32px rows. If both (most web apps), design for touch and let
    pointer users have the extra air, or ship a density toggle — do not average them.
@@ -97,7 +104,7 @@ Tailwind v4, CSS-first — `--spacing` is the multiplier all numeric utilities d
 @theme {
   --spacing: 0.25rem;                         /* p-4 → 1rem, gap-6 → 1.5rem */
   --spacing-gutter: clamp(1rem, 5vw, 3rem);   /* px-gutter, gap-gutter */
-  --container-prose: 68ch;                    /* max-w-prose */
+  --container-prose: 65ch;                    /* max-w-prose — typography-system move 4 owns this number */
 }
 ```
 
@@ -203,6 +210,10 @@ block. Headings are tight to the content they head — `margin-block: var(--spac
 padding looks like its contents are escaping. Frame ≥ contents, always. This one rule fixes a surprising
 share of "looks cramped".
 
+A full before/after applying both rules to a six-child card — same colours, same type, same border, three
+wrappers added and nothing else — is in `references/spacing-tokens.md` §"Worked example: a cluttered card,
+fixed with spacing alone", next to the per-component values it uses.
+
 How it fails: uniform generous space applied as a style rather than as structure. A page where everything is
 32px from everything else is airy *and* structureless — it carries exactly as little grouping information as
 a page where everything is 8px apart. Differential space is the point; more space is not.
@@ -281,7 +292,8 @@ an emphasised middle plan. Those align to the **page gutter and max-width**, whi
 consistent, and compose freely inside:
 
 ```css
-:root { --gutter: clamp(1rem, 5vw, 3rem); --content-max: 72rem; --measure: 68ch; }
+/* --measure is typography-system move 4's number, held here as a token. Do not fork it. */
+:root { --gutter: clamp(1rem, 5vw, 3rem); --content-max: 72rem; --measure: 65ch; }
 ```
 
 The **12 desktop / 8 tablet / 4 mobile** convention (Material Design's layout grid) is a sensible default
@@ -461,44 +473,6 @@ html { scroll-padding-block-start: calc(var(--header-h) + var(--space-md));
 a 2px ring with a 2px offset needs 4px of clearance, so a control flush against a container edge will have
 its ring clipped by any ancestor with `overflow: hidden`.
 
-### 9. Before and after: a cluttered card, fixed with spacing alone — *worked example*
-
-A card holding six children — badge, title, byline, summary, and two buttons. Same colours, same type, same
-border throughout; only spacing changes.
-
-```css
-/* BEFORE — one gap for six items, padding smaller than the internal gap. */
-.card       { padding: 12px; border: 1px solid var(--line); }
-.card > *   { margin-bottom: 12px; }
-.card > *:last-child { margin-bottom: 0; }
-```
-
-Six equally-spaced items means six perceived groups. The badge floats free of the title it modifies, the
-byline is as far from its heading as the summary is from the buttons, and the 12px padding is the same as the
-internal gap so the content reads as pressed against the frame. Every fix reached for at this point — a
-divider, a background tint on the meta block, a bolder title — adds ink to solve a spacing problem.
-
-```css
-/* AFTER — three zones, three gap values, frame ≥ contents. */
-.card {
-  padding: var(--space-lg);              /* 24 — padding ≥ largest inner gap */
-  border: 1px solid var(--line);
-  display: grid;
-  gap: var(--space-lg);                  /* 24 — between zones */
-}
-.card__meta    { display: grid; gap: var(--space-2xs); justify-items: start; } /* 4 */
-.card__summary { max-width: 60ch; }
-.card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }       /* 8 */
-```
-
-The only markup change is three wrappers — `.card__meta` around badge/title/byline, `.card__summary`,
-`.card__actions` around the buttons — so the CSS has zones to space.
-
-What changed measurably: perceived groups 6 → 3; intra-group to inter-group gap ratio 1:1 → 1:6; padding no
-longer smaller than the internal gaps; measure capped at 60ch. No new borders, tints, weights or colours.
-This is what "spend whitespace before you spend ink" means in practice, and it is the first thing to try on
-any card, row or panel that "feels cluttered".
-
 ## Anti-patterns
 
 - **Arbitrary values in the markup.** `p-[13px]`, `gap-[18px]`, `style="margin-top: 22px"`. The scale exists
@@ -554,13 +528,16 @@ Run against the screen or the PR diff.
 
 ## Sources
 
-- **WCAG 2.2** (W3C Recommendation) — the law-like layer. SC **1.4.4 Resize Text** (AA, 200% without loss of
-  content or functionality); SC **1.4.10 Reflow** (AA, 320 CSS px vertical / 256 CSS px horizontal, exception
-  for content requiring two-dimensional layout); SC **1.4.12 Text Spacing** (AA — line height ≥1.5×, spacing
-  after paragraphs ≥2×, letter spacing ≥0.12×, word spacing ≥0.16× of font size); SC **2.4.11 Focus Not
-  Obscured (Minimum)** (AA, new in 2.2) and **2.4.12** (AAA); SC **2.5.5 Target Size (Enhanced)** (AAA,
-  44×44 CSS px); SC **2.5.8 Target Size (Minimum)** (AA, new in 2.2, 24×24 CSS px with spacing, equivalent,
-  inline, user-agent-control and essential exceptions).
+- **WCAG 2.2** (W3C Recommendation) — the law-like layer. The criteria this skill's checklist enforces are
+  1.4.4, 1.4.10, 1.4.12, 2.4.11 and 2.5.8, cited inline where they bite; the shared floor with full
+  definitions is in `ui-craft` §The accessibility floor. Three details are load-bearing for this skill and are
+  not stated there: **1.4.10**'s 320 CSS px is paired with 256 CSS px for horizontally-scrolling content and
+  carries an exception "for parts of the content which require two-dimensional layout for usage or meaning",
+  which is what permits a scrolling data table but not a scrolling page; **2.5.8**'s 24×24 floor has five
+  exceptions — spacing, equivalent, inline, user-agent control and essential — and the spacing one is the
+  reason adjacent undersized targets are judged by their 24px-diameter centred circles rather than their
+  boxes; and **2.5.5 Target Size (Enhanced)** is the AAA tier at 44×44 CSS px, with **2.4.12** the AAA tier of
+  focus-not-obscured (*no part* obscured, not merely "not entirely").
 - **Material Design** (Google) — layout grid and spacing: components align to an **8dp** square baseline
   grid; iconography and type align to a **4dp** grid; responsive column counts of **12 / 8 / 4** for
   desktop / tablet / mobile; touch targets **≥48×48 dp** with 8dp or more between them; default screen
@@ -601,10 +578,12 @@ circulate widely with no locatable primary source.
 ## Further reading in this skill
 
 - `references/spacing-tokens.md` — read when setting up a project or auditing an existing one: complete token
-  files for three densities, per-component padding tables (buttons, inputs, cards, tables, nav, modals),
-  Tailwind v4 and plain-CSS versions, and a staged migration recipe with lint rules for a codebase already
-  full of arbitrary values.
+  files for three densities with their coarse-pointer bumps, per-component padding tables (buttons, inputs,
+  cards, tables, nav, modals), a full before/after of a cluttered card fixed by spacing alone, Tailwind v4 and
+  plain-CSS versions, and a staged migration recipe with lint rules for a codebase already full of arbitrary
+  values.
 - `references/responsive-layout.md` — read when a layout must adapt: breakpoint strategy versus container
   queries with a decision table, the full primitive library, grid recipes (breakout, auto-fit, sidebar,
-  holy-grail, dense dashboards), how to make tables and charts survive 320px, mobile viewport units and safe
-  areas, and a step-by-step 320px/400%-zoom reflow audit.
+  holy-grail, dense dashboards), how to make code blocks, charts and table *containers* survive 320px (the
+  table itself is `list-and-queue-design`), mobile viewport units and safe areas, and a step-by-step
+  320px/400%-zoom reflow audit.

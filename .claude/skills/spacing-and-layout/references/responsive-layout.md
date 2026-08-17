@@ -258,22 +258,15 @@ Make the scroll region keyboard-accessible and announced:
 </div>
 ```
 
-For a small table, the better answer is to **restack into cards below the breakpoint** rather than scroll:
-
-```css
-@media (width < 40rem) {
-  .stack-table thead { position: absolute; inline-size: 1px; block-size: 1px;
-                       overflow: hidden; clip-path: inset(50%); }
-  .stack-table tr { display: grid; gap: var(--space-2xs);
-                    padding-block: var(--space-md); border-block-end: 1px solid var(--line); }
-  .stack-table td { display: grid; grid-template-columns: 8rem 1fr; gap: var(--space-xs); }
-  .stack-table td::before { content: attr(data-label); font-weight: 600; }
-}
-```
-
-This changes the table's semantics for assistive technology (`display: grid` on rows/cells drops the table
-role in some engines). If the data relationships matter, prefer the scroll container. Restacking is for
-simple key/value lists that were only ever a table for convenience.
+**Do not restack by putting `display: block|flex|grid` on `<table>`, `<tr>` or `<td>`.** That is the snippet
+everyone has copied, and it changes the elements' computed roles in several engines, so the table semantics
+the markup was chosen for are gone — a live accessibility bug, not a style choice. If a card layout is
+genuinely the better mobile answer, render a **separate component from the same data** — a `<ul>` of
+`<article>`s with a `<dl>` keeping every value labelled — and switch to it with a container query. The full
+pattern, what it costs (sorting loses its home, column comparison disappears, two components to keep in
+sync), and the two alternatives worth choosing instead are in
+`list-and-queue-design/references/tables-accessibility-and-responsive.md` §7, patterns A–C. That skill owns
+the decision; this one supplies the gaps and padding inside whichever component you land on.
 
 ### Code blocks, long tokens, URLs
 
