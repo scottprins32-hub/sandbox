@@ -46,6 +46,11 @@ a{color:inherit; text-decoration:none}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:2px}
 [tabindex="-1"]:focus{outline:none}   /* route headings take focus programmatically */
+/* the skip link reveals itself on focus instead of staying a clipped 1px box */
+.skip{position:fixed; top:10px; left:10px; z-index:90; background:var(--amber); color:#241A05;
+  font-weight:600; font-size:.9rem; padding:11px 18px; border-radius:10px;
+  transform:translateY(calc(-100% - 14px)); transition:transform .2s var(--ease)}
+.skip:focus{transform:none}
 
 /* Grain. One tiny SVG, no network, sits above the photography and stops the
    large dark fields from banding. */
@@ -669,7 +674,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 /* The governor as a live strip: three bands, the one the truck is in right now
    lit. Column widths are the share of a session spent in each state, so the row
    carries data rather than being three equal boxes. */
-.gov{display:grid; grid-template-columns:4.1fr 4.1fr 1.7fr; gap:2px;
+.gov{display:grid; grid-template-columns:4.1fr 4.1fr minmax(230px,1.7fr); gap:2px;
   background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden;
   margin-bottom:var(--s5)}
 .gov>div{background:var(--card); padding:16px 18px 18px; min-width:0;
@@ -808,7 +813,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
 }
 </style>
 
-<a class="sr" href="#main" id="skip" data-i18n="a11y.skip">Skip to the content</a>
+<a class="skip" href="#main" id="skip" data-i18n="a11y.skip">Skip to the content</a>
 
 <header class="hdr" id="hdr">
   <div class="wrap hdr-in">
@@ -908,7 +913,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
     <div class="story">
       <div class="story-body rv">
         <p class="pull" data-i18n="story.pull">Somebody cut a window in the side of a bread van and bolted a charcoal grill under it.</p>
-        <p class="body" data-i18n="story.p1">In the 1970s the bread trucks finished their rounds by morning and sat idle all night. Drivers started firing up charcoal in the back and selling to whoever was still out. That is a trùk 'i pan, literally a bread truck, and forty years later it is still how the island eats after dark.</p>
+        <p class="body" data-i18n="story.p1">In the 1970s the bread trucks finished their rounds by morning and sat idle all night. Drivers started firing up charcoal in the back and selling to whoever was still out. That is a trùk 'i pan, literally a bread truck, and fifty years on it is still how the island eats after dark.</p>
         <p class="body" data-i18n="story.p2">The rules have not changed much. It opens when the restaurants close. Nothing is pre-cooked. You order at a window, you wait where you are standing, and the answer to every question is either batata or pan.</p>
         <p class="body" data-i18n="story.p3">Fridays came late to that tradition, in 2018, and treats it seriously enough to put rib eye, picanha and conch on a paper plate at two in the morning.</p>
         <div class="gloss" id="gloss" lang="pap">
@@ -1039,7 +1044,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
           <a class="way" href="#/order?where=delivery">
             <span class="way-ic">{{ICON:motorcycle}}</span>
             <div><b data-i18n="wait.w3h">Have it brought over</b><p data-i18n="wait.w3p">Delivery across Willemstad and the Caracasbaai peninsula while the grill is lit.</p></div>
-            <div class="way-time num">35<small data-i18n="wait.min">min</small></div>
+            <div class="way-time num">35<small data-i18n="wait.typ">typical</small></div>
           </a>
         </div>
       </div>
@@ -1252,7 +1257,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
         <span class="pill amber gov-now" data-i18n="kit.now" hidden>Right now</span>
         <p class="n num">1 to 6 <small data-i18n="kit.tickets">tickets</small></p>
         <b data-i18n="kit.b1h">Quote it and take it</b>
-        <p data-i18n="kit.b1p">Fire time is quoted straight, orders flow, nothing is throttled. The first hour after the grill lights and the last before it goes out both sit here.</p></div>
+        <p data-i18n="kit.b1p">Fire time is quoted straight, orders flow, nothing is throttled. The opening minutes and the tail of the night sit here.</p></div>
       <div class="g2">
         <span class="gov-bar"></span>
         <span class="pill amber gov-now" data-i18n="kit.now" hidden>Right now</span>
@@ -1281,7 +1286,7 @@ table.mx-t{border-collapse:collapse; width:100%; min-width:760px}
     <p class="ft-word" aria-hidden="true">Bon nochi</p>
     <details class="about">
       <summary>{{ICON:info}}<span data-i18n="about.sum">About this concept</span><span class="caret">{{ICON:caret-down}}</span></summary>
-      <p data-i18n="about.p1">This is a redesign concept, not the live site, and nothing here takes payment. The truck, the address, the phone number, the photography and the menu are real. Prices are transcribed from the truck's own printed menu of December 2024 and converted to the Caribbean guilder, which replaced the Netherlands Antillean guilder as legal tender on 1 July 2025.</p>
+      <p data-i18n="about.p1">This is a redesign concept, not the live site, and nothing here takes payment. The truck, the address, the phone number, the photography and the menu are real. Plate prices are transcribed from the truck's own printed menu of December 2024 and converted to the Caribbean guilder, which replaced the Netherlands Antillean guilder as legal tender on 1 July 2025. The sides at Cg 2, the mitar mitar second pass at Cg 3, extra batata at Cg 4, delivery at Cg 8 and the Cg 2 Trempan credit are this concept's own numbers, not the menu's.</p>
       <p data-i18n="about.p2">The fire time, the depth of the rail and the tickets on the kitchen screen are <b>modelled</b>, not measured. They follow a curve that peaks between 22:30 and 01:00 because that is when reviews describe the worst waits. The opening hours, the island clock and the late-night session logic are real and run on America/Curacao, which does not observe daylight saving.</p>
       <p data-i18n="about.p3">Two things need a human. The Papiamentu needs a native speaker's pass before any of this ships. And the truck's own banner, visible in their photography, reads "closed on Thuesday" while every listing shows seven days open, so the hours table here follows the listings and the discrepancy is the owner's to settle.</p>
     </details>
@@ -1435,7 +1440,7 @@ const T={
   "story.kicker":"Trùk 'i pan","story.h":"Un trùk di pan<br>ku nunka a<br>bai kas",
   "story.lede":"Kada isla tin un kos ku e ta hasi mei anochi. Kòrsou ta grill.",
   "story.pull":"Un hende a kòrta un bentana den un trùk di pan i a pone un grill di karbon bou di dje.",
-  "story.p1":"Den añanan '70 e trùknan di pan tabata kaba nan ronda mainta i keda pará henter anochi. Chofùrnan a kuminsá sende karbon patras i bende na ken ku ainda tabata pafó. Esei ta un trùk 'i pan, i kuarenta aña despues ta ainda asina e isla ta kome despues di skur.",
+  "story.p1":"Den añanan '70 e trùknan di pan tabata kaba nan ronda mainta i keda pará henter anochi. Chofùrnan a kuminsá sende karbon patras i bende na ken ku ainda tabata pafó. Esei ta un trùk 'i pan, i sinkuenta aña despues ta ainda asina e isla ta kome despues di skur.",
   "story.p2":"E reglanan no a kambia hopi. E ta habri ora restaurantnan ta sera. Nada no ta kushiná promé. Bo ta òrdena na un bentana, bo ta warda kaminda bo ta pará, i e kontesta riba tur pregunta ta batata òf pan.",
   "story.p3":"Fridays a yega lat na e tradishon ei, na 2018, i ta tum'é serio sufisiente pa pone rib eye, picanha i karkó riba un tayo di papel pa dos or di mainta.",
   "story.cap":"E bentana, Caracasbaaiweg 216, mayoria anochi rònt di dies or.",
@@ -1480,14 +1485,14 @@ const T={
   "about.sum":"Tokante e konsepto aki",
   "kit.h":"E rail","kit.tickets":"tiket","kit.up":"ariba",
   "kit.lede":"Un tempu primintí ta un mentira si kushina no por kump'lié. Tiket ta yega gruponan pa karni, asina e kokinero ta sende kuater galiña un biaha en bes di kuater biaha, i e preis di tempu ku e klente ta mira ta lesá for di e pantaya aki en bes di for di un promedio.",
-  "kit.b1h":"Sit'é i tum'é","kit.b1p":"Tempu di kandela ta sitá derechi, òrdu ta kore, nada no ta frená. E promé ora despues ku e grill sende i e último promé ku e paga ta keda den e banda aki.",
+  "kit.b1h":"Sit'é i tum'é","kit.b1p":"Tempu di kandela ta sitá derechi, òrdu ta kore, nada no ta frená. E promé minütnan despues di sende i e rabu di e anochi ta keda den e banda aki.",
   "kit.b2h":"Sitá onest, habri e lane trempan","kit.b2p":"E sita ta subi ku e rail, i slòt di Trempan ta paresé den e flujo pa e piek kuminsá platia su mes.",
   "kit.b3h":"Stòp di primintí","kit.b3p":"Tiket nobo ta haña un rango, no un number. Entrega ta pousa i e trùk ta bis'é, en bes di kobra ketu bai pa un espera di kuarenta minüt.",
   "ft.eat":"Kome","ft.know":"Sa","ft.reach":"Kontaktá","ft.inside":"Paden","ft.delivery":"Entrega",
   "ft.what":"Kiko ta un trùk 'i pan","ft.fire":"Kon tempu di kandela ta funshoná","ft.hours":"Ora di habri",
   "ft.rail":"E rail, bista di personal","ft.app":"E app di Fridays",
   "ft.concept":"Rediseño konseptual. No ta e sitio bibu.","tray.cta":"Kuminsá e òrdu aki",
-  "have.t":"Tiket {code} ta kaba riba e rail.","have.link":"Sigui e","kit.now":"Awor aki","of4":"di",
+  "have.t":"Tiket {code} ta kaba riba e rail.","have.link":"Sigui e","kit.now":"Awor aki","of4":"di","wait.typ":"típiko",
   "t.leaveB1":"Sali den {n} minüt",
   "t.collectB":"Buska {t} {when}","t.collectS":"Muchu leu pa un konteo. E telefon ta konta bo den e último ora.",
   "t.queuedS":"E grill ta friu, pues nada no a kuminsá. E liña di tempu ta kore for di ora e sende.",
@@ -1533,6 +1538,8 @@ const T={
   "t.card":"Ta kaba na 4471","t.cash":"Cg òf USD, sin kosto di karchi",
   "t.route":"Habri e ruta","t.rail":"Wak e riba e rail","t.again":"Òrdena algu mas",
   "t.done":"Buská. Dushi.","t.doneS":"E tiket aki a wòrdu entregá.",
+  "t.deliveredB":"Entregá. Dushi.","t.deliveredS":"Entregá na bo porta rònt di {t}.",
+  "t.sinceB":"Kla for di {t}","t.sinceS":"Kushina ta ten\u00e9 kayente. Mustra {code} na bentana 2.",
   "t.trempanB":"Slòt Trempan wardá","t.trempanS":"Diesdos minüt garantisá, {money} menos apliká",
   "k.empty":"Nada riba e rail. Bin bèk despues di nuebe.",
   "k.emptyB":"E rail ta bashí.",
@@ -1546,7 +1553,7 @@ const T={
   "k.cleared":"E rail a kaba. E siguiente tiketnan ta yega djis aki.",
   "k.gov":"E hanchura di e bandanan ta e parti di un seshon di djabièrnè òf djasabra, 21:00 te 04:00, ku e kola modelá ta pasa den kada estado: mas o menos 41, 41 i 17 porshento. E banda ku ta sendé ta esun ku e trùk ta aden awor aki.",
   "r.order":"Òrdena","r.ticket":"Bo tiket","r.kitchen":"E rail",
-  "about.p1":"Esaki ta un konsepto di rediseño, no e sitio bibu, i nada aki no ta kobra plaka. E trùk, e adrès, e number di telefon, e potrètnan i e menu ta real. Preisnan ta transkribí for di e menu imprimí di e trùk mes di desèmber 2024 i konvertí na florin karibense, ku a bini na lugá di florin antiano komo moneda legal riba 1 di yüli 2025.",
+  "about.p1":"Esaki ta un konsepto di rediseño, no e sitio bibu, i nada aki no ta kobra plaka. E trùk, e adrès, e number di telefon, e potrètnan i e menu ta real. Preisnan ta transkribí for di e menu imprimí di e trùk mes di desèmber 2024 i konvertí na florin karibense, ku a bini na lugá di florin antiano komo moneda legal riba 1 di yüli 2025. E kantonan na Cg 2, e di dos pasada di mitar mitar na Cg 3, extra batata na Cg 4, entrega na Cg 8 i e krédito Trempan di Cg 2 ta number di e konsepto aki mes, no di e menu.",
   "about.p2":"E tempu di kandela, e profundidat di e rail i e tiketnan riba e pantaya di kushina ta <b>modelá</b>, no midí. Nan ta sigui un kurva ku ta yega su punto mas haltu entre 22:30 i 01:00, pasobra ta e ora ei reseñanan ta papia di e speranan mas largu. E oranan di habri, e ora di e isla i e lógika di e seshon di anochi ta real i ta kore riba America/Curacao, ku no ta kambia pa ora di zomer.",
   "about.p3":"Dos kos tin mester di un hende. E papiamentu tin mester di un repaso di un hende ku ta papi’é komo lenga di kas promé ku nada di esaki sali. I e letrero di e trùk mes, ku ta bisa “closed on Thuesday”, ta kontradisí tur lista ku ta bisa shete dia habrí, pues e tabel di ora aki ta sigui e listanan i e diferensia ta na doño pa resolvé."
  },
@@ -1565,7 +1572,7 @@ const T={
   "story.kicker":"Trùk 'i pan","story.h":"Een broodwagen<br>die nooit<br>thuiskwam",
   "story.lede":"Elk eiland doet iets om middernacht. Curaçao grilt.",
   "story.pull":"Iemand zaagde een luik in de zijkant van een broodwagen en schroefde er een houtskoolgrill onder.",
-  "story.p1":"In de jaren zeventig waren de broodwagens 's ochtends klaar met hun ronde en stonden ze de hele nacht stil. Chauffeurs begonnen achterin houtskool aan te steken en verkochten aan wie nog buiten was. Dat is een trùk 'i pan, letterlijk een broodwagen, en veertig jaar later eet het eiland na donker nog steeds zo.",
+  "story.p1":"In de jaren zeventig waren de broodwagens 's ochtends klaar met hun ronde en stonden ze de hele nacht stil. Chauffeurs begonnen achterin houtskool aan te steken en verkochten aan wie nog buiten was. Dat is een trùk 'i pan, letterlijk een broodwagen, en vijftig jaar later eet het eiland na donker nog steeds zo.",
   "story.p2":"De regels zijn nauwelijks veranderd. Het gaat open als de restaurants sluiten. Niets is voorgekookt. Je bestelt aan een luik, je wacht waar je staat, en het antwoord op elke vraag is batata of pan.",
   "story.p3":"Fridays kwam laat bij die traditie, in 2018, en neemt het serieus genoeg om om twee uur 's nachts rib eye, picanha en karkó op een papieren bord te leggen.",
   "story.cap":"Het luik, Caracasbaaiweg 216, de meeste avonden rond elf uur.",
@@ -1610,14 +1617,14 @@ const T={
   "about.sum":"Over dit concept",
   "kit.h":"Het rek","kit.tickets":"bonnen","kit.up":"of meer",
   "kit.lede":"Een beloofde tijd is een leugen als de keuken hem niet kan halen. Bonnen komen binnen gegroepeerd op vlees, zodat de grillkok vier kip in een keer bakt in plaats van vier keer, en de tijd die de klant ziet wordt van dit scherm gelezen in plaats van van een gemiddelde.",
-  "kit.b1h":"Noem hem en neem hem aan","kit.b1p":"De vuurtijd wordt recht toe recht aan gegeven, bestellingen lopen door, niets wordt geknepen. Het eerste uur na het aansteken en het laatste voor sluiting zitten allebei in deze band.",
+  "kit.b1h":"Noem hem en neem hem aan","kit.b1p":"De vuurtijd wordt recht toe recht aan gegeven, bestellingen lopen door, niets wordt geknepen. De eerste minuten na het aansteken en de staart van de nacht zitten in deze band.",
   "kit.b2h":"Eerlijk noemen, de vroege baan openen","kit.b2p":"De schatting loopt op met het rek, en Trempan-slots verschijnen in de flow zodat de piek zichzelf begint af te vlakken.",
   "kit.b3h":"Stop met beloven","kit.b3p":"Nieuwe bonnen krijgen een marge, geen getal. Bezorging pauzeert en de truck zegt dat, in plaats van stilletjes geld aan te nemen voor veertig minuten wachten.",
   "ft.eat":"Eten","ft.know":"Weten","ft.reach":"Bereiken","ft.inside":"Binnen","ft.delivery":"Bezorging",
   "ft.what":"Wat een trùk 'i pan is","ft.fire":"Hoe vuurtijd werkt","ft.hours":"Openingstijden",
   "ft.rail":"Het rek, keukenscherm","ft.app":"De Fridays-app",
   "ft.concept":"Conceptueel herontwerp. Niet de live site.","tray.cta":"Begin deze bestelling",
-  "have.t":"Bon {code} staat al op het rek.","have.link":"Volg hem","kit.now":"Nu","of4":"van",
+  "have.t":"Bon {code} staat al op het rek.","have.link":"Volg hem","kit.now":"Nu","of4":"van","wait.typ":"gemiddeld",
   "t.leaveB1":"Vertrek over {n} minuut",
   "t.collectB":"Ophalen om {t} {when}","t.collectS":"Te ver weg voor een aftelling. De telefoon telt af in het laatste uur.",
   "t.queuedS":"De grill is koud, dus er is nog niets begonnen. De tijdlijn loopt vanaf het moment dat hij aangaat.",
@@ -1664,6 +1671,8 @@ const T={
   "t.card":"Eindigt op 4471","t.cash":"Cg of USD, geen kaartkosten",
   "t.route":"Open de route","t.rail":"Bekijk hem op het rek","t.again":"Bestel nog iets",
   "t.done":"Opgehaald. Dushi.","t.doneS":"Deze bon is overhandigd.",
+  "t.deliveredB":"Bezorgd. Dushi.","t.deliveredS":"Rond {t} aan je deur afgegeven.",
+  "t.sinceB":"Klaar sinds {t}","t.sinceS":"De keuken houdt hem warm. Laat {code} zien bij luik 2.",
   "t.trempanB":"Trempan-slot vastgezet","t.trempanS":"Twaalf minuten gegarandeerd, {money} korting toegepast",
   "k.empty":"Niets op het rek. Kom na negenen terug.",
   "k.emptyB":"Het rek is leeg.",
@@ -1677,7 +1686,7 @@ const T={
   "k.cleared":"Rek leeg. De volgende bonnen komen zo binnen.",
   "k.gov":"De bandbreedtes zijn het aandeel van een vrijdag- of zaterdagsessie, 21:00 tot 04:00, dat de gemodelleerde rij in elke toestand doorbrengt: ongeveer 41, 41 en 17 procent. De opgelichte band is die waar de truck nu in zit.",
   "r.order":"Bestellen","r.ticket":"Je bon","r.kitchen":"Het rek",
-  "about.p1":"Dit is een conceptueel herontwerp, niet de live site, en er wordt hier niets afgeschreven. De truck, het adres, het telefoonnummer, de fotografie en het menu zijn echt. Prijzen zijn overgenomen van de eigen gedrukte menukaart van december 2024 en omgerekend naar de Caribische gulden, die op 1 juli 2025 de Antilliaanse gulden als wettig betaalmiddel verving.",
+  "about.p1":"Dit is een conceptueel herontwerp, niet de live site, en er wordt hier niets afgeschreven. De truck, het adres, het telefoonnummer, de fotografie en het menu zijn echt. Prijzen zijn overgenomen van de eigen gedrukte menukaart van december 2024 en omgerekend naar de Caribische gulden, die op 1 juli 2025 de Antilliaanse gulden als wettig betaalmiddel verving. De bijgerechten van Cg 2, de tweede grillgang van Cg 3, extra batata van Cg 4, bezorging van Cg 8 en het Trempan-tegoed van Cg 2 zijn cijfers van dit concept, niet van de kaart.",
   "about.p2":"De vuurtijd, de diepte van het rek en de bonnen op het keukenscherm zijn <b>gemodelleerd</b>, niet gemeten. Ze volgen een curve die piekt tussen 22:30 en 01:00, omdat recensies daar de langste wachttijden beschrijven. De openingstijden, de eilandklok en de logica van de nachtsessie zijn echt en draaien op America/Curacao, waar geen zomertijd geldt.",
   "about.p3":"Twee dingen hebben een mens nodig. Het Papiaments moet langs een moedertaalspreker voordat hier iets van live gaat. En het bord op de truck zelf, dat “closed on Thuesday” zegt, spreekt elke vermelding tegen die zeven dagen open toont, dus de urentabel hier volgt de vermeldingen en het verschil is aan de eigenaar om uit te zoeken."
  }
@@ -1725,6 +1734,8 @@ const EN_EXTRA={
  "t.card":"Ending 4471","t.cash":"Cg or USD, no card fee",
  "t.route":"Open the driving route","t.rail":"See it on the rail","t.again":"Order something else",
  "t.done":"Collected. Dushi.","t.doneS":"This ticket has been handed over.",
+ "t.deliveredB":"Delivered. Dushi.","t.deliveredS":"Handed over at your door around {t}.",
+ "t.sinceB":"Ready since {t}","t.sinceS":"The kitchen is holding it warm. Show {code} at hatch 2.",
  "t.trempanB":"Trempan slot held","t.trempanS":"Twelve minutes guaranteed, {money} off applied",
  "k.empty":"Nothing on the rail. Come back after nine.",
  "k.emptyB":"The rail is empty.","k.emptyS":"The grill lights at 21:00. Tickets and the batch hint appear once it does.",
@@ -1735,7 +1746,7 @@ const EN_EXTRA={
  "k.left":"{n} min left","k.over":"{n} min over","k.mine":"Yours",
  "k.cleared":"Rail cleared. The next tickets land in a moment.",
  "k.gov":"Band widths are the share of a Friday or Saturday session, 21:00 to 04:00, that the modelled queue spends in each state: roughly 41, 41 and 17 per cent. The lit band is the one the truck is in right now.",
- "sz.small":"small","sz.large":"large","kit.now":"Right now","of4":"of",
+ "sz.small":"small","sz.large":"large","kit.now":"Right now","of4":"of","wait.typ":"typical",
  "t.leaveB1":"Leave in {n} minute",
  "t.collectB":"Collect at {t} {when}","t.collectS":"Too far out for a countdown. The phone counts you down in the last hour.",
  "t.queuedS":"The grill is cold, so nothing has started. The timeline runs from the moment it lights.",
@@ -1977,6 +1988,15 @@ function route(first){
   }
 }
 addEventListener("hashchange",()=>route());
+/* The skip link must not write the hash: routes live there, and "#main" would
+   be parsed as a home anchor and silently eject a keyboard user from the order
+   flow. It moves focus instead. */
+$("#skip").addEventListener("click",e=>{
+  e.preventDefault();
+  const m=$("#main"); m.tabIndex=-1;
+  m.focus({preventScroll:true});
+  m.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"});
+});
 
 let sayTimer=0;
 function say(msg){
@@ -2159,11 +2179,12 @@ function drawSides(){
   $("#sides").innerHTML=SIDES.map(s=>
     `<button class="opt" role="radio" data-side="${s.id}" aria-checked="${s.id===S.side}">
       <b>${s.en}</b><span>${subOf(s)}</span>${s.d?`<u>${tx("o.plus")} ${money(s.d)}</u>`:""}</button>`).join("");
-  // the chip prints what this partner actually adds, because a dearer second cut
-  // moves the plate by more than the flat second-pass charge
-  const here=base();
+  // the chip prints what this partner actually adds over the plate WITHOUT any
+  // partner: measuring against the current plate made every chip read plus Cg 0
+  // the moment one was selected
+  const here=priceOf({...S, half:null});
   $("#halves").innerHTML=CUTS.filter(c=>c.id!==S.cut && famOpt(c,S.fmt)?.price!=null).map(c=>{
-    const d=Math.max(0, priceOf({...S, half:c.id}) - here);
+    const d=priceOf({...S, half:c.id}) - here;
     return `<button class="opt" data-half="${c.id}" aria-pressed="${c.id===S.half}">
       <b>${cutName(c)}</b>${altSpan(cutName(c),cutAlt(c))}
       <u>${tx("o.plus")} ${money(d)}</u></button>`;}).join("")
@@ -2205,7 +2226,7 @@ function drawReadback(){
     ? `<span>${tx("o.fire")} <b>${mins} ${tx("w.min")}</b></span>
        <span>${tx("o.ready")} <b>${clock(slot.mins+mins)} ${whenWord(slot.when)}</b></span>
        <span>${tx("o.slot")} <b>${clock(slot.mins)}</b></span>`
-    : f.open
+    : f.open && !lastOrders(f,mins)
     ? `<span>${tx("o.fire")} <b>${mins} ${tx("w.min")}</b></span>
        <span>${tx("o.ready")} <b>${clock(f.t.mins+mins)}</b></span>
        <span>${tx("o.onrail")} <b>${f.queue} ${tx("o.tickets")}</b></span>`
@@ -2250,10 +2271,10 @@ function drawCart(){
       <em class="num">${money(it.price*it.qty)}</em>
       <span class="mods">${describe(it)}</span>
       <span class="line-act">
-        <span class="qty"><button data-dec="${i}" aria-label="${tx("qty.less")}">${IC.minus}</button>
+        <span class="qty"><button data-dec="${i}" aria-label="${tx("qty.less")}, ${cutName(cutOf(it.cut))}">${IC.minus}</button>
           <span class="num">${it.qty}</span>
-          <button data-inc="${i}" aria-label="${tx("qty.more")}">${IC.plus}</button></span>
-        <button class="line-x" data-del="${i}" aria-label="${tx("qty.del")}">${IC.trash}</button>
+          <button data-inc="${i}" aria-label="${tx("qty.more")}, ${cutName(cutOf(it.cut))}">${IC.plus}</button></span>
+        <button class="line-x" data-del="${i}" aria-label="${tx("qty.del")}, ${cutName(cutOf(it.cut))}">${IC.trash}</button>
       </span></div>`).join("");
   }
   const sub=S.cart.reduce((n,it)=>n+it.price*it.qty,0);
@@ -2290,16 +2311,18 @@ function drawQuote(){
   const pill=$("#openPill");
   pill.className="pill "+(f.open ? (f.queue>7?"warm":"on") : "cool");
   pill.lastElementChild.textContent = f.open ? tx(f.queue>7?"p.busy":"p.open") : tx("p.closed");
-  // A closed truck has no fire time. Quoting one next to a "Closed" pill was the
-  // page contradicting itself.
-  $("#fireN").textContent = f.open ? mins : "-";
-  $("#fireN").className = "num" + (f.open && mins>25 ? " warm" : "");
+  // A closed truck has no fire time, and neither does one past last orders:
+  // quoting "ready 02:10" beside "closes 02:00" was the page contradicting itself.
+  const lo = S.when!=="trempan" && lastOrders(f,mins);
+  const quoting = f.open && !lo;
+  $("#fireN").textContent = quoting || S.when==="trempan" ? mins : "-";
+  $("#fireN").className = "num" + (quoting && mins>25 ? " warm" : "");
   const slot=nextTrempanSlot();
   $("#readyAt").textContent = S.when==="trempan"
     ? `${tx("o.ready").toLowerCase()} ${clock(slot.mins+mins)} ${whenWord(slot.when)}`
-    : f.open ? `${tx("o.ready").toLowerCase()} ${clock(f.t.mins+mins)}` : `${tx("win.opens").toLowerCase()} ${clock(OPENS)}`;
-  $("#fireBar").style.width = f.open ? Math.min(100, mins/45*100)+"%" : "0%";
-  $("#whenNow").textContent = f.open ? f.mins+" "+tx("w.min") : tx("w.at21");
+    : quoting ? `${tx("o.ready").toLowerCase()} ${clock(f.t.mins+mins)}` : `${tx("win.opens").toLowerCase()} ${clock(OPENS)}`;
+  $("#fireBar").style.width = quoting || S.when==="trempan" ? Math.min(100, mins/45*100)+"%" : "0%";
+  $("#whenNow").textContent = quoting ? f.mins+" "+tx("w.min") : tx("w.at21");
   $("#whenTrempan").textContent = `${clock(slot.mins)} ${whenWord(slot.when)}, ${money(TREMPAN_OFF)} ${tx("w.off")}`;
   $("#fireNote").textContent = !f.open ? tx("q.cold")
     : S.when==="trempan" ? fill("q.trempan",{t:clock(slot.mins), when:whenWord(slot.when)})
@@ -2483,7 +2506,9 @@ $("#place").addEventListener("click",()=>{
   let startOff = start - f.t.mins;
   if(startOff < 0) startOff += 1440;
   S.ticket={
-    code:"F-"+String(40+(start%57)).padStart(3,"0"),
+    // the modelled rail's codes run F-038 upward, so the customer's own series
+    // starts at 200 and the two can never collide on the kitchen screen
+    code:"F-"+String(200+(start%57)),
     placedClock:f.t.mins, epoch:Date.now(),
     startOff, cook, readyOff:startOff+cook,
     items:S.cart.map(it=>({...it})),
@@ -2522,23 +2547,44 @@ function renderTicket(){
   // may pulse. A pre-order placed at three in the afternoon used to show its
   // steak cooking six hours before anything was lit.
   const lit=fire().open;
-  const liveAt = lit ? stages.findIndex(s=>rel(s.off)>0) : -2;
+  // -2: the grill is cold, everything pending. -3: the grill is open but this
+  // ticket's own fire has not started (queued for a slot or the next night), so
+  // only "Ticket in" is done and nothing pulses.
+  const liveAt = !lit ? -2
+               : rel(K.startOff) > 2 ? -3
+               : stages.findIndex(s=>rel(s.off)>0);
   const left=rel(K.readyOff);
-  const collected=left < -10;
+  // A delivery completes itself once the rider has had time to arrive. A window
+  // or terrace plate is never auto-collected: the kitchen holds it and the
+  // ticket says so, because declaring it handed over with nobody there is the
+  // page inventing an event.
+  const collected = K.where==="delivery" ? left < -(RIDE+8) : false;
+  const waiting   = K.where!=="delivery" && left < -10;
   const collectAt=K.placedClock+K.readyOff;
-  const dayWord=tx(collectAt>=1440 ? "w.tomorrow" : "w.tonight");
+  // past next noon is tomorrow; 00:17 at the end of tonight's session is not
+  const dayWord=tx(collectAt>=2160 ? "w.tomorrow" : "w.tonight");
 
   let call;
   // A countdown is the right shape for the last hour and absurd for the next
   // eighteen, so past three hours the ticket names the hour instead.
   const far = left-DRIVE > 180;
   if(far && !collected){
-    call=`<div class="panel"><div class="row"><span class="row-ic">${IC.timer}</span>
-      <span class="rl"><b>${fill("t.collectB",{t:clock(collectAt), when:dayWord})}</b>
-      <span>${tx("t.collectS")}</span></span></div></div>`;
+    // a delivery customer paid not to travel, so the far panel quotes arrival
+    call = K.where==="delivery"
+      ? `<div class="panel"><div class="row"><span class="row-ic">${IC.motorcycle}</span>
+         <span class="rl"><b>${fill("t.arriveB",{t:clock(collectAt+RIDE)})} ${dayWord}</b>
+         <span>${fill("t.arriveS",{t:clock(collectAt), n:RIDE})}</span></span></div></div>`
+      : `<div class="panel"><div class="row"><span class="row-ic">${IC.timer}</span>
+         <span class="rl"><b>${fill("t.collectB",{t:clock(collectAt), when:dayWord})}</b>
+         <span>${tx("t.collectS")}</span></span></div></div>`;
   }else if(collected){
     call=`<div class="panel"><div class="row"><span class="row-ic">${IC.check}</span>
-      <span class="rl"><b>${tx("t.done")}</b><span>${tx("t.doneS")}</span></span></div></div>`;
+      <span class="rl"><b>${tx("t.deliveredB")}</b>
+      <span>${fill("t.deliveredS",{t:clock(collectAt+RIDE)})}</span></span></div></div>`;
+  }else if(waiting){
+    call=`<div class="leave calm"><span class="lv-n" aria-hidden="true">${IC.check}</span>
+      <div><b>${fill("t.sinceB",{t:clock(collectAt)})}</b>
+      <span>${fill("t.sinceS",{code:K.code})}</span></div></div>`;
   }else if(K.where==="delivery"){
     // the rider cannot have it before it comes off the coals
     const arr=left+RIDE;
@@ -2580,8 +2626,9 @@ function renderTicket(){
         ${lit?"":`<p class="quote-note" style="margin:8px 0 2px">${tx("t.queuedS")}</p>`}
         <div class="timeline">
           ${stages.map((s,i)=>{
-            // -2 is "the grill is cold", which is not the same as "all finished"
-            const cls = liveAt===-2 ? "" : liveAt<0 ? "done"
+            // -2 is "the grill is cold", -3 is "queued"; neither is "all finished"
+            const cls = liveAt===-2 ? "" : liveAt===-3 ? (i===0?"done":"")
+              : liveAt<0 ? "done"
               : i<liveAt ? "done" : i===liveAt ? "live" : "";
             return `<div class="tl ${cls}"><span class="tl-dot">${s.ic}</span>
               <div><b>${s.b}</b><span>${s.s}</span></div>
@@ -2628,6 +2675,7 @@ function renderTicket(){
    moment the island clock passes midnight, which is every night of the week. */
 const RAIL_EPOCH=Date.now();
 const railElapsed=()=>(Date.now()-RAIL_EPOCH)/60000;
+let railKHigh=0;    // high-water mark, so the stream of codes is monotonic
 /* Rows carry a cut id and a box key rather than a printed English string, so the
    rail speaks whichever language the switcher is on and the batch tally can
    count on identity instead of on a display name. */
@@ -2675,15 +2723,17 @@ function renderKitchen(){
      of gaining a day the way clock-face arithmetic does. */
   const el=railElapsed();
   const n=Math.max(1,f.queue);
-  const span=Math.max(6, f.mins+4), step=span/n;
-  // Tickets are a stream, not a fixed set: ticket k is due step minutes after
-  // ticket k-1, and the rail shows the n of them that have not been handed over
-  // yet. A screen left open all night keeps its depth instead of draining.
-  const kMin=Math.max(0, Math.ceil((el-8+span*0.18)/step)-1);
+  // Tickets are a stream on a FIXED cadence: with a varying step the k mapping
+  // shifted as the queue ebbed and handed-over codes came back onto the rail.
+  // 3.2 minutes a ticket also makes the visible span track the fire quote.
+  const STEP=3.2;
+  const computedK=Math.max(0, Math.ceil((el-6)/STEP));
+  railKHigh=Math.max(railKHigh, computedK);
+  const kMin=railKHigh;
   let TICKETS=Array.from({length:n},(_,i)=>{
-    const k=kMin+i, due=(k+1)*step - span*0.18;
+    const k=kMin+i, due=(k+1)*STEP - 5;
     return {code:"F-"+String(38+k).padStart(3,"0"),
-            left:Math.round(due-el), inOff:Math.round(due-span*0.82-el),
+            left:Math.round(due-el), inOff:Math.round(due-el-(f.mins+4)),
             items:POOL[k % POOL.length]};
   });
   // Your own ticket belongs on this screen too, or the rail is a diorama.

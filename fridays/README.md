@@ -30,7 +30,7 @@ and substitutes `{{FONTS}}`, `{{IMG:key}}`, `{{ICON:name}}` and `{{IMGJSON:...}}
 Papiamentu for "bread truck". In the 1970s and 80s Curaçao's bread delivery vans finished
 their rounds by morning and sat idle overnight. Drivers began cutting a service window into
 the side, bolting a charcoal grill underneath, and selling to whoever was still out after
-the restaurants closed. Forty years later it is still how the island eats after dark: open
+the restaurants closed. Fifty years on it is still how the island eats after dark: open
 around 21:00, running to 02:00 on a weeknight and past 04:00 on a Friday, everything cooked
 to order over charcoal, eaten standing up.
 
@@ -186,9 +186,9 @@ and 01:00, using one shared formula so both products quote the same number at th
 instant, verified at twelve session boundaries. They run against real Curaçao time, so the pages genuinely read differently at nine
 in the evening and at two in the morning, but no live kitchen feeds them. Trempan, the fire
 ticket, the rail and the governor are proposals, not existing features. So are the prices
-the printed menu does not carry, and they are labelled as such on the hub: sides at Cg 2,
-the mitar mitar second grill pass at Cg 3, extra batata at Cg 4, delivery at Cg 8, and the
-Cg 2 Trempan credit. The app's clock dial is a demo control and says so on the plinth: left
+the printed menu does not carry, and they are named as this concept's own in the site's
+About panel, which is where they are charged: sides at Cg 2, the mitar mitar second grill
+pass at Cg 3, extra batata at Cg 4, delivery at Cg 8, and the Cg 2 Trempan credit. The app's clock dial is a demo control and says so on the plinth: left
 on Live it shows the truck as it actually is, which for most of the day is a cold grill.
 
 **Needs a native pass.** The Papiamentu was written from sourced vocabulary, corrected once
@@ -220,11 +220,23 @@ a keyboard-only walkthrough of both order flows; and a contrast pass measured fr
 pixels** rather than computed from CSS, after the CSS-derived audit was caught reading
 mid-animation opacity and reporting failures that were not there.
 
-The design, accessibility, code, UX, craft and factual accuracy were then put through three
-adversarial review rounds, six independent lenses each, every finding handed to a separate
-skeptic instructed to refute it and to default to refuted when unsure. Thirty-one findings
-survived the first round, thirteen the second, and forty-three the third against twenty-nine
-refuted. All are fixed here.
+The design, accessibility, code, UX, craft and factual accuracy were then put through four
+adversarial review rounds, each finding handed to a separate skeptic instructed to refute it
+and to default to refuted when unsure. Thirty-one findings survived the first round, thirteen
+the second, forty-three the third against twenty-nine refuted, and forty-three the fourth
+against one refuted. All are fixed here.
+
+The fourth round added a lens that reads the previous round's commits hunk by hunk and hunts
+only for what those fixes broke, and it earned its place: the day-roll added in round three to
+stop after-closing orders being born ready was applied unconditionally, which shoved the demo
+presets' deliberately backdated tickets a day into the future; the slot grid's new lead-time
+rule created a dead zone from 22:26 to 23:00 in which the sheet offered tomorrow's lane while
+greying every slot in it; and the mitar mitar chips' new honest deltas were measured against a
+plate that already contained the selected partner, so they all read plus Cg 0 the moment one
+was chosen. The round also caught the app quoting "ready 02:10" beside "closes 02:00" because
+only the site had a last-orders window, a skip link that silently ejected keyboard users from
+the order flow because its href collided with the hash router, and a rail whose codes ran
+backwards as the queue ebbed.
 
 The third round is the one worth reading, because the two products had just been rewritten and
 it found the class of fault a rewrite produces. A whole sheet, the app's headline Trempan

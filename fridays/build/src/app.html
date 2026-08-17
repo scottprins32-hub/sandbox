@@ -637,7 +637,7 @@ button.row{transition:opacity .2s} button.row:hover{opacity:.82}
         <h3>ON THEIR OWN APP</h3>
         <ul>
           <li>{{ICON:check}}<span>The builder mirrors the window: pick the cut, pick the format, batata or pan, then sauce, with the cells the kitchen refuses saying so.</span></li>
-          <li>{{ICON:check}}<span>Fire time is quoted from the live rail, so the peak quotes the high thirties and the first hour after lighting quotes about ten.</span></li>
+          <li>{{ICON:check}}<span>Fire time is quoted from the live rail, so the peak quotes the high thirties and the hour after lighting the mid teens.</span></li>
           <li>{{ICON:check}}<span>Fridays keeps the relationship, the order history and the reason someone stopped coming.</span></li>
           <li>{{ICON:check}}<span>Papiamentu first, with Dutch and English behind it. The website next door switches all three live.</span></li>
           <li>{{ICON:check}}<span>Card fees only, and a cash-at-the-window option that costs nothing.</span></li>
@@ -675,6 +675,7 @@ const I={
   gift:`{{ICON:gift}}`, drop:`{{ICON:drop}}`, seal:`{{ICON:seal-check}}`, pin:`{{ICON:map-pin}}`,
   note:`{{ICON:note-pencil}}`, users:`{{ICON:users-three}}`, moto:`{{ICON:motorcycle}}`,
   receipt:`{{ICON:receipt}}`, minus:`{{ICON:minus}}`, plus:`{{ICON:plus}}`, info:`{{ICON:info}}`,
+  phone:`{{ICON:phone}}`,
   clock:`{{ICON:clock}}`, hourglass:`{{ICON:hourglass-medium}}`, heart:`{{ICON:heart}}`
 };
 
@@ -760,14 +761,21 @@ function fire(){
 }
 // ten minutes before this night's own closing time, which differs by weekday
 const lastHour=()=>1440+CLOSE[sessionDay()]-10;
+/* A quote that lands after the shutters come down is not a quote. Mirrors the
+   site's lastOrders() so the two products answer an 01:50 order the same way. */
+const lastOrdersApp=f=>f.open && (f.t + f.mins) > f.shut;
 function nextSlot(){
   const t=now();
   if(t>=OPENS && t<LANE_SHUT){
     const s=Math.ceil((t+20)/15)*15;
     if(s<LANE_SHUT) return {at:s, when:"tonight"};
   }
-  return {at:OPENS, when: t<OPENS ? "tonight" : "tomorrow"};
+  if(t<OPENS) return {at:Math.max(OPENS, Math.ceil((t+20)/15)*15), when:"tonight"};
+  return {at:OPENS, when:"tomorrow"};
 }
+/* A held slot is stored as an absolute session minute, so tonight's 22:30 and
+   tomorrow's 21:15 cannot be confused, and a lapsed hold is detectable. */
+const slotWhen=m=>m>=2160 ? "tomorrow" : "tonight";
 
 /* ------------------------------------------------------------------ state */
 const USUAL={cut:"steak", fmt:"regular", side:0, sauces:[1], prefs:[], half:null, note:"",
@@ -852,11 +860,17 @@ function orderTotals(){
 /* ------------------------------------------------------------- the ticket */
 function makeTicket(opts){
   const f=fire(), t=now(), o=opts||{};
-  let startAt = o.startAt ?? (S.when==="trempan" ? (S.slot ?? nextSlot().at) : (f.open ? t : OPENS));
-  // 21:00 is 1260 in session minutes, so ordering at 02:50 for the next opening
-  // lands six hours in the past unless it is rolled into the coming night
-  if(startAt < t) startAt += 1440;
-  const cook = o.cook ?? (S.when==="trempan" ? 12 : (f.open ? f.mins : 12));
+  // The demo ways pass an explicit startAt that is deliberately a few minutes in
+  // the past (a ticket already mid-flight), so only the computed default may be
+  // rolled into the coming night: 21:00 is 1260 in session minutes, and ordering
+  // at 02:50 for the next opening lands six hours back without the roll.
+  const lo=lastOrdersApp(f);
+  let startAt=o.startAt;
+  if(startAt==null){
+    startAt = S.when==="trempan" ? (S.slot ?? nextSlot().at) : (f.open && !lo ? t : OPENS);
+    if(startAt < t) startAt += 1440;
+  }
+  const cook = o.cook ?? (S.when==="trempan" ? 12 : (f.open && !lo ? f.mins : 12));
   const tt = orderTotals();
   return {
     code:"F-"+String(40+(startAt%57)).padStart(3,"0"),
@@ -915,6 +929,8 @@ function appbar(st,f){
 function windowCard(f){
   const note = !f.open
     ? `Nothing is pre-cooked, so nothing is on the coals yet. An order placed now joins the queue for the moment it lights.`
+    : lastOrdersApp(f)
+    ? `Last orders have gone. The grill goes out at ${clock(f.shut)}, so an order placed now queues for tomorrow's lighting.`
     : f.queue>7
       ? `The rail is ${f.queue} deep, which is where that number comes from. A Trempan slot runs twelve minutes flat.`
       : `Quoted off the rail, not off an average. Nothing is sitting under a lamp.`;
@@ -948,7 +964,7 @@ function trempanCard(){
     <div class="card-hd"><h3 lang="pap">Trempan</h3>
       <span class="pill amber">${clock(OPENS)} to ${clock(LANE_SHUT)}</span></div>
     <p class="note">${held
-      ? `Slot held at ${clock(S.slot)} ${S.slot>=now()?"tonight":"tomorrow"}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
+      ? `Slot held at ${clock(S.slot)} ${slotWhen(S.slot)}. Twelve minutes guaranteed and ${cg(TREMPAN_OFF)} off.`
       : `Collect in the first two hours after the grill lights and the kitchen guarantees twelve minutes and takes ${cg(TREMPAN_OFF)} off, because an empty grill costs them more than a discount does.`}</p>
     <button class="btn btn-line" style="margin-top:12px" data-open="trempan">${I.sun}${
       held ? "Change the slot" : `Book ${s.when==="tomorrow"?"tomorrow's":"tonight's"} lane`}</button>
@@ -986,8 +1002,12 @@ function ticketBlock(st){
       ? {at:K.readyAt, b:"With the rider", s:"On the way to you", ic:I.moto}
       : {at:K.readyAt, b:"At the window", s:"Hatch 2, show the code", ic:I.storefront}
   ];
-  // a cold grill has started nothing, so no stage may pulse and none is done
-  const liveAt = fire().open ? stages.findIndex(s=>s.at>t) : -2;
+  // A cold grill has started nothing, and a ticket queued for a later lighting
+  // has not started either even if the grill is currently open: -2 renders all
+  // stages pending, -3 renders only "Ticket in" as done.
+  const liveAt = !fire().open ? -2
+               : t < K.startAt-2 ? -3
+               : stages.findIndex(s=>s.at>t);
 
   let call="";
   if(K.where==="delivery" && st!=="collected"){
@@ -1007,7 +1027,7 @@ function ticketBlock(st){
     call = n>180
       ? `<div class="card"><div class="row" style="padding-top:0">
          <span class="row-ic">${I.timer}</span>
-         <span class="rl"><b>Collect at ${clock(K.readyAt)}${K.readyAt>=1440?" tomorrow":" tonight"}</b>
+         <span class="rl"><b>Collect at ${clock(K.readyAt)}${K.readyAt>=2160?" tomorrow":" tonight"}</b>
          <span>Too far out for a countdown. The phone counts you down in the last hour.</span></span>
          </div></div>`
       : `<div class="leave"><span class="lv-n">${n}</span>
@@ -1021,10 +1041,15 @@ function ticketBlock(st){
     call=`<div class="leave calm"><span class="lv-n" aria-hidden="true">${I.check}</span>
       <b>Ready at hatch 2</b><span>Show ${K.code} at the window.</span></div>`;
   }else if(st==="collected"){
-    call=`<div class="card"><div class="row" style="padding-top:0">
-      <span class="row-ic">${I.check}</span>
-      <span class="rl"><b>Collected. Dushi.</b><span>${K.code} was handed over at ${clock(K.readyAt)}.</span></span>
-    </div></div>`;
+    call = K.where==="delivery"
+      ? `<div class="card"><div class="row" style="padding-top:0">
+         <span class="row-ic">${I.check}</span>
+         <span class="rl"><b>Delivered. Dushi.</b><span>${K.code} arrived around ${clock(K.readyAt+RIDE)}.</span></span>
+         </div></div>`
+      : `<div class="card"><div class="row" style="padding-top:0">
+         <span class="row-ic">${I.check}</span>
+         <span class="rl"><b>Collected. Dushi.</b><span>${K.code} was handed over at ${clock(K.readyAt)}.</span></span>
+         </div></div>`;
   }
   const money=(v)=>cg(v);
   return call+`
@@ -1036,7 +1061,8 @@ function ticketBlock(st){
     <div class="perf" aria-hidden="true"><i></i></div>
     <div class="tk-body"><div class="timeline">
       ${stages.map((s,i)=>{
-        const cls = liveAt===-2 ? "" : liveAt<0 ? "done"
+        const cls = liveAt===-2 ? "" : liveAt===-3 ? (i===0?"done":"")
+          : liveAt<0 ? "done"
           : i<liveAt ? "done" : i===liveAt ? "live" : "";
         return `<div class="tl ${cls}"><span class="tl-dot">${s.ic}</span>
           <div><b>${s.b}</b><span>${s.s}</span></div><time class="num">${clock(s.at)}</time></div>`;
@@ -1062,6 +1088,11 @@ function ticketBlock(st){
 }
 
 function renderRoot(){
+  // a slot that passed without an order is released, and the card says so
+  if(S.slot!=null && S.slot < now()-1 && !S.ticket){
+    S.toast=`The ${clock(S.slot)} slot passed without an order, so it was released.`;
+    S.slot=null; if(S.when==="trempan") S.when="now";
+  }
   const st=rootState(), f=fire();
   const keep=view.scrollTop, mark=markFocus();
   let body;
@@ -1077,11 +1108,12 @@ function renderRoot(){
 }
 function thumbHTML(st,f){
   if(S.ticket && S.ticket.where==="delivery" && st!=="collected"){
-    const K=S.ticket, arr=K.readyAt-now()+RIDE;
-    return arr>0
-      ? `<a class="btn btn-line" href="tel:+59995113297">${I.pin}Call the truck</a>
-         <button class="btn btn-quiet" data-addplate>Add another plate</button>`
-      : `<button class="btn btn-hot" data-here>${I.check}It arrived</button>`;
+    const K=S.ticket, left=K.readyAt-now(), arr=left+RIDE;
+    // once it is off the coals the rider has it, and nothing joins a motorcycle
+    return arr<=0
+      ? `<button class="btn btn-hot" data-here>${I.check}It arrived</button>`
+      : `<a class="btn btn-line" href="tel:+59995113297">${I.phone}Call the truck</a>
+         ${left>0?`<button class="btn btn-quiet" data-addplate>Add another plate</button>`:""}`;
   }
   if(st==="cold") return S.slot!=null
     ? `<button class="btn btn-hot" data-open="order">${I.basket}Build a plate for ${clock(S.slot)}</button>
@@ -1091,9 +1123,14 @@ function thumbHTML(st,f){
   if(st==="lit") return `<button class="btn btn-hot" data-order="usual">${I.fire}Order it again, ${cg(USUAL.price)}</button>
     <button class="btn btn-quiet" data-open="order">Build something else</button>`;
   const K=S.ticket, left=K.readyAt-now(), drive=driveMin();
-  if(st==="firing") return `<a class="btn btn-line" href="${MAP}" rel="noopener">${I.pin}Open the driving route</a>
+  if(st==="firing"){
+    const n=Math.max(0,left-drive);
+    return `<a class="btn btn-line" href="${MAP}" rel="noopener">${I.pin}Open the driving route</a>
     <button class="btn btn-quiet" data-addplate>Add another plate</button>
-    <p class="sub">Leave in ${Math.max(0,left-drive)} min. The phone will say so.</p>`;
+    <p class="sub">${n>180
+      ? `Collect at ${clock(K.readyAt)} ${K.readyAt>=2160?"tomorrow":"tonight"}.`
+      : `Leave in ${n} min. The phone will say so.`}</p>`;
+  }
   if(st==="leave") return `<a class="btn btn-fire" href="${MAP}" rel="noopener">${I.car}Leave now, open the route</a>
     <button class="btn btn-quiet" data-addplate>Add another plate</button>
     <p class="sub">${clock(K.readyAt)} at hatch 2.</p>`;
@@ -1106,8 +1143,16 @@ function paintChrome(st,f){
   $("#sbClock").textContent=clock(now());
   const isl=$("#island");
   if(S.ticket && !S.ticket.collected){
-    const left=S.ticket.readyAt-now(), drive=driveMin();
-    const txt = left<=0 ? "Ready" : left<=drive ? "Leave now" : Math.max(0,left-drive)+" min";
+    const K=S.ticket, left=K.readyAt-now(), drive=driveMin();
+    let txt;
+    if(K.where==="delivery"){
+      const arr=left+RIDE;
+      txt = arr<=0 ? "Delivered" : arr>180 ? clock(K.readyAt+RIDE) : arr+" min";
+    }else{
+      const n=left-drive;
+      txt = left<=0 ? "Ready" : left<=drive ? "Leave now"
+          : n>180 ? clock(K.readyAt) : n+" min";
+    }
     isl.className="island live";
     isl.innerHTML=`${I.fire}<b>${txt}</b>`;
   }else{ isl.className="island"; isl.innerHTML=""; }
@@ -1182,9 +1227,16 @@ function orderBody(){
 }
 function orderFoot(){
   const o=S.order, f=fire(), p=orderPrice(o);
+  const slot=S.slot ?? nextSlot().at;
+  const sub = S.when==="trempan"
+      ? `12 min, ready ${clock(slot+12)} ${S.slot!=null ? slotWhen(S.slot) : nextSlot().when}`
+    : lastOrdersApp(f)
+      ? `last orders have gone, queues for ${clock(OPENS)} tomorrow`
+    : f.open
+      ? `${f.mins} min, ready ${clock(now()+f.mins)}`
+      : `the grill lights at ${clock(OPENS)}`;
   return `<div class="bl"><b class="num">${cg(p)}</b>
-      <span>${f.open ? `${f.mins} min, ready ${clock(now()+f.mins)}`
-                     : `the grill lights at ${clock(OPENS)}`}</span></div>
+      <span>${sub}</span></div>
     <div style="display:flex; gap:8px">
       <button class="btn btn-line btn-sm" data-oback ${o.step===0?"disabled":""}>${I.caretL}Back</button>
       <button class="btn btn-hot" style="flex:1" data-onext>${
@@ -1207,9 +1259,10 @@ function confirmBody(){
                    ["delivery",I.moto,"Delivery",cg(SHIP)]])}
     <h3 class="seg-h">When</h3>
     ${seg("when",[["now",I.fire,"As soon as it can be",
-                    f.open ? f.mins+" min" : clock(OPENS)+" "+(now()<OPENS?"tonight":"tomorrow")],
+                    f.open && !lastOrdersApp(f) ? f.mins+" min"
+                    : clock(OPENS)+" "+(now()<OPENS?"tonight":"tomorrow")],
                   ["trempan",I.sun,"Trempan",
-                    clock(S.slot ?? s.at)+" "+(S.slot!=null ? (S.slot>=now()?"tonight":"tomorrow") : s.when)
+                    clock(S.slot ?? s.at)+" "+(S.slot!=null ? slotWhen(S.slot) : s.when)
                     +", "+cg(TREMPAN_OFF)+" off"]])}
     <h3 class="seg-h">How you pay</h3>
     ${seg("pay",[["card",I.card,"Card","Maestro, Visa"],
@@ -1239,16 +1292,18 @@ const BARS=Array.from({length:12},(_,i)=>{
   const q=Math.round(1+Math.max(0,1-Math.abs(h-23.75)/3.4)*14);
   return [clock(m), Math.max(8, Math.round(q/15*100)), q<=6?"early":q<=12?"":"peak"];
 });
-const FULL=[5,8];      // slots already taken tonight
+const FULL=[3,6];      // slots already taken tonight
 function trempanBody(){
   const at=Math.floor((now()-OPENS)/30);
-  // the header is driven by nextSlot(), so the grid honours the same lead time
-  // and the same upper bound, or the two disagree on one screen
-  const earliest=Math.ceil((now()+20)/15)*15;
+  // the header is driven by nextSlot(), so the grid follows it: once the lane
+  // has rolled to tomorrow every time is bookable again, and while it is still
+  // tonight the same twenty minute lead applies to the grid as to the header
+  const lane=nextSlot();
+  const earliest=Math.max(OPENS, Math.ceil((now()+20)/15)*15);
   const slots=Array.from({length:8},(_,i)=>OPENS+i*15);
   return `<div class="card" style="margin-bottom:11px">
       <div class="card-hd"><h3>When the truck is busy</h3></div>
-      <div class="chart" role="img" aria-label="Queue depth through the night: shallow from 21:00 to about 22:30, deepest between 23:00 and 00:30, easing again after 01:00. Trempan covers the shallow stretch.">
+      <div class="chart" role="img" aria-label="Queue depth through the night: shallow for the first hour, climbing through 22:00, deepest between 23:00 and 00:30, easing after 01:30. The Trempan lane covers 21:00 to 23:00.">
         ${BARS.map((b,i)=>`<div class="${b[2]}${i===at?" at":""}" style="height:${b[1]}%"></div>`).join("")}</div>
       <div class="chart-x"><span>21:00</span><span>23:30</span><span>02:30</span></div>
       <p class="note" style="margin-top:9px">The rail stays shallow until about 22:00 and the lane
@@ -1257,7 +1312,7 @@ function trempanBody(){
     </div>
     <p class="qsub" style="margin-bottom:8px">${nextSlot().when==="tomorrow"?"Tomorrow":"Tonight"}, ${DAYS[(sessionDay()+(nextSlot().when==="tomorrow"?1:0))%7]}</p>
     <div class="slotgrid" role="radiogroup" aria-label="Collection slot">${slots.map((m,i)=>
-      `<button role="radio" data-slot="${m}" ${FULL.includes(i)||(now()<LANE_SHUT&&m<earliest)?"disabled":""}
+      `<button role="radio" data-slot="${m}" ${FULL.includes(i)||(lane.when==="tonight"&&m<earliest)?"disabled":""}
         aria-checked="${S.slotPick===m}" class="num">${clock(m)}</button>`).join("")}</div>
     <p class="note" style="margin-top:10px">Greyed times are held by somebody else, or too close
     to now for the kitchen to promise twelve minutes.</p>
@@ -1334,7 +1389,8 @@ function coverBits(){
   return {
     label:"Collection code "+K.code,
     body:`<span class="k">Collection code</span><b>${K.code}</b>
-      <p>Hold this up at hatch 2. ${clock(K.readyAt)}, ${itemName(K.items[0])}.</p>
+      <p>Hold this up at hatch 2. ${clock(K.readyAt)}, ${
+        K.items.length>1 ? K.items.length+" plates" : itemName(K.items[0])}.</p>
       <span class="bars" aria-hidden="true">${Array.from({length:34},(_,i)=>
         `<i style="height:${[46,30,40,24,46,34][i%6]}px; width:${i%4?3:5}px; opacity:${i%7?1:.25}"></i>`).join("")}</span>`,
     foot:`<button class="btn btn-line" data-closecover>${I.x}Done</button>`};
@@ -1343,6 +1399,8 @@ function pushContent(){
   const f=fire(), K=S.ticket;
   if(K && !K.collected){
     const left=K.readyAt-now(), d=driveMin();
+    if(now() < K.startAt-2) return {t:`${K.code} is queued`,
+      b:`On the coals at ${clock(K.startAt)}, ready around ${clock(K.readyAt)} ${slotWhen(K.readyAt)}.`};
     if(K.where==="delivery") return left>0
       ? {t:`${K.code} is on the coals`, b:`The rider leaves at ${clock(K.readyAt)}, with you about ${clock(K.readyAt+RIDE)}.`}
       : {t:"The rider has it", b:`${K.code} is with you about ${clock(K.readyAt+RIDE)}.`};
@@ -1466,11 +1524,22 @@ function closeTop(){
   else if(S.cover) S.cover=null;
   else if(S.sheet) S.sheet = S.sheet==="confirm" ? "order" : null;
   paint();
-  if(!S.sheet && !S.cover && !S.system && returnSel){
-    const back=document.querySelector(returnSel);
-    if(back) back.focus({preventScroll:true});
-    returnSel=null;
+  if(!S.sheet && !S.cover && !S.system){
+    if(returnSel){
+      const back=document.querySelector(returnSel);
+      if(back) back.focus({preventScroll:true});
+      returnSel=null;
+    }
+    // the opener may itself have been repainted away (the send button, say)
+    settleFocus();
   }
+}
+/* When the control that was pressed no longer exists after a repaint, focus
+   lands on the thumb's primary action rather than falling to <body>. */
+function settleFocus(){
+  if(document.activeElement!==document.body) return;
+  const t=$("#thumb .btn") || $("#thumb a") || $(".avatar");
+  if(t) t.focus({preventScroll:true});
 }
 let sayTimer=0;
 function say(m){
@@ -1519,9 +1588,9 @@ document.addEventListener("click",e=>{
                    : jump.dataset.jump==="last" ? lastHour() : +jump.dataset.jump); return; }
 
   if(hit("[data-close]") || hit("[data-closecover]")){ closeTop(); return; }
-  if(hit("[data-unlock]")){ S.system=null; paint(); return; }
-  if(hit("[data-lockpush]")){ S.system=null; S.banner=false; paint(); say("Ticket opened"); return; }
-  if(hit("[data-bannertap]")){ S.banner=false; paint(); return; }
+  if(hit("[data-unlock]")){ S.system=null; paint(); settleFocus(); return; }
+  if(hit("[data-lockpush]")){ S.system=null; S.banner=false; paint(); settleFocus(); say("Ticket opened"); return; }
+  if(hit("[data-bannertap]")){ S.banner=false; paint(); settleFocus(); return; }
 
   const openIt=hit("[data-open]");
   if(openIt){
@@ -1576,8 +1645,12 @@ document.addEventListener("click",e=>{
       K.items.push({cut:o.cut, fmt:o.fmt, side:o.side, sauces:[...o.sauces],
         prefs:[...o.prefs], half:o.half, note:o.note, price, qty:1});
       K.sub+=price; K.total+=price;
-      S.adding=false; S.sheet=null; paint();
-      say(`Added to ${K.code}. ${cg(K.total)} on the ticket.`);
+      // another plate is another pass on the grill, and another charge
+      K.readyAt+=3;
+      S.adding=false; S.sheet=null; paint(); settleFocus();
+      say(K.pay==="cash"
+        ? `Added to ${K.code}, ${cg(price)} to pay at the window. Ready moves to ${clock(K.readyAt)}.`
+        : `Added to ${K.code}, ${cg(price)} added on the Maestro. Ready moves to ${clock(K.readyAt)}.`);
       return;
     }
     S.sheet="confirm"; renderOverlay();
@@ -1591,20 +1664,23 @@ document.addEventListener("click",e=>{
   const slot=hit("[data-slot]:not(:disabled)");
   if(slot){ S.slotPick=+slot.dataset.slot; refreshSheet(); return; }
   if(hit("[data-hold]")){
-    S.slot=S.slotPick; S.when="trempan"; closeTop();
-    say(`Trempan slot held at ${clock(S.slot)}`); return;
+    const lane=nextSlot();
+    S.slot=S.slotPick + (lane.when==="tomorrow" ? 1440 : 0);
+    S.when="trempan"; closeTop();
+    say(`Trempan slot held, ${clock(S.slot)} ${slotWhen(S.slot)}`); return;
   }
   if(hit("[data-send]")){
     S.ticket=makeTicket(); S.cover="placed"; S.sheet=null; paint();
     say(`Ticket ${S.ticket.code}, ready around ${clock(S.ticket.readyAt)}`); return;
   }
   if(hit("[data-addplate]")){
+    if(!S.ticket || S.ticket.collected || S.ticket.readyAt-now()<=0) return;
     S.adding=true;
     Object.assign(S.order,{step:0, half:null, halfOn:false,
       sauces:new Set([1]), prefs:new Set(), note:""});
     openOverlay("sheet","order",T.closest("button")); return;
   }
-  if(hit("[data-here]")){ S.ticket.collected=true; S.toast=""; paint();
+  if(hit("[data-here]")){ S.ticket.collected=true; S.toast=""; paint(); settleFocus();
     say("Collected"); return; }
   if(hit("[data-save]")){ S.toast="Saved as a usual."; paint(); say("Saved as a usual"); return; }
   if(hit("[data-again]")){ S.ticket=null; S.toast=""; S.slot=null; S.when="now";
@@ -1629,6 +1705,15 @@ function maybeNotify(){
   if(!K || K.collected || !S.alerts || K.notified) return;
   const left=K.readyAt-now();
   // once per ticket, on a real threshold crossing, never on a bare timer
+  if(K.where==="delivery"){
+    if(left<=0 && left>-RIDE){
+      K.notified=true; S.banner=true;
+      clearTimeout(bannerTimer);
+      bannerTimer=setTimeout(()=>{ S.banner=false; renderBanner(); },9000);
+      say("Notification: the rider has it");
+    }
+    return;
+  }
   if(left<=driveMin() && left>0){
     K.notified=true; S.banner=true;
     clearTimeout(bannerTimer);
