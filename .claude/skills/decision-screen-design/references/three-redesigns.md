@@ -1,8 +1,8 @@
 # Three redesigns, read element by element
 
-These are reconstructions of worked examples from a video, presented there as conversion wins. No data was
-published with them: no sample sizes, no effect sizes, no test duration, no statement of what was measured or
-against what baseline. Treat them accordingly.
+These are reconstructions of three worked before/after examples that circulate as conversion wins. No data
+is published with them: no sample sizes, no effect sizes, no test duration, no statement of what was measured
+or against what baseline. Treat them accordingly.
 
 There is a second, more important limit. Each redesign changes eight to twelve things at once — image,
 headline, price presentation, information order, button verb, and several new elements that did not exist in
@@ -81,13 +81,8 @@ deceptive version of the same change.
 7 — first charge of $19, cancel any time before."** Nothing about the redesign's logic requires hiding the
 number, and hiding it converts a trust-building screen into a drip-pricing one.
 
-**First-person possessive framing — thin evidence, flag it as such.** "Start *my* free trial" over "Start
-*your* free trial" traces to a single practitioner A/B test (Michael Aagaard, ContentVerve/Unbounce, around
-2013) on one landing page, endlessly re-quoted at "+90%". There is no published replication and no controlled
-study. The proposed mechanism — self-referential encoding, after Rogers, Kuiper & Kirker (1977) — is about
-memory for self-relevant material, and the leap from encoding to click-through is not evidenced. Treat it as
-a free coin-flip: costs nothing to choose, never worth arguing about in a review, never worth citing as a
-number. If someone quotes the 90% at you, this paragraph is the reply.
+**First-person possessive framing** (*"Start my free trial"*). `persuasive-copy` owns this one: the
+circulating ~90% figure traces to a single unreplicated 2013 test. Free to choose, never worth citing.
 
 **Effort specificity.** "Starts in 2 taps" bounds the remaining cost. An unknown cost gets estimated
 pessimistically — the user has been through enough signup flows to assume the worst — so naming it converts a

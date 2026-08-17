@@ -89,12 +89,14 @@ capture form" is a small betrayal that people register even when they can't name
 | Sign up | Start free — no card needed / Create my first project |
 | Save | Save draft / Publish changes / Apply to 14 records |
 
-**First-person labels.** "Start my free trial" beat "Start your free trial" by 90% click-through in a
-landing-page test by Michael Aagaard at Unbounce. Treat that as *one A/B test on one page*, not a law — it
-is a single unaudited case study and the effect size is implausible as a general constant. The part that
-generalises is the mechanism: the label works better when it reads as the user's own sentence about their
-own outcome. Test it yourself if the surface has the traffic; if it doesn't, pick the phrasing your users
-would actually say out loud.
+**First-person labels.** *"Start my free trial"* versus *"Start your free trial"* is the most-repeated
+microcopy tip in the field, and its evidence is thinner than its reputation: essentially one landing-page
+A/B test from around 2013 (Michael Aagaard, ContentVerve/Unbounce), on a single page, whose reported ~90%
+lift is quoted everywhere and replicated nowhere checkable. The mechanism is plausible — the label reads as
+the user's own sentence about their own outcome. The circulating number is not. Test it if the surface has
+the traffic, expect something small, and note it reads awkwardly in several languages and in formal B2B
+registers, which matters in a bilingual product. If you can't test it, pick the phrasing your users would
+say out loud and spend the argument elsewhere. **This is the canonical treatment; siblings point here.**
 
 **Destructive actions name the consequence and its scope.** A dialog's title should ask the real question and
 the buttons should answer it, so the pair reads correctly with the body text ignored — which is how they get

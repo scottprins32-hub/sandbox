@@ -194,12 +194,9 @@ create a payment obligation *now*. The button that actually charges must say so,
 requirement, and getting it wrong can leave the consumer not bound by the contract. Moves 3 and 10 are two
 halves of one rule: **soft verbs for reversible starts, explicit payment language for charges.**
 
-**First-person framing** — *"Start my free trial"* versus *"your free trial"* — is a small ownership cue and
-a widely used practitioner technique. The evidence is thinner than its reputation: essentially one
-much-repeated A/B test from around 2013 (Michael Aagaard / ContentVerve) on a single page, whose reported
-~90% lift is quoted everywhere and replicated nowhere checkable. The mechanism is plausible, the circulating
-effect size is not. Test it, expect something small, and note it reads awkwardly in several languages and in
-formal B2B registers.
+**First-person framing** — *"Start my free trial"* versus *"your free trial"* — is `persuasive-copy`'s call;
+it owns the debunk. The short version: the circulating ~90% figure comes from one unreplicated 2013 test,
+so treat it as a free coin-flip, never as a number to cite.
 
 ### 4. Kill uncertainty with a number
 
@@ -562,8 +559,7 @@ Run against the screen, the design, or the diff.
 - **US fees** — FTC Act §5; FTC *Rule on Unfair or Deceptive Fees*, 16 CFR Part 464, effective 12 May 2025 —
   total price including all mandatory fees, for live-event tickets and short-term lodging, binding on
   platforms and resellers as well as sellers.
-- **First-person CTA copy** — one much-repeated A/B test (Michael Aagaard / ContentVerve, c. 2013), single
-  page, reported ~90% lift, no verifiable replication. A technique to test, not a finding.
+- **First-person CTA copy** — owned by `persuasive-copy`; one unreplicated 2013 test, not a finding.
 
 **Deliberately not quoted:** any conversion-lift percentage for the three redesigns, any "X% abandon when
 they see a range", and any claimed fine for a specific pricing pattern. Where a number could not be traced to

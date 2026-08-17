@@ -199,13 +199,16 @@ Then **show the accumulation**, because unseen stored value does not create felt
 
 ### 7. Progress, goal gradient, and resumption
 
-**The goal-gradient effect** (Hull, 1932; revived for humans by Kivetz, Urminsky & Zheng, 2006, *JMR*, in a coffee-card field study): effort accelerates as a goal gets closer. **Endowed progress** (Nunes & Dreze, 2006, *JCR* — the car-wash study): people given a card with 10 slots and two already stamped completed more often than those given an 8-slot card requiring the same eight purchases. The framing of the same work as *progress already made* changes completion.
+**The goal-gradient effect** (Hull, 1932; Kivetz, Urminsky & Zheng, 2006, *JMR*): effort accelerates as a
+goal gets closer. `onboarding-activation` move 5 owns this and endowed progress in full — the study figures,
+the seeding technique, and the honesty constraint. What is specific to *retention* is the third bullet:
 
-What to build:
-
-- **Pre-credit real progress.** If the user has already created an account and connected email, the setup checklist opens at 2 of 5 complete, not 0 of 5 — because it is *true*.
-- **Show remaining, not just done**, near the end: "2 steps left" outperforms "80%" at the point where the gradient does the work.
-- **Resumption over restart.** Land the returning user exactly where they were, with a one-line delta of what changed while they were gone.
+- **Pre-credit real progress**, and **show remaining rather than done** near the end ("2 steps left" beats
+  "80%" where the gradient does the work). Both belong to first-run; see `onboarding-activation`.
+- **Resumption over restart — this is the retention move.** A returning user after three days should land
+  exactly where they were, with a one-line delta of what changed while they were gone. First-run progress
+  gets someone through setup once; resumption is what makes session forty cheap, and it is the reason a
+  returning user opens the app instead of deciding to deal with it later.
 
 A caveat worth knowing because the folklore version is everywhere: the **Zeigarnik effect** (better *memory* for interrupted tasks) has a poor replication record — a 2025 meta-analysis (Ghibellini & Meier, *Humanities and Social Sciences Communications*) found no reliable memory advantage for unfinished tasks. What *did* hold up in the same analysis is the related **Ovsiankina effect**: people spontaneously resume interrupted tasks at a high rate, roughly two-thirds across studies, with no prompt and no reward. The safe reading for product work: **"make it trivial to resume what you started" is well supported; "engineer a cliffhanger so they can't stop thinking about it" is not.** Design for resumption, not for nagging incompleteness.
 
