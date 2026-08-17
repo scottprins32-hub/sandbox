@@ -25,7 +25,11 @@ The goal is to make the *intended* task cheap and the *unintended* one expensive
 - People start a flow and don't finish it, and you want to know where the cost is before you A/B test copy.
 - You are deciding between a confirmation dialog and an undo.
 
-Go elsewhere when: the question is **where the eye goes on the screen** → `attention-and-hierarchy`. The
+Go elsewhere when: the screen is a **repeating list, table or work queue** rather than one task — default
+sort, row actions, bulk operations, pagination → `list-and-queue-design`. The screen is asking for **money
+or a commitment** — a paywall, plan comparison, price display, checkout summary → `decision-screen-design`,
+which owns the composition of that moment; this skill owns completing the task once the decision is made.
+The question is **where the eye goes on the screen** → `attention-and-hierarchy`. The
 question is **what the words should say** → `persuasive-copy`. The question is **how a brand-new user
 reaches the value moment** → `onboarding-activation` (that skill owns first-run; this one owns the mechanics
 of any single task within it). The question is **whether a default or a friction asymmetry is manipulative

@@ -24,7 +24,9 @@ whitespace is a hierarchy channel. Read it for the mechanism. Read this for the 
 - A layout that overflows, horizontally scrolls, or clips at small widths or high zoom.
 - Reviewing a diff full of arbitrary values (`p-[13px]`, `margin-top: 22px`, `w-[347px]`).
 
-Go elsewhere when: the question is the *type scale itself* — sizes, weights, tracking, typeface choice
+Go elsewhere when: the layout is a **data table** and the question is column count, density modes or what
+happens to it at 320px → `list-and-queue-design` (this skill still supplies the padding and gap values it
+uses). The question is the *type scale itself* — sizes, weights, tracking, typeface choice
 (`typography-system`, which this skill defers to; type sizes drive spacing, so settle them first); *which
 element should be loudest* or why users miss something (`attention-and-hierarchy`); *how the transition
 animates* when the layout changes (`design-motion-principles`); whether the whole thing looks generic or

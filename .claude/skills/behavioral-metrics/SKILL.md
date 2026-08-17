@@ -15,7 +15,7 @@ This skill answers two questions: **did the thing we built actually work, and wh
 - Before shipping anything from the persuasion/engagement skills — the guardrails must be live first.
 - Deciding what to do when you have a few hundred users a week and someone asked for statistical significance.
 
-Go elsewhere when: you need to *find and validate* the activation moment itself in depth → **onboarding-activation** and its `onboarding-activation/references/instrumenting-activation.md`, which owns candidate generation and the causation test. You are deciding whether a mechanic is defensible → **ethical-persuasion-audit** (a guardrail regression is evidence, not a substitute for the ethics review). You already know where the funnel leaks and need the fix → **friction-and-flow**, **attention-and-hierarchy**, **persuasive-copy**, **habit-loop-design**. Unsure which principle is at play → **ux-psychology** (router + full catalog).
+Go elsewhere when: you need to *find and validate* the activation moment itself in depth → **onboarding-activation** and its `onboarding-activation/references/instrumenting-activation.md`, which owns candidate generation and the causation test. You are deciding whether a mechanic is defensible → **ethical-persuasion-audit** (a guardrail regression is evidence, not a substitute for the ethics review). You already know where the funnel leaks and need the fix → **friction-and-flow**, **attention-and-hierarchy**, **persuasive-copy**, **habit-loop-design**, **decision-screen-design** (if the leak is a screen with a price on it) or **list-and-queue-design** (if it is a table operators work all day). Unsure which principle is at play → **ux-psychology** (router + full catalog).
 
 ## Diagnose first
 

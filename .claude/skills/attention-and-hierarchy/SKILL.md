@@ -20,7 +20,10 @@ what this is for". Hierarchy is not decoration. It is the interface's answer to 
 - Colour, contrast, dark mode and accessibility questions where the real question is legibility and rank. The
   values that satisfy the answer — ramps, tokens, both themes — are `color-and-theming`'s.
 
-Go elsewhere when: the problem is people *abandoning a task* they started (`friction-and-flow`); the problem
+Go elsewhere when: the screen is a **table, list or work queue** and the question is which columns earn a
+place, what a row does, or how bulk selection behaves (`list-and-queue-design` — this skill still owns the
+salience pass over it); the screen **asks for money or a commitment** (`decision-screen-design`); the problem
+is people *abandoning a task* they started (`friction-and-flow`); the problem
 is the *words* rather than their prominence (`persuasive-copy`); the problem is a first-time user not
 understanding the product at all (`onboarding-activation`); the problem is animation craft — easing, duration,
 choreography (`design-motion-principles`, which this skill defers to entirely). This skill decides *whether*

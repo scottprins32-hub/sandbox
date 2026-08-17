@@ -17,7 +17,7 @@ The job here is to name the value moment, measure the distance to it in seconds 
 - Choosing whether to build a product tour, a checklist, sample data, or nothing.
 - Onboarding a workforce onto a tool their employer chose for them.
 
-Go elsewhere when: the user already activated and you want them to come back on day 7 → **habit-loop-design**. The problem is a specific form or checkout that is slow and annoying for *existing* users → **friction-and-flow**. You need the layout and visual-priority pass on the screen → **attention-and-hierarchy**. You are writing the words on the value prop → **persuasive-copy**. You need to define and instrument the metric set properly → **behavioral-metrics**. You are worried a technique here is manipulative → **ethical-persuasion-audit**. You do not know which of these you need → **ux-psychology**.
+Go elsewhere when: the user already activated and you want them to come back on day 7 → **habit-loop-design**. The problem is a specific form or checkout that is slow and annoying for *existing* users → **friction-and-flow**. You need the layout and visual-priority pass on the screen → **attention-and-hierarchy**. You are writing the words on the value prop → **persuasive-copy**. You need to define and instrument the metric set properly → **behavioral-metrics**. The screen at the end of the trial is a **paywall or plan comparison** → **decision-screen-design**. You are worried a technique here is manipulative → **ethical-persuasion-audit**. You do not know which of these you need → **ux-psychology**.
 
 ## Diagnose first
 

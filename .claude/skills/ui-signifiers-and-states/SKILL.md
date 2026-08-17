@@ -24,7 +24,9 @@ pencil icon to edit" in your UI is a bug report about the pencil icon.
 - Wiring async feedback: loading buttons, save confirmations, toasts, live regions.
 - A view needs its loading / empty / error / partial variants and nobody has defined them.
 
-Go elsewhere when: the question is **where the eye goes and what is loudest** → `attention-and-hierarchy`,
+Go elsewhere when: the component is a **row in a table or queue** and the question is what the row *does* —
+click target, drawer versus page, bulk selection scope → `list-and-queue-design`; this skill still owns the
+row's state matrix. The question is **where the eye goes and what is loudest** → `attention-and-hierarchy`,
 which owns Gestalt grouping, preattentive salience and the theory of hierarchy; this skill assumes it and
 gives per-state values. **Which colours the tokens hold** → `color-and-theming`. **How much space around a
 target** → `spacing-and-layout`. **Whether a pressed state should use elevation** → `depth-and-overlays`.

@@ -25,7 +25,10 @@ diagnosis right and most of the technique picks itself.
 - Someone says the product "doesn't explain itself", "sounds corporate", "sounds salesy", or "nobody clicks".
 - You are localising an interface, or the product serves two audiences in two languages.
 
-Go elsewhere when: the question is **where the eye lands** → `attention-and-hierarchy` (copy can't fix a
+Go elsewhere when: the screen is a **pricing page, paywall, plan comparison or checkout summary** and the
+question is what goes on it and in what order → `decision-screen-design`; this skill owns how each line is
+worded, that one owns the composition of the commitment moment. The question is **where the eye lands** →
+`attention-and-hierarchy` (copy can't fix a
 button nobody sees). The question is **how many fields, what validation, how fast it feels** →
 `friction-and-flow`. The question is **what a brand-new user should see first** → `onboarding-activation`.
 The question is **whether this notification should exist at all** → `habit-loop-design`. The question is
