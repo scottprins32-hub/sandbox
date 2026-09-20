@@ -1,0 +1,1033 @@
+<title>Modern Pitching</title>
+<style>
+:root{
+  --ground:#0D100E; --surface:#161A17; --paper:#E9EAE3; --ink:#11140F;
+  --mark:#C8FF00; --mark-deep:#4F6B00;
+  --on-ground:#F2F3EE; --muted-dark:#A9AFA1; --muted-paper:#4E5247;
+  --line-dark:rgba(242,243,238,.13); --line-paper:rgba(17,20,15,.16);
+  --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --gut:clamp(16px,5vw,52px);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--on-ground);
+  font-family:var(--sans); font-size:clamp(1rem,.96rem + .22vw,1.1rem);
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  font-synthesis-weight:none;
+}
+h1,h2,h3,p,ul,ol,dl,figure{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit}
+img{max-width:100%}
+
+/* ---- type roles ---- */
+.d1{
+  font-size:clamp(2.35rem,8.4vw,5.1rem); line-height:.94;
+  font-weight:800; font-stretch:118%; letter-spacing:-.022em;
+  text-wrap:balance; text-transform:uppercase;
+}
+.d2{
+  font-size:clamp(1.7rem,5.2vw,2.9rem); line-height:1.02;
+  font-weight:800; font-stretch:112%; letter-spacing:-.018em;
+  text-wrap:balance; text-transform:uppercase;
+}
+.d3{font-size:clamp(1.05rem,2.4vw,1.3rem);font-weight:700;line-height:1.25;letter-spacing:-.008em}
+.lede{font-size:clamp(1.05rem,1rem + .5vw,1.28rem);line-height:1.5;max-width:34ch}
+.prose{max-width:62ch}
+.lbl{
+  font-family:var(--mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted-dark);
+  display:flex; align-items:center; gap:.6em;
+}
+.lbl::before{content:"";width:18px;height:1.5px;background:var(--mark);flex:none}
+.paper .lbl{color:var(--muted-paper)}
+.paper .lbl::before{background:var(--mark-deep)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---- layout ---- */
+.wrap{max-width:1120px;margin:0 auto;padding-inline:var(--gut)}
+.band{padding-block:clamp(56px,10vw,110px);position:relative}
+.band--grid::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(to right,var(--line-dark) 0 1px,transparent 1px 33.3333%),
+    repeating-linear-gradient(to bottom,var(--line-dark) 0 1px,transparent 1px 33.3333%);
+  mask-image:linear-gradient(to bottom,#000 0 62%,transparent);
+}
+.band--grid>*{position:relative}
+.paper{background:var(--paper);color:var(--ink)}
+.paper .mutedx{color:var(--muted-paper)}
+.mutedx{color:var(--muted-dark)}
+.stack{display:flex;flex-direction:column;gap:clamp(18px,3.2vw,30px)}
+.stack-s{display:flex;flex-direction:column;gap:12px}
+.rule{height:1px;background:var(--line-dark);border:0;margin:0}
+.paper .rule{background:var(--line-paper)}
+
+/* framing marks */
+.framed{position:relative;padding:clamp(20px,3.6vw,34px)}
+.framed::before,.framed::after{content:"";position:absolute;width:15px;height:15px;border:1.5px solid var(--mark)}
+.framed::before{top:0;left:0;border-right:0;border-bottom:0}
+.framed::after{bottom:0;right:0;border-left:0;border-top:0}
+.paper .framed::before,.paper .framed::after{border-color:var(--mark-deep)}
+
+/* highlighter */
+.hl{background:var(--mark);color:var(--ink);padding:.06em .34em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* ---- header ---- */
+.top{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
+  background:color-mix(in srgb,var(--ground) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line-dark);
+}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:58px;padding-block:9px}
+.wordmark{display:flex;align-items:baseline;gap:.5em;text-decoration:none;font-weight:800;font-stretch:118%;text-transform:uppercase;letter-spacing:-.01em;font-size:1rem;line-height:1}
+.wordmark i{font-style:normal;color:var(--mark);font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;font-weight:600}
+.top-sp{flex:1}
+.langsw{display:flex;border:1px solid var(--line-dark);border-radius:2px;overflow:hidden;flex:none}
+.langsw button{
+  font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.1em;
+  background:none;border:0;color:var(--muted-dark);padding:7px 9px;cursor:pointer;line-height:1;
+}
+.langsw button[aria-pressed="true"]{background:var(--mark);color:var(--ink)}
+
+/* ---- buttons ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6em;
+  font-family:var(--mono);font-size:.82rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;text-decoration:none;cursor:pointer;
+  padding:15px 22px;border:1.5px solid var(--mark);border-radius:2px;
+  background:var(--mark);color:var(--ink);
+  transition:transform .18s var(--ease),background .18s var(--ease);
+  text-align:center;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn--ghost{background:transparent;color:var(--on-ground);border-color:var(--line-dark)}
+.btn--ghost:hover{border-color:var(--mark)}
+.paper .btn--ghost{color:var(--ink);border-color:var(--line-paper)}
+.paper .btn{border-color:var(--mark-deep);background:var(--mark-deep);color:var(--paper)}
+.paper .btn--ghost{background:transparent;color:var(--ink)}
+.btn--sm{padding:10px 14px;font-size:.72rem}
+.btnrow{display:flex;flex-wrap:wrap;gap:12px}
+.btnrow .btn{flex:1 1 220px}
+@media(min-width:640px){.btnrow .btn{flex:0 0 auto}}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:3px solid var(--mark);outline-offset:3px;border-radius:2px;
+}
+.paper :where(a,button,input,select,textarea,summary):focus-visible{outline-color:var(--mark-deep)}
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--mark);color:var(--ink);padding:12px 18px;font-family:var(--mono);font-size:.8rem}
+.skip:focus{left:8px;top:8px}
+
+/* ---- hero ---- */
+.hero{padding-block:clamp(34px,6vw,64px) clamp(44px,8vw,86px)}
+.hero .d1 em{font-style:normal;color:var(--mark);display:block}
+.hero-cta{margin-top:4px}
+.strip{
+  display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--mono);
+  font-size:.72rem;letter-spacing:.06em;color:var(--muted-dark);
+  border-top:1px solid var(--line-dark);padding-top:16px;
+}
+.strip span{display:flex;align-items:center;gap:.5em}
+.strip span::before{content:"";width:5px;height:5px;background:var(--mark);flex:none}
+
+/* ---- fact grid ---- */
+.facts{display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--line-paper)}
+@media(min-width:560px){.facts{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.facts{grid-template-columns:repeat(4,1fr)}}
+.facts div{border-bottom:1px solid var(--line-paper);padding:14px 0;display:flex;flex-direction:column;gap:5px}
+@media(min-width:560px){.facts div{padding-inline-end:18px}}
+.facts dt,.facts .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-paper)}
+.facts .v{font-weight:700;font-size:1.02rem;line-height:1.3}
+
+/* ---- includes ---- */
+.incl{display:grid;gap:10px;grid-template-columns:1fr}
+@media(min-width:680px){.incl{grid-template-columns:1fr 1fr;gap:10px 30px}}
+.incl li{display:flex;gap:11px;align-items:flex-start;line-height:1.4}
+.incl li::before{content:"";width:9px;height:9px;flex:none;margin-top:.45em;background:var(--mark-deep)}
+.band:not(.paper) .incl li::before{background:var(--mark)}
+
+/* ---- price ---- */
+.pricebox{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 26px}
+.pnum{font-size:clamp(2.6rem,9vw,4rem);font-weight:800;font-stretch:115%;line-height:.86;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pnum small{font-size:.3em;font-weight:600;letter-spacing:.04em;vertical-align:.9em;font-family:var(--mono)}
+.pmeta{font-family:var(--mono);font-size:.78rem;line-height:1.5;color:var(--muted-paper)}
+.eb{display:none;border-left:3px solid var(--mark-deep);padding:2px 0 2px 14px}
+.eb.on{display:block}
+.eb b{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
+.cd{font-family:var(--mono);font-size:.76rem;letter-spacing:.04em}
+
+/* ---- table ---- */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:520px}
+caption{text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-paper);padding-bottom:10px}
+th,td{text-align:left;padding:14px 16px 14px 0;border-bottom:1px solid var(--line-paper);vertical-align:top}
+thead th{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-paper);font-weight:500;padding-bottom:9px}
+td.p{font-family:var(--mono);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.n{font-weight:700}
+tbody tr:last-child td{border-bottom:0}
+
+/* ---- the frame (signature) ---- */
+.scope{background:var(--surface);border:1px solid var(--line-dark);border-radius:3px;overflow:hidden}
+.scope-hd{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line-dark);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-dark)}
+.scope-hd .dot{width:7px;height:7px;background:var(--mark);flex:none}
+.scope-hd .sp{flex:1}
+.badge{border:1px solid var(--line-dark);padding:4px 8px;color:var(--muted-dark);letter-spacing:.08em}
+.stage{position:relative;background:var(--ground)}
+.stage svg{display:block;width:100%;height:auto;max-width:100%}
+.playbtn{
+  position:absolute;right:10px;bottom:10px;z-index:3;
+  background:color-mix(in srgb,var(--ground) 80%,transparent);color:var(--on-ground);
+  border:1px solid var(--line-dark);border-radius:2px;padding:8px 11px;cursor:pointer;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+}
+.scrub{padding:16px 14px 6px;display:flex;flex-direction:column;gap:12px}
+.ticks{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.ticks button{
+  background:none;border:0;border-top:2px solid var(--line-dark);padding:9px 2px 0;cursor:pointer;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:var(--muted-dark);
+  text-align:left;line-height:1.2;transition:color .2s var(--ease),border-color .2s var(--ease);
+}
+.ticks button[aria-current="true"]{color:var(--mark);border-top-color:var(--mark)}
+.ticks b{display:block;font-size:.72rem;font-weight:600}
+.ticks span{display:none}
+@media(min-width:560px){.ticks span{display:block;font-weight:400;font-size:.62rem}}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;background:transparent;margin:0;height:34px;cursor:grab;
+}
+input[type=range]:active{cursor:grabbing}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line-dark)}
+input[type=range]::-moz-range-track{height:2px;background:var(--line-dark)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--mark);border:0;margin-top:-10px}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--mark);border:0}
+.readout{border-top:1px solid var(--line-dark);padding:18px 14px 20px;display:grid;gap:9px;min-height:172px;align-content:start}
+@media(min-width:720px){.readout{grid-template-columns:1fr 1.15fr;gap:9px 34px;min-height:150px}}
+.readout .rnum{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--mark)}
+.readout .rname{font-size:clamp(1.3rem,3.6vw,1.9rem);font-weight:800;font-stretch:112%;text-transform:uppercase;letter-spacing:-.012em;line-height:1.02}
+.readout .rmeas{font-family:var(--mono);font-size:.8rem;line-height:1.5;color:var(--mark)}
+.readout .rwhy{color:var(--muted-dark);line-height:1.5}
+.rleft{display:flex;flex-direction:column;gap:6px}
+.rright{display:flex;flex-direction:column;gap:9px}
+
+/* ---- coaches ---- */
+.coaches{display:grid;gap:clamp(16px,3vw,28px);grid-template-columns:1fr}
+@media(min-width:680px){.coaches{grid-template-columns:1fr 1fr}}
+.coach{border-top:1.5px solid var(--mark);padding-top:16px;display:flex;flex-direction:column;gap:7px}
+.coach .cn{font-size:1.25rem;font-weight:800;font-stretch:110%;text-transform:uppercase;letter-spacing:-.01em;line-height:1.05}
+.coach .cr{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;color:var(--mark)}
+
+/* ---- form ---- */
+form{display:grid;gap:16px;grid-template-columns:1fr;max-width:640px}
+@media(min-width:620px){.f2{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,legend{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-paper)}
+input[type=text],input[type=email],input[type=tel],input[type=url],select,textarea{
+  font-family:var(--sans);font-size:1rem;color:var(--ink);background:#FDFDFB;
+  border:1px solid var(--line-paper);border-radius:2px;padding:13px 12px;width:100%;
+}
+textarea{min-height:96px;resize:vertical}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 19px) 21px,calc(100% - 13px) 21px;background-size:6px 6px;background-repeat:no-repeat;padding-right:38px}
+fieldset{border:1px solid var(--line-paper);border-radius:2px;padding:14px;margin:0;display:flex;flex-direction:column;gap:9px}
+.radio,.check{display:flex;gap:10px;align-items:flex-start;font-family:var(--sans);font-size:.98rem;line-height:1.4;cursor:pointer}
+.radio input,.check input{margin:.28em 0 0;flex:none;width:18px;height:18px;accent-color:var(--mark-deep)}
+.stub{
+  font-family:var(--mono);font-size:.74rem;line-height:1.55;
+  border:1px dashed var(--mark-deep);padding:11px 13px;color:var(--muted-paper);border-radius:2px;
+}
+.stub b{color:var(--ink);letter-spacing:.06em;text-transform:uppercase;font-size:.68rem;display:block;margin-bottom:4px}
+.notice{font-family:var(--mono);font-size:.78rem;line-height:1.5;border-left:3px solid var(--mark-deep);padding:8px 0 8px 13px}
+.confirm{
+  font-family:var(--mono);font-size:.78rem;background:var(--mark);color:var(--ink);
+  padding:.1em .4em;border-radius:2px;font-weight:500;display:inline-block;letter-spacing:.01em;
+}
+.band:not(.paper) .confirm{background:transparent;color:var(--mark);border:1px dashed var(--mark);padding:.06em .36em}
+
+/* ---- faq ---- */
+.faq{border-top:1px solid var(--line-paper)}
+.faq details{border-bottom:1px solid var(--line-paper)}
+.faq summary{
+  cursor:pointer;padding:17px 34px 17px 0;position:relative;font-weight:700;
+  font-size:1.02rem;line-height:1.35;list-style:none;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:4px;top:15px;font-family:var(--mono);font-size:1.25rem;color:var(--mark-deep);line-height:1}
+.faq details[open] summary::after{content:"\2212"}
+.faq .a{padding:0 0 18px;max-width:62ch;color:var(--muted-paper);line-height:1.55}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line-dark);padding-block:clamp(34px,6vw,58px) calc(clamp(34px,6vw,58px) + 78px)}
+@media(min-width:760px){footer{padding-bottom:clamp(34px,6vw,58px)}}
+.fgrid{display:grid;gap:26px;grid-template-columns:1fr}
+@media(min-width:680px){.fgrid{grid-template-columns:1.4fr 1fr 1fr}}
+.fgrid a{color:var(--muted-dark)}
+.fcol{display:flex;flex-direction:column;gap:8px;font-size:.92rem}
+
+/* ---- sticky mobile CTA ---- */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;
+  background:color-mix(in srgb,var(--ground) 95%,transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--line-dark);
+  padding:11px var(--gut) calc(11px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:12px;align-items:center;
+  transition:transform .3s var(--ease);
+}
+.dock .dmeta{font-family:var(--mono);font-size:.66rem;line-height:1.3;color:var(--muted-dark);flex:1;letter-spacing:.04em}
+.dock .btn{flex:none;padding:13px 18px}
+.dock[data-hide="1"]{transform:translateY(120%)}
+@media(min-width:760px){.dock{display:none}}
+
+/* ---- reveals (js only, never hides at-rest content without js) ---- */
+.js .rv{opacity:0;transform:translateY(14px)}
+.js .rv.in{opacity:1;transform:none;transition:opacity .5s var(--ease),transform .55s var(--ease)}
+
+/* ---- look-pass fixes ---- */
+section[id],#main{scroll-margin-top:104px}
+dd{margin:0}
+.f2{display:flex;flex-direction:column;gap:16px}
+@media(min-width:620px){.f2{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
+@media(max-width:479px){.top .btn{display:none}}
+.playbtn{left:10px;right:auto}
+
+@media(prefers-reduced-motion:reduce){
+  .js .rv{opacity:1;transform:none}
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  .btn:hover{transform:none}
+}
+</style>
+<style>
+.paperzone .band + .band{padding-top:0}
+.paperzone .band + .band > .wrap > .stack{padding-top:clamp(34px,6vw,60px);border-top:1px solid var(--line-paper)}
+</style>
+
+<a class="skip" href="#main" data-i18n="a11y.skip">Naar de inhoud</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="wordmark" href="#main"><span>Modern Pitching</span></a>
+    <span class="top-sp"></span>
+    <div class="langsw" role="group" data-i18n-attr="aria-label:a11y.lang">
+      <button type="button" id="l-nl" data-lang="nl" aria-pressed="true">NL</button>
+      <button type="button" id="l-en" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn btn--sm" href="#boeken" data-i18n="nav.cta">Stuur video in</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ══ HERO ══ -->
+  <section class="band band--grid hero">
+    <div class="wrap stack">
+      <p class="lbl"><span data-i18n="hero.eyebrow">Winterprogramma 2026 · BP Sports Center</span></p>
+      <h1 class="d1"><span data-i18n="hero.h1a">De worp is voorbij voordat je hem ziet.</span><em data-i18n="hero.h1b">Het antwoord zit in één frame.</em></h1>
+      <p class="lede" data-i18n="hero.lede">Wij filmen elke training, meten elke worp, en laten precies zien wat er gebeurt tussen been omhoog en loslaten. Voor pitchers van 9 t/m 16.</p>
+      <div class="btnrow hero-cta">
+        <a class="btn" href="#boeken" data-i18n="hero.cta1">Stuur video in — gratis</a>
+        <a class="btn btn--ghost" href="#winter" data-i18n="hero.cta2">Winterprogramma →</a>
+      </div>
+      <p class="strip">
+        <span data-i18n="hero.s1">Elke training gefilmd</span>
+        <span data-i18n="hero.s2">Radardata in je eigen account</span>
+        <span data-i18n="hero.s3">Twee coaches</span>
+        <span data-i18n="hero.s4">Analyse na week 1</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ WINTERPROGRAMMA ══ -->
+  <section class="band paper" id="winter" aria-labelledby="winter-h">
+    <div class="wrap stack">
+      <p class="lbl"><span data-i18n="win.lbl">Seizoen</span></p>
+      <h2 class="d2" id="winter-h" data-i18n="win.h">Winterprogramma 2026</h2>
+      <p class="prose" data-i18n="win.intro">Acht weken, twee keer per week, twee uur per training. Zestien trainingen bij BP Sports Center, met Scott en Connor allebei op de groep.</p>
+
+      <dl class="facts">
+        <div><dt data-i18n="win.k1">Wanneer</dt><dd class="v" data-i18n="win.v1">wo 28 okt — za 19 dec 2026</dd></div>
+        <div><dt data-i18n="win.k2">Dagen &amp; tijden</dt><dd class="v" data-i18n="win.v2">woensdag 16:30–18:30<br>zaterdag 16:00–18:00</dd></div>
+        <div><dt data-i18n="win.k3">Omvang</dt><dd class="v" data-i18n="win.v3">16 trainingen · 8 weken · 2 uur</dd></div>
+        <div><dt data-i18n="win.k4">Leeftijd</dt><dd class="v" data-i18n="win.v4">9 t/m 16 jaar</dd></div>
+        <div><dt data-i18n="win.k5">Waar</dt><dd class="v">BP Sports Center<br><span class="confirm">[confirm: adres]</span></dd></div>
+        <div><dt data-i18n="win.k6">Coaches</dt><dd class="v">Scott <span class="confirm">[confirm: achternaam]</span><br>Connor <span class="confirm">[confirm: achternaam]</span></dd></div>
+        <div><dt data-i18n="win.k7">Groepsgrootte</dt><dd class="v"><span class="confirm">[confirm: max aantal pitchers]</span></dd></div>
+        <div><dt data-i18n="win.k8">Inschrijven</dt><dd class="v"><span class="confirm">[confirm: inschrijflink + iDEAL]</span></dd></div>
+      </dl>
+
+      <h3 class="d3" data-i18n="win.inclh">Wat er in zit</h3>
+      <ul class="incl">
+        <li data-i18n="win.i1">Elke training gefilmd</li>
+        <li data-i18n="win.i2">Alle radardata in je eigen Modern Pitching-account</li>
+        <li data-i18n="win.i3">Persoonlijke mechanics-analyse na week 1</li>
+        <li data-i18n="win.i4">Eigen kracht- en gooiprogramma in de app</li>
+        <li data-i18n="win.i5">Twee coaches, kleine groepen binnen de groep</li>
+        <li data-i18n="win.i6">Je houdt de app-toegang ná het programma</li>
+      </ul>
+
+      <hr class="rule">
+
+      <div class="pricebox" id="pricebox">
+        <p class="pnum"><small>€</small>425</p>
+        <p class="pmeta" data-i18n="win.pmeta">Standaardprijs winterprogramma 2026.<br>16 trainingen, per pitcher.</p>
+      </div>
+      <p class="pmeta"><span data-i18n="win.sib">Broer/zus-korting:</span> <span class="confirm">[confirm]</span> · <span data-i18n="win.inst">gespreid betalen:</span> <span class="confirm">[confirm]</span></p>
+
+      <div class="btnrow">
+        <a class="btn" href="#boeken" data-i18n="win.cta">Inschrijven winterprogramma</a>
+      </div>
+      <p class="notice" data-i18n="win.demo">Demo — de inschrijfknop gaat nu naar het formulier hieronder. Vóór livegang koppelen aan de betaallink.</p>
+    </div>
+  </section>
+
+  <template id="tpl-eb">
+    <div class="eb on">
+      <span class="pmeta" data-i18n="win.ebl">Early bird t/m 30 september</span>
+      <b>€375</b>
+      <span class="cd" id="cd"></span>
+    </div>
+  </template>
+
+  <!-- ══ SIGNATURE: HET FRAME ══ -->
+  <section class="band band--grid" id="frame" aria-labelledby="frame-h">
+    <div class="wrap stack">
+      <p class="lbl"><span data-i18n="fr.lbl">De analyse</span></p>
+      <h2 class="d2" id="frame-h" data-i18n="fr.h">Elke worp valt uiteen in zes frames</h2>
+      <p class="prose mutedx" data-i18n="fr.intro">Sleep door de beweging — of gebruik de pijltjestoetsen. Bij elk frame staat wat we meten en waarom het uitmaakt. Dit is precies de volgorde die wij aanhouden als we een video van jouw pitcher terugkijken.</p>
+
+      <div class="scope">
+        <div class="scope-hd">
+          <span class="dot"></span>
+          <span data-i18n="fr.hd">Delivery — zijaanzicht</span>
+          <span class="sp"></span>
+          <span class="badge" data-i18n="fr.badge">Schema · geen echte atleetdata</span>
+        </div>
+
+        <div class="stage">
+          <svg id="fig" viewBox="96 30 256 240" role="img" aria-labelledby="fig-t">
+            <title id="fig-t" data-i18n="fr.figalt">Schematische zijaanzichttekening van een pitching delivery, met de gemeten ijkpunten per frame.</title>
+            <g id="figlayer">
+              <line x1="0" y1="250" x2="400" y2="250" stroke="#A9AFA1" stroke-opacity=".3" stroke-width="1"></line>
+              <rect x="126" y="246" width="32" height="4" fill="#A9AFA1" fill-opacity=".45"></rect>
+              <g fill="none" stroke="#F2F3EE" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="198" cy="86" r="10"></circle>
+                <path d="M198 102 L206 160"></path>
+                <path d="M198 108 L176 102 L166 80"></path>
+                <path d="M198 108 L222 118 L238 106"></path>
+                <path d="M200 160 L190 206 L178 246"></path>
+                <path d="M212 160 L244 192 L262 250"></path>
+              </g>
+              <circle cx="166" cy="80" r="4.5" fill="#C8FF00"></circle>
+              <g stroke="#C8FF00" stroke-width="1.6" fill="none">
+                <path d="M176 104 L220 112" stroke-dasharray="5 4"></path>
+                <path d="M188 165 L228 156" stroke-dasharray="5 4"></path>
+                <path d="M198 108 L198 160" stroke-opacity=".45"></path>
+              </g>
+              <text x="232" y="140" fill="#C8FF00" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">HEUP–SCHOUDER</text>
+            </g>
+          </svg>
+          <button type="button" class="playbtn" id="play" data-i18n="fr.play">Afspelen</button>
+        </div>
+
+        <div class="scrub">
+          <label class="lbl" for="scrub" style="font-size:.66rem"><span data-i18n="fr.scrublbl">Frame</span></label>
+          <input type="range" id="scrub" min="0" max="5" step="1" value="3" data-i18n-attr="aria-label:fr.scruba">
+          <div class="ticks" id="ticks" role="group" data-i18n-attr="aria-label:fr.ticksa"></div>
+        </div>
+
+        <div class="readout" aria-live="polite">
+          <div class="rleft">
+            <p class="rnum" id="r-num">04 / 06</p>
+            <p class="rname" id="r-name">Voetplant</p>
+          </div>
+          <div class="rright">
+            <p class="rmeas" id="r-meas">Meten: heup-schouderscheiding, kniehoek voor, stridelengte.</p>
+            <p class="rwhy" id="r-why">Dit is het frame waar we het vaakst iets vinden.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COACHES ══ -->
+  <section class="band" id="coaches" aria-labelledby="coaches-h">
+    <div class="wrap stack">
+      <p class="lbl"><span data-i18n="co.lbl">Wie er staat</span></p>
+      <h2 class="d2" id="coaches-h" data-i18n="co.h">Twee coaches op de groep</h2>
+      <div class="coaches">
+        <div class="coach">
+          <p class="cn">Scott <span class="confirm">[confirm: achternaam]</span></p>
+          <p class="cr" data-i18n="co.r1">Pitcher · Nederlands nationaal team</p>
+          <p class="mutedx" data-i18n="co.b1">Ik gooi zelf nog elke week. Wat ik in jouw video zie, heb ik meestal zelf een keer moeten afleren.</p>
+        </div>
+        <div class="coach">
+          <p class="cn">Connor <span class="confirm">[confirm: achternaam]</span></p>
+          <p class="cr"><span class="confirm">[confirm: rol / achtergrond]</span></p>
+          <p class="mutedx"><span class="confirm">[confirm: één regel over Connor — in Scotts woorden]</span></p>
+        </div>
+      </div>
+      <hr class="rule">
+      <p class="prose mutedx" data-i18n="co.tail">Twee paar ogen betekent dat er altijd iemand naar de beweging kijkt terwijl de ander de data bijhoudt. Daarom werken we met kleine groepen binnen de groep.</p>
+    </div>
+  </section>
+
+  <div class="paperzone paper">
+
+    <!-- ══ PRIJZEN ══ -->
+    <section class="band" id="prijzen" aria-labelledby="prijzen-h">
+      <div class="wrap stack">
+        <p class="lbl"><span data-i18n="pr.lbl">Prijzen</span></p>
+        <h2 class="d2" id="prijzen-h" data-i18n="pr.h">Wat het kost</h2>
+        <div class="tblwrap">
+          <table>
+            <caption data-i18n="pr.cap">Alle prijzen per pitcher, inclusief btw</caption>
+            <thead><tr>
+              <th scope="col" data-i18n="pr.c1">Wat</th>
+              <th scope="col" data-i18n="pr.c2">Prijs</th>
+              <th scope="col" data-i18n="pr.c3">Wat je krijgt</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td class="n" data-i18n="pr.r1n">Video-analyse</td>
+                <td class="p" data-i18n="pr.r1p">€0</td>
+                <td data-i18n="pr.r1d">Eén bullpen-video insturen. Je krijgt een volledig rapport terug. Geen addertje.</td>
+              </tr>
+              <tr>
+                <td class="n" data-i18n="pr.r2n">Intake op locatie</td>
+                <td class="p"><span class="confirm">[confirm: prijs]</span></td>
+                <td><span data-i18n="pr.r2d">Filmen, radar, mechanics-analyse en een plan. Duur:</span> <span class="confirm">[confirm]</span></td>
+              </tr>
+              <tr>
+                <td class="n" data-i18n="pr.r3n">Winterprogramma 2026</td>
+                <td class="p" id="pr-winter">€425</td>
+                <td data-i18n="pr.r3d">16 trainingen, 8 weken, twee coaches, app-toegang die blijft.</td>
+              </tr>
+              <tr>
+                <td class="n" data-i18n="pr.r4n">Broer/zus</td>
+                <td class="p"><span class="confirm">[confirm]</span></td>
+                <td data-i18n="pr.r4d">Tweede kind uit hetzelfde gezin.</td>
+              </tr>
+              <tr>
+                <td class="n" data-i18n="pr.r5n">Gespreid betalen</td>
+                <td class="p"><span class="confirm">[confirm]</span></td>
+                <td data-i18n="pr.r5d">In termijnen betalen voor het winterprogramma.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ BOEKEN ══ -->
+    <section class="band" id="boeken" aria-labelledby="boeken-h">
+      <div class="wrap stack">
+        <p class="lbl"><span data-i18n="bk.lbl">Boeken</span></p>
+        <h2 class="d2" id="boeken-h" data-i18n="bk.h">Begin met één video</h2>
+        <p class="prose" data-i18n="bk.intro">Stuur een bullpen-video in en je krijgt een volledig rapport terug — gratis. In dat rapport staat of een intake op locatie zinvol is. Je zit nergens aan vast.</p>
+
+        <form id="bookform" novalidate>
+          <div class="f2">
+            <div class="field">
+              <label for="f-parent" data-i18n="bk.f1">Naam ouder / verzorger</label>
+              <input type="text" id="f-parent" name="parent" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="f-email" data-i18n="bk.f2">E-mail</label>
+              <input type="email" id="f-email" name="email" autocomplete="email">
+            </div>
+          </div>
+          <div class="f2">
+            <div class="field">
+              <label for="f-phone" data-i18n="bk.f3">Telefoon</label>
+              <input type="tel" id="f-phone" name="phone" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label for="f-player" data-i18n="bk.f4">Naam pitcher</label>
+              <input type="text" id="f-player" name="player">
+            </div>
+          </div>
+          <div class="f2">
+            <div class="field">
+              <label for="f-age" data-i18n="bk.f5">Leeftijd pitcher</label>
+              <select id="f-age" name="age">
+                <option value="" data-i18n="bk.f5o">Kies leeftijd</option>
+                <option>9</option><option>10</option><option>11</option><option>12</option>
+                <option>13</option><option>14</option><option>15</option><option>16</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f-club" data-i18n="bk.f6">Club (optioneel)</label>
+              <input type="text" id="f-club" name="club">
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-video" data-i18n="bk.f7">Link naar de video</label>
+            <input type="url" id="f-video" name="video" data-i18n-attr="placeholder:bk.f7p" placeholder="YouTube, Drive of WeTransfer-link">
+          </div>
+          <fieldset>
+            <legend data-i18n="bk.f8">Waar gaat het om</legend>
+            <label class="radio"><input type="radio" name="want" value="video" checked><span data-i18n="bk.f8a">Gratis video-analyse</span></label>
+            <label class="radio"><input type="radio" name="want" value="intake"><span data-i18n="bk.f8b">Intake op locatie bij BP Sports Center</span></label>
+            <label class="radio"><input type="radio" name="want" value="winter"><span data-i18n="bk.f8c">Winterprogramma 2026</span></label>
+          </fieldset>
+          <div class="field">
+            <label for="f-msg" data-i18n="bk.f9">Iets wat ik moet weten (optioneel)</label>
+            <textarea id="f-msg" name="msg"></textarea>
+          </div>
+
+          <div class="stub">
+            <b data-i18n="bk.stub1t">Stub — toestemmingstekst</b>
+            <span data-i18n="bk.stub1">Hier komt de door Modern Pitching goedgekeurde tekst over toestemming van een ouder/verzorger voor het insturen en bewaren van beeld van een minderjarige. Nog niet juridisch nagekeken.</span>
+          </div>
+          <label class="check"><input type="checkbox" id="f-consent" name="consent"><span data-i18n="bk.consent">Ik ben ouder of verzorger en geef toestemming voor het insturen en bewaren van deze video. <span class="confirm">[stub: definitieve tekst]</span></span></label>
+
+          <div class="btnrow">
+            <button class="btn" type="button" id="submit" data-i18n="bk.submit">Verstuur aanvraag</button>
+          </div>
+          <p class="notice" id="formnotice" data-i18n="bk.demo">Demo — dit formulier verstuurt niets. Koppelen aan <b>Calendly</b> vóór livegang.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══ VRAGEN ══ -->
+    <section class="band" id="vragen" aria-labelledby="vragen-h">
+      <div class="wrap stack">
+        <p class="lbl"><span data-i18n="fq.lbl">Vragen van ouders</span></p>
+        <h2 class="d2" id="vragen-h" data-i18n="fq.h">Wat ouders meestal vragen</h2>
+        <div class="faq">
+          <details>
+            <summary data-i18n="fq.q1">Wat houdt hij over na die acht weken?</summary>
+            <div class="a" data-i18n="fq.a1">Zijn kracht- en gooiprogramma blijft in de app staan, met alle video's en radardata van de zestien trainingen. Die toegang houdt hij ná het programma — dat vervalt niet in december.</div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q2">Wanneer krijgt hij zijn analyse?</summary>
+            <div class="a" data-i18n="fq.a2">Na week één. Dan hebben we genoeg beeld en radardata om er iets zinnigs over te zeggen. Die analyse maken Connor en ik samen.</div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q3">Hoeveel coaches staan er op de groep?</summary>
+            <div class="a" data-i18n="fq.a3">Twee: Connor en ik, alle zestien trainingen. Daardoor kunnen we binnen de groep in kleine groepjes werken.</div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q4">Verandert de prijs nog?</summary>
+            <div class="a" id="fq-a4" data-i18n="fq.a4">Het winterprogramma kost €425 per pitcher.</div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q5">Mijn kind is 9 — is dat niet te jong?</summary>
+            <div class="a"><span class="confirm">[confirm: Scotts antwoord over minimumleeftijd en beginnersniveau]</span></div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q6">Wat als hij een training mist?</summary>
+            <div class="a"><span class="confirm">[confirm: inhaalbeleid]</span></div>
+          </details>
+          <details>
+            <summary data-i18n="fq.q7">Wat neemt hij mee?</summary>
+            <div class="a"><span class="confirm">[confirm: handschoen, schoeisel, eigen bal, drinken?]</span></div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fgrid">
+    <div class="fcol">
+      <p class="wordmark" style="font-size:1.15rem"><span>Modern Pitching</span></p>
+      <p class="mutedx" data-i18n="ft.tag">Video, mechanics en radardata voor jonge pitchers. Winterprogramma 2026 bij BP Sports Center.</p>
+    </div>
+    <div class="fcol">
+      <p class="lbl"><span data-i18n="ft.c">Contact</span></p>
+      <p><span class="confirm">[confirm: e-mailadres]</span></p>
+      <p><span class="confirm">[confirm: telefoon / WhatsApp]</span></p>
+      <p><span class="confirm">[confirm: KvK-nummer]</span></p>
+    </div>
+    <div class="fcol">
+      <p class="lbl"><span data-i18n="ft.l">Juridisch</span></p>
+      <p><span class="confirm">[stub: privacyverklaring]</span></p>
+      <p><span class="confirm">[stub: algemene voorwaarden]</span></p>
+      <p><span class="confirm">[stub: beeldmateriaal &amp; minderjarigen]</span></p>
+    </div>
+  </div>
+</footer>
+
+<div class="dock" id="dock">
+  <span class="dmeta" id="dockmeta" data-i18n="dock.meta">Gratis · één video · volledig rapport terug</span>
+  <a class="btn" href="#boeken" data-i18n="dock.cta">Stuur video in</a>
+</div>
+<script>
+(function(){
+"use strict";
+var root=document.documentElement;
+root.classList.add("js");
+
+/* ══════════ i18n ══════════ */
+var D={
+nl:{
+"a11y.skip":"Naar de inhoud","a11y.lang":"Taal kiezen","nav.cta":"Stuur video in",
+"hero.eyebrow":"Winterprogramma 2026 · BP Sports Center",
+"hero.h1a":"De worp is voorbij voordat je hem ziet.","hero.h1b":"Het antwoord zit in één frame.",
+"hero.lede":"Wij filmen elke training, meten elke worp, en laten precies zien wat er gebeurt tussen been omhoog en loslaten. Voor pitchers van 9 t/m 16.",
+"hero.cta1":"Stuur video in — gratis","hero.cta2":"Winterprogramma →",
+"hero.s1":"Elke training gefilmd","hero.s2":"Radardata in je eigen account","hero.s3":"Twee coaches","hero.s4":"Analyse na week 1",
+"win.lbl":"Seizoen","win.h":"Winterprogramma 2026",
+"win.intro":"Acht weken, twee keer per week, twee uur per training. Zestien trainingen bij BP Sports Center, met Scott en Connor allebei op de groep.",
+"win.k1":"Wanneer","win.v1":"wo 28 okt — za 19 dec 2026",
+"win.k2":"Dagen &amp; tijden","win.v2":"woensdag 16:30–18:30<br>zaterdag 16:00–18:00",
+"win.k3":"Omvang","win.v3":"16 trainingen · 8 weken · 2 uur",
+"win.k4":"Leeftijd","win.v4":"9 t/m 16 jaar",
+"win.k5":"Waar","win.k6":"Coaches","win.k7":"Groepsgrootte","win.k8":"Inschrijven",
+"win.inclh":"Wat er in zit",
+"win.i1":"Elke training gefilmd","win.i2":"Alle radardata in je eigen Modern Pitching-account",
+"win.i3":"Persoonlijke mechanics-analyse na week 1","win.i4":"Eigen kracht- en gooiprogramma in de app",
+"win.i5":"Twee coaches, kleine groepen binnen de groep","win.i6":"Je houdt de app-toegang ná het programma",
+"win.pmeta":"Standaardprijs winterprogramma 2026.<br>16 trainingen, per pitcher.",
+"win.ebl":"Early bird t/m 30 september","win.sib":"Broer/zus-korting:","win.inst":"gespreid betalen:",
+"win.cta":"Inschrijven winterprogramma",
+"win.demo":"Demo — de inschrijfknop gaat nu naar het formulier hieronder. Vóór livegang koppelen aan de betaallink.",
+"win.cdays":"Nog {n} dagen","win.clast":"Laatste dag",
+"fr.lbl":"De analyse","fr.h":"Elke worp valt uiteen in zes frames",
+"fr.intro":"Sleep door de beweging — of gebruik de pijltjestoetsen. Bij elk frame staat wat we meten en waarom het uitmaakt. Dit is precies de volgorde die wij aanhouden als we een video van jouw pitcher terugkijken.",
+"fr.hd":"Delivery — zijaanzicht","fr.badge":"Schema · geen echte atleetdata",
+"fr.figalt":"Schematische zijaanzichttekening van een pitching delivery, met de gemeten ijkpunten per frame.",
+"fr.play":"Afspelen","fr.pause":"Pauzeren","fr.scrublbl":"Frame",
+"fr.scruba":"Frame in de beweging — gebruik de pijltjestoetsen","fr.ticksa":"Spring naar een frame",
+"co.lbl":"Wie er staat","co.h":"Twee coaches op de groep",
+"co.r1":"Pitcher · Nederlands nationaal team",
+"co.b1":"Ik gooi zelf nog elke week. Wat ik in jouw video zie, heb ik meestal zelf een keer moeten afleren.",
+"co.tail":"Twee paar ogen betekent dat er altijd iemand naar de beweging kijkt terwijl de ander de data bijhoudt. Daarom werken we met kleine groepen binnen de groep.",
+"pr.lbl":"Prijzen","pr.h":"Wat het kost","pr.cap":"Alle prijzen per pitcher, inclusief btw",
+"pr.c1":"Wat","pr.c2":"Prijs","pr.c3":"Wat je krijgt",
+"pr.r1n":"Video-analyse","pr.r1p":"€0","pr.r1d":"Eén bullpen-video insturen. Je krijgt een volledig rapport terug. Geen addertje.",
+"pr.r2n":"Intake op locatie","pr.r2d":"Filmen, radar, mechanics-analyse en een plan. Duur:",
+"pr.r3n":"Winterprogramma 2026","pr.r3d":"16 trainingen, 8 weken, twee coaches, app-toegang die blijft.",
+"pr.r4n":"Broer/zus","pr.r4d":"Tweede kind uit hetzelfde gezin.",
+"pr.r5n":"Gespreid betalen","pr.r5d":"In termijnen betalen voor het winterprogramma.",
+"pr.ebnote":"t/m 30 sep · daarna €425",
+"bk.lbl":"Boeken","bk.h":"Begin met één video",
+"bk.intro":"Stuur een bullpen-video in en je krijgt een volledig rapport terug — gratis. In dat rapport staat of een intake op locatie zinvol is. Je zit nergens aan vast.",
+"bk.f1":"Naam ouder / verzorger","bk.f2":"E-mail","bk.f3":"Telefoon","bk.f4":"Naam pitcher",
+"bk.f5":"Leeftijd pitcher","bk.f5o":"Kies leeftijd","bk.f6":"Club (optioneel)",
+"bk.f7":"Link naar de video","bk.f7p":"YouTube, Drive of WeTransfer-link",
+"bk.f8":"Waar gaat het om","bk.f8a":"Gratis video-analyse","bk.f8b":"Intake op locatie bij BP Sports Center","bk.f8c":"Winterprogramma 2026",
+"bk.f9":"Iets wat ik moet weten (optioneel)",
+"bk.stub1t":"Stub — toestemmingstekst",
+"bk.stub1":"Hier komt de door Modern Pitching goedgekeurde tekst over toestemming van een ouder/verzorger voor het insturen en bewaren van beeld van een minderjarige. Nog niet juridisch nagekeken.",
+"bk.consent":"Ik ben ouder of verzorger en geef toestemming voor het insturen en bewaren van deze video. <span class=\"confirm\">[stub: definitieve tekst]</span>",
+"bk.submit":"Verstuur aanvraag",
+"bk.demo":"Demo — dit formulier verstuurt niets. Koppelen aan <b>Calendly</b> vóór livegang.",
+"bk.demo2":"Er is niets verstuurd. Dit formulier is nog niet gekoppeld aan <b>Calendly</b> — dat gebeurt vóór livegang.",
+"fq.lbl":"Vragen van ouders","fq.h":"Wat ouders meestal vragen",
+"fq.q1":"Wat houdt hij over na die acht weken?",
+"fq.a1":"Zijn kracht- en gooiprogramma blijft in de app staan, met alle video's en radardata van de zestien trainingen. Die toegang houdt hij ná het programma — dat vervalt niet in december.",
+"fq.q2":"Wanneer krijgt hij zijn analyse?",
+"fq.a2":"Na week één. Dan hebben we genoeg beeld en radardata om er iets zinnigs over te zeggen. Die analyse maken Connor en ik samen.",
+"fq.q3":"Hoeveel coaches staan er op de groep?",
+"fq.a3":"Twee: Connor en ik, alle zestien trainingen. Daardoor kunnen we binnen de groep in kleine groepjes werken.",
+"fq.q4":"Verandert de prijs nog?","fq.a4":"Het winterprogramma kost €425 per pitcher.",
+"fq.a4eb":"Ja. Het winterprogramma kost €375 bij inschrijving vóór 1 oktober 2026, daarna €425. Die datum schuift niet op — we houden hem aan.",
+"fq.q5":"Mijn kind is 9 — is dat niet te jong?","fq.q6":"Wat als hij een training mist?","fq.q7":"Wat neemt hij mee?",
+"ft.tag":"Video, mechanics en radardata voor jonge pitchers. Winterprogramma 2026 bij BP Sports Center.",
+"ft.c":"Contact","ft.l":"Juridisch",
+"dock.meta":"Gratis · één video · volledig rapport terug","dock.cta":"Stuur video in",
+"meta.title":"Modern Pitching","meta.desc":"Winterprogramma 2026 voor pitchers van 9 t/m 16 bij BP Sports Center. Elke training gefilmd, radardata in je eigen account, mechanics-analyse na week 1. Begin met een gratis video-analyse."
+},
+en:{
+"a11y.skip":"Skip to content","a11y.lang":"Choose language","nav.cta":"Send a video",
+"hero.eyebrow":"Winter programme 2026 · BP Sports Center",
+"hero.h1a":"The pitch is over before you can see it.","hero.h1b":"The answer is in one frame.",
+"hero.lede":"We film every session, measure every pitch, and show exactly what happens between leg lift and release. For pitchers aged 9 to 16.",
+"hero.cta1":"Send a video — free","hero.cta2":"Winter programme →",
+"hero.s1":"Every session filmed","hero.s2":"Radar data in your own account","hero.s3":"Two coaches","hero.s4":"Analysis after week 1",
+"win.lbl":"Season","win.h":"Winter programme 2026",
+"win.intro":"Eight weeks, twice a week, two hours a session. Sixteen sessions at BP Sports Center, with Scott and Connor both on the floor.",
+"win.k1":"When","win.v1":"Wed 28 Oct — Sat 19 Dec 2026",
+"win.k2":"Days &amp; times","win.v2":"Wednesday 16:30–18:30<br>Saturday 16:00–18:00",
+"win.k3":"Size","win.v3":"16 sessions · 8 weeks · 2 hours",
+"win.k4":"Age","win.v4":"9 to 16",
+"win.k5":"Where","win.k6":"Coaches","win.k7":"Group size","win.k8":"Sign-up",
+"win.inclh":"What's in it",
+"win.i1":"Every session filmed","win.i2":"All radar data in your own Modern Pitching account",
+"win.i3":"Personal mechanics analysis after week 1","win.i4":"Your own strength and throwing programme in the app",
+"win.i5":"Two coaches, small groups inside the group","win.i6":"You keep app access after the programme ends",
+"win.pmeta":"Standard price, winter programme 2026.<br>16 sessions, per pitcher.",
+"win.ebl":"Early bird until 30 September","win.sib":"Sibling rate:","win.inst":"instalments:",
+"win.cta":"Sign up for the winter programme",
+"win.demo":"Demo — the sign-up button currently jumps to the form below. Connect it to the payment link before launch.",
+"win.cdays":"{n} days left","win.clast":"Last day",
+"fr.lbl":"The analysis","fr.h":"Every pitch breaks into six frames",
+"fr.intro":"Drag through the delivery — or use the arrow keys. Each frame names what we measure and why it matters. This is the exact order we work through when we review a video of your pitcher.",
+"fr.hd":"Delivery — side view","fr.badge":"Diagram · not real athlete data",
+"fr.figalt":"Schematic side view of a pitching delivery, showing the checkpoints measured at each frame.",
+"fr.play":"Play","fr.pause":"Pause","fr.scrublbl":"Frame",
+"fr.scruba":"Frame in the delivery — use the arrow keys","fr.ticksa":"Jump to a frame",
+"co.lbl":"Who you get","co.h":"Two coaches on the group",
+"co.r1":"Pitcher · Dutch national team",
+"co.b1":"I still throw every week. Whatever I see in your video, I've usually had to unlearn it myself at some point.",
+"co.tail":"Two pairs of eyes means someone is always watching the movement while the other keeps up with the data. That's why we work in small groups inside the group.",
+"pr.lbl":"Prices","pr.h":"What it costs","pr.cap":"All prices per pitcher, VAT included",
+"pr.c1":"What","pr.c2":"Price","pr.c3":"What you get",
+"pr.r1n":"Video analysis","pr.r1p":"€0","pr.r1d":"Send in one bullpen video. You get a full report back. No catch.",
+"pr.r2n":"Intake on site","pr.r2d":"Filming, radar, mechanics analysis and a plan. Length:",
+"pr.r3n":"Winter programme 2026","pr.r3d":"16 sessions, 8 weeks, two coaches, app access that stays.",
+"pr.r4n":"Sibling","pr.r4d":"Second child from the same family.",
+"pr.r5n":"Instalments","pr.r5d":"Paying for the winter programme in instalments.",
+"pr.ebnote":"until 30 Sep · €425 after",
+"bk.lbl":"Booking","bk.h":"Start with one video",
+"bk.intro":"Send in a bullpen video and you get a full report back — free. The report says whether an intake on site is worth it. You're not committing to anything.",
+"bk.f1":"Parent / guardian name","bk.f2":"Email","bk.f3":"Phone","bk.f4":"Pitcher's name",
+"bk.f5":"Pitcher's age","bk.f5o":"Choose age","bk.f6":"Club (optional)",
+"bk.f7":"Link to the video","bk.f7p":"YouTube, Drive or WeTransfer link",
+"bk.f8":"What this is about","bk.f8a":"Free video analysis","bk.f8b":"Intake on site at BP Sports Center","bk.f8c":"Winter programme 2026",
+"bk.f9":"Anything I should know (optional)",
+"bk.stub1t":"Stub — consent wording",
+"bk.stub1":"Modern Pitching's approved wording goes here, covering a parent or guardian's consent to submit and store footage of a minor. Not yet reviewed by a lawyer.",
+"bk.consent":"I am the parent or guardian and I consent to this video being submitted and stored. <span class=\"confirm\">[stub: final wording]</span>",
+"bk.submit":"Send request",
+"bk.demo":"Demo — this form sends nothing. Connect it to <b>Calendly</b> before launch.",
+"bk.demo2":"Nothing was sent. This form isn't connected to <b>Calendly</b> yet — that happens before launch.",
+"fq.lbl":"Parents ask","fq.h":"What parents usually ask",
+"fq.q1":"What does he keep after the eight weeks?",
+"fq.a1":"His strength and throwing programme stays in the app, along with every video and all radar data from the sixteen sessions. He keeps that access after the programme — it doesn't expire in December.",
+"fq.q2":"When does he get his analysis?",
+"fq.a2":"After week one. By then we have enough footage and radar data to say something useful. Connor and I put that analysis together.",
+"fq.q3":"How many coaches are on the group?",
+"fq.a3":"Two: Connor and me, all sixteen sessions. That's what lets us work in small groups inside the group.",
+"fq.q4":"Is the price still going to change?","fq.a4":"The winter programme costs €425 per pitcher.",
+"fq.a4eb":"Yes. The winter programme is €375 if you sign up before 1 October 2026, and €425 after that. That date doesn't move — we hold it.",
+"fq.q5":"My child is 9 — isn't that too young?","fq.q6":"What if he misses a session?","fq.q7":"What does he bring?",
+"ft.tag":"Video, mechanics and radar data for young pitchers. Winter programme 2026 at BP Sports Center.",
+"ft.c":"Contact","ft.l":"Legal",
+"dock.meta":"Free · one video · full report back","dock.cta":"Send a video",
+"meta.title":"Modern Pitching","meta.desc":"Winter programme 2026 for pitchers aged 9–16 at BP Sports Center. Every session filmed, radar data in your own account, mechanics analysis after week 1. Start with a free video analysis."
+}};
+
+function t(k,lang){
+  var d=D[lang];
+  if(d&&Object.prototype.hasOwnProperty.call(d,k))return d[k];
+  if(console&&console.warn)console.warn("[i18n] missing key:",lang,k);
+  return D.nl[k]!==undefined?D.nl[k]:"";
+}
+
+/* ══════════ delivery frames (signature) ══════════ */
+var POSES=[
+{num:"01",
+ nl:{n:"Opstelling",m:"Meten: standbreedte en balans in de opzet.",w:"Waar je begint bepaalt hoeveel je onderweg moet rechtzetten."},
+ en:{n:"Set",m:"Measured: stance width and balance at the set.",w:"Where you start decides how much you have to correct on the way down."},
+ lab:{nl:"BALANS",en:"BALANCE"},
+ head:[150,80],spine:[[150,95],[150,155]],
+ arm:[[150,100],[160,128],[151,150]],glove:[[150,100],[140,128],[149,150]],
+ back:[[144,155],[142,200],[140,250]],front:[[156,155],[158,200],[160,250]],ball:[151,150],
+ ann:'<path d="M150 46 L150 258" stroke-dasharray="4 5"/>',
+ labxy:[158,66]},
+{num:"02",
+ nl:{n:"Been omhoog",m:"Meten: of je hoofd boven je achterste heup blijft.",w:"Val je hier al naar voren, dan is alles daarna reparatiewerk."},
+ en:{n:"Leg lift",m:"Measured: whether your head stays over your back hip.",w:"Drift forward here and everything after it is repair work."},
+ lab:{nl:"BALANSLIJN",en:"BALANCE LINE"},
+ head:[148,72],spine:[[148,88],[150,150]],
+ arm:[[148,95],[158,122],[150,145]],glove:[[148,95],[138,122],[149,145]],
+ back:[[144,150],[142,198],[140,250]],front:[[156,150],[172,120],[170,158]],ball:[150,145],
+ ann:'<path d="M147 56 L142 258" stroke-dasharray="4 5"/><path d="M158 120 L198 120" stroke-dasharray="4 5"/>',
+ labxy:[202,124]},
+{num:"03",
+ nl:{n:"Afzet",m:"Meten: richting van de stride en hoe lang de heupen gesloten blijven.",w:"Hier wordt snelheid gemaakt of weggegeven."},
+ en:{n:"Drive",m:"Measured: stride direction and how long the hips stay closed.",w:"This is where velocity is made, or given away."},
+ lab:{nl:"STRIDE-RICHTING",en:"STRIDE LINE"},
+ head:[170,84],spine:[[170,100],[178,158]],
+ arm:[[170,106],[152,120],[140,102]],glove:[[170,106],[186,124],[198,112]],
+ back:[[172,158],[160,204],[148,248]],front:[[184,158],[214,178],[240,226]],ball:[140,102],
+ ann:'<path d="M148 252 L318 252" stroke-dasharray="6 5"/><path d="M308 246 L320 252 L308 258"/>',
+ labxy:[238,244]},
+{num:"04",
+ nl:{n:"Voetplant",m:"Meten: heup-schouderscheiding, kniehoek voor, stridelengte.",w:"Dit is het frame waar we het vaakst iets vinden."},
+ en:{n:"Foot plant",m:"Measured: hip–shoulder separation, front knee angle, stride length.",w:"This is the frame where we find something most often."},
+ lab:{nl:"HEUP–SCHOUDER",en:"HIP–SHOULDER"},
+ head:[198,86],spine:[[198,102],[206,160]],
+ arm:[[198,108],[176,102],[166,80]],glove:[[198,108],[222,118],[238,106]],
+ back:[[200,160],[190,206],[178,246]],front:[[212,160],[244,192],[262,250]],ball:[166,80],
+ ann:'<path d="M174 104 L222 112" stroke-dasharray="5 4"/><path d="M186 166 L230 156" stroke-dasharray="5 4"/><path d="M198 108 L204 160" stroke-opacity=".4"/>',
+ labxy:[236,140]},
+{num:"05",
+ nl:{n:"Versnelling",m:"Meten: armslot en het moment dat de romp opendraait.",w:"Te vroeg opendraaien kost snelheid én belast de arm."},
+ en:{n:"Acceleration",m:"Measured: arm slot and the moment the torso opens.",w:"Opening early costs velocity and loads the arm."},
+ lab:{nl:"ARMSLOT",en:"ARM SLOT"},
+ head:[214,88],spine:[[214,104],[220,162]],
+ arm:[[214,110],[198,92],[206,66]],glove:[[214,110],[230,128],[222,142]],
+ back:[[216,162],[212,208],[200,244]],front:[[226,162],[252,198],[266,250]],ball:[206,66],
+ ann:'<path d="M206 62 A 30 30 0 0 0 192 106" stroke-dasharray="5 4"/>',
+ labxy:[214,52]},
+{num:"06",
+ nl:{n:"Loslaten & afremmen",m:"Meten: een vast loslaatpunt en het afrempad van de arm.",w:"Dit frame gaat over de vraag of hij over drie jaar nog gooit."},
+ en:{n:"Release & deceleration",m:"Measured: a repeatable release point and the arm's deceleration path.",w:"This frame is about whether he's still throwing in three years."},
+ lab:{nl:"AFREMPAD",en:"DECEL PATH"},
+ head:[232,94],spine:[[232,110],[236,164]],
+ arm:[[232,114],[258,110],[282,118]],glove:[[232,114],[226,136],[236,150]],
+ back:[[230,164],[238,206],[222,236]],front:[[242,164],[264,200],[272,250]],ball:[318,112],
+ ann:'<path d="M284 122 Q 296 166 260 186" stroke-dasharray="5 4"/><circle cx="292" cy="115" r="2.4" fill="#C8FF00" stroke="none" opacity=".5"/><circle cx="305" cy="113" r="3" fill="#C8FF00" stroke="none" opacity=".75"/>',
+ labxy:[268,96]}
+];
+
+function poly(pts){return "M"+pts.map(function(p){return p[0]+" "+p[1]}).join(" L ")}
+function body(p,stroke,w,op){
+  return '<g fill="none" stroke="'+stroke+'" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round" opacity="'+op+'">'
+    +'<circle cx="'+p.head[0]+'" cy="'+p.head[1]+'" r="10"></circle>'
+    +'<path d="'+poly(p.spine)+'"></path>'
+    +'<path d="'+poly(p.arm)+'"></path>'
+    +'<path d="'+poly(p.glove)+'"></path>'
+    +'<path d="'+poly(p.back)+'"></path>'
+    +'<path d="'+poly(p.front)+'"></path></g>';
+}
+function drawFrame(i,lang){
+  var p=POSES[i],g=i>0?POSES[i-1]:null,s="";
+  s+='<line x1="0" y1="250" x2="400" y2="250" stroke="#A9AFA1" stroke-opacity=".3" stroke-width="1"></line>';
+  s+='<rect x="126" y="246" width="32" height="4" fill="#A9AFA1" fill-opacity=".45"></rect>';
+  if(g)s+=body(g,"#A9AFA1",2.4,".22");
+  s+=body(p,"#F2F3EE",3.2,"1");
+  s+='<circle cx="'+p.ball[0]+'" cy="'+p.ball[1]+'" r="4.5" fill="#C8FF00"></circle>';
+  s+='<g stroke="#C8FF00" stroke-width="1.6" fill="none" stroke-linecap="round">'+p.ann+'</g>';
+  s+='<text x="'+p.labxy[0]+'" y="'+p.labxy[1]+'" fill="#C8FF00" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">'+p.lab[lang]+'</text>';
+  return s;
+}
+
+/* ══════════ state ══════════ */
+var lang="nl", idx=3, timer=null, playing=false;
+var $=function(s){return document.querySelector(s)};
+var figlayer=$("#figlayer"), scrub=$("#scrub"), ticks=$("#ticks"), playBtn=$("#play");
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function recall(k){try{return localStorage.getItem(k)}catch(e){return null}}
+
+/* ══════════ price guard — early bird only inserted while it is genuinely live ══════════ */
+var DEADLINE=new Date(2026,9,1,0,0,0); /* 1 Oct 2026, local */
+var ebLive=Date.now()<DEADLINE.getTime();
+function daysLeft(){return Math.max(0,Math.ceil((DEADLINE.getTime()-Date.now())/86400000))}
+if(ebLive){
+  var tpl=$("#tpl-eb");
+  if(tpl&&tpl.content)$("#pricebox").appendChild(tpl.content.cloneNode(true));
+}
+
+/* ══════════ apply language ══════════ */
+function applyLang(L){
+  lang=L;
+  root.setAttribute("lang",L);
+  document.title=t("meta.title",L);
+  var head=document.head,md=head.querySelector('meta[name="description"]');
+  if(!md){md=document.createElement("meta");md.setAttribute("name","description");head.appendChild(md)}
+  md.setAttribute("content",t("meta.desc",L));
+  [["og:title",t("meta.title",L)],["og:description",t("meta.desc",L)],["og:type","website"],["og:locale",L==="nl"?"nl_NL":"en_GB"]]
+    .forEach(function(pair){
+      var m=head.querySelector('meta[property="'+pair[0]+'"]');
+      if(!m){m=document.createElement("meta");m.setAttribute("property",pair[0]);head.appendChild(m)}
+      m.setAttribute("content",pair[1]);
+    });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"),function(el){
+    el.innerHTML=t(el.getAttribute("data-i18n"),L);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-attr]"),function(el){
+    el.getAttribute("data-i18n-attr").split(",").forEach(function(pair){
+      var bits=pair.split(":");
+      if(bits.length===2)el.setAttribute(bits[0].trim(),t(bits[1].trim(),L));
+    });
+  });
+
+  var wm=document.querySelector(".wordmark i"); if(wm)wm.textContent=L.toUpperCase();
+  Array.prototype.forEach.call(document.querySelectorAll(".langsw button"),function(b){
+    b.setAttribute("aria-pressed",String(b.getAttribute("data-lang")===L));
+  });
+
+  /* price guard: €375 exists on the page ONLY while the early bird is live */
+  var prw=$("#pr-winter"), a4=$("#fq-a4");
+  if(ebLive){
+    if(prw)prw.innerHTML='€375<br><span class="pmeta" style="font-weight:400">'+t("pr.ebnote",L)+"</span>";
+    if(a4)a4.innerHTML=t("fq.a4eb",L);
+    var cd=$("#cd"),n=daysLeft();
+    if(cd)cd.textContent=n<=1?t("win.clast",L):t("win.cdays",L).replace("{n}",String(n));
+  }
+  playBtn.textContent=t(playing?"fr.pause":"fr.play",L);
+  renderTicks();
+  paint();
+  store("mp-lang",L);
+}
+
+/* ══════════ the frame scrubber ══════════ */
+function renderTicks(){
+  ticks.innerHTML=POSES.map(function(p,i){
+    return '<button type="button" data-i="'+i+'" aria-current="'+(i===idx)+'">'
+      +"<b>"+p.num+"</b><span>"+p[lang].n+"</span></button>";
+  }).join("");
+}
+function paint(){
+  var p=POSES[idx];
+  figlayer.innerHTML=drawFrame(idx,lang);
+  $("#r-num").textContent=p.num+" / 06";
+  $("#r-name").textContent=p[lang].n;
+  $("#r-meas").textContent=p[lang].m;
+  $("#r-why").textContent=p[lang].w;
+  scrub.value=String(idx);
+  Array.prototype.forEach.call(ticks.children,function(b,i){b.setAttribute("aria-current",String(i===idx))});
+}
+function go(i){idx=Math.max(0,Math.min(5,i));paint()}
+function stop(){
+  if(timer){clearInterval(timer);timer=null}
+  playing=false;playBtn.textContent=t("fr.play",lang);
+}
+function play(){
+  if(playing){stop();return}
+  playing=true;playBtn.textContent=t("fr.pause",lang);
+  if(idx>=5)go(0);
+  timer=setInterval(function(){
+    if(idx>=5){stop();return}
+    go(idx+1);
+  },620);
+}
+playBtn.addEventListener("click",play);
+scrub.addEventListener("input",function(){stop();go(parseInt(scrub.value,10))});
+ticks.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-i]");
+  if(b){stop();go(parseInt(b.getAttribute("data-i"),10))}
+});
+
+/* one auto pass when the panel is first reached — never on reduced motion */
+if("IntersectionObserver" in window && !reduce){
+  var once=new IntersectionObserver(function(en){
+    en.forEach(function(e){
+      if(e.isIntersecting){once.disconnect();go(0);play()}
+    });
+  },{threshold:.45});
+  once.observe($("#frame"));
+}
+
+/* ══════════ form — demo only, never a fake success ══════════ */
+$("#submit").addEventListener("click",function(){
+  var n=$("#formnotice");
+  n.innerHTML=t("bk.demo2",lang);
+  n.focus&&n.setAttribute("tabindex","-1");
+  n.focus&&n.focus();
+});
+
+/* ══════════ sticky dock — steps aside for the form ══════════ */
+var dock=$("#dock");
+if("IntersectionObserver" in window){
+  new IntersectionObserver(function(en){
+    en.forEach(function(e){dock.setAttribute("data-hide",e.isIntersecting?"1":"0")});
+  },{threshold:.12}).observe($("#boeken"));
+}
+
+/* ══════════ reveals — below-fold only, ≤0.55s, never hides at-rest content ══════════ */
+if("IntersectionObserver" in window && !reduce){
+  var rv=[];
+  ["#winter .wrap > *","#frame .wrap > *","#coaches .wrap > *",".paperzone .wrap > *"].forEach(function(sel){
+    Array.prototype.push.apply(rv,document.querySelectorAll(sel));
+  });
+  var io=new IntersectionObserver(function(en){
+    en.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}});
+  },{threshold:.08,rootMargin:"0px 0px -6% 0px"});
+  rv.forEach(function(el,i){el.classList.add("rv");el.style.transitionDelay=(i%5)*35+"ms";io.observe(el)});
+}
+
+/* ══════════ boot ══════════ */
+document.querySelector(".langsw").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-lang]");
+  if(b)applyLang(b.getAttribute("data-lang"));
+});
+applyLang(recall("mp-lang")==="en"?"en":"nl");
+})();
+</script>
