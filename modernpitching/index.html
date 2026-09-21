@@ -95,7 +95,7 @@ html.en .nl{display:none !important}
 .frame{background:var(--ink-2);border:1px solid var(--line-ink);border-radius:6px;padding:16px;position:relative}
 .frame svg{width:100%;height:auto}
 .frame .tag{position:absolute;top:14px;left:16px;font:500 .8rem var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--mute-ink)}
-.readout{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
 .readout div{border-top:1px solid var(--line-ink);padding-top:10px}
 .readout b{display:block;font:500 clamp(1.6rem,4vw,2.2rem)/1 var(--display);color:var(--white)}
 .readout span{font-size:.85rem;color:var(--mute-ink)}
@@ -157,8 +157,9 @@ html.en .nl{display:none !important}
 .phase{font:600 clamp(2rem,7vw,3.5rem)/1 var(--display);text-transform:uppercase;min-height:1em}
 .meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .meters div{border-top:1px solid var(--line-ink);padding-top:8px}
-.meters b{display:block;font:500 clamp(1.5rem,4.5vw,2.2rem)/1 var(--display)}
-.meters span{font-size:.85rem;color:var(--mute-ink)}
+.meters b{display:block;font:500 clamp(1.4rem,4vw,2rem)/1 var(--display);white-space:nowrap}
+.meters span{font-size:.85rem;color:var(--mute-ink);display:block}
+.meters .ref{display:block;font-style:normal;font-size:.78rem;color:var(--orange);min-height:1.2em;margin-top:2px}
 .phase-desc{color:var(--mute-ink);min-height:3.2em}
 .slider{display:grid;gap:8px}
 .slider label{font-size:.85rem;color:var(--mute-ink)}
@@ -296,8 +297,9 @@ footer.ft{border-top:1px solid var(--line-ink);padding-block:40px calc(96px + en
       <span class="tag"><span class="nl">Frame 3 van 6, voetlanding</span><span class="en">Frame 3 of 6, foot strike</span></span>
       <svg id="heroFrame" viewBox="0 0 400 380" role="img" aria-label="Getekende pitcher op het moment van voetlanding"></svg>
       <div class="readout">
-        <div><b id="heroTilt">0°</b><span><span class="nl">romphoek t.o.v. verticaal</span><span class="en">trunk angle from vertical</span></span></div>
-        <div><b id="heroKnee">0°</b><span><span class="nl">voorste knie</span><span class="en">lead knee</span></span></div>
+        <div><b id="heroTilt">0°</b><span><span class="nl">romp voorover</span><span class="en">trunk forward</span></span></div>
+        <div><b id="heroKnee">0°</b><span><span class="nl">voorste knie gebogen</span><span class="en">lead knee flexed</span></span></div>
+        <div><b id="heroStride">0%</b><span><span class="nl">stap, % lichaamslengte</span><span class="en">stride, % of height</span></span></div>
       </div>
     </div>
   </div>
@@ -397,8 +399,10 @@ footer.ft{border-top:1px solid var(--line-ink);padding-block:40px calc(96px + en
         <div class="phase" id="phaseName" aria-live="off"></div>
         <p class="phase-desc" id="phaseDesc"></p>
         <div class="meters">
-          <div><b id="mTilt">0°</b><span><span class="nl">romphoek t.o.v. verticaal</span><span class="en">trunk angle from vertical</span></span></div>
-          <div><b id="mKnee">0°</b><span><span class="nl">voorste knie</span><span class="en">lead knee</span></span></div>
+          <div><b id="mTilt">0°</b><span><span class="nl">romp voorover</span><span class="en">trunk forward</span></span><em id="rTilt" class="ref"></em></div>
+          <div><b id="mKnee">0°</b><span><span class="nl">voorste knie gebogen</span><span class="en">lead knee flexed</span></span><em id="rKnee" class="ref"></em></div>
+          <div><b id="mStride">0%</b><span><span class="nl">stap, % lichaamslengte</span><span class="en">stride, % of height</span></span><em id="rStride" class="ref"></em></div>
+          <div><b id="mHead">n.v.t.</b><span><span class="nl">hoofd t.o.v. voorste voet, in hoofdbreedtes</span><span class="en">head vs lead foot, in head widths</span></span><em id="rHead" class="ref"></em></div>
         </div>
       </div>
     </div>
@@ -409,11 +413,11 @@ footer.ft{border-top:1px solid var(--line-ink);padding-block:40px calc(96px + en
         <span><span class="nl">Beenheffen</span><span class="en">Leg lift</span></span>
         <span><span class="nl">Stap</span><span class="en">Stride</span></span>
         <span><span class="nl">Voetlanding</span><span class="en">Foot strike</span></span>
-        <span><span class="nl">Armspanning</span><span class="en">Arm cocking</span></span>
+        <span><span class="nl">Uitdraai</span><span class="en">Layback</span></span>
         <span><span class="nl">Release</span><span class="en">Release</span></span>
         <span><span class="nl">Uitzwaai</span><span class="en">Follow-through</span></span>
       </div>
-      <p class="fine"><span class="nl">Illustratie: een getekende worp. De hoeken worden uit de tekening gemeten, niet uit echte beelden. Zo ziet een analyse in de app er in grote lijnen uit.</span><span class="en">Illustration: a drawn delivery. The angles are measured from the drawing, not from real footage. This is roughly what an analysis in the app looks like.</span></p>
+      <p class="fine"><span class="nl">Illustratie: een getekende worp met standaard lichaamsverhoudingen. De waarden worden uit de tekening gemeten, niet uit echte beelden. We tonen alleen wat een enkele camera betrouwbaar kan meten: romp, voorste knie, staplengte en hoofdpositie. Schouderrotatie hoort daar niet bij. Referentiewaarden: ASMI (Fleisig e.a.) via Diffendaffer e.a. 2023; van Trigt e.a. 2018, 52 jeugdpitchers van 10 tot 18 jaar (VU Amsterdam, TU Delft); Seroyer e.a. 2010; hoofdpositie naar Oyama e.a. 2013.</span><span class="en">Illustration: a drawn delivery with standard body proportions. Values are measured from the drawing, not from real footage. We only show what a single camera can measure reliably: trunk, lead knee, stride length and head position. Shoulder rotation is not on that list. Reference values: ASMI (Fleisig et al.) via Diffendaffer et al. 2023; van Trigt et al. 2018, 52 youth pitchers aged 10 to 18 (VU Amsterdam, TU Delft); Seroyer et al. 2010; head position after Oyama et al. 2013.</span></p>
     </div>
   </div>
 </section>
@@ -637,74 +641,128 @@ footer.ft{border-top:1px solid var(--line-ink);padding-block:40px calc(96px + en
     }
   }
 
-  /* ---------- the drawn delivery ---------- */
-  // side view, pitcher throws to the right. joints: hd head, nk neck, sr/er/wr throwing arm, sl/el/wl glove arm, hp hip, kr/ar back leg, kl/al lead leg
+  /* ---------- the drawn delivery: a segment model driven by joint angles ---------- */
+  // Side view, right-handed pitcher throwing to the right. Segment lengths follow standard
+  // anthropometric ratios of body height H (thigh and shank ~0.26H, hip to shoulder ~0.29H,
+  // upper arm ~0.19H, forearm and hand ~0.18H). Angles: legs from straight down, trunk from
+  // straight up, arms from straight down; positive turns the far end toward the target.
+  var H=240, G=360, RUB=110, TOE=18;
+  var L={thigh:62,shank:62,trunk:70,ua:45,fa:44,head:12};
+  // Key events: leg lift, mid stride, foot contact, maximum external rotation, release, follow-through.
+  // anchor: which foot is planted; ax: that ankle's x. Reference values: ASMI/Fleisig (knee ~43°
+  // flexion and trunk ~upright at foot contact, knee ~30° at release, stride ~85% of height),
+  // van Trigt et al. 2018 (52 youth pitchers: stride 80%, knee 40/45/40° at FC/MER/BR),
+  // Seroyer et al. 2010 (trunk 32-55° forward at release).
   var K=[
-    {hd:[130,128],nk:[130,150],sr:[124,153],er:[112,185],wr:[140,190],sl:[137,152],el:[152,180],wl:[142,190],hp:[130,222],kr:[130,290],ar:[130,355],kl:[166,214],al:[150,254]},
-    {hd:[132,138],nk:[135,160],sr:[128,163],er:[95,178],wr:[72,206],sl:[143,160],el:[186,152],wl:[230,150],hp:[150,230],kr:[145,295],ar:[128,355],kl:[215,270],al:[255,330]},
-    {hd:[165,142],nk:[170,165],sr:[163,168],er:[150,150],wr:[122,120],sl:[178,165],el:[226,165],wl:[266,160],hp:[190,235],kr:[165,300],ar:[128,357],kl:[250,295],al:[275,357]},
-    {hd:[200,136],nk:[205,160],sr:[198,163],er:[214,140],wr:[190,100],sl:[213,162],el:[235,175],wl:[216,186],hp:[215,236],kr:[185,300],ar:[132,356],kl:[255,290],al:[275,357]},
-    {hd:[250,142],nk:[245,165],sr:[240,168],er:[280,141],wr:[316,151],sl:[250,168],el:[226,186],wl:[210,196],hp:[235,240],kr:[200,300],ar:[150,350],kl:[262,285],al:[275,357]},
-    {hd:[285,185],nk:[275,200],sr:[270,203],er:[300,231],wr:[286,270],sl:[279,204],el:[241,216],wl:[236,241],hp:[245,250],kr:[225,300],ar:[200,340],kl:[265,290],al:[275,357]}
+    {anchor:'back',ax:118, bt:6,  bs:-4,  lt:78, ls:-12, tr:-6, tu:20,  tuS:1,   tf:125,  gu:30, guS:1,  gf:130,  hd:[2,-24]},
+    {anchor:'back',ax:118, bt:-5, bs:-35, lt:45, ls:15,  tr:-8, tu:-30, tuS:1,   tf:-40,  gu:92, guS:1,  gf:85,   hd:[3,-24]},
+    {anchor:'back',ax:140, bt:-32,bs:-47, lt:57, ls:12,  tr:-2, tu:-105,tuS:0.5, tf:-195, gu:95, guS:0.6,gf:80,   hd:[4,-24]},
+    {anchor:'lead',ax:283, bt:-30,bs:-60, lt:50, ls:10,  tr:20, tu:95,  tuS:0.35,tf:-120, gu:60, guS:0.7,gf:-30,  hd:[10,-23]},
+    {anchor:'lead',ax:283, bt:-25,bs:-45, lt:40, ls:10,  tr:32, tu:120, tuS:1,   tf:-255,  gu:20, guS:0.7,gf:-100, hd:[10,-23]},
+    {anchor:'lead',ax:283, bt:-5, bs:-50, lt:30, ls:8,   tr:50, tu:70,  tuS:1,   tf:-340,   gu:-10,guS:0.7,gf:-70,  hd:[12,-21]}
   ];
-  var PH=[
-    {nl:['Beenheffen','Balans op het achterbeen. Hier begint alles rustig, ook bij een harde worp.'],en:['Leg lift','Balance on the back leg. Everything starts calm here, even a hard pitch.']},
-    {nl:['Stap','De handen breken, het voorbeen zoekt de plaat. De heup gaat als eerste richting het doel.'],en:['Stride','The hands break, the lead leg reaches for the plate. The hip goes first toward the target.']},
-    {nl:['Voetlanding','De voorvoet landt, de romp is nog gesloten. Dit frame zegt het meest over de rest van de worp.'],en:['Foot strike','The lead foot lands, the trunk is still closed. This frame says the most about the rest of the pitch.']},
-    {nl:['Armspanning','Het voorbeen blokt, de romp draait, de arm komt achter. Hier ontstaat snelheid, of blessurekans.'],en:['Arm cocking','The lead leg blocks, the trunk rotates, the arm lays back. This is where velocity is made, or injury risk.']},
-    {nl:['Release','Romp voorover, arm gestrekt, bal weg. De radar leest hier.'],en:['Release','Trunk forward, arm extended, ball gone. The radar reads here.']},
-    {nl:['Uitzwaai','De arm zwaait uit over het voorbeen. Een korte uitzwaai betekent meestal een geremde romp.'],en:['Follow-through','The arm swings out over the lead leg. A short follow-through usually means a braked trunk.']}
-  ];
-  function lerp(a,b,f){ return [a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f]; }
-  function pose(tt){ var i=Math.min(4,Math.floor(tt)), f=tt-i, a=K[i], b=K[i+1], o={}; for(var k in a) o[k]=lerp(a[k],b[k],f); o.t=tt; return o; }
+  var R=Math.PI/180;
+  function dn(a,l){ return [l*Math.sin(a*R), l*Math.cos(a*R)]; }      // segment pointing down-ish
+  function up(a,l){ return [l*Math.sin(a*R),-l*Math.cos(a*R)]; }      // segment pointing up-ish
+  function add(p,v){ return [p[0]+v[0],p[1]+v[1]]; }
+  function sub(p,v){ return [p[0]-v[0],p[1]-v[1]]; }
+  function mix(a,b,f){ return a+(b-a)*f; }
+  function pose(t){
+    t=Math.max(0,Math.min(5,t));
+    var i=Math.min(4,Math.floor(t)), f=t-i, a=K[i], b=K[i+1], s={};
+    ['bt','bs','lt','ls','tr','tu','tuS','tf','gu','guS','gf'].forEach(function(k){ s[k]=mix(a[k],b[k],f); });
+    s.hd=[mix(a.hd[0],b.hd[0],f),mix(a.hd[1],b.hd[1],f)];
+    if(Math.abs(b.tu-a.tu)>150) s.tuS*=1-0.85*Math.sin(Math.PI*f);   // upper arm points at the camera mid-way: it foreshortens
+    var anchor = t<2 ? 'back' : 'lead';
+    var ax = t<2 ? mix(a.ax,b.ax,f) : 283;
+    var p={t:t};
+    if(anchor==='back'){
+      p.ar=[ax,G]; p.kr=sub(p.ar,dn(s.bs,L.shank)); p.hp=sub(p.kr,dn(s.bt,L.thigh));
+      p.kl=add(p.hp,dn(s.lt,L.thigh)); p.al=add(p.kl,dn(s.ls,L.shank));
+    }else{
+      p.al=[ax,G]; p.kl=sub(p.al,dn(s.ls,L.shank)); p.hp=sub(p.kl,dn(s.lt,L.thigh));
+      p.kr=add(p.hp,dn(s.bt,L.thigh)); p.ar=add(p.kr,dn(s.bs,L.shank));
+    }
+    p.sh=add(p.hp,up(s.tr,L.trunk));
+    p.hd=add(p.sh,s.hd);
+    p.er=add(p.sh,dn(s.tu,L.ua*s.tuS)); p.wr=add(p.er,dn(s.tf,L.fa));
+    p.el=add(p.sh,dn(s.gu,L.ua*s.guS)); p.wl=add(p.el,dn(s.gf,L.fa));
+    return p;
+  }
   function deg(r){ return r*180/Math.PI; }
-  function tilt(p){ return deg(Math.atan2(p.nk[0]-p.hp[0], p.hp[1]-p.nk[1])); }
-  function knee(p){ var a=[p.hp[0]-p.kl[0],p.hp[1]-p.kl[1]], b=[p.al[0]-p.kl[0],p.al[1]-p.kl[1]]; var d=(a[0]*b[0]+a[1]*b[1])/(Math.hypot(a[0],a[1])*Math.hypot(b[0],b[1])); return deg(Math.acos(Math.max(-1,Math.min(1,d)))); }
-  function seg(a,b,cls,w){ return '<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="'+(cls||'#fff')+'" stroke-width="'+(w||5)+'" stroke-linecap="round"/>'; }
+  function tilt(p){ return deg(Math.atan2(p.sh[0]-p.hp[0], p.hp[1]-p.sh[1])); }
+  function kneeFlex(p){ var a=sub(p.hp,p.kl), b=sub(p.al,p.kl); var d=(a[0]*b[0]+a[1]*b[1])/(Math.hypot(a[0],a[1])*Math.hypot(b[0],b[1])); return 180-deg(Math.acos(Math.max(-1,Math.min(1,d)))); }
+  function stridePct(p){ return (p.al[0]+TOE-RUB)/H*100; }
+  function headOff(p){ return (p.al[0]-p.hd[0])/(2*L.head); }       // head widths behind the lead-ankle vertical
+  function elbowFlex(p){ var a=sub(p.sh,p.er), b=sub(p.wr,p.er); var d=(a[0]*b[0]+a[1]*b[1])/(Math.hypot(a[0],a[1])*Math.hypot(b[0],b[1])); return 180-deg(Math.acos(Math.max(-1,Math.min(1,d)))); }
+
+  var PH=[
+    {nl:['Beenheffen','Balans op het achterbeen, handen bij de borst. Hier begint alles rustig: de opwindfase duurt een halve tot ruim een seconde.'],en:['Leg lift','Balance on the back leg, hands at the chest. Everything starts calm here: the wind-up takes half a second to well over a second.']},
+    {nl:['Stap','De handen breken, de heup gaat als eerste richting het doel, het voorbeen zoekt de plaat. De staplengte is een van de weinige dingen die een camera betrouwbaar meet.'],en:['Stride','The hands break, the hip leads toward the target, the lead leg reaches for the plate. Stride length is one of the few things a camera measures reliably.']},
+    {nl:['Voetlanding','De voorvoet landt met de knie 40 tot 45 graden gebogen, de romp nog rechtop en de werparm rond 90/90: elleboog op schouderhoogte, onderarm omhoog. De romp draait pas na dit moment.'],en:['Foot contact','The lead foot lands with the knee flexed 40 to 45 degrees, the trunk still upright and the throwing arm near 90/90: elbow at shoulder height, forearm up. The trunk rotates only after this moment.']},
+    {nl:['Maximale uitdraai','De arm ligt achter, de romp komt voorover, het hoofd blijft boven de voorste voet. De schouderhoek is het meest geciteerde getal in de literatuur en precies het getal dat een telefooncamera niet eerlijk kan meten. Daarom staat er hier geen getal bij.'],en:['Max. external rotation','The arm lays back, the trunk comes forward, the head stays over the lead foot. The shoulder angle is the most quoted number in the literature and exactly the one a phone camera cannot measure honestly. So we put no number on it.']},
+    {nl:['Release','Romp ruim 30 graden voorover, elleboog bijna gestrekt, voorste knie gestrekt ten opzichte van de landing. Van maximale uitdraai tot release duurt 42 tot 58 milliseconden. De radar leest hier.'],en:['Release','Trunk well past 30 degrees forward, elbow nearly straight, lead knee extended compared with landing. Max. external rotation to release takes 42 to 58 milliseconds. The radar reads here.']},
+    {nl:['Uitzwaai','De arm remt af over het voorbeen, het achterbeen komt mee. De romp levert de energie, de arm geeft die door. Hier vangt het lichaam op wat het net heeft gemaakt.'],en:['Follow-through','The arm decelerates over the lead leg, the back leg comes through. The trunk generates the energy, the arm passes it on. Here the body absorbs what it just produced.']}
+  ];
+  // reference values shown under each meter at the three measured events (index 2, 3, 4)
+  var REF={
+    tilt:  {nl:['','','typisch rechtop, 0 tot 5°','','typisch 30° of meer voorover',''],en:['','','typically upright, 0 to 5°','','typically 30° or more forward','']},
+    knee:  {nl:['','','typisch 40 tot 45° gebogen','jeugd gemiddeld 45°','profs ~30°, jeugd ~40°',''],en:['','','typically 40 to 45° flexed','youth average 45°','pros ~30°, youth ~40°','']},
+    stride:{nl:['','','jeugd gemiddeld 80%, profs ~85%','jeugd gemiddeld 80%, profs ~85%','jeugd gemiddeld 80%, profs ~85%',''],en:['','','youth average 80%, pros ~85%','youth average 80%, pros ~85%','youth average 80%, pros ~85%','']},
+    head:  {nl:['','','','richtlijn: binnen 1 hoofdbreedte','',''],en:['','','','guideline: within 1 head width','','']}
+  };
+  function ln(a,b,c,w,dash){ return '<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="'+c+'" stroke-width="'+w+'" stroke-linecap="round"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'; }
+  function seg(a,b,c,w){ return ln(a,b,c||'#fff',w||5); }
+  function dot(p,r,fill,stroke){ return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+r+'" fill="'+fill+'"'+(stroke?' stroke="'+stroke+'" stroke-width="2"':'')+'/>'; }
+  var REL=pose(4).wr;
   function draw(svg,p){
-    var O='#ff9b00', W='#ffffff', G='#3a3a3d', M='#6f6e69';
-    var afterStrike=p.t>=1.85, afterRelease=p.t>=4;
-    var ball=afterRelease? [p.wr[0]+(p.t-4)*110, p.wr[1]-(p.t-4)*6] : p.wr;
+    var O='#ff9b00', W='#ffffff', G2='#3a3a3d', M='#6f6e69', D='#1d1d1f';
+    var afterFC=p.t>=2, afterBR=p.t>=4;
+    var ball= afterBR ? [REL[0]+(p.t-4)*150, REL[1]-(p.t-4)*3] : p.wr;
     var s='';
-    // grid + ground + rubber
-    for(var x=40;x<400;x+=60) s+='<line x1="'+x+'" y1="20" x2="'+x+'" y2="362" stroke="#1d1d1f" stroke-width="1"/>';
-    s+='<line x1="0" y1="362" x2="400" y2="362" stroke="'+G+'" stroke-width="2"/>';
-    s+='<rect x="116" y="356" width="28" height="6" fill="'+M+'"/>';
-    // vertical reference from the hip + trunk angle wedge
-    s+='<line x1="'+p.hp[0].toFixed(1)+'" y1="'+p.hp[1].toFixed(1)+'" x2="'+p.hp[0].toFixed(1)+'" y2="'+(p.hp[1]-90).toFixed(1)+'" stroke="'+M+'" stroke-width="1.5" stroke-dasharray="4 5"/>';
-    // legs
-    s+=seg(p.hp,p.kr,W)+seg(p.kr,p.ar,W)+seg([p.ar[0]-6,p.ar[1]+4],[p.ar[0]+14,p.ar[1]+4],W,4);
-    s+=seg(p.hp,p.kl,afterStrike?O:W)+seg(p.kl,p.al,afterStrike?O:W)+seg([p.al[0]-6,p.al[1]+4],[p.al[0]+14,p.al[1]+4],afterStrike?O:W,4);
-    // trunk + head
-    s+=seg(p.hp,p.nk,O,6);
-    s+='<circle cx="'+p.hd[0].toFixed(1)+'" cy="'+p.hd[1].toFixed(1)+'" r="12" fill="'+W+'"/>';
-    // glove arm (behind), throwing arm (front)
-    s+=seg(p.sl,p.el,M)+seg(p.el,p.wl,M)+'<circle cx="'+p.wl[0].toFixed(1)+'" cy="'+p.wl[1].toFixed(1)+'" r="6" fill="'+M+'"/>';
-    s+=seg(p.sr,p.er,W)+seg(p.er,p.wr,W);
-    // joints
-    [p.hp,p.kr,p.kl,p.nk,p.er,p.wr].forEach(function(j){ s+='<circle cx="'+j[0].toFixed(1)+'" cy="'+j[1].toFixed(1)+'" r="3.5" fill="#0a0a0a" stroke="'+W+'" stroke-width="2"/>'; });
-    if(afterStrike) s+='<circle cx="'+p.kl[0].toFixed(1)+'" cy="'+p.kl[1].toFixed(1)+'" r="14" fill="none" stroke="'+O+'" stroke-width="1.5" stroke-dasharray="3 4"/>';
-    // ball
-    if(ball[0]<400) s+='<circle cx="'+ball[0].toFixed(1)+'" cy="'+ball[1].toFixed(1)+'" r="5.5" fill="'+O+'"/>';
+    for(var x=40;x<400;x+=60) s+=ln([x,20],[x,G],D,1);
+    s+=ln([0,G],[400,G],G2,2);
+    s+='<rect x="92" y="'+(G-6)+'" width="18" height="6" fill="'+M+'"/>';
+    s+=ln(p.hp,[p.hp[0],p.hp[1]-95],M,1.5,'4 5');                                  // vertical through the hip: trunk angle
+    if(afterFC) s+=ln([p.al[0],G],[p.al[0],p.hd[1]-30],O,0.9,'3 5');                // vertical through the lead ankle: head position
+    s+=seg(p.hp,p.kr,W)+seg(p.kr,p.ar,W)+ln([p.ar[0]-8,p.ar[1]+4],[p.ar[0]+10,p.ar[1]+4],W,4);
+    var lc=afterFC?O:W;
+    s+=seg(p.hp,p.kl,lc)+seg(p.kl,p.al,lc)+ln([p.al[0]-4,p.al[1]+4],[p.al[0]+TOE,p.al[1]+4],lc,4);
+    s+=seg(p.hp,p.sh,O,6);
+    s+=dot(p.hd,L.head,W);
+    s+=seg(p.sh,p.el,M)+seg(p.el,p.wl,M)+dot(p.wl,6,M);
+    s+=seg(p.sh,p.er,W)+seg(p.er,p.wr,W);
+    [p.hp,p.kr,p.kl,p.sh,p.er,p.wr].forEach(function(j){ s+=dot(j,3.5,'#0a0a0a',W); });
+    if(afterFC) s+='<circle cx="'+p.kl[0].toFixed(1)+'" cy="'+p.kl[1].toFixed(1)+'" r="14" fill="none" stroke="'+O+'" stroke-width="1.5" stroke-dasharray="3 4"/>';
+    if(ball[0]<400) s+=dot(ball,5.5,O);
     svg.innerHTML=s;
   }
   function fmt(n){ return Math.round(n)+'°'; }
+  function fmtPct(n){ return Math.round(n)+'%'; }
+  function fmtHead(p){ if(p.t<2) return lang==='en'?'n/a':'n.v.t.'; var h=headOff(p); var v=Math.abs(h).toFixed(1).replace('.',lang==='en'?'.':','); return v+(lang==='en'?(h<0?' ahead':' behind'):(h<0?' voor':' achter')); }
 
-  // hero: the static foot-strike frame
+  // hero: the static foot-contact frame
   var hero=document.getElementById('heroFrame');
-  if(hero){ var hp=pose(2); draw(hero,hp); document.getElementById('heroTilt').textContent=fmt(tilt(hp)); document.getElementById('heroKnee').textContent=fmt(knee(hp)); }
+  if(hero){ var hp=pose(2); draw(hero,hp); document.getElementById('heroTilt').textContent=fmt(tilt(hp)); document.getElementById('heroKnee').textContent=fmt(kneeFlex(hp)); document.getElementById('heroStride').textContent=fmtPct(stridePct(hp)); }
 
-  // signature: scroll-scrubbed, with a native slider as the touch/keyboard path
+  // signature: scroll-scrubbed, with a native slider as the touch and keyboard path
   var svg=document.getElementById('scrubFrame'), range=document.getElementById('scrubRange');
   var wrap=document.getElementById('analyse');
   var target=2, current=2, manualUntil=0, raf=0;
   function renderPhase(tt){
     var p=pose(tt); draw(svg,p);
-    var i=Math.round(tt), ph=PH[i][lang==='en'?'en':'nl'];
+    var i=Math.round(tt), lg=lang==='en'?'en':'nl', ph=PH[i][lg];
     document.getElementById('phaseName').textContent=ph[0];
     document.getElementById('phaseDesc').textContent=ph[1];
     document.getElementById('mTilt').textContent=fmt(tilt(p));
-    document.getElementById('mKnee').textContent=fmt(knee(p));
+    document.getElementById('mKnee').textContent=fmt(kneeFlex(p));
+    document.getElementById('mStride').textContent=fmtPct(stridePct(p));
+    document.getElementById('mHead').textContent=fmtHead(p);
+    var near=Math.abs(tt-i)<0.25;
+    document.getElementById('rTilt').textContent=near?REF.tilt[lg][i]:'';
+    document.getElementById('rKnee').textContent=near?REF.knee[lg][i]:'';
+    document.getElementById('rStride').textContent=near?REF.stride[lg][i]:'';
+    document.getElementById('rHead').textContent=near?REF.head[lg][i]:'';
     range.setAttribute('aria-valuetext',ph[0]);
     if(document.activeElement!==range) range.value=Math.round(tt/5*1000);
   }
