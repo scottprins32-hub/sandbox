@@ -3,7 +3,7 @@
 // through a real glass ball; dispersion, Beer–Lambert tint, studio softbox
 // reflections, a floating shadow with a caustic. Satellites bud off and slam
 // back in on the half-time hits, then the camera dives into the glass.
-import { W, H, b, bp, E, C, clamp, lerp, prog, TAU, wobble } from "../core.js";
+import { W, H, b, bp, E, C, clamp, lerp, wobble } from "../core.js";
 import { layout, glyph } from "../type.js";
 import { PALETTE, NOISE, FLUID } from "../glsl.js";
 

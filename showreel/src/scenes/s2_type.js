@@ -1,6 +1,6 @@
 // 02 — KINETIC TYPE: "FORM / FOLLOWS / MOTION", one word per beat, each with
 // its own motion idea, ending in a camera dive through the counter of an O.
-import { W, H, b, bp, E, C, clamp, lerp, prog, TAU } from "../core.js";
+import { W, H, b, bp, E, C, lerp, prog, TAU } from "../core.js";
 import { layout, glyph, fitSize } from "../type.js";
 import S3 from "./s3_geometry.js";
 

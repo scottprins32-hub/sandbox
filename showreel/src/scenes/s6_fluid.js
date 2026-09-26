@@ -1,7 +1,7 @@
 // 06 — SHADER: one domain-warped fluid field, four ways to see it. Diagonal
 // wipes on each beat swap the rendering style — flow, isolines, halftone,
 // datamosh — while the simulation underneath never cuts.
-import { W, H, b, bp, E, C, clamp, lerp, prog, snap, hit } from "../core.js";
+import { W, H, b, bp, E, C, prog, snap, hit } from "../core.js";
 import { layout, glyph } from "../type.js";
 import { PALETTE, NOISE, FLUID } from "../glsl.js";
 import { scramble } from "../hud.js";

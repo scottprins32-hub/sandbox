@@ -1,7 +1,7 @@
 // 03 — GEOMETRY: a Bauhaus quarter-disc system. Four rotation waves re-tile
 // the pattern on the beat, a 3D flip recolours it, and every disc is then
 // reeled into the single circle that detonates bar 4.
-import { W, H, b, bp, E, C, clamp, lerp, prog, TAU, snap, mixc, spring } from "../core.js";
+import { W, H, b, bp, E, C, clamp, lerp, prog, TAU, snap, mixc } from "../core.js";
 import { zoomState, ZOOM } from "./s2_type.js";
 
 const cx = W / 2, cy = H / 2;

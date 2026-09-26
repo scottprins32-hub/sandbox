@@ -1,6 +1,6 @@
 // The reel's persistent overlay: crop marks, slate, timecode, chapter label,
 // beat LED and a scene-marked progress rail. Drawn once per output frame.
-import { W, H, FPS, BEAT, DURATION, C, rgba, clamp, prog, E, hash, b } from "./core.js";
+import { W, H, FPS, BEAT, DURATION, C, clamp, prog, E, hash, b } from "./core.js";
 import { layout, glyph } from "./type.js";
 
 const SCRAMBLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/+*<>=";

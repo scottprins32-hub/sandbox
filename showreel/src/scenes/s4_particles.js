@@ -2,7 +2,7 @@
 // function of time (so sub-frames and scrubbing are exact): drag-damped
 // explosion → tilted spiral galaxy with differential rotation → a Fibonacci
 // sphere that condenses into the glass of scene 05.
-import { W, H, b, bp, E, C, clamp, lerp, prog, TAU, rng, noise2, rgba } from "../core.js";
+import { W, H, b, bp, E, C, clamp, lerp, prog, TAU, rng, rgba } from "../core.js";
 
 const cx = W / 2, cy = H / 2;
 const N = 14000;

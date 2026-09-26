@@ -26,7 +26,7 @@ for p in a1 b a2; do echo "file '$p.mkv'" >> render/parts/list.txt; done
 "$FF" -y -hide_banner -loglevel error \
   -f concat -safe 0 -i render/parts/list.txt -i assets/soundtrack.wav \
   -vf "scale=out_color_matrix=bt709:out_range=tv:flags=accurate_rnd+full_chroma_int,format=yuv420p" \
-  -c:v libx264 -preset slow -crf 17 -profile:v high -level 4.2 \
+  -c:v libx264 -preset slow -crf 19 -profile:v high -level 4.2 \
   -x264-params "aq-mode=3:aq-strength=0.9:deblock=-1,-1" \
   -color_primaries bt709 -color_trc bt709 -colorspace bt709 -color_range tv \
   -c:a aac -b:a 320k -ar 48000 -shortest -movflags +faststart "$OUT"
