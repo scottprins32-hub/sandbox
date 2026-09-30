@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "PureVita",
+  "short_name": "PureVita",
+  "description": "Boek reformer pilates, volg je schema en zie je voortgang.",
+  "lang": "nl",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3EFE8",
+  "theme_color": "#F3EFE8",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Rooster", "short_name": "Rooster", "description": "Boek een reformer les", "url": "./?tab=rooster", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Training", "short_name": "Training", "description": "Start je training van vandaag", "url": "./?tab=training", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Voortgang", "short_name": "Voortgang", "description": "Bekijk je metingen en records", "url": "./?tab=voortgang", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "screenshots": [
+    { "src": "screenshots/vandaag.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Vandaag: je volgende sessie en je week" },
+    { "src": "screenshots/rooster.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Rooster: houd vast om een les te boeken" },
+    { "src": "screenshots/training.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Training: sets afvinken met rusttimer" },
+    { "src": "screenshots/wide.jpg", "sizes": "1440x900", "type": "image/jpeg", "form_factor": "wide", "label": "PureVita app op een groot scherm" }
+  ]
+}
