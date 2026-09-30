@@ -1,0 +1,32 @@
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    restart: on-failure
+    volumes:
+      - ./:/app
+      - scara_node_modules:/app/node_modules
+      - scara_data:/app/.data
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE44_PUBLIC_HOST_SUFFIX=${BASE44_PUBLIC_HOST_SUFFIX}
+      - SCARA_PASSCODE=scara2026
+      - WATCHPACK_POLLING=true
+    command:
+      - sh
+      - -ec
+      - |
+        npm install --no-audit --no-fund
+        test -f .data/scara.db || npm run seed
+        exec npx next dev -H 0.0.0.0 -p 3000
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.status===200?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  scara_node_modules:
+  scara_data:
