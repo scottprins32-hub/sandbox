@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&icon_names=add,arrow_forward,calendar_month,call,chat,check,close,fitness_center,home,location_on,mail,monitoring,remove,restart_alt,schedule,timer,volume_off,volume_up&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&icon_names=add,arrow_forward,calendar_month,call,chat,check,chevron_left,close,emoji_events,fitness_center,home,info,local_fire_department,location_on,mail,monitoring,person_add,remove,restart_alt,schedule,timer,volume_off,volume_up,water_drop&display=block">
 <style>
 /* Layout: one phone-width column (header, scrolling view, tab bar). On a wide screen it sits
    on the brand's ink like a device. The spring from the website is the app's one gesture:
@@ -60,8 +60,8 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;text-wrap:
 .confirm{display:inline-block;font:500 .75rem/1.35 var(--mono);color:var(--confirm-fg);background:var(--confirm-bg);border:1px dashed var(--confirm-line);padding:3px 7px;border-radius:4px}
 
 /* ---------- shell ---------- */
-.stage{height:100%;display:grid;grid-template-columns:1fr;place-items:center}
-.device{position:relative;width:100%;height:100%;max-width:440px;background:var(--bg);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.stage{height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr);place-items:center}
+.device{position:relative;width:100%;height:100%;max-width:440px;background:var(--bg);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;overflow:clip}
 .aside{display:none}
 @media (min-width:900px){
   .stage{grid-template-columns:minmax(0,1fr) 440px minmax(0,1fr);gap:48px;padding:24px}
@@ -119,9 +119,55 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;text-wrap:
 
 /* week spring */
 .week{display:grid;gap:10px}
-.week svg{width:100%;height:36px;overflow:visible}
-.week path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
-.week .track{stroke:var(--line)}
+.coilbar{width:100%;height:36px;overflow:visible;display:block}
+.coilbar path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
+.coilbar .track{stroke:var(--line)}
+.card-title{font:400 1.5rem/1.1 var(--serif);margin-top:4px}
+
+/* wellness, water, trainer note */
+.scale{display:grid;grid-template-columns:5.75em repeat(5,minmax(0,1fr));gap:6px;align-items:center;font-size:.875rem}
+.scale button{height:40px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);font:500 .875rem var(--mono)}
+.scale button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);box-shadow:none}
+.drops{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.drop{height:44px;display:grid;place-items:center;border-radius:10px;color:var(--mute)}
+.drop.on{color:var(--accent)}
+.drop.on .ico{font-variation-settings:"FILL" 1,"wght" 400,"opsz" 24}
+.drop:active{background:var(--surface-2)}
+.note-card blockquote{margin:0;font:400 1.3125rem/1.3 var(--serif)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+
+/* progress extras */
+.badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.badge{display:grid;justify-items:center;text-align:center;gap:4px;padding:14px 6px;border-radius:var(--r);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-size:.75rem}
+.badge .ico{font-size:28px;width:auto;color:var(--accent)}
+.badge strong{font-weight:500;font-size:.8125rem;line-height:1.2}
+.badge.off{opacity:.55}
+.badge.off .ico{color:var(--mute)}
+
+/* exercise sheet */
+.ex-name{font:500 1.0625rem/1.3 var(--sans);text-align:left;display:inline-flex;align-items:center;gap:6px}
+.ex-name .ico{font-size:18px;color:var(--mute)}
+.steps-list{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.plain{list-style:none;margin:0;padding:0}
+.plain li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+
+/* welcome flow */
+.onboard{position:absolute;inset:0;z-index:40;background:var(--bg);display:grid;grid-template-rows:auto 1fr auto;gap:24px;padding:calc(18px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.onboard[hidden]{display:none}
+.onboard > .stack{align-content:center}
+.ob-steps{display:flex;gap:6px;width:120px}
+.ob-steps i{flex:1;height:3px;border-radius:2px;background:var(--surface-2)}
+.ob-steps i.on{background:var(--accent)}
+.ob-title{font-size:2.75rem;line-height:1}
+.ob-title em{font-style:italic;color:var(--accent)}
+.choice{display:grid;gap:10px}
+.choice button{text-align:left;padding:16px;border-radius:var(--r);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);display:grid;gap:2px}
+.choice button[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent)}
+.choice strong{font-weight:500}
+.count-pick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.count-pick button{height:56px;border-radius:14px;font:400 1.75rem/1 var(--serif);box-shadow:inset 0 0 0 1px var(--line)}
+.count-pick button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);box-shadow:none}
+.ob-next{width:100%;min-height:52px}
 .big{font:400 2.25rem/1 var(--serif);letter-spacing:-.02em}
 .big small{font:500 .875rem var(--sans);color:var(--mute);letter-spacing:0}
 
@@ -182,8 +228,8 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;text-wrap:
 .ex.is-done h3{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:1.5px}
 
 /* rest timer sheet */
-.sheet{position:absolute;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-radius:24px 24px 0 0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -1px 0 var(--line),0 -20px 40px -20px rgba(0,0,0,.25);transform:translateY(105%);transition:transform .5s var(--ease);display:grid;gap:14px}
-.sheet.is-open{transform:none}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:20;max-height:86%;overflow-y:auto;overscroll-behavior:contain;background:var(--surface);border-radius:24px 24px 0 0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -1px 0 var(--line),0 -20px 40px -20px rgba(0,0,0,.25);transform:translateY(105%);visibility:hidden;transition:transform .5s var(--ease),visibility 0s .5s;display:grid;gap:14px}
+.sheet.is-open{transform:none;visibility:visible;transition:transform .5s var(--ease)}
 .scrim{position:absolute;inset:0;z-index:15;background:rgba(10,9,8,.4);opacity:0;pointer-events:none;transition:opacity .3s}
 .scrim.is-open{opacity:1;pointer-events:auto}
 .timer-num{font:400 4.5rem/1 var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
@@ -220,6 +266,10 @@ table{width:100%;border-collapse:collapse;font-size:.8125rem;font-variant-numeri
 th,td{text-align:left;padding:8px 0;border-bottom:1px solid var(--line)}
 th{color:var(--mute);font-weight:500}
 td:last-child,th:last-child{text-align:right}
+.well-table th,.well-table td{text-align:center;padding:6px 0}
+.well-table th[scope=row]{text-align:left;font-weight:500;color:var(--fg)}
+.well-table td span{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--accent) calc(var(--v) * 16%),transparent)}
+.well-table td .none{background:none;color:var(--mute)}
 .hist li{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .hist ul{list-style:none;margin:0;padding:0}
 .hist .ico{width:36px;height:36px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:19px}
@@ -256,12 +306,14 @@ td:last-child,th:last-child{text-align:right}
       <div class="row"><button class="btn btn--ghost" data-action="timer-add"><span class="ico" aria-hidden="true">add</span>15 sec</button><p class="note" id="timer-next"></p></div>
     </section>
     <section class="sheet profile" id="profile" aria-label="Profiel" aria-hidden="true"></section>
+    <section class="sheet stack" id="exsheet" aria-label="Oefening" aria-hidden="true"></section>
+    <section class="onboard" id="onboard" aria-label="Welkom" hidden></section>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
   <aside class="aside" aria-label="Over dit prototype">
     <p class="word">Pure<em>Vita</em> app</p>
     <p>Prototype voor klanten van PureVita. Boek reformer pilates, volg je schema en zie je voortgang.</p>
-    <p>Alles wat je hier doet blijft op dit apparaat. Houd een Boek knop ingedrukt om een les te boeken.</p>
+    <p>Alles wat je hier doet blijft op dit apparaat. Houd een Boek knop ingedrukt om een les te boeken, tik een oefening aan voor uitleg.</p>
   </aside>
 </div>
 
@@ -330,6 +382,20 @@ td:last-child,th:last-child{text-align:right}
       { id: 'deadbug', name: 'Dead bug', sets: 3, reps: '8 per kant', kg: 0, step: 0, rest: 45, cue: 'Onderrug blijft tegen de vloer.' }
     ]
   };
+  const HOWTO = {
+    squat: ['Houd een dumbbell of kettlebell met beide handen voor je borst.', 'Zak door je knieën en heupen tot je bovenbenen ongeveer horizontaal zijn.', 'Duw jezelf omhoog via je hele voet.'],
+    rdl: ['Sta op heupbreedte met de halter voor je bovenbenen.', 'Duw je heupen naar achteren en laat de halter langs je benen zakken tot je hamstrings rekken.', 'Kom omhoog door je heupen naar voren te duwen.'],
+    row: ['Zet één hand en knie op een bank, rug plat.', 'Trek de dumbbell naar je heup.', 'Laat hem gecontroleerd zakken tot je arm gestrekt is.'],
+    plank: ['Onderarmen onder je schouders, benen gestrekt.', 'Houd je lichaam in één lijn van hoofd tot hielen.', 'Adem rustig door en houd de spanning vast.'],
+    split: ['Zet één voet ver naar voren, je achterste been op de bal van je voet.', 'Zak recht omlaag tot je knie bijna de grond raakt.', 'Duw je omhoog vanuit je voorste been. Je voorste knie blijft boven je voet.'],
+    press: ['Lig op een bank met een dumbbell in elke hand boven je borst.', 'Laat ze gecontroleerd zakken tot je ellebogen iets onder de bank zijn.', 'Duw ze weer omhoog tot je armen gestrekt zijn.'],
+    hip: ['Leun met je bovenrug tegen een bank, de halter over je heupen.', 'Duw je heupen omhoog tot je lichaam één lijn vormt van knieën tot schouders.', 'Knijp bovenin je billen samen en zak gecontroleerd.'],
+    deadbug: ['Lig op je rug, armen omhoog, knieën boven je heupen.', 'Strek tegelijk je tegenovergestelde arm en been uit.', 'Kom terug en wissel van kant. Je onderrug blijft tegen de vloer.']
+  };
+  const GOALS = { fitter: ['Fitter worden', 'Meer conditie en energie'], afvallen: ['Afvallen', 'Gezond gewicht verliezen'], spier: ['Spieropbouw', 'Sterker worden en spiermassa opbouwen'], sport: ['Beter in mijn sport', 'Sportspecifiek trainen'] };
+  const NOTE = { from: 'Indy Meijer', text: 'Mooie sessie! Je goblet squat ging makkelijk, dus volgende keer proberen we 18 kg. Let bij de split squat op je voorste knie.' };
+  const MONTH_LONG = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  const CHALLENGE = 12;
   const METRICS = {
     gewicht: { name: 'Gewicht', unit: 'kg', dec: 1, rows: [['2026-06-02', 72.4], ['2026-07-01', 71.6], ['2026-08-03', 70.9], ['2026-09-01', 70.3]] },
     vet: { name: 'Vetpercentage', unit: '%', dec: 1, rows: [['2026-06-02', 27.1], ['2026-07-01', 26.4], ['2026-08-03', 25.8], ['2026-09-01', 25.2]] },
@@ -339,20 +405,24 @@ td:last-child,th:last-child{text-align:right}
   /* ---------- state, kept on this device only ---------- */
   const KEY = 'purevita-app-v1';
   const bookable = classes.filter(c => c.taken < CAP && at(c.day, c.time) > new Date());
+  const LOG_KINDS = {
+    pt: ['training', 'Personal training', 'Met Indy, Rijnsburg'], pil: ['pilates', 'Reformer flow', 'Noordwijk'],
+    a: ['training', 'Training A', 'Eigen schema'], b: ['training', 'Training B', 'Eigen schema']
+  };
   const seed = () => ({
-    name: 'Noor', credits: 7, sound: false,
+    name: 'Noor', credits: 7, sound: false, onboarded: false, goal: 'fitter', weekGoal: 3, prCount: 0,
     booked: bookable[3] ? [bookable[3].id] : [], waitlist: [],
-    weights: {}, done: {}, workoutDay: 'A',
-    logs: [
-      { at: addDays(today, -2).toISOString(), kind: 'training', title: 'Personal training', sub: 'Met Indy, Rijnsburg' },
-      { at: addDays(today, -5).toISOString(), kind: 'pilates', title: 'Reformer flow', sub: 'Noordwijk' },
-      { at: addDays(today, -8).toISOString(), kind: 'training', title: 'Training B', sub: 'Eigen schema' }
-    ]
+    weights: {}, done: {}, workoutDay: 'A', water: {},
+    logs: [[-2, 'pt'], [-5, 'pil'], [-8, 'b'], [-9, 'pt'], [-12, 'pil'], [-15, 'a'], [-16, 'pt'], [-19, 'pil'], [-22, 'a']]
+      .map(([o, k]) => ({ at: addDays(today, o).toISOString(), kind: LOG_KINDS[k][0], title: LOG_KINDS[k][1], sub: LOG_KINDS[k][2] })),
+    wellness: Object.fromEntries([[4, 4, 2], [3, 3, 3], [4, 3, 2], [2, 2, 4], [4, 4, 1]].map(([slaap, energie, pijn], i) => [iso(addDays(today, -1 - i)), { slaap, energie, pijn }])),
+    history: Object.fromEntries(Object.entries({ squat: [[-14, 14], [-7, 16]], rdl: [[-14, 27.5], [-7, 30]], row: [[-7, 12]], split: [[-9, 8], [-2, 10]], press: [[-9, 12], [-2, 14]], hip: [[-9, 35], [-2, 40]] })
+      .map(([k, v]) => [k, v.map(([o, kg]) => ({ d: iso(addDays(today, o)), kg }))]))
   });
   let S;
-  try { S = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch (_) { S = seed(); }
+  try { S = Object.assign(seed(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch (_) { S = seed(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
-  const ui = { tab: 'vandaag', day: iso(today), mode: 'pilates', metric: 'gewicht' };
+  const ui = { tab: 'vandaag', day: iso(today), mode: 'pilates', metric: 'gewicht', wellEdit: false, ob: null };
 
   /* ---------- feedback: toast, buzz, twang ---------- */
   let toastT = 0;
@@ -386,6 +456,26 @@ td:last-child,th:last-child{text-align:right}
     return list.sort((a, b) => a.when - b.when);
   }
   const weekCount = () => S.logs.filter(l => new Date(l.at) >= weekStart).length;
+  const countBetween = (a, b) => S.logs.filter(l => { const d = new Date(l.at); return d >= a && d < b; }).length;
+  function weekStreak() {   // weeks in a row that hit the weekly goal; this week counts once it is reached
+    let n = countBetween(weekStart, addDays(weekStart, 7)) >= S.weekGoal ? 1 : 0;
+    for (let i = 1; i < 52; i++) { const s = addDays(weekStart, -7 * i); if (countBetween(s, addDays(s, 7)) >= S.weekGoal) n++; else break; }
+    return n;
+  }
+  const monthCount = () => S.logs.filter(l => { const d = new Date(l.at); return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); }).length;
+  function wellStreak() {
+    let d = S.wellness[iso(today)] ? today : addDays(today, -1), n = 0;
+    while (S.wellness[iso(d)]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  function wellTip(w) {
+    if (w.pijn >= 4) return 'Veel spierpijn. Houd het vandaag rustig of vraag je trainer om een aangepaste training.';
+    if (w.slaap <= 2) return 'Weinig geslapen. Train gerust, maar ga vandaag niet voor een record.';
+    if (w.energie >= 4 && w.pijn <= 2) return 'Je voelt je fit. Goede dag om te trainen!';
+    return 'Dank je, genoteerd. Luister vandaag goed naar je lichaam.';
+  }
+  const allExercises = () => [...PLAN.A, ...PLAN.B];
+  const coilBar = (key, p) => `<svg class="coilbar" data-key="${key}" data-p="${clamp(p).toFixed(3)}" aria-hidden="true"><path class="track"></path><path class="fill"></path></svg>`;
   const hhmm = d => `${String(d.getHours()).padStart(2, '0')}.${String(d.getMinutes()).padStart(2, '0')}`;
   const wa = text => 'https://wa.me/31639501008?text=' + encodeURIComponent(text);
   const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond'; };
@@ -394,27 +484,43 @@ td:last-child,th:last-child{text-align:right}
 
   /* ---------- views ---------- */
   function vVandaag() {
-    const up = upcoming(), n = up[0], wc = weekCount(), goal = 3;
+    const up = upcoming(), n = up[0], wc = weekCount(), goal = S.weekGoal, streak = weekStreak();
     let next = `<div class="card next"><p class="label">Volgende sessie</p><h2>Niets gepland</h2><p>Boek een reformer les of plan een extra training.</p><div class="row"><button class="btn btn--ghost" data-tab="rooster">Naar het rooster</button></div></div>`;
     if (n) {
       const title = n.kind === 'pt' ? 'Personal training' : TYPES[n.c.type].name;
       const who = n.kind === 'pt' ? `Met ${PT.trainer}` : 'Reformer studio';
       const where = n.kind === 'pt' ? 'Kloosterschuurlaan 15b, Rijnsburg' : 'Noordwijk';
+      const dl = dayLabel(new Date(n.when.getFullYear(), n.when.getMonth(), n.when.getDate()));
       next = `<div class="card next"><p class="label">Volgende sessie</p><h2>${esc(title)}</h2>
-        <div class="meta"><span><span class="ico" aria-hidden="true">schedule</span>${dayLabel(new Date(n.when.getFullYear(), n.when.getMonth(), n.when.getDate()))}, ${hhmm(n.when)}</span><span><span class="ico" aria-hidden="true">location_on</span>${esc(where)}</span></div>
+        <div class="meta"><span><span class="ico" aria-hidden="true">schedule</span>${dl}, ${hhmm(n.when)}</span><span><span class="ico" aria-hidden="true">location_on</span>${esc(where)}</span></div>
         <p style="opacity:.8">${esc(who)}</p>
-        <div class="row"><a class="btn btn--ghost" href="${wa(`Hoi! Ik wil graag mijn ${title.toLowerCase()} van ${dayLabel(new Date(n.when.getFullYear(), n.when.getMonth(), n.when.getDate())).toLowerCase()} om ${hhmm(n.when)} verzetten.`)}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">chat</span>Verzetten</a></div></div>`;
+        <div class="row"><a class="btn btn--ghost" href="${wa(`Hoi! Ik wil graag mijn ${title.toLowerCase()} van ${dl.toLowerCase()} om ${hhmm(n.when)} verzetten.`)}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">chat</span>Verzetten</a></div></div>`;
     }
+    const w = S.wellness[iso(today)] || {}, wComplete = w.slaap && w.energie && w.pijn;
+    const scaleRow = (k, label) => `<div class="scale" role="group" aria-label="${label}"><span>${label}</span>${[1, 2, 3, 4, 5].map(v => `<button data-well="${k}" data-v="${v}" aria-pressed="${w[k] === v}" aria-label="${label} ${v} van 5">${v}</button>`).join('')}</div>`;
+    const well = wComplete && !ui.wellEdit
+      ? `<div class="card stack"><div class="row between"><p class="label">Wellness vandaag</p><button class="btn btn--ghost" data-action="well-edit" style="min-height:36px">Aanpassen</button></div>
+          <div class="pills"><span class="pill">Slaap ${w.slaap}/5</span><span class="pill">Energie ${w.energie}/5</span><span class="pill">Spierpijn ${w.pijn}/5</span></div><p>${wellTip(w)}</p></div>`
+      : `<div class="card stack"><div><p class="label">Wellness check-in</p><h3 class="card-title">Hoe voel je je vandaag?</h3></div>
+          ${scaleRow('slaap', 'Slaap')}${scaleRow('energie', 'Energie')}${scaleRow('pijn', 'Spierpijn')}
+          <p class="note">1 is slecht, 5 is top. Bij spierpijn is 1 geen en 5 veel.</p>
+          ${ui.wellEdit ? '<button class="btn btn--primary" data-action="well-done">Klaar</button>' : ''}</div>`;
+    const wt = S.water[iso(today)] || 0;
     const plan = PLAN[S.workoutDay];
+    const invite = 'https://wa.me/?text=' + encodeURIComponent('Zin om samen te trainen? Bij PureVita kun je duo training doen: met z\'n tweeën, onder begeleiding van een personal trainer. Kijk op www.purevita.nl');
     return `
-      <div class="hello"><h1>${greeting()}, <em>${esc(S.name)}</em></h1><p>${DOW_LONG[today.getDay()]} ${today.getDate()} ${MON[today.getMonth()]}</p></div>
+      <div class="hello"><h1>${greeting()}, <em>${esc(S.name)}</em></h1><p>${DOW_LONG[today.getDay()]} ${today.getDate()} ${MON[today.getMonth()]}. Je doel: ${GOALS[S.goal][0].toLowerCase()}.</p></div>
       <div class="section">${next}</div>
+      <div class="section">${well}</div>
       <div class="section"><div class="card week">
-        <div class="row between"><p class="label">Deze week</p><span class="pill${wc >= goal ? ' good' : ''}">${wc >= goal ? '<span class="ico" aria-hidden="true">check</span>Doel gehaald' : `Doel: ${goal} sessies`}</span></div>
-        <p class="big">${wc} <small>van ${goal} sessies</small></p>
-        <svg id="week-coil" aria-hidden="true"><path class="track"></path><path class="fill"></path></svg>
+        <div class="row between"><p class="label">Deze week</p><div class="pills">${streak > 1 ? `<span class="pill"><span class="ico" aria-hidden="true">local_fire_department</span>${streak} weken op rij</span>` : ''}<span class="pill${wc >= goal ? ' good' : ''}">${wc >= goal ? '<span class="ico" aria-hidden="true">check</span>Doel gehaald' : `Doel: ${goal}`}</span></div></div>
+        <p class="big">${wc} <small>van ${goal} ${goal === 1 ? 'sessie' : 'sessies'}</small></p>
+        ${coilBar('week', wc / goal)}
         <p class="note">Elke sessie rekt de veer verder op.</p>
       </div></div>
+      <div class="section"><div class="card stack note-card"><p class="label">Van je trainer</p><blockquote>${esc(NOTE.text)}</blockquote><p class="note">${esc(NOTE.from)}, na je laatste personal training</p></div></div>
+      <div class="section"><div class="card stack"><div class="row between"><p class="label">Water vandaag</p><span class="note">${wt} van 8 glazen</span></div>
+        <div class="drops" role="group" aria-label="Glazen water">${Array.from({ length: 8 }, (_, i) => `<button class="drop${i < wt ? ' on' : ''}" data-water="${i + 1}" aria-pressed="${i < wt}" aria-label="${i + 1} ${i ? 'glazen' : 'glas'}"><span class="ico" aria-hidden="true">water_drop</span></button>`).join('')}</div></div></div>
       <div class="section">
         <div class="section-head"><h2>Op je schema</h2><span class="label">Training ${S.workoutDay}</span></div>
         <button class="card link-card" data-tab="training"><span><span class="t">${plan.length} oefeningen</span><span class="note" style="display:block">${plan.map(e => esc(e.name)).join(', ')}</span></span><span class="ico" aria-hidden="true">arrow_forward</span></button>
@@ -423,7 +529,8 @@ td:last-child,th:last-child{text-align:right}
         <div class="section-head"><h2>Rittenkaart</h2><span class="label">Reformer</span></div>
         <div class="card row between"><p class="big">${S.credits} <small>van 10 lessen over</small></p><button class="btn btn--ghost" data-tab="rooster">Boek</button></div>
       </div>
-      <div class="proto"><p>Prototype. Alle namen, lessen en metingen hier zijn voorbeelden.</p><span class="confirm">[confirm: rooster, lesvormen en rittenkaart reformer pilates]</span></div>`;
+      <div class="section"><a class="card link-card" href="${invite}" target="_blank" rel="noopener"><span><span class="t">Train samen</span><span class="note" style="display:block">Nodig iemand uit voor duo training, via WhatsApp.</span></span><span class="ico" aria-hidden="true">person_add</span></a></div>
+      <div class="proto"><p>Prototype. Alle namen, lessen, notities en metingen hier zijn voorbeelden.</p><span class="confirm">[confirm: rooster, lesvormen en rittenkaart reformer pilates]</span></div>`;
   }
 
   function vRooster() {
@@ -470,7 +577,7 @@ td:last-child,th:last-child{text-align:right}
     const exs = plan.map(e => {
       const sets = done[e.id] || [], kg = S.weights[e.id] ?? e.kg, all = sets.filter(Boolean).length === e.sets;
       return `<article class="card ex${all ? ' is-done' : ''}">
-        <div class="ex-head"><div><h3>${esc(e.name)}</h3><p class="cue">${esc(e.cue)}</p></div><span class="pill">${e.sets} × ${esc(e.reps)}</span></div>
+        <div class="ex-head"><div><h3><button class="ex-name" data-action="ex" data-id="${e.id}">${esc(e.name)}<span class="ico" aria-hidden="true">info</span></button></h3><p class="cue">${esc(e.cue)}</p></div><span class="pill">${e.sets} × ${esc(e.reps)}</span></div>
         <div class="ex-controls">
           ${e.step ? `<div class="stepper" role="group" aria-label="Gewicht ${esc(e.name)}"><button data-action="kg" data-id="${e.id}" data-d="-1" aria-label="Minder gewicht"><span class="ico" aria-hidden="true">remove</span></button><output>${kg.toLocaleString('nl-NL')} kg</output><button data-action="kg" data-id="${e.id}" data-d="1" aria-label="Meer gewicht"><span class="ico" aria-hidden="true">add</span></button></div>` : `<span class="note">Eigen lichaamsgewicht</span>`}
           <div class="sets" role="group" aria-label="Sets ${esc(e.name)}">${Array.from({ length: e.sets }, (_, i) => `<button class="set" data-action="set" data-id="${e.id}" data-i="${i}" aria-pressed="${!!sets[i]}" aria-label="Set ${i + 1}${sets[i] ? ', klaar' : ''}">${sets[i] ? '<span class="ico" aria-hidden="true">check</span>' : i + 1}</button>`).join('')}</div>
@@ -500,26 +607,59 @@ td:last-child,th:last-child{text-align:right}
         <div class="chart" id="chart"><svg role="img" aria-label="${m.name} per meting, van ${fmt(first)} naar ${fmt(last)} ${m.unit}"></svg><div class="tip" id="tip"></div></div>
         <details><summary>Toon als tabel</summary><table><thead><tr><th>Datum</th><th>${m.name} (${m.unit})</th></tr></thead><tbody>${rows.map(r => `<tr><td>${dt(r[0])}</td><td>${fmt(r[1])}</td></tr>`).join('')}</tbody></table></details>
       </div>
+      ${progressExtras()}
       <div class="section hist"><div class="section-head"><h2>Geschiedenis</h2></div><ul>${hist || '<li><span></span><span>Nog niets gelogd.</span></li>'}</ul></div>
       <div class="proto"><p>Voorbeeldmetingen. In de echte app vult je coach ze in na elke meting.</p></div>`;
   }
 
+  function progressExtras() {
+    const mc = monthCount(), mName = MONTH_LONG[today.getMonth()];
+    const badges = [
+      ['Eerste les', S.logs.some(l => l.kind === 'pilates'), 'calendar_month'],
+      ['5 sessies', S.logs.length >= 5, 'fitness_center'],
+      ['Weekdoel', weekCount() >= S.weekGoal, 'check'],
+      ['Nieuw record', (S.prCount || 0) > 0, 'emoji_events'],
+      ['3 dagen wellness', wellStreak() >= 3, 'local_fire_department'],
+      ['Challenge', mc >= CHALLENGE, 'emoji_events']
+    ];
+    const recs = allExercises().filter(e => (S.history[e.id] || []).length).map(e => {
+      const h = S.history[e.id], b = Math.max(...h.map(x => x.kg));
+      return `<li><span class="ico" aria-hidden="true">emoji_events</span><div><strong>${esc(e.name)}</strong><span>${h.length} keer gelogd</span></div><span>${b.toLocaleString('nl-NL')} kg</span></li>`;
+    }).join('');
+    const wdays = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
+    const wrow = ([k, l]) => `<tr><th scope="row">${l}</th>${wdays.map(d => { const v = (S.wellness[iso(d)] || {})[k]; return `<td>${v ? `<span style="--v:${v}">${v}</span>` : '<span class="none">-</span>'}</td>`; }).join('')}</tr>`;
+    return `
+      <div class="section"><div class="section-head"><h2>Challenge</h2><span class="label">${mName}</span></div>
+        <div class="card stack"><p>Train deze maand ${CHALLENGE} keer, in de studio of op de reformer.</p>${coilBar('challenge', mc / CHALLENGE)}
+        <p class="note">${mc >= CHALLENGE ? 'Challenge gehaald, sterk!' : `${mc} van ${CHALLENGE}. Nog ${CHALLENGE - mc} te gaan.`}</p></div></div>
+      <div class="section"><div class="section-head"><h2>Badges</h2><span class="label">${badges.filter(b => b[1]).length} van ${badges.length}</span></div>
+        <div class="badges">${badges.map(([nm, ok, ic]) => `<div class="badge${ok ? '' : ' off'}"><span class="ico" aria-hidden="true">${ic}</span><strong>${nm}</strong><span class="note">${ok ? 'Behaald' : 'Nog niet'}</span></div>`).join('')}</div></div>
+      <div class="section hist"><div class="section-head"><h2>Records</h2><span class="label">Zwaarste gewicht</span></div><ul>${recs || '<li><span></span><span>Nog geen records.</span></li>'}</ul></div>
+      <div class="section card"><div class="section-head"><h2>Wellness</h2><span class="label">Laatste 7 dagen</span></div>
+        <table class="well-table"><thead><tr><th scope="col"><span class="sr-only">Meting</span></th>${wdays.map(d => `<th scope="col">${DOW[d.getDay()]}</th>`).join('')}</tr></thead>
+        <tbody>${[['slaap', 'Slaap'], ['energie', 'Energie'], ['pijn', 'Spierpijn']].map(wrow).join('')}</tbody></table>
+        <p class="note">Schaal 1 tot 5. Vul elke dag je check-in in op Vandaag.</p></div>`;
+  }
+
   /* ---------- drawings that live inside views ---------- */
-  function drawWeek() {
-    const svg = $('#week-coil'); if (!svg) return;
-    const W = svg.clientWidth || 300, p = clamp(weekCount() / 3);
-    svg.setAttribute('viewBox', `0 0 ${W} 36`);
-    svg.querySelector('.track').setAttribute('d', `M0 18 H${W}`);
-    const target = lerp(48, W, p);
-    if (reduce) { svg.querySelector('.fill').setAttribute('d', coil(0, 18, target, 18, 12, 10, 4)); return; }
-    let x = 48, v = 0, last = performance.now();
-    const step = now => {   // the spring overshoots a little, then settles on this week's count
-      const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
-      v += (160 * (target - x) - 14 * v) * dt; x += v * dt;
-      svg.querySelector('.fill').setAttribute('d', coil(0, 18, x, 18, 12, 10, 4));
-      if (Math.abs(v) > .5 || Math.abs(target - x) > .5) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+  const coilAt = {};   // last drawn stretch per bar, so a re-render only animates what changed
+  function drawCoils() {
+    document.querySelectorAll('svg.coilbar').forEach(svg => {
+      const W = svg.clientWidth || 300, key = svg.dataset.key, target = lerp(48, W, parseFloat(svg.dataset.p) || 0);
+      const fill = svg.querySelector('.fill'), draw = x => fill.setAttribute('d', coil(0, 18, x, 18, 12, 10, 4));
+      svg.setAttribute('viewBox', `0 0 ${W} 36`);
+      svg.querySelector('.track').setAttribute('d', `M0 18 H${W}`);
+      const from = coilAt[key] ?? 48; coilAt[key] = target;
+      if (reduce || Math.abs(from - target) < .5) { draw(target); return; }
+      let x = from, v = 0, last = performance.now();
+      const step = now => {   // overshoots a little, then settles
+        if (!svg.isConnected) return;
+        const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
+        v += (160 * (target - x) - 14 * v) * dt; x += v * dt; draw(x);
+        if (Math.abs(v) > .5 || Math.abs(target - x) > .5) requestAnimationFrame(step); else draw(target);
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   function drawChart() {
@@ -570,7 +710,7 @@ td:last-child,th:last-child{text-align:right}
     document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === ui.tab ? 'page' : 'false'));
     $('#avatar').textContent = (S.name || 'N').trim().charAt(0).toUpperCase() || 'N';
     if (focus) { view.scrollTop = 0; view.focus({ preventScroll: true }); } else { view.scrollTop = keep; [...view.children].forEach(el => el.style.animation = 'none'); }
-    drawWeek(); drawChart(); drawHolds();
+    drawCoils(); drawChart(); drawHolds();
   }
 
   /* ---------- actions ---------- */
@@ -621,7 +761,7 @@ td:last-child,th:last-child{text-align:right}
   view.addEventListener('contextmenu', e => { if (e.target.closest('.hold')) e.preventDefault(); });
 
   document.addEventListener('click', e => {
-    const t = e.target.closest('[data-tab],[data-mode],[data-day],[data-metric],[data-workout],[data-action],.hold');
+    const t = e.target.closest('[data-tab],[data-mode],[data-day],[data-metric],[data-workout],[data-action],[data-well],[data-water],[data-ob],[data-goal],[data-count],.hold');
     if (!t) return;
     if (t.classList.contains('hold')) {           // keyboard and screen readers confirm without holding
       if (e.detail === 0) t.dataset.hold === 'book' ? book(t.dataset.id) : cancel(t.dataset.id);
@@ -632,6 +772,30 @@ td:last-child,th:last-child{text-align:right}
     if (t.dataset.day) { ui.day = t.dataset.day; render(); return; }
     if (t.dataset.metric) { ui.metric = t.dataset.metric; render(); return; }
     if (t.dataset.workout) { S.workoutDay = t.dataset.workout; save(); render(); return; }
+    if (t.dataset.well) {
+      const k = iso(today), w = S.wellness[k] = { ...(S.wellness[k] || {}), [t.dataset.well]: Number(t.dataset.v) };
+      save(); render();
+      if (!ui.wellEdit && w.slaap && w.energie && w.pijn) { buzz(10); toast('Check-in opgeslagen'); }
+      return;
+    }
+    if (t.dataset.water) {
+      const k = iso(today), v = Number(t.dataset.water), cur = S.water[k] || 0;
+      S.water[k] = cur === v ? v - 1 : v; save(); render(); buzz(8);
+      if (S.water[k] === 8) { twang(.7); toast('8 glazen, top!'); }
+      return;
+    }
+    if (t.dataset.goal) { ui.ob.goal = t.dataset.goal; renderOnboard(); return; }
+    if (t.dataset.count) { ui.ob.weekGoal = Number(t.dataset.count); renderOnboard(); return; }
+    if (t.dataset.ob) {
+      const o = ui.ob;
+      if (t.dataset.ob === 'back') o.step = Math.max(0, o.step - 1);
+      else if (o.step < 2) o.step++;
+      else {
+        Object.assign(S, { name: (o.name || '').trim() || S.name, goal: o.goal, weekGoal: o.weekGoal, onboarded: true }); save();
+        $('#onboard').hidden = true; ui.ob = null; render(true); twang(.8); toast(`Welkom, ${S.name}!`); return;
+      }
+      renderOnboard(); return;
+    }
     const a = t.dataset.action, id = t.dataset.id;
     if (a === 'wait') { S.waitlist.push(id); save(); render(); toast('Je staat op de wachtlijst'); }
     if (a === 'unwait') { S.waitlist = S.waitlist.filter(w => w !== id); save(); render(); toast('Van de wachtlijst gehaald'); }
@@ -646,14 +810,27 @@ td:last-child,th:last-child{text-align:right}
       if (arr[i]) { buzz(10); const left = arr.filter(Boolean).length < ex.sets; openTimer(ex.rest, left ? `Volgende: set ${arr.filter(Boolean).length + 1} ${ex.name.toLowerCase()}` : 'Door naar de volgende oefening'); }
     }
     if (a === 'finish') {
+      const done = S.done[iso(today) + S.workoutDay] || {}, prs = [];
+      PLAN[S.workoutDay].forEach(e => {   // every weighted exercise you did goes into its history; a new max is a record
+        const kg = S.weights[e.id] ?? e.kg; if (!kg || !(done[e.id] || []).some(Boolean)) return;
+        const h = S.history[e.id] = S.history[e.id] || [], best = h.reduce((m, x) => Math.max(m, x.kg), 0);
+        h.push({ d: iso(today), kg }); if (kg > best) prs.push(`${e.name}, ${kg.toLocaleString('nl-NL')} kg`);
+      });
+      S.prCount = (S.prCount || 0) + prs.length;
       S.logs.push({ at: new Date().toISOString(), kind: 'training', title: `Training ${S.workoutDay}`, sub: 'Eigen schema' });
-      delete S.done[iso(today) + S.workoutDay]; save(); closeSheets(); ui.tab = 'vandaag'; render(true); twang(1); toast('Training opgeslagen. Sterk gedaan!');
+      delete S.done[iso(today) + S.workoutDay]; save(); closeSheets(); ui.tab = 'vandaag'; render(true); twang(1);
+      toast(prs.length ? `Nieuw record: ${prs[0]}` : 'Training opgeslagen. Sterk gedaan!');
     }
+    if (a === 'well-edit') { ui.wellEdit = true; render(); }
+    if (a === 'well-done') { ui.wellEdit = false; render(); toast('Check-in bijgewerkt'); }
+    if (a === 'ex') openEx(id);
+    if (a === 'wg') { S.weekGoal = Math.min(7, Math.max(1, S.weekGoal + Number(t.dataset.d))); save(); openProfile(); render(); }
+    if (a === 'goals') { closeSheets(true); startOnboard(1); }
     if (a === 'profile') openProfile();
     if (a === 'timer-close') closeSheets();
     if (a === 'timer-add') timer.end += 15000;
     if (a === 'sound') { S.sound = !S.sound; save(); openProfile(); if (S.sound) twang(.5); }
-    if (a === 'reset') { t.textContent === 'Zeker weten?' ? (S = seed(), save(), closeSheets(), render(true), toast('Demo teruggezet')) : (t.textContent = 'Zeker weten?'); }
+    if (a === 'reset') { t.textContent === 'Zeker weten?' ? (S = seed(), save(), closeSheets(), Object.keys(coilAt).forEach(k => delete coilAt[k]), render(true), startOnboard(0)) : (t.textContent = 'Zeker weten?'); }
   });
   $('#scrim').addEventListener('click', closeSheets);
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
@@ -682,14 +859,57 @@ td:last-child,th:last-child{text-align:right}
     const el = $('#profile');
     el.innerHTML = `<div class="row between"><h2 style="font-size:1.75rem">Profiel</h2><button class="btn btn--ghost" data-action="timer-close" aria-label="Sluit profiel"><span class="ico" aria-hidden="true">close</span></button></div>
       <div class="field"><label class="label" for="p-name">Je naam</label><input id="p-name" value="${esc(S.name)}" autocomplete="given-name"></div>
-      <dl><div><dt>Abonnement</dt><dd>Personal training, 1x per week</dd></div><div><dt>Rittenkaart reformer</dt><dd>${S.credits} van 10 over</dd></div><div><dt>Je trainer</dt><dd>${esc(PT.trainer)}</dd></div></dl>
+      <dl><div><dt>Je doel</dt><dd>${GOALS[S.goal][0]}</dd></div>
+        <div><dt>Weekdoel</dt><dd><span class="stepper" role="group" aria-label="Weekdoel"><button data-action="wg" data-d="-1" aria-label="Minder sessies"><span class="ico" aria-hidden="true">remove</span></button><output>${S.weekGoal} per week</output><button data-action="wg" data-d="1" aria-label="Meer sessies"><span class="ico" aria-hidden="true">add</span></button></span></dd></div>
+        <div><dt>Abonnement</dt><dd>Personal training, 1x per week</dd></div><div><dt>Rittenkaart reformer</dt><dd>${S.credits} van 10 over</dd></div><div><dt>Je trainer</dt><dd>${esc(PT.trainer)}</dd></div></dl>
       <div class="row" style="flex-wrap:wrap"><a class="btn btn--primary" href="${wa('Hoi PureVita!')}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">chat</span>WhatsApp</a><a class="btn btn--ghost" href="tel:+31639501008"><span class="ico" aria-hidden="true">call</span>06 39 50 10 08</a></div>
       <button class="toggle" data-action="sound" role="switch" aria-checked="${S.sound}"><span class="row"><span class="ico" aria-hidden="true">${S.sound ? 'volume_up' : 'volume_off'}</span>Veergeluid</span><span class="switch" aria-hidden="true"></span></button>
+      <button class="btn btn--ghost" data-action="goals">Doelen opnieuw instellen</button>
       <button class="btn btn--ghost" data-action="reset"><span class="ico" aria-hidden="true">restart_alt</span>Demo terugzetten</button>`;
     el.querySelector('#p-name').addEventListener('input', e => { S.name = e.target.value.slice(0, 24); save(); $('#avatar').textContent = (S.name.trim().charAt(0) || 'N').toUpperCase(); });
     el.querySelector('#p-name').addEventListener('change', () => render());
     openSheet('#profile');
   }
+  function openEx(id) {
+    const e = allExercises().find(x => x.id === id); if (!e) return;
+    const h = [...(S.history[e.id] || [])].reverse(), best = h.length ? Math.max(...h.map(x => x.kg)) : 0;
+    const dt = s => { const [, mo, da] = s.split('-').map(Number); return `${da} ${MON[mo - 1]}`; };
+    const el = $('#exsheet');
+    el.innerHTML = `<div class="row between"><h2 style="font-size:1.75rem">${esc(e.name)}</h2><button class="btn btn--ghost" data-action="timer-close" aria-label="Sluit uitleg"><span class="ico" aria-hidden="true">close</span></button></div>
+      <div class="pills"><span class="pill">${e.sets} × ${esc(e.reps)}</span><span class="pill">${e.rest} sec rust</span>${best ? `<span class="pill"><span class="ico" aria-hidden="true">emoji_events</span>Record ${best.toLocaleString('nl-NL')} kg</span>` : ''}</div>
+      <p class="label">Zo doe je het</p>
+      <ol class="steps-list">${(HOWTO[e.id] || []).map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+      <p class="note">Tip van je coach: ${esc(e.cue)}</p>
+      <p class="label">Jouw gewichten</p>
+      ${e.step ? (h.length ? `<ul class="plain">${h.slice(0, 6).map(x => `<li><span>${dt(x.d)}</span><span>${x.kg.toLocaleString('nl-NL')} kg${x.kg === best ? ' (record)' : ''}</span></li>`).join('')}</ul>` : '<p class="note">Nog niets gelogd. Rond een training af om je gewicht op te slaan.</p>') : '<p class="note">Eigen lichaamsgewicht. Maak het zwaarder met een langere tijd of meer herhalingen.</p>'}`;
+    openSheet('#exsheet');
+  }
+
+  function startOnboard(step = 0) {
+    ui.ob = { step, name: S.name || '', goal: S.goal || 'fitter', weekGoal: S.weekGoal || 3 };
+    $('#onboard').hidden = false; renderOnboard();
+  }
+  function renderOnboard() {
+    const o = ui.ob, el = $('#onboard');
+    const back = o.step > 0 ? `<button class="btn btn--ghost" data-ob="back" aria-label="Terug"><span class="ico" aria-hidden="true">chevron_left</span></button>` : '<span></span>';
+    const bars = [0, 1, 2].map(i => `<i class="${i <= o.step ? 'on' : ''}"></i>`).join('');
+    const body = [
+      `<div class="stack"><h1 class="ob-title">Welkom bij Pure<em>Vita</em></h1><p class="note">Je trainingen, lessen en voortgang op één plek. Eerst even kennismaken.</p>
+        <div class="field"><label class="label" for="ob-name">Hoe heet je?</label><input id="ob-name" value="${esc(o.name)}" autocomplete="given-name" placeholder="Je voornaam"></div></div>`,
+      `<div class="stack"><h1 class="ob-title">Waar train je <em>voor?</em></h1>
+        <div class="choice" role="group" aria-label="Kies je doel">${Object.entries(GOALS).map(([k, [t, sub]]) => `<button data-goal="${k}" aria-pressed="${o.goal === k}"><strong>${t}</strong><span class="note">${sub}</span></button>`).join('')}</div></div>`,
+      `<div class="stack"><h1 class="ob-title">Hoe vaak per <em>week?</em></h1><p class="note">Trainingen en reformer lessen tellen allebei mee. Je kunt dit later aanpassen.</p>
+        <div class="count-pick" role="group" aria-label="Sessies per week">${[1, 2, 3, 4, 5].map(c => `<button data-count="${c}" aria-pressed="${o.weekGoal === c}">${c}</button>`).join('')}</div>
+        ${coilBar('onboard', o.weekGoal / 5)}<p class="big">${o.weekGoal} <small>${o.weekGoal === 1 ? 'sessie' : 'sessies'} per week</small></p></div>`
+    ][o.step];
+    el.innerHTML = `<div class="row between">${back}<div class="ob-steps" role="img" aria-label="Stap ${o.step + 1} van 3">${bars}</div></div>${body}
+      <button class="btn btn--primary ob-next" data-ob="next">${o.step === 2 ? 'Aan de slag' : 'Verder'}<span class="ico" aria-hidden="true">arrow_forward</span></button>`;
+    const inp = el.querySelector('#ob-name');
+    if (inp) { inp.addEventListener('input', e => { o.name = e.target.value.slice(0, 24); }); inp.addEventListener('keydown', e => { if (e.key === 'Enter') el.querySelector('.ob-next').click(); }); }
+    drawCoils();
+    setTimeout(() => (inp || el.querySelector('[aria-pressed="true"]') || el.querySelector('.ob-next'))?.focus({ preventScroll: true }), 40);
+  }
+
   let lastFocus = null;
   function openSheet(sel) {
     closeSheets(true); lastFocus = document.activeElement;
@@ -703,8 +923,9 @@ td:last-child,th:last-child{text-align:right}
     if (!silent && lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   }
 
-  new ResizeObserver(() => { drawHolds(); drawChart(); }).observe(view);
+  new ResizeObserver(() => { Object.keys(coilAt).forEach(k => delete coilAt[k]); drawHolds(); drawChart(); drawCoils(); }).observe(view);
   render(true);
+  if (!S.onboarded) startOnboard(0);
 })();
 </script>
 </body>
