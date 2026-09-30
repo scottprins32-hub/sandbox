@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="nl" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PureVita</title>
+<meta name="description" content="PureVita: personal training, duo training, coaching en voeding in Rijnsburg, en reformer pilates in Noordwijk. Plan een proefles.">
+<meta property="og:title" content="PureVita">
+<meta property="og:description" content="Personal training in Rijnsburg. Reformer pilates in Noordwijk. Waarom morgen starten als het ook vandaag kan.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:image" content="assets/hero-rug-1600.jpg">
+<meta name="theme-color" content="#F3EFE8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="preload" as="image" href="assets/hero-rug-1600.jpg" imagesrcset="assets/hero-rug-800.jpg 800w, assets/hero-rug-1600.jpg 1600w" imagesizes="92vw">
+<script>document.documentElement.className='js';if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion','is-intro');</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HealthClub","name":"PureVita","url":"https://www.purevita.nl","telephone":"+31639501008","email":"info@purevita.nl",
+"address":{"@type":"PostalAddress","streetAddress":"Kloosterschuurlaan 15b","addressLocality":"Rijnsburg","addressCountry":"NL"},
+"openingHoursSpecification":[
+{"@type":"OpeningHoursSpecification","dayOfWeek":"Monday","opens":"08:00","closes":"22:00"},
+{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday"],"opens":"07:30","closes":"22:00"},
+{"@type":"OpeningHoursSpecification","dayOfWeek":"Friday","opens":"08:00","closes":"19:00"},
+{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:30","closes":"17:00"}],
+"sameAs":["https://www.instagram.com/purevita.nl/","https://www.instagram.com/reformerpilatesnoordwijk/","https://www.facebook.com/Eva.PureVita","https://www.linkedin.com/company/purevita/"]}
+</script>
+<style>
+/* Layout: one spring. A coil holds "Pure" and "Vita" together; scroll or drag puts it under
+   tension, every letter hangs on its own spring, and the studio opens between them. The spring
+   returns as the logo's progress bar, the reformer's pinned chapters, the steps and the footer. */
+:root{
+  --paper:#F3EFE8;      /* studio wall, main ground */
+  --paper-2:#EAE4DA;    /* raised paper, price rows */
+  --ink:#141312;        /* the black PureVita shirt */
+  --ink-2:#1F1D1A;
+  --gold:#E3C98F;       /* shirt lettering; accent on ink only (11.5:1) */
+  --bronze:#7B5B25;     /* accent on paper (5.4:1) */
+  --mute:#5E5850;       /* secondary text on paper (6.1:1) */
+  --mute-ink:#A39B8F;   /* secondary text on ink (6.7:1) */
+  --line:rgba(20,19,18,.14);
+  --line-ink:rgba(243,239,232,.16);
+  --blend:#DFDCD6;      /* hero ink: difference against paper renders #141312 */
+  --confirm-fg:#6B2A12; --confirm-bg:#F6DCCB; --confirm-line:#B5532A;
+
+  --serif:"Instrument Serif","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:"Geist","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+
+  --fs-small:.875rem;
+  --fs-body:clamp(1rem,.96rem + .2vw,1.125rem);
+  --fs-lead:clamp(1.125rem,1.02rem + .5vw,1.375rem);
+  --fs-h3:clamp(1.75rem,1.3rem + 1.6vw,2.75rem);
+  --fs-h2:clamp(2.75rem,1.6rem + 4.6vw,6.25rem);
+  --fs-statement:clamp(2.125rem,1.3rem + 3.6vw,5rem);
+
+  --gutter:clamp(16px,4vw,56px);
+  --max:1320px;
+  --section:clamp(88px,12vw,184px);
+  --radius:10px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-soft:cubic-bezier(.25,1,.5,1);
+  --header-h:68px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h) + 16px)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 var(--fs-body)/1.6 var(--sans);overflow-x:clip;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+img{height:auto}
+a{color:inherit}
+p{margin:0}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+h2{font:400 var(--fs-h2)/.92 var(--serif);letter-spacing:-.02em}
+h3{font:400 var(--fs-h3)/1 var(--serif);letter-spacing:-.01em}
+em{font-style:italic}
+ul,ol,dl,dd{margin:0;padding:0}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--bronze);outline-offset:3px;border-radius:2px}
+.on-ink :focus-visible{outline-color:var(--gold)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;left:16px;top:-80px;z-index:100;background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:500}
+.skip:focus{top:calc(12px + env(safe-area-inset-top,0px))}
+/* film grain: static, never animated */
+.grain{position:fixed;inset:0;z-index:70;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.wrap{width:100%;max-width:calc(var(--max) + var(--gutter)*2);margin-inline:auto;padding-inline:var(--gutter)}
+.label{font:500 .75rem/1.2 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--bronze)}
+.on-ink .label{color:var(--gold)}
+.lead{font-size:var(--fs-lead);line-height:1.5;max-width:34em}
+.muted{color:var(--mute)}
+.on-ink .muted{color:var(--mute-ink)}
+.confirm{display:inline-block;font:500 .8125rem/1.35 var(--mono);color:var(--confirm-fg);background:var(--confirm-bg);border:1px dashed var(--confirm-line);padding:4px 8px;border-radius:4px}
+
+/* ---------- links and buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:.6em;min-height:48px;padding:0 22px;border-radius:999px;font:500 1rem/1 var(--sans);text-decoration:none;position:relative;overflow:hidden;isolation:isolate;transition:color .35s var(--ease-soft);cursor:pointer;border:0}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;transform:translateY(101%);transition:transform .45s var(--ease-out)}
+.btn:hover::before,.btn:focus-visible::before{transform:none}
+.btn--ink{background:var(--ink);color:var(--paper)}
+.btn--ink::before{background:var(--bronze)}
+.btn--line{box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink)}
+.btn--line::before{background:var(--ink)}
+.btn--line:hover,.btn--line:focus-visible{color:var(--paper)}
+.btn--gold{background:var(--gold);color:var(--ink)}
+.btn--gold::before{background:var(--paper)}
+.arrow{display:inline-block;transition:transform .45s var(--ease-out)}
+a:hover .arrow,a:focus-visible .arrow{transform:translateX(4px)}
+.link{text-decoration:none;background:linear-gradient(currentColor,currentColor) 0 100%/100% 1px no-repeat;padding-bottom:2px;transition:background-size .45s var(--ease-out)}
+.link:hover,.link:focus-visible{background-size:0 1px;background-position:100% 100%}
+
+/* ---------- header ---------- */
+.site-header{position:fixed;inset:0 0 auto;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background-color .3s,box-shadow .3s}
+.site-header.is-solid{background:var(--paper);box-shadow:0 1px 0 var(--line)}
+.site-header .wrap{height:var(--header-h);display:flex;align-items:center;justify-content:space-between;gap:24px}
+.wordmark{display:inline-flex;align-items:center;font:400 1.75rem/1 var(--serif);text-decoration:none;letter-spacing:-.01em}
+.wordmark em{font-style:italic}
+.wm-coil{width:14px;height:14px;overflow:visible;flex:none;margin:0 1px}
+.wm-coil path{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linecap:round}
+.nav{display:flex;align-items:center;gap:clamp(16px,2.2vw,32px)}
+.nav a:not(.btn){text-decoration:none;font-size:.9375rem;position:relative}
+.nav a:not(.btn)::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease-out)}
+.nav a:not(.btn):hover::after,.nav a:not(.btn):focus-visible::after{transform:scaleX(1);transform-origin:left}
+.nav .btn{min-height:42px;padding:0 18px;font-size:.9375rem}
+.menu-btn{display:none;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:transparent;box-shadow:inset 0 0 0 1px var(--ink);font:500 .9375rem/1 var(--sans);color:var(--ink);cursor:pointer}
+@media (max-width:860px){
+  .menu-btn{display:inline-flex;align-items:center}
+  .nav{position:fixed;inset:0;z-index:-1;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding:calc(var(--header-h) + env(safe-area-inset-top,0px)) var(--gutter) 40px;background:var(--paper);visibility:hidden;opacity:0;transition:opacity .3s,visibility 0s .3s}
+  .nav.is-open{visibility:visible;opacity:1;transition:opacity .3s}
+  .nav a:not(.btn){font:400 clamp(2.5rem,11vw,3.5rem)/1.05 var(--serif)}
+  .nav a:not(.btn)::after{display:none}
+  .nav .btn{margin-top:24px;min-height:52px;font-size:1rem;padding:0 24px}
+}
+
+/* ---------- hero: the spring ---------- */
+.hero{position:relative}
+.hero-stage{position:relative;height:100svh;min-height:560px;overflow:hidden;touch-action:pan-y;background:var(--paper)}
+.hero-photo{position:absolute;left:50%;top:48%;width:min(calc(100% - var(--gutter)*2),var(--max));height:54%;transform:translate(-50%,-50%);border-radius:var(--radius);overflow:hidden;background:var(--ink-2)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:55% 40%;transform-origin:50% 45%}
+.hero-photo canvas{position:absolute;inset:0;width:100%;height:100%}
+.gl-on .hero-photo img{opacity:0}
+.hero-ink{position:absolute;inset:0;mix-blend-mode:difference;pointer-events:none;color:var(--blend)}
+.hero h1{position:absolute;inset:0;margin:0}
+.word{position:absolute;font:400 clamp(3.4rem,14vw,13.5rem)/.8 var(--serif);letter-spacing:-.035em;white-space:nowrap;padding-bottom:.06em}
+.word--vita{font-style:italic}
+.word .in{display:inline-block}
+.word .ch{display:inline-block;will-change:transform}
+.is-intro .word{overflow:hidden}
+/* resting layout without JS: the spring already released */
+.w-pure{left:var(--gutter);top:calc(48% - 27%);transform:translateY(-50%)}
+.w-vita{right:var(--gutter);top:calc(48% + 27%);transform:translateY(-50%)}
+.hero-coil{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hero-coil path{fill:none;stroke:var(--blend);stroke-linecap:round;stroke-linejoin:round}
+.has-spring .word{left:0;top:0;right:auto;transform:none;will-change:transform}
+.hero-caption{position:absolute;left:0;right:0;bottom:0;padding-bottom:clamp(20px,3.2vh,36px)}
+.hero-caption .wrap{display:grid;grid-template-columns:1fr auto;align-items:end;gap:20px 40px}
+.hero-lede{font:400 var(--fs-lead)/1.35 var(--sans);max-width:22em}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px 20px}
+.hero-tools{display:none;align-items:center;gap:16px}
+.is-pinned .hero-tools{display:flex}
+.hero-hint{font:500 .6875rem/1.2 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+.sound{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);font:500 .6875rem/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute);cursor:pointer}
+.sound[aria-pressed=true]{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sound svg{width:18px;height:10px}
+.sound path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round}
+.is-pinned.hero{height:205svh}
+.is-pinned .hero-stage{position:sticky;top:0;cursor:grab}
+.is-pinned .hero-stage.is-dragging{cursor:grabbing}
+@media (max-width:700px){
+  .hero-photo{height:44%;top:46%}
+  .w-pure{top:calc(46% - 22%)}
+  .w-vita{top:calc(46% + 22%)}
+  .word{font-size:18.5vw}
+  .hero-caption .wrap{grid-template-columns:1fr}
+  .hero-cta{justify-content:flex-start}
+}
+@media (max-width:760px){
+  .hero-cta .btn{display:none}
+  .hero-caption{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+
+/* ---------- sections ---------- */
+section{position:relative}
+.section{padding-block:var(--section)}
+.on-ink{background:var(--ink);color:var(--paper)}
+
+.manifest .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.manifest .label{grid-column:1/-1}
+.statement{grid-column:1/span 11;font:400 var(--fs-statement)/1.02 var(--serif);letter-spacing:-.02em;text-wrap:balance}
+.statement em{color:var(--bronze)}
+.manifest .lead{grid-column:6/span 6}
+.facts{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);margin-top:24px}
+.facts div{padding:28px 24px 0 0}
+.facts div + div{padding-left:24px;border-left:1px solid var(--line)}
+.facts dt{font:400 clamp(2.5rem,1.6rem + 3vw,4.25rem)/1 var(--serif);letter-spacing:-.02em}
+.facts dd{margin-top:10px;color:var(--mute);max-width:18em}
+@media (max-width:760px){
+  .statement,.manifest .lead{grid-column:1/-1}
+  .facts{grid-template-columns:1fr}
+  .facts div,.facts div + div{padding:24px 0;border-left:0;border-bottom:1px solid var(--line)}
+}
+
+/* marquee: moves only when you scroll */
+.marquee{overflow:hidden;padding-block:clamp(24px,4vw,56px) clamp(72px,9vw,140px)}
+.marquee-track{display:flex;width:max-content;will-change:transform}
+.marquee-row{display:flex;align-items:center;gap:.35em;padding-right:.35em;font:400 clamp(3.5rem,2rem + 7vw,9.5rem)/1 var(--serif);letter-spacing:-.03em;white-space:nowrap}
+.marquee-row em{font-style:italic;color:var(--bronze)}
+.marquee-row svg{width:.9em;height:.36em;flex:none}
+.marquee-row path{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+
+/* discipline rows: asymmetric zig-zag */
+.split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px 24px;align-items:start}
+.split-media{grid-column:1/span 7}
+.split-body{grid-column:9/span 4;display:grid;gap:28px;align-content:start;padding-top:clamp(0px,6vw,96px)}
+.split h2{margin-top:-.08em}
+.frame{border-radius:var(--radius);overflow:hidden;background:var(--paper-2);position:relative}
+.frame img{width:100%;height:100%;object-fit:cover}
+.caption{margin-top:12px;font-size:var(--fs-small);color:var(--mute)}
+.on-ink .caption{color:var(--mute-ink)}
+.kinds{border-top:1px solid var(--line)}
+.kinds li{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr);gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.kinds strong{font-weight:500}
+.kinds span{color:var(--mute)}
+@media (max-width:900px){
+  .split-media,.split-body{grid-column:1/-1;grid-row:auto}
+  .split-body{padding-top:0}
+}
+@media (max-width:420px){.kinds li{grid-template-columns:1fr;gap:4px}}
+
+/* reformer */
+.reformer{padding-bottom:0}
+.reformer-intro{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.reformer-head{grid-column:1/span 6;display:grid;gap:28px;align-content:start}
+.reformer-copy{grid-column:8/span 5;display:grid;gap:22px;align-content:start;padding-top:clamp(0px,4vw,64px)}
+.reformer-copy p{color:var(--mute-ink)}
+.reformer-copy p:first-child{color:var(--paper);font-size:var(--fs-lead);line-height:1.5}
+.reformer .ig{display:inline-flex;align-items:center;gap:.5em;color:var(--gold);text-decoration:none;font-weight:500}
+@media (max-width:900px){.reformer-head,.reformer-copy{grid-column:1/-1}.reformer-copy{padding-top:0}}
+
+.chapters{position:relative;padding-block:clamp(56px,8vw,120px) var(--section)}
+.chapters-pin{display:grid;gap:40px}
+.chapters-stage{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:32px 24px;align-items:center}
+.chapter-list{grid-column:1/span 4;display:grid;gap:40px}
+.chapter{display:grid;gap:14px;align-content:start}
+.chapter .num{font:500 .75rem/1 var(--mono);letter-spacing:.09em;color:var(--gold)}
+.chapter h3{font-size:clamp(2.25rem,1.5rem + 2.6vw,4rem)}
+.chapter h3 em{color:var(--gold)}
+.chapter p{color:var(--mute-ink);max-width:28em}
+.chapter .btn{justify-self:start;margin-top:8px}
+.chapters figure{grid-column:5/-1;margin:0;position:relative}
+.chapters svg{width:100%;height:auto;overflow:visible;position:relative}
+.chapters svg .st{fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.chapters svg .st-soft{fill:none;stroke:var(--mute-ink);stroke-width:1.25;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.chapters svg .fill{fill:var(--ink-2);stroke:var(--gold);stroke-width:2;vector-effect:non-scaling-stroke}
+.rail{display:none}
+/* pinned version: the reformer stays put and the chapters play on it */
+.motion .chapters{height:380svh;padding:0}
+.motion .chapters-pin{position:sticky;top:0;height:100svh;grid-template-rows:1fr auto;gap:0;padding-block:calc(var(--header-h) + 24px) 32px}
+.motion .chapter-list{display:grid;grid-template-areas:"c"}
+.motion .chapter{grid-area:c;opacity:0;transform:translateY(24px);visibility:hidden;transition:opacity .5s var(--ease-soft),transform .7s var(--ease-out),visibility 0s .5s}
+.motion .chapter.is-active{opacity:1;transform:none;visibility:visible;transition:opacity .5s var(--ease-soft) .1s,transform .7s var(--ease-out) .1s,visibility 0s}
+.motion .rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.rail li{display:grid;gap:10px;font:500 .6875rem/1.2 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute-ink);transition:color .3s}
+.rail li::before{content:"";height:2px;background:linear-gradient(var(--gold),var(--gold)) 0 0/calc(var(--p,0)*100%) 100% no-repeat,var(--line-ink)}
+.rail li.is-active{color:var(--paper)}
+@media (max-width:900px){
+  .chapter-list,.chapters figure{grid-column:1/-1}
+  .chapters figure{grid-row:1}
+  .motion .chapters-stage{align-content:center}
+  .rail li span{display:none}
+}
+
+/* coaching + voeding */
+.duo{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:72px 24px}
+.duo article{display:grid;gap:22px;align-content:start}
+.duo article:first-child{grid-column:1/span 5}
+.duo article:last-child{grid-column:8/span 5;margin-top:clamp(0px,14vw,220px)}
+.duo .frame{aspect-ratio:4/5}
+.duo ul{display:grid;gap:8px}
+.duo li{padding-left:22px;position:relative}
+.duo li::before{content:"";position:absolute;left:0;top:.8em;width:12px;height:1px;background:var(--bronze)}
+@media (max-width:760px){.duo article:first-child,.duo article:last-child{grid-column:1/-1;margin-top:0}}
+
+/* prices: static on purpose, nothing here waits for an animation */
+.prices{background:var(--paper-2)}
+.prices .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.prices-head{grid-column:1/span 4;display:grid;gap:24px;align-content:start;position:sticky;top:calc(var(--header-h) + 32px);align-self:start}
+.price-groups{grid-column:6/span 7;display:grid;gap:56px}
+.price-group h3{font-size:clamp(1.75rem,1.4rem + 1.2vw,2.5rem);display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--ink)}
+.price-group h3 small{font:500 .75rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.price-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 24px;align-items:baseline;padding:16px 12px;margin-inline:-12px;border-bottom:1px solid var(--line);border-radius:6px;transition:background-color .25s}
+.price-row:hover{background:var(--paper)}
+.price-row .what{font-weight:500}
+.price-row .note{grid-column:1;color:var(--mute);font-size:var(--fs-small)}
+.price-row .amount{grid-row:1/span 2;grid-column:2;font:400 clamp(1.75rem,1.4rem + 1vw,2.25rem)/1 var(--serif);font-variant-numeric:tabular-nums;white-space:nowrap}
+.price-extra{margin-top:14px;font-size:var(--fs-small);color:var(--mute)}
+@media (max-width:900px){.prices-head,.price-groups{grid-column:1/-1}.prices-head{position:static}}
+
+/* start */
+.steps-wrap{margin-top:clamp(40px,6vw,80px);position:relative}
+.steps-coil{display:block;width:100%;height:28px;overflow:visible}
+.steps-coil path{fill:none;stroke:var(--bronze);stroke-width:1.5;stroke-linecap:round}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));counter-reset:step;border-top:1px solid var(--line)}
+.steps li{counter-increment:step;padding:28px 24px 0 0;display:grid;gap:12px;align-content:start}
+.steps li + li{padding-left:24px;border-left:1px solid var(--line)}
+.steps li::before{content:counter(step,decimal-leading-zero);font:500 .75rem/1 var(--mono);letter-spacing:.08em;color:var(--bronze)}
+.steps h3{font-size:clamp(1.75rem,1.4rem + 1vw,2.25rem)}
+.steps p{color:var(--mute)}
+@media (max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.steps li:nth-child(3){padding-left:0;border-left:0}.steps li{padding-bottom:28px}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}.steps li,.steps li + li{padding:24px 0;border-left:0;border-bottom:1px solid var(--line)}}
+
+/* team */
+.team .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.team-head{grid-column:1/span 5;display:grid;gap:24px;align-content:start}
+.team .frame{grid-column:1/-1;aspect-ratio:2/1}
+.roster{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line)}
+.roster li{padding:20px 20px 0 0;display:grid;gap:6px;align-content:start}
+.roster li + li{padding-left:20px;border-left:1px solid var(--line)}
+.roster strong{font:400 clamp(1.375rem,1.1rem + .8vw,1.75rem)/1.1 var(--serif)}
+.roster span{color:var(--mute);font-size:var(--fs-small)}
+@media (max-width:1000px){.roster{grid-template-columns:repeat(2,minmax(0,1fr))}.roster li,.roster li + li{padding:18px 16px 18px 0;border-left:0;border-bottom:1px solid var(--line)}}
+@media (max-width:760px){.team-head{grid-column:1/-1}.team .frame{aspect-ratio:4/3}}
+
+/* studio */
+.studio .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px 24px}
+.studio .frame--wide{grid-column:1/span 8;aspect-ratio:3/2}
+.studio .frame--tall{grid-column:10/span 3;aspect-ratio:3/4;align-self:end}
+.studio-body{grid-column:1/span 5;display:grid;gap:24px;align-content:start}
+.hours{grid-column:7/span 6;display:grid;border-top:1px solid var(--ink)}
+.hours div{display:grid;grid-template-columns:1fr auto;padding:14px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.hours dd{font-family:var(--mono);font-size:.9375rem}
+.hours .closed dd{color:var(--mute)}
+@media (max-width:760px){.studio .frame--wide,.studio .frame--tall,.studio-body,.hours{grid-column:1/-1}.studio .frame--tall{display:none}}
+
+/* trial form */
+.trial .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.trial-head{grid-column:1/span 5;display:grid;gap:24px;align-content:start}
+.trial form{grid-column:7/span 6;display:grid;gap:28px}
+.field{display:grid;gap:10px;border:0;margin:0;padding:0;min-width:0}
+.field > label,.field legend{font:500 .75rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);padding:0}
+.field input[type=text],.field textarea{width:100%;font:400 1.125rem/1.4 var(--sans);color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--line-ink);padding:10px 0;border-radius:0}
+.field textarea{resize:vertical;min-height:88px}
+.field input::placeholder,.field textarea::placeholder{color:var(--mute-ink);opacity:1}
+.field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line-ink);transition:background-color .25s,color .25s,box-shadow .25s}
+.chip input:checked + span{background:var(--gold);color:var(--ink);box-shadow:none}
+.chip input:focus-visible + span{outline:2px solid var(--gold);outline-offset:3px}
+.chip:hover span{box-shadow:inset 0 0 0 1px var(--mute-ink)}
+.message{background:var(--ink-2);border-radius:var(--radius);padding:22px;display:grid;gap:14px;box-shadow:inset 0 0 0 1px var(--line-ink)}
+.message p{font-size:1.0625rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.message-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.direct{display:grid;gap:6px;font-size:var(--fs-small);color:var(--mute-ink)}
+.direct a{color:var(--paper);justify-self:start}
+@media (max-width:900px){.trial-head,.trial form{grid-column:1/-1}}
+
+/* footer */
+.site-footer{padding-block:clamp(64px,8vw,112px) 32px;border-top:1px solid var(--line);overflow:hidden}
+.site-footer .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px 24px}
+.foot-mark{grid-column:1/-1;display:flex;align-items:center;font:400 clamp(4rem,2rem + 12vw,15rem)/.8 var(--serif);letter-spacing:-.035em;min-width:0}
+.foot-mark em{font-style:italic}
+.foot-mark svg{width:1.05em;height:.5em;flex:none;overflow:visible}
+.foot-mark path{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.foot-col{grid-column:span 3;display:grid;gap:10px;align-content:start;font-size:.9375rem}
+.foot-col .label{margin-bottom:6px}
+.foot-col a{text-decoration:none;justify-self:start}
+.foot-col a:hover{text-decoration:underline;text-underline-offset:3px}
+.foot-base{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-top:24px;border-top:1px solid var(--line);color:var(--mute);font-size:var(--fs-small)}
+@media (max-width:900px){.foot-col{grid-column:span 6}}
+@media (max-width:520px){.foot-col{grid-column:1/-1}}
+
+/* mobile sticky booking */
+.book-bar{display:none}
+@media (max-width:760px){
+  .book-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--paper);box-shadow:0 -1px 0 var(--line);transition:transform .35s var(--ease-out)}
+  .book-bar .btn{flex:1;justify-content:center}
+  .book-bar.is-hidden{transform:translateY(110%)}
+  body{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+}
+
+/* split headings: each line rises out of its own mask */
+.split-line{padding-bottom:.08em;margin-bottom:-.08em}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Naar de inhoud</a>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="wordmark" href="#top" aria-label="PureVita, naar boven">Pure<svg class="wm-coil" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d=""></path></svg><em>Vita</em></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Hoofdmenu">
+      <a href="#training">Training</a>
+      <a href="#pilates">Pilates</a>
+      <a href="#aanbod">Prijzen</a>
+      <a href="#team">Team</a>
+      <a href="#studio">Studio</a>
+      <a class="btn btn--ink" href="#proefles">Plan een proefles</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-stage">
+      <div class="hero-photo">
+        <img src="assets/hero-rug-1600.jpg" srcset="assets/hero-rug-800.jpg 800w, assets/hero-rug-1600.jpg 1600w" sizes="92vw" width="1600" height="797" alt="Twee trainers van PureVita trainen aan de kabelmachine, gezien op de rug. Op het zwarte shirt staat PureVita Personal Training." fetchpriority="high">
+      </div>
+      <div class="hero-ink">
+        <svg class="hero-coil" aria-hidden="true" focusable="false"><path></path></svg>
+        <h1 id="hero-title">
+          <span class="sr-only">PureVita: personal training in Rijnsburg en reformer pilates in Noordwijk</span>
+          <span class="word word--pure w-pure" aria-hidden="true"><span class="in">Pure</span></span>
+          <span class="word word--vita w-vita" aria-hidden="true"><span class="in">Vita</span></span>
+        </h1>
+      </div>
+      <div class="hero-caption">
+        <div class="wrap">
+          <p class="hero-lede">Personal training in Rijnsburg.<br>Reformer pilates in Noordwijk.</p>
+          <div class="hero-cta">
+            <div class="hero-tools">
+              <span class="hero-hint" aria-hidden="true">Sleep om de veer te spannen</span>
+              <button class="sound" type="button" aria-pressed="false"><svg viewBox="0 0 18 10" aria-hidden="true"><path d="M1 5 C3 0 4 0 5 5 S7 10 9 5 S11 0 13 5 S15 10 17 5"></path></svg><span>Geluid uit</span></button>
+            </div>
+            <a class="btn btn--line" href="#aanbod">Bekijk het aanbod</a>
+            <a class="btn btn--ink" href="#proefles">Plan een proefles <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section manifest" aria-labelledby="over-title">
+    <div class="wrap">
+      <p class="label" id="over-title">Waarom morgen starten als het ook vandaag kan</p>
+      <p class="statement">Kracht is <em>gecontroleerde spanning.</em> Of je nu een barbell optilt of een carriage uitduwt, je wordt sterker van weerstand die je zelf leert sturen.</p>
+      <p class="lead muted">Bij PureVita train je niet in een volle zaal. Je traint met een trainer die ziet hoe je beweegt, je techniek bijstuurt en je plan aanpast aan wat jij wilt: fitter worden, afvallen, spieropbouw of beter worden in je sport.</p>
+      <dl class="facts">
+        <div><dt>Fitvak A</dt><dd>Al onze trainers zijn Fitvak A gecertificeerd.</dd></div>
+        <div><dt>1 op 1</dt><dd>Of met z'n tweeën, of in een private group van 3 tot 6 personen.</dd></div>
+        <div><dt>07.30</dt><dd>Dinsdag tot en met donderdag staat de studio al voor je klaar.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-row">Personal training<svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg><em>Duo</em><svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg>Private group<svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg><em>Reformer pilates</em><svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg>Coaching<svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg><em>Voeding</em><svg viewBox="0 0 90 36"><path d="M2 18 H14 C17 4 22 4 22 18 S27 32 30 18 S35 4 38 18 S43 32 46 18 S51 4 54 18 S59 32 62 18 S67 4 70 18 H88"></path></svg></div>
+    </div>
+  </div>
+
+  <section class="section" id="training" aria-labelledby="training-title" style="padding-top:0">
+    <div class="wrap split">
+      <div class="split-media">
+        <div class="frame" style="aspect-ratio:1600/1005">
+          <img src="assets/training-1600.jpg" srcset="assets/training-800.jpg 800w, assets/training-1600.jpg 1600w" sizes="(max-width:900px) 92vw, 58vw" width="1600" height="1005" loading="lazy" alt="Een trainer van PureVita begeleidt een klant bij een buikspieroefening met een medicine ball in de studio.">
+        </div>
+      </div>
+      <div class="split-body">
+        <p class="label">Rijnsburg</p>
+        <h2 id="training-title" data-split>Personal <em>training</em></h2>
+        <p>Je gaat één op één aan de slag met een personal trainer. Samen bespreken jullie je doelen, daarna bouwt je trainer het plan, corrigeert je techniek en houdt bij wat werkt.</p>
+        <ul class="kinds">
+          <li><strong>Personal training</strong><span>Eén op één. Je trainer is er alleen voor jou.</span></li>
+          <li><strong>Duo training</strong><span>Samen met je trainingspartner, met één trainer.</span></li>
+          <li><strong>Private group</strong><span>Circuittraining met 3 tot 6 personen en een trainer.</span></li>
+        </ul>
+        <p><a class="link" href="#aanbod">Bekijk de prijzen</a> <span class="arrow" aria-hidden="true">→</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-ink reformer" id="pilates" aria-labelledby="pilates-title">
+    <div class="wrap reformer-intro">
+      <div class="reformer-head">
+        <p class="label">Noordwijk</p>
+        <h2 id="pilates-title" data-split>Reformer <em>pilates</em></h2>
+      </div>
+      <div class="reformer-copy">
+        <p>Op de reformer werk je tegen de weerstand van veren. Elke beweging vraagt controle, dus je traint precies wat in een gewone workout vaak wordt overgeslagen: je core, je houding, je stabiliteit en je ademhaling.</p>
+        <p>De veren geven weerstand zonder schokken. Je kunt dus stevig trainen zonder impact op je gewrichten.</p>
+        <p><a class="ig link" href="https://www.instagram.com/reformerpilatesnoordwijk/" rel="noopener">Volg @reformerpilatesnoordwijk</a></p>
+      </div>
+    </div>
+
+    <div class="chapters" id="chapters">
+      <div class="chapters-pin wrap">
+        <div class="chapters-stage">
+          <div class="chapter-list">
+            <article class="chapter is-active" data-chapter="0">
+              <p class="num">01 / 04</p>
+              <h3>Footwork</h3>
+              <p>Je ligt op de carriage en duwt jezelf weg van de voetstang. De veren leren je benen te sturen in plaats van alleen te duwen.</p>
+            </article>
+            <article class="chapter" data-chapter="1">
+              <p class="num">02 / 04</p>
+              <h3>The <em>Hundred</em></h3>
+              <p>Honderd tellen ademen terwijl je core de carriage stil houdt. Het lijkt rustig. Dat is het niet.</p>
+            </article>
+            <article class="chapter" data-chapter="2">
+              <p class="num">03 / 04</p>
+              <h3>Long <em>stretch</em></h3>
+              <p>Een plank op een bewegende carriage. Uitduwen en terugkomen, zonder dat de veren het van je overnemen.</p>
+            </article>
+            <article class="chapter" data-chapter="3">
+              <p class="num">04 / 04</p>
+              <h3>Jouw <em>les</em></h3>
+              <p>Welke oefening je ook doet, er kijkt een instructeur mee die je bijstuurt.</p>
+              <p><span class="confirm">[confirm: lesvormen, groepsgrootte en rooster reformer pilates]</span></p>
+              <a class="btn btn--gold" href="#proefles" data-kind="k-pilates">Plan een proefles pilates <span class="arrow" aria-hidden="true">→</span></a>
+            </article>
+          </div>
+          <figure>
+            <svg id="reformer" viewBox="0 0 1200 300" role="img" aria-labelledby="reformer-desc">
+              <desc id="reformer-desc">Lijntekening van een reformer: een frame met rails, een carriage die over de rails schuift, veren die de carriage terugtrekken en een voetstang.</desc>
+              <line class="st-soft" x1="20" y1="262" x2="1180" y2="262"></line>
+              <rect class="st" x="60" y="196" width="1080" height="16" rx="8"></rect>
+              <path class="st" d="M92 212 v42 M1108 212 v42"></path>
+              <path class="st" d="M150 196 L128 104"></path>
+              <circle class="st" cx="126" cy="96" r="10"></circle>
+              <rect class="st" x="170" y="146" width="12" height="50" rx="3"></rect>
+              <path class="st" d="M1126 196 V100"></path>
+              <circle class="st" cx="1126" cy="92" r="9"></circle>
+              <path class="st" id="ref-springs" d=""></path>
+              <path class="st-soft" id="ref-rope" d=""></path>
+              <g id="ref-carriage">
+                <rect class="fill" x="0" y="150" width="440" height="32" rx="6"></rect>
+                <rect class="fill" x="370" y="132" width="64" height="18" rx="5"></rect>
+                <rect class="fill" x="334" y="118" width="14" height="32" rx="4"></rect>
+                <rect class="fill" x="306" y="118" width="14" height="32" rx="4"></rect>
+                <circle class="st" cx="40" cy="190" r="6"></circle>
+                <circle class="st" cx="400" cy="190" r="6"></circle>
+              </g>
+            </svg>
+            <figcaption class="caption">Veren, carriage, voetstang. Meer heb je niet nodig.</figcaption>
+          </figure>
+        </div>
+        <ol class="rail" aria-hidden="true">
+          <li class="is-active"><span>Footwork</span></li>
+          <li><span>The Hundred</span></li>
+          <li><span>Long stretch</span></li>
+          <li><span>Jouw les</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="begeleiding" aria-label="Coaching en voeding">
+    <div class="wrap duo">
+      <article aria-labelledby="coaching-title">
+        <div class="frame">
+          <img src="assets/coaching-1600.jpg" srcset="assets/coaching-800.jpg 800w, assets/coaching-1600.jpg 1066w" sizes="(max-width:760px) 92vw, 40vw" width="1066" height="1599" loading="lazy" alt="Een trainer van PureVita en een klant bespreken aan tafel een trainingsschema op een tablet.">
+        </div>
+        <p class="label">Zelfstandig trainen</p>
+        <h3 id="coaching-title">Coaching</h3>
+        <p>Train je liever zelf? Kies voor 6 of 12 maanden coaching. Samen stellen jullie doelen en elke maand past je coach je schema aan.</p>
+        <ul>
+          <li>Gratis online intakegesprek</li>
+          <li>Elke maand een fysieke meting en een nieuw schema</li>
+          <li>Elke maand een privé techniek sessie van 60 minuten</li>
+          <li>WhatsApp contact met je coach en toegang tot de support groep</li>
+        </ul>
+      </article>
+      <article aria-labelledby="voeding-title">
+        <div class="frame">
+          <img src="assets/voeding-1600.jpg" srcset="assets/voeding-800.jpg 800w, assets/voeding-1600.jpg 1066w" sizes="(max-width:760px) 92vw, 40vw" width="1066" height="1600" loading="lazy" alt="Handen op tafel met een tablet en een glas water tijdens een voedingsconsult.">
+        </div>
+        <p class="label">Op maat</p>
+        <h3 id="voeding-title">Voeding</h3>
+        <p>Ieders lichaam werkt anders, daarom werken we met een plan op maat. Je houdt 3 tot 5 dagen een voedingsdagboek bij, daarna maakt je coach een persoonlijk voedingsplan dat past bij je leven.</p>
+        <ul>
+          <li>Gratis kennismakingsgesprek en intake</li>
+          <li>Online of persoonlijk, met wegen en meten</li>
+          <li>Vervolgconsulten om bij te sturen</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section prices" id="aanbod" aria-labelledby="aanbod-title">
+    <div class="wrap">
+      <div class="prices-head">
+        <p class="label">Aanbod</p>
+        <h2 id="aanbod-title">Wat het <em>kost</em></h2>
+        <p class="muted">Twijfel je wat bij je past? Tijdens de proefles adviseert je trainer hoe vaak je traint, op vaste of flexibele tijden.</p>
+        <p><a class="btn btn--ink" href="#proefles">Plan een proefles <span class="arrow" aria-hidden="true">→</span></a></p>
+      </div>
+      <div class="price-groups">
+        <div class="price-group">
+          <h3>Personal training <small>jaarabonnement, per maand</small></h3>
+          <div class="price-row"><span class="what">1x per week</span><span class="note">± €45 per sessie</span><span class="amount">€195</span></div>
+          <div class="price-row"><span class="what">2x per week</span><span class="note">± €43 per sessie</span><span class="amount">€370</span></div>
+          <p class="price-extra">Inclusief persoonlijk voedingsplan, t.w.v. €200.</p>
+        </div>
+        <div class="price-group">
+          <h3>Duo training <small>per persoon, per maand</small></h3>
+          <div class="price-row"><span class="what">1x per week</span><span class="note">± €30 per sessie</span><span class="amount">€130</span></div>
+          <div class="price-row"><span class="what">2x per week</span><span class="note">± €29 per sessie</span><span class="amount">€250</span></div>
+          <p class="price-extra">Jaarabonnement, inclusief persoonlijk voedingsplan.</p>
+        </div>
+        <div class="price-group">
+          <h3>Private group <small>3 tot 6 personen</small></h3>
+          <div class="price-row"><span class="what">Losse les</span><span class="note">Circuittraining met een trainer</span><span class="amount">€15</span></div>
+          <div class="price-row"><span class="what">10-rittenkaart</span><span class="note">€13 per les</span><span class="amount">€130</span></div>
+        </div>
+        <div class="price-group">
+          <h3>Coaching <small>per maand</small></h3>
+          <div class="price-row"><span class="what">6 maanden</span><span class="note">Maandelijks schema, meting en techniek sessie</span><span class="amount">€60</span></div>
+          <div class="price-row"><span class="what">12 maanden</span><span class="note">Maandelijks schema, meting en techniek sessie</span><span class="amount">€55</span></div>
+          <div class="price-row"><span class="what">Voedingsplan</span><span class="note">Optioneel, eenmalig</span><span class="amount">€150</span></div>
+        </div>
+        <div class="price-group">
+          <h3>Voeding <small>eenmalig</small></h3>
+          <div class="price-row"><span class="what">Online consult</span><span class="note">Intake, voedingsdagboek, 1 vervolgconsult, voedingsplan</span><span class="amount">€200</span></div>
+          <div class="price-row"><span class="what">Persoonlijk consult</span><span class="note">Intake, 2 vervolgconsulten, wegen en meten, voedingsplan</span><span class="amount">€250</span></div>
+        </div>
+        <div class="price-group">
+          <h3>Reformer pilates <small>Noordwijk</small></h3>
+          <div class="price-row"><span class="what">Lessen en rittenkaarten</span><span class="note"><span class="confirm">[confirm: prijzen reformer pilates]</span></span><span class="amount">€ …</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="start" aria-labelledby="start-title">
+    <div class="wrap">
+      <p class="label">Zo begin je</p>
+      <h2 id="start-title" data-split>Van proefles <em>naar plan</em></h2>
+      <div class="steps-wrap">
+        <svg class="steps-coil" aria-hidden="true" focusable="false"><path d=""></path></svg>
+        <ol class="steps">
+          <li><h3>Proefles</h3><p>Je plant een proefles. Je trainer kijkt waar je nu staat en wat je wilt bereiken.</p></li>
+          <li><h3>Intake</h3><p>Samen vullen jullie het intakeformulier in, zodat je trainer je doelen en je achtergrond kent.</p></li>
+          <li><h3>Advies</h3><p>Je hoort hoe vaak je het beste kunt trainen, 1 tot 3 keer per week, op vaste of flexibele tijden.</p></li>
+          <li><h3>Trainen</h3><p>Je begint. Je trainer houdt bij wat werkt en stuurt bij waar het nodig is.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section team" id="team" aria-labelledby="team-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="team-head">
+        <p class="label">Het team</p>
+        <h2 id="team-title" data-split>Vijf trainers, <em>één plan</em></h2>
+        <p class="muted">Een team van enthousiaste trainers die all-round zijn opgeleid en alle kneepjes van het vak kennen.</p>
+      </div>
+      <div class="frame">
+        <img src="assets/team-1600.jpg" srcset="assets/team-800.jpg 800w, assets/team-1600.jpg 1600w" sizes="92vw" width="1600" height="800" loading="lazy" alt="Vier trainers van PureVita staan lachend naast elkaar in de studio, in zwarte shirts." style="object-position:50% 30%">
+      </div>
+      <ul class="roster">
+        <li><strong>Eva van Kesteren</strong><span>Oprichter, personal trainer, voedingsconsulent</span></li>
+        <li><strong>Indy Meijer</strong><span>Personal trainer, voedingsconsulent, functional specialist</span></li>
+        <li><strong>Eva Cecchi</strong><span>Personal trainer</span></li>
+        <li><strong>Sophie-lynn Waaijenberg</strong><span>Personal trainer</span></li>
+        <li><strong>Faye Boeren</strong><span>Invaltrainer</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section studio" id="studio" aria-labelledby="studio-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="frame frame--wide">
+        <img src="assets/studio-1600.jpg" srcset="assets/studio-800.jpg 800w, assets/studio-1600.jpg 1600w" sizes="(max-width:760px) 92vw, 62vw" width="1600" height="1066" loading="lazy" alt="Zwart-witfoto van de PureVita studio met squat racks, een halterbank en ramen langs de wand.">
+      </div>
+      <div class="frame frame--tall">
+        <img src="assets/rek-800.jpg" width="800" height="533" loading="lazy" alt="Detail van een rek met halterschijven, dumbbells en kettlebells." style="object-position:30% 50%">
+      </div>
+      <div class="studio-body">
+        <p class="label">De studio</p>
+        <h2 id="studio-title" data-split>Kloosterschuurlaan <em>15b</em></h2>
+        <p class="muted">Onze studio in Rijnsburg: racks, halters, kettlebells en ruimte om te bewegen. Reformer pilates geven we in Noordwijk.</p>
+        <p><a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=PureVita+Kloosterschuurlaan+15b+Rijnsburg" rel="noopener">Open in Google Maps</a> <span class="arrow" aria-hidden="true">→</span></p>
+      </div>
+      <dl class="hours" aria-label="Openingstijden Rijnsburg">
+        <div><dt>Maandag</dt><dd>08.00 - 22.00</dd></div>
+        <div><dt>Dinsdag tot en met donderdag</dt><dd>07.30 - 22.00</dd></div>
+        <div><dt>Vrijdag</dt><dd>08.00 - 19.00</dd></div>
+        <div><dt>Zaterdag</dt><dd>09.30 - 17.00</dd></div>
+        <div class="closed"><dt>Zondag</dt><dd>Gesloten</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section on-ink trial" id="proefles" aria-labelledby="proefles-title">
+    <div class="wrap">
+      <div class="trial-head">
+        <p class="label">Proefles</p>
+        <h2 id="proefles-title" data-split>Begin <em>vandaag</em></h2>
+        <p class="muted">Kies wat je wilt proberen. We zetten je bericht klaar in WhatsApp, jij drukt alleen nog op versturen.</p>
+        <div class="direct">
+          <span>Liever bellen of mailen?</span>
+          <a class="link" href="tel:+31639501008">06 39 50 10 08</a>
+          <a class="link" href="mailto:info@purevita.nl?subject=Proefles%20PureVita">info@purevita.nl</a>
+        </div>
+      </div>
+      <form id="trial-form" novalidate>
+        <div class="field">
+          <label for="f-name">Je naam</label>
+          <input id="f-name" name="name" type="text" autocomplete="given-name" placeholder="Bijvoorbeeld Noor">
+        </div>
+        <fieldset class="field">
+          <legend>Wat wil je proberen?</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="kind" id="k-pt" value="personal training" checked><span>Personal training</span></label>
+            <label class="chip"><input type="radio" name="kind" id="k-duo" value="duo training"><span>Duo training</span></label>
+            <label class="chip"><input type="radio" name="kind" id="k-group" value="private group"><span>Private group</span></label>
+            <label class="chip"><input type="radio" name="kind" id="k-pilates" value="reformer pilates"><span>Reformer pilates</span></label>
+            <label class="chip"><input type="radio" name="kind" id="k-coach" value="coaching"><span>Coaching</span></label>
+            <label class="chip"><input type="radio" name="kind" id="k-food" value="voeding"><span>Voeding</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Wanneer past het je?</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="when" id="w-any" value="" checked><span>Maakt niet uit</span></label>
+            <label class="chip"><input type="radio" name="when" id="w-morning" value="'s ochtends"><span>Ochtend</span></label>
+            <label class="chip"><input type="radio" name="when" id="w-afternoon" value="'s middags"><span>Middag</span></label>
+            <label class="chip"><input type="radio" name="when" id="w-evening" value="'s avonds"><span>Avond</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="f-note">Nog iets dat je trainer moet weten? <span class="muted">(optioneel)</span></label>
+          <textarea id="f-note" name="note" rows="3" placeholder="Bijvoorbeeld een oude blessure of een doel" data-lenis-prevent></textarea>
+        </div>
+        <div class="message" aria-live="polite">
+          <p class="label">Je bericht</p>
+          <p id="msg-preview"></p>
+          <div class="message-foot">
+            <span class="muted" style="font-size:var(--fs-small)">Deze site bewaart niets van wat je invult.</span>
+            <a class="btn btn--gold" id="wa-link" href="https://wa.me/31639501008" rel="noopener">Open in WhatsApp <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="foot-mark" aria-hidden="true">Pure<svg class="foot-coil"><path d=""></path></svg><em>Vita</em></p>
+    <div class="foot-col">
+      <p class="label">Rijnsburg</p>
+      <p>Kloosterschuurlaan 15b<br>Rijnsburg</p>
+      <p class="muted">Personal training, duo, private group, coaching en voeding</p>
+    </div>
+    <div class="foot-col">
+      <p class="label">Noordwijk</p>
+      <p><span class="confirm">[confirm: adres reformer studio]</span></p>
+      <p class="muted">Reformer pilates</p>
+    </div>
+    <div class="foot-col">
+      <p class="label">Contact</p>
+      <a href="tel:+31639501008">06 39 50 10 08</a>
+      <a href="mailto:info@purevita.nl">info@purevita.nl</a>
+      <a href="https://wa.me/31639501008" rel="noopener">WhatsApp</a>
+    </div>
+    <div class="foot-col">
+      <p class="label">Volg</p>
+      <a href="https://www.instagram.com/purevita.nl/" rel="noopener">Instagram @purevita.nl</a>
+      <a href="https://www.instagram.com/reformerpilatesnoordwijk/" rel="noopener">Instagram @reformerpilatesnoordwijk</a>
+      <a href="https://www.facebook.com/Eva.PureVita" rel="noopener">Facebook</a>
+      <a href="https://www.linkedin.com/company/purevita/" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 PureVita</span>
+      <span><a href="https://www.purevita.nl/algemenevoorwaarden" rel="noopener">Algemene voorwaarden</a> <span class="confirm">[confirm: privacyverklaring van PureVita]</span></span>
+    </div>
+  </div>
+</footer>
+
+<div class="book-bar" id="book-bar">
+  <a class="btn btn--ink" href="#proefles">Plan een proefles <span class="arrow" aria-hidden="true">→</span></a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const fine = matchMedia('(pointer: fine)');
+  const G = window.gsap, ST = window.ScrollTrigger, Split = window.SplitText;
+  const motion = !reduce.matches;
+  if (!motion || !G) root.classList.remove('is-intro');
+  if (G && ST) G.registerPlugin(ST, ...(Split ? [Split] : []));
+
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  // A side-on coil spring from (x0,y0) to (x1,y1). Each turn is an ellipse (rx along the axis,
+  // r across it) carried forward by the pitch; as the spring stretches the loops open into a wave.
+  function coil(x0, y0, x1, y1, turns, r, lead) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.max(Math.hypot(dx, dy), 1);
+    const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const l = Math.min(lead, L * .2), body = Math.max(L - 2 * l, 1), rx = r * .55;
+    const steps = Math.ceil(turns * 22);
+    let d = `M${x0.toFixed(1)} ${y0.toFixed(1)}`;
+    for (let i = 0; i <= steps; i++) {
+      const s = i / steps, th = Math.PI * 2 * turns * s;
+      const a = l + body * s + rx * (1 - Math.cos(th)) * (s > 0 && s < 1 ? 1 : 0);
+      const p = r * Math.sin(th);
+      d += `L${(x0 + ux * a + nx * p).toFixed(1)} ${(y0 + uy * a + ny * p).toFixed(1)}`;
+    }
+    return d + `L${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  }
+
+  /* ---------- smooth scroll ---------- */
+  let lenis = null;
+  if (motion && window.Lenis && G) {
+    lenis = new Lenis({ lerp: .1 });
+    if (ST) lenis.on('scroll', ST.update);
+    G.ticker.add(t => lenis.raf(t * 1000)); G.ticker.lagSmoothing(0);
+  }
+  const headerOffset = () => -(document.querySelector('.site-header').offsetHeight + 16);
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]'); if (!a) return;
+    const id = a.getAttribute('href'); const el = id === '#top' ? document.body : document.querySelector(id);
+    if (a.dataset.kind) { const r = document.getElementById(a.dataset.kind); if (r) { r.checked = true; compose(); } }
+    if (!el || !lenis) return;
+    e.preventDefault(); lenis.scrollTo(id === '#top' ? 0 : el, { offset: id === '#top' ? 0 : headerOffset(), duration: 1.4 });
+    if (id !== '#top') history.replaceState(null, '', id);
+  });
+
+  /* ---------- sound: a spring twang, off until asked for ---------- */
+  const soundBtn = document.querySelector('.sound');
+  let actx = null, soundOn = false;
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    if (soundOn && !actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { soundOn = false; } }
+    if (actx && actx.state === 'suspended') actx.resume();
+    soundBtn.setAttribute('aria-pressed', soundOn); soundBtn.lastElementChild.textContent = soundOn ? 'Geluid aan' : 'Geluid uit';
+    if (soundOn) twang(.4);
+  });
+  function twang(amount) {
+    if (!soundOn || !actx) return;
+    const now = actx.currentTime, a = clamp(amount, .05, 1.2);
+    const out = actx.createGain(); out.gain.setValueAtTime(.0001, now);
+    out.gain.exponentialRampToValueAtTime(.18 * Math.min(1, a + .2), now + .01);
+    out.gain.exponentialRampToValueAtTime(.0001, now + .9 + a * .4); out.connect(actx.destination);
+    [[1, 1], [2.01, .35], [3.2, .12]].forEach(([mul, g]) => {
+      const o = actx.createOscillator(), og = actx.createGain(), lfo = actx.createOscillator(), lg = actx.createGain();
+      const f = (95 + 190 * a) * mul;
+      o.type = 'sine'; o.frequency.setValueAtTime(f * 1.06, now); o.frequency.exponentialRampToValueAtTime(f, now + .25);
+      lfo.frequency.value = 7 + a * 4; lg.gain.value = f * .012; lfo.connect(lg).connect(o.frequency);
+      og.gain.value = g; o.connect(og).connect(out); o.start(now); lfo.start(now); o.stop(now + 1.5); lfo.stop(now + 1.5);
+    });
+  }
+
+  /* ---------- hero spring ---------- */
+  const hero = document.querySelector('.hero');
+  const stage = hero.querySelector('.hero-stage');
+  const photo = stage.querySelector('.hero-photo');
+  const img = photo.querySelector('img');
+  const pure = stage.querySelector('.word--pure');
+  const vita = stage.querySelector('.word--vita');
+  const svg = stage.querySelector('.hero-coil');
+  const path = svg.querySelector('path');
+
+  // every letter is its own mass: the one nearest the spring leads, the outer ones trail
+  const letters = [];
+  [[pure, -1], [vita, 1]].forEach(([w, side]) => {
+    const inner = w.querySelector('.in'), chars = [...inner.textContent];
+    inner.textContent = '';
+    chars.forEach((c, i) => {
+      const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; inner.appendChild(s);
+      const rank = side < 0 ? chars.length - 1 - i : i;
+      const k = 340 - rank * 62;
+      letters.push({ el: s, word: w, x: 0, y: 0, vx: 0, vy: 0, k, c: 2 * Math.sqrt(k) * .5, lead: rank === 0 });
+    });
+  });
+
+  let m = null, t = 0, v = 0, target = 0, scrollT = 0, drag = 0, running = false, last = 0, pinned = false, cur = null;
+
+  function measure() {
+    const W = stage.clientWidth, H = stage.clientHeight, narrow = W < 700;
+    const g = parseFloat(getComputedStyle(document.querySelector('.wrap')).paddingLeft) || 16;
+    const font = parseFloat(getComputedStyle(pure).fontSize);
+    const PW = Math.min(W - g * 2, 1320), PH = Math.min(H * (narrow ? .44 : .54), PW * (narrow ? 1.1 : .62));
+    const cy = H * (narrow ? .46 : .48);
+    m = { W, H, g, font, PW, PH, cx: W / 2, cy, wP: pure.offsetWidth, wV: vita.offsetWidth, hW: pure.offsetHeight, gap: font * .06 };
+    m.rest = font * .9;
+    const total = m.wP + m.wV + m.rest + m.gap * 2;
+    m.xP0 = m.cx - total / 2; m.xV0 = m.xP0 + m.wP + m.gap * 2 + m.rest;
+    m.xP1 = g; m.xV1 = W - g - m.wV;
+    Object.assign(photo.style, { width: PW + 'px', height: PH + 'px', top: cy + 'px' });
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    path.style.strokeWidth = Math.max(1.5, font * .02) + 'px';
+    gl && gl.resize(PW, PH);
+  }
+
+  function targets(k) {
+    const kc = clamp(k), open = ease(clamp((kc - .04) / .86));
+    return {
+      k, open,
+      xP: lerp(m.xP0, m.xP1, k), xV: lerp(m.xV0, m.xV1, k),
+      yP: lerp(m.cy, m.cy - m.PH / 2, open), yV: lerp(m.cy, m.cy + m.PH / 2, open)
+    };
+  }
+  function stepLetters(dt) {
+    let busy = false;
+    for (const L of letters) {
+      const tx = L.word === pure ? cur.xP : cur.xV, ty = L.word === pure ? cur.yP : cur.yV;
+      if (!motion) { L.x = tx; L.y = ty; L.vx = L.vy = 0; continue; }
+      L.vx += (L.k * (tx - L.x) - L.c * L.vx) * dt; L.x += L.vx * dt;
+      L.vy += (L.k * (ty - L.y) - L.c * L.vy) * dt; L.y += L.vy * dt;
+      if (Math.abs(tx - L.x) > .05 || Math.abs(ty - L.y) > .05 || Math.abs(L.vx) > .05 || Math.abs(L.vy) > .05) busy = true;
+    }
+    return busy;
+  }
+  function snapLetters() { for (const L of letters) { L.x = L.word === pure ? cur.xP : cur.xV; L.y = L.word === pure ? cur.yP : cur.yV; L.vx = L.vy = 0; } }
+
+  function draw() {
+    if (!m || !cur) return;
+    const { xP, xV, yP, yV, open } = cur;
+    pure.style.transform = `translate3d(${xP.toFixed(1)}px,${(yP - m.hW / 2).toFixed(1)}px,0)`;
+    vita.style.transform = `translate3d(${xV.toFixed(1)}px,${(yV - m.hW / 2).toFixed(1)}px,0)`;
+    let leadP = { dx: 0, dy: 0 }, leadV = { dx: 0, dy: 0 };
+    for (const L of letters) {
+      const dx = L.x - (L.word === pure ? xP : xV), dy = L.y - (L.word === pure ? yP : yV);
+      L.el.style.transform = dx || dy ? `translate3d(${dx.toFixed(2)}px,${dy.toFixed(2)}px,0)` : '';
+      if (L.lead) (L.word === pure ? leadP : leadV).dx = dx, (L.word === pure ? leadP : leadV).dy = dy;
+    }
+    const iy = m.PH / 2 * (1 - open), ix = m.PW / 2 * (1 - lerp(.16, 1, open));
+    photo.style.clipPath = `inset(${iy.toFixed(1)}px ${ix.toFixed(1)}px round ${Math.min(10, m.PH / 2 * open + 1).toFixed(1)}px)`;
+    const zoom = 1.18 - .18 * open;
+    if (gl) gl.set({ zoom, vel: v }); else img.style.transform = `scale(${zoom.toFixed(4)})`;
+    const lift = m.font * .02;
+    path.setAttribute('d', coil(xP + m.wP + m.gap * .5 + leadP.dx, yP - lift + leadP.dy, xV - m.gap * .5 + leadV.dx, yV - lift + leadV.dy, 9, m.font * .085, m.font * .1));
+  }
+
+  // one damped spring drives the hero: scroll and drag only move its target
+  const K = 210, C = 21;
+  function tick(now) {
+    const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
+    v += (K * (target - t) - C * v) * dt; t += v * dt;
+    cur = targets(t);
+    const busy = stepLetters(dt);
+    if (!busy && Math.abs(v) < 1e-4 && Math.abs(target - t) < 1e-4) { t = target; v = 0; cur = targets(t); snapLetters(); draw(); running = false; return; }
+    draw(); requestAnimationFrame(tick);
+  }
+  function kick() { if (!running) { running = true; last = performance.now(); requestAnimationFrame(tick); } }
+  function setTarget() {
+    let k = clamp(scrollT) + drag;
+    if (k > 1) k = 1 + (k - 1) * .35;          // rubber band past full stretch
+    target = clamp(k, -.1, 1.18); kick();
+  }
+  function onScroll() {
+    const r = hero.getBoundingClientRect(), span = hero.offsetHeight - stage.offsetHeight;
+    scrollT = span > 0 ? clamp(-r.top / span) : 1; setTarget();
+  }
+
+  /* ---------- WebGL: the photo bends with the spring and bulges under your finger ---------- */
+  const gl = (() => {
+    if (!motion) return null;
+    const canvas = document.createElement('canvas'); canvas.setAttribute('aria-hidden', 'true');
+    const c = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: false });
+    if (!c) return null;
+    const sh = (type, src) => { const s = c.createShader(type); c.shaderSource(s, src); c.compileShader(s); return c.getShaderParameter(s, c.COMPILE_STATUS) ? s : null; };
+    const vs = sh(c.VERTEX_SHADER, 'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}');
+    const fs = sh(c.FRAGMENT_SHADER, `precision mediump float;
+      uniform sampler2D tex;uniform vec2 res,isz,focus,mouse;uniform float zoom,vel,hover;varying vec2 v;
+      vec2 cover(vec2 uv){float ra=res.x/res.y,ri=isz.x/isz.y;vec2 s=ra>ri?vec2(1.,ri/ra):vec2(ra/ri,1.);
+        vec2 c=mix(s*.5,1.-s*.5,focus);return (uv-.5)*s+c;}
+      void main(){vec2 uv=v;
+        vec2 a=vec2(res.x/res.y,1.);float d=length((uv-mouse)*a);float b=hover*smoothstep(.42,0.,d);
+        uv=(uv-mouse)*(1.-.16*b)+mouse;
+        uv.x+=vel*.035*sin(uv.y*3.1416);uv.y+=vel*.012*sin(uv.x*6.2832);
+        uv=(uv-.5)/zoom+.5;vec2 t=cover(uv);
+        float sp=clamp(abs(vel),0.,2.5)*.0045+b*.006;
+        gl_FragColor=vec4(texture2D(tex,t+vec2(sp,0.)).r,texture2D(tex,t).g,texture2D(tex,t-vec2(sp,0.)).b,1.);}`);
+    if (!vs || !fs) return null;
+    const pr = c.createProgram(); c.attachShader(pr, vs); c.attachShader(pr, fs); c.linkProgram(pr);
+    if (!c.getProgramParameter(pr, c.LINK_STATUS)) return null;
+    c.useProgram(pr);
+    const buf = c.createBuffer(); c.bindBuffer(c.ARRAY_BUFFER, buf);
+    c.bufferData(c.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), c.STATIC_DRAW);
+    const loc = c.getAttribLocation(pr, 'p'); c.enableVertexAttribArray(loc); c.vertexAttribPointer(loc, 2, c.FLOAT, false, 0, 0);
+    const U = {}; ['tex', 'res', 'isz', 'focus', 'mouse', 'zoom', 'vel', 'hover'].forEach(n => U[n] = c.getUniformLocation(pr, n));
+    const st = { zoom: 1.18, vel: 0, hover: 0, hoverT: 0, mx: .5, my: .5, mxT: .5, myT: .5, ready: false, w: 1, h: 1 };
+    const tex = c.createTexture();
+    const pic = new Image();
+    pic.onload = () => {
+      try {
+        c.bindTexture(c.TEXTURE_2D, tex); c.pixelStorei(c.UNPACK_FLIP_Y_WEBGL, true);
+        c.texImage2D(c.TEXTURE_2D, 0, c.RGB, c.RGB, c.UNSIGNED_BYTE, pic);
+        [c.TEXTURE_WRAP_S, c.TEXTURE_WRAP_T].forEach(p => c.texParameteri(c.TEXTURE_2D, p, c.CLAMP_TO_EDGE));
+        c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MIN_FILTER, c.LINEAR);
+        c.uniform2f(U.isz, pic.naturalWidth, pic.naturalHeight); c.uniform2f(U.focus, .55, .6);
+        photo.appendChild(canvas); root.classList.add('gl-on'); st.ready = true; render();
+      } catch (_) { /* tainted or unsupported: the plain image stays */ }
+    };
+    pic.src = img.currentSrc || img.src;
+    function render() {
+      if (!st.ready) return;
+      c.viewport(0, 0, canvas.width, canvas.height);
+      c.uniform2f(U.res, st.w, st.h); c.uniform1f(U.zoom, st.zoom); c.uniform1f(U.vel, clamp(st.vel, -3, 3));
+      c.uniform1f(U.hover, st.hover); c.uniform2f(U.mouse, st.mx, st.my);
+      c.drawArrays(c.TRIANGLE_STRIP, 0, 4);
+    }
+    let hovering = false;
+    function hoverLoop() {
+      st.hover += (st.hoverT - st.hover) * .1; st.mx += (st.mxT - st.mx) * .16; st.my += (st.myT - st.my) * .16;
+      render();
+      if (Math.abs(st.hoverT - st.hover) > .002 || Math.abs(st.mxT - st.mx) > .001 || Math.abs(st.myT - st.my) > .001) requestAnimationFrame(hoverLoop);
+      else hovering = false;
+    }
+    const wake = () => { if (!hovering) { hovering = true; requestAnimationFrame(hoverLoop); } };
+    return {
+      set(o) { Object.assign(st, o); render(); },
+      resize(w, h) { const dpr = Math.min(1.5, devicePixelRatio || 1); st.w = w; st.h = h; canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); render(); },
+      point(x, y, on) {
+        const r = photo.getBoundingClientRect();
+        st.mxT = clamp((x - r.left) / r.width); st.myT = 1 - clamp((y - r.top) / r.height);
+        st.hoverT = on && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom ? 1 : 0; wake();
+      },
+      leave() { st.hoverT = 0; wake(); }
+    };
+  })();
+
+  function setup() {
+    pinned = motion;
+    root.classList.add('has-spring');
+    hero.classList.toggle('is-pinned', pinned);
+    measure();
+    if (pinned) { onScroll(); t = target; } else { t = target = 1; }
+    cur = targets(t); snapLetters(); draw();
+  }
+  setup();
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { measure(); cur = targets(t); snapLetters(); draw(); });
+  new ResizeObserver(() => { measure(); cur = targets(t); draw(); }).observe(stage);
+  addEventListener('scroll', () => pinned && onScroll(), { passive: true });
+
+  // drag: pull sideways to put the spring under tension, let go and it springs back
+  let px = 0, py = 0, pid = null, active = false;
+  stage.addEventListener('pointerdown', e => {
+    if (!pinned || e.button > 0 || e.target.closest('a,button')) return;
+    pid = e.pointerId; px = e.clientX; py = e.clientY; active = false;
+  });
+  stage.addEventListener('pointermove', e => {
+    if (gl && (e.pointerType === 'mouse' || active)) gl.point(e.clientX, e.clientY, true);
+    if (e.pointerId !== pid) return;
+    const dx = e.clientX - px, dy = e.clientY - py;
+    if (!active) {
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+      active = true; stage.setPointerCapture(pid); stage.classList.add('is-dragging');
+    }
+    drag = Math.abs(dx) / (m.W * .45); setTarget();
+  });
+  stage.addEventListener('pointerleave', () => gl && gl.leave());
+  const release = e => {
+    if (e.pointerId !== pid) return;
+    pid = null; if (!active) return;
+    twang(drag); active = false; drag = 0; stage.classList.remove('is-dragging'); setTarget();
+    if (gl && e.pointerType !== 'mouse') gl.leave();
+  };
+  stage.addEventListener('pointerup', release);
+  stage.addEventListener('pointercancel', release);
+
+  /* ---------- intro: the hero's first frame is the logo resolving ---------- */
+  if (root.classList.contains('is-intro')) {
+    const ins = stage.querySelectorAll('.word .in');
+    const len = path.getTotalLength ? path.getTotalLength() + 40 : 800;
+    G.set(ins, { yPercent: 112 });
+    G.set(path, { strokeDasharray: len, strokeDashoffset: len });
+    G.set('.hero-caption .wrap > *, .site-header .wrap > *', { y: 18, opacity: 0 });
+    G.timeline({ delay: .15, onComplete: () => G.set(path, { clearProps: 'strokeDasharray,strokeDashoffset' }) })
+      .to(ins, { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: .12 }, 0)
+      .to(path, { strokeDashoffset: 0, duration: 1.1, ease: 'expo.inOut' }, .25)
+      .add(() => root.classList.remove('is-intro'), 1.3)
+      .add(() => { v += 2.6; kick(); }, 1.32)
+      .to('.site-header .wrap > *, .hero-caption .wrap > *', { y: 0, opacity: 1, duration: 1, ease: 'expo.out', stagger: .08, clearProps: 'transform,opacity' }, .55);
+  }
+
+  /* ---------- header: the logo's own spring is the page progress ---------- */
+  const header = document.querySelector('.site-header');
+  const wm = document.querySelector('.wm-coil'), wmPath = wm.querySelector('path');
+  function headerFrame() {
+    header.classList.toggle('is-solid', scrollY > 24 || nav.classList.contains('is-open'));
+    const p = clamp(scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight));
+    const w = motion ? 12 + p * 40 : 14;
+    wm.style.width = w + 'px'; wm.setAttribute('viewBox', `0 0 ${w} 14`);
+    wmPath.setAttribute('d', coil(0, 8, w, 8, 4, 3.2, 1.5));
+  }
+
+  const menuBtn = document.querySelector('.menu-btn'), nav = document.getElementById('nav');
+  function setMenu(open) {
+    menuBtn.setAttribute('aria-expanded', open); menuBtn.textContent = open ? 'Sluit' : 'Menu';
+    nav.classList.toggle('is-open', open); root.style.overflow = open ? 'hidden' : '';
+    lenis && (open ? lenis.stop() : lenis.start());
+    headerFrame();
+    if (open) nav.querySelector('a').focus();
+  }
+  menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
+  nav.addEventListener('click', e => { if (e.target.closest('a') && nav.classList.contains('is-open')) setMenu(false); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('is-open')) { setMenu(false); menuBtn.focus(); } });
+  matchMedia('(min-width:861px)').addEventListener('change', q => q.matches && setMenu(false));
+  headerFrame(); addEventListener('scroll', headerFrame, { passive: true });
+
+  const bar = document.getElementById('book-bar');
+  new IntersectionObserver(([e]) => bar.classList.toggle('is-hidden', e.isIntersecting), { rootMargin: '0px 0px -20% 0px' })
+    .observe(document.getElementById('proefles'));
+
+  /* ---------- reformer: pinned chapters, the carriage performs each exercise ---------- */
+  const carriage = document.getElementById('ref-carriage');
+  const springs = document.getElementById('ref-springs');
+  const rope = document.getElementById('ref-rope');
+  const chapters = [...document.querySelectorAll('.chapter')];
+  const rail = [...document.querySelectorAll('.rail li')];
+  let rx = 250, rTarget = 250, rRun = false, chapter = 0;
+  function drawReformer(x) {
+    carriage.setAttribute('transform', `translate(${x.toFixed(1)} 0)`);
+    springs.setAttribute('d', [158, 166, 174].map(y => coil(182, y, x, y, 11, 6, 6)).join(''));
+    rope.setAttribute('d', `M1126 92 L${(x + 430).toFixed(1)} 140`);
+  }
+  function carriageAt(p) {
+    const n = 4, i = Math.min(n - 1, Math.floor(p * n)), q = p * n - i;
+    const rep = (reps, amp) => 250 + amp * (.5 - .5 * Math.cos(Math.PI * 2 * reps * q));
+    if (i === 0) return [i, rep(3, 150)];                                   // footwork: three short presses
+    if (i === 1) return [i, 330 + 7 * Math.sin(Math.PI * 2 * 12 * q)];     // the hundred: held, breathing
+    if (i === 2) return [i, rep(2, 300)];                                   // long stretch: two long reps
+    return [i, 250];                                                        // your class: back to rest
+  }
+  function refTick() {
+    rx += (rTarget - rx) * .14;
+    if (Math.abs(rTarget - rx) < .1) { rx = rTarget; rRun = false; drawReformer(rx); return; }
+    drawReformer(rx); requestAnimationFrame(refTick);
+  }
+  drawReformer(rx);
+  if (motion && ST) {
+    ST.create({
+      trigger: '#chapters', start: 'top top', end: 'bottom bottom',
+      onUpdate(self) {
+        const p = self.progress, [i, x] = carriageAt(p);
+        rTarget = x; if (!rRun) { rRun = true; requestAnimationFrame(refTick); }
+        rail.forEach((li, j) => li.style.setProperty('--p', clamp(p * 4 - j)));
+        if (i !== chapter) {
+          chapter = i;
+          chapters.forEach((c, j) => c.classList.toggle('is-active', j === i));
+          rail.forEach((li, j) => li.classList.toggle('is-active', j === i));
+        }
+      }
+    });
+  } else {
+    root.classList.remove('motion');
+    chapters.forEach(c => c.classList.add('is-active'));
+  }
+
+  /* ---------- everything else hangs on the same idea ---------- */
+  if (motion && G && ST) {
+    // headings rise line by line out of their own mask
+    if (Split) document.querySelectorAll('[data-split]').forEach(h => {
+      Split.create(h, { type: 'lines', mask: 'lines', linesClass: 'split-line', autoSplit: true,
+        onSplit: s => G.from(s.lines, { yPercent: 108, duration: 1.1, stagger: .09, ease: 'expo.out',
+          scrollTrigger: { trigger: h, start: 'top 88%', once: true } }) });
+    });
+    // the manifest reads itself as you scroll
+    const statement = document.querySelector('.statement');
+    if (Split) Split.create(statement, { type: 'words', autoSplit: true,
+      onSplit: s => G.fromTo(s.words, { opacity: .18 }, { opacity: 1, stagger: .06, ease: 'none',
+        scrollTrigger: { trigger: statement, start: 'top 78%', end: 'bottom 45%', scrub: true } }) });
+
+    // marquee: moves with scroll, leans with scroll speed
+    const track = document.querySelector('.marquee-track');
+    track.appendChild(track.firstElementChild.cloneNode(true));
+    const skew = G.quickTo(track, 'skewX', { duration: .5, ease: 'power3.out' });
+    G.fromTo(track, { xPercent: 0 }, { xPercent: -50, ease: 'none',
+      scrollTrigger: { trigger: '.marquee', start: 'top bottom', end: 'bottom top', scrub: .6,
+        onUpdate: s => skew(clamp(s.getVelocity() / -300, -9, 9)) } });
+
+    // photos: open from a crop, then drift inside their frame
+    document.querySelectorAll('.frame').forEach(f => {
+      const im = f.querySelector('img');
+      G.fromTo(f, { clipPath: 'inset(9% 7% 9% 7% round 10px)' }, { clipPath: 'inset(0% 0% 0% 0% round 10px)', duration: 1.4, ease: 'expo.out',
+        scrollTrigger: { trigger: f, start: 'top 85%', once: true } });
+      G.fromTo(im, { yPercent: -7, scale: 1.16 }, { yPercent: 7, scale: 1.16, ease: 'none',
+        scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+
+    // the steps hang on a spring that stretches as you read them
+    const sc = document.querySelector('.steps-coil'), scp = sc.querySelector('path');
+    const drawSteps = p => { const W = sc.clientWidth; sc.setAttribute('viewBox', `0 0 ${W} 28`); scp.setAttribute('d', coil(0, 14, lerp(64, W, p), 14, 16, 7, 6)); };
+    ST.create({ trigger: '.steps-wrap', start: 'top 85%', end: 'bottom 55%', scrub: .8, onUpdate: s => drawSteps(s.progress), onRefresh: s => drawSteps(s.progress) });
+
+    // the footer logo lets go last
+    const fc = document.querySelector('.foot-coil'), fcp = fc.querySelector('path');
+    const drawFoot = p => {
+      const em = parseFloat(getComputedStyle(fc.parentNode).fontSize), w = em * lerp(.5, innerWidth < 700 ? .75 : 1.4, p), h = em * .5;
+      fc.style.width = w + 'px'; fc.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      fcp.setAttribute('d', coil(em * .04, h * .55, w - em * .04, h * .55, 7, h * .32, em * .06));
+    };
+    ST.create({ trigger: '.site-footer', start: 'top bottom', end: 'bottom bottom', scrub: .8, onUpdate: s => drawFoot(s.progress), onRefresh: s => drawFoot(s.progress) });
+
+    // buttons lean toward the pointer and spring back
+    if (fine.matches) document.querySelectorAll('.btn').forEach(b => {
+      const xTo = G.quickTo(b, 'x', { duration: .4, ease: 'power3.out' }), yTo = G.quickTo(b, 'y', { duration: .4, ease: 'power3.out' });
+      b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * .28); yTo((e.clientY - r.top - r.height / 2) * .38); });
+      b.addEventListener('pointerleave', () => G.to(b, { x: 0, y: 0, duration: 1, ease: 'elastic.out(1,.32)' }));
+    });
+
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => ST.refresh());
+  } else {
+    const fc = document.querySelector('.foot-coil'), fcp = fc.querySelector('path');
+    fc.setAttribute('viewBox', '0 0 120 50'); fcp.setAttribute('d', coil(4, 27, 116, 27, 7, 16, 8));
+    const sc = document.querySelector('.steps-coil'), scp = sc.querySelector('path');
+    const W = sc.clientWidth || 800; sc.setAttribute('viewBox', `0 0 ${W} 28`); scp.setAttribute('d', coil(0, 14, W, 14, 16, 7, 6));
+  }
+
+  /* ---------- trial: the form writes the WhatsApp message ---------- */
+  const form = document.getElementById('trial-form');
+  const preview = document.getElementById('msg-preview');
+  const wa = document.getElementById('wa-link');
+  function compose() {
+    const f = new FormData(form);
+    const name = (f.get('name') || '').trim(), kind = f.get('kind'), when = f.get('when'), note = (f.get('note') || '').trim();
+    const who = name ? `Ik ben ${name} en ik` : 'Ik';
+    let msg = kind === 'coaching' || kind === 'voeding'
+      ? `Hoi PureVita! ${who} wil graag een kennismakingsgesprek over ${kind} plannen.`
+      : `Hoi PureVita! ${who} wil graag een proefles ${kind} plannen.`;
+    if (when) msg += ` Het liefst ${when}.`;
+    if (note) msg += `\n\n${note}`;
+    preview.textContent = msg;
+    wa.href = 'https://wa.me/31639501008?text=' + encodeURIComponent(msg);
+  }
+  form.addEventListener('input', compose);
+  form.addEventListener('submit', e => { e.preventDefault(); wa.click(); });
+  compose();
+})();
+</script>
+</body>
+</html>
