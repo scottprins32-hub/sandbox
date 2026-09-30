@@ -1,0 +1,29 @@
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE44_PUBLIC_HOST_SUFFIX
+      - WATCHPACK_POLLING=true
+    command:
+      - sh
+      - -ec
+      - |
+        npm ci --no-audit --no-fund
+        if [ ! -f .data/scara.db ]; then npm run seed; else npm run db:migrate; fi
+        exec npx next dev -H 0.0.0.0 -p 3000
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -m 10 http://localhost:3000/api/health >/dev/null || (echo 'next dev unhealthy'; exit 1)"]
+      interval: 20s
+      timeout: 12s
+      retries: 5
+      start_period: 300s
+
+volumes:
+  node_modules:
