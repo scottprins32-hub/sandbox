@@ -1,6 +1,7 @@
 // Menus, garage, gift box, saving, input, and the race flow.
 import * as THREE from 'three';
-import { CHARACTERS, CLASS_STATS, KARTS, GLIDERS, TRACKS, CUPS, DIFFICULTY, POINTS, PLACE_COINS, GIFT_COST, ITEMS } from './data.js';
+import { CHARACTERS, CLASS_STATS, KARTS, GLIDERS, TRACKS, CUPS, DIFFICULTY, POINTS, PLACE_COINS, GIFT_COST, ITEMS, allModelPaths } from './data.js';
+import { preload } from './assets.js';
 import { buildRacer, buildDriver, buildKart, buildGlider } from './models.js';
 import { Race, pickOpponents } from './race.js';
 import { unlock, sfx, setMusic, setSfx, musicStart, musicStop } from './audio.js';
@@ -14,12 +15,20 @@ const SAVE_KEY = 'kartparty.v1';
 const fresh = () => ({
   coins: 0,
   unlocked: { chars: CHARACTERS.filter((c) => c.start).map((c) => c.id), karts: KARTS.filter((k) => k.start).map((k) => k.id), gliders: GLIDERS.filter((g) => g.start).map((g) => g.id) },
-  fresh: [], sel: { char: 'pip', kart: 'classic', glider: 'wing' }, cups: {}, races: 0,
+  fresh: [], sel: { char: 'pip', kart: 'racer', glider: 'wing' }, cups: {}, races: 0,
   settings: { difficulty: 'easy', assist: true, tilt: false, music: true, sfx: true },
 });
 let save;
 try { save = { ...fresh(), ...JSON.parse(localStorage.getItem(SAVE_KEY) || '{}') }; } catch { save = fresh(); }
 save.settings = { ...fresh().settings, ...save.settings };
+// drop drivers/karts that no longer exist (the roster changed to the Kenney models) and keep the starters
+{
+  const f = fresh(), keep = (key, list) => [...new Set([...f.unlocked[key], ...(save.unlocked?.[key] || []).filter((id) => list.some((x) => x.id === id))])];
+  save.unlocked = { chars: keep('chars', CHARACTERS), karts: keep('karts', KARTS), gliders: keep('gliders', GLIDERS) };
+  if (!CHARACTERS.some((c) => c.id === save.sel.char)) save.sel.char = 'pip';
+  if (!KARTS.some((k) => k.id === save.sel.kart)) save.sel.kart = 'racer';
+  save.fresh = (save.fresh || []).filter((x) => [...CHARACTERS.map((c) => 'c_' + c.id), ...KARTS.map((k) => 'k_' + k.id), ...GLIDERS.map((g) => 'g_' + g.id)].includes(x));
+}
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch { /* private mode: progress lasts this visit only */ } };
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 const sel = () => ({ char: byId(CHARACTERS, save.sel.char), kart: byId(KARTS, save.sel.kart), glider: byId(GLIDERS, save.sel.glider) });
@@ -69,7 +78,7 @@ function showMenuRacer(mode = 'turntable', podium) {
     podium.forEach((p, i) => {
       const block = new THREE.Mesh(new THREE.BoxGeometry(3.2, spots[i][1], 3.2), new THREE.MeshLambertMaterial({ color: cols[i] }));
       block.position.set(spots[i][0], spots[i][1] / 2, 0); menu.scene.add(block); menu.racers.push(block);
-      const r = buildRacer(p.char, byId(KARTS, p.kart || 'classic'), GLIDERS[0]);
+      const r = buildRacer(p.char, byId(KARTS, p.kart || 'racer'), GLIDERS[0]);
       r.root.position.set(spots[i][0], spots[i][1], 0); r.root.rotation.y = 0.2 * (i ? -Math.sign(spots[i][0]) : 0);
       menu.scene.add(r.root); menu.racers.push(r.root);
     });
@@ -92,7 +101,7 @@ function renderMenu(dt) {
     const garage = $('#garage').classList.contains('on');
     const gl = garage && tab === 'gliders';
     menu.camera.position.set(0, garage ? 4.6 : 4, (portrait ? 13 : 11) + (gl ? 4 : 0));
-    menu.camera.lookAt(0, garage ? (portrait ? (gl ? 0.2 : -0.6) : 0.9) : (portrait ? 0.2 : 1.1), 0);
+    menu.camera.lookAt(0, garage ? (portrait ? (gl ? -1.2 : -2.4) : 0.9) : (portrait ? 0.2 : 1.1), 0);
   }
   menu.camera.updateProjectionMatrix();
   if (menu.spin) menu.spin.rotation.y += dt * 0.6;
@@ -112,10 +121,8 @@ function makePortraits() {
     sc.add(obj); cam.position.set(...pos); cam.lookAt(...look);
     pr.render(sc, cam); const url = pr.domElement.toDataURL(); sc.remove(obj); return url;
   };
-  for (const c of CHARACTERS) { const d = buildDriver(c); d.rotation.y = -0.35; portraits['c_' + c.id] = shot(d, [0, 1.2, 4.2], [0, 1.0, 0]); }
-  const s = sel();
-  const tint = s.char.color === 0xf7f7f7 || s.char.color === 0xfaf4ff ? s.char.accent : s.char.color;
-  for (const k of KARTS) { const g = buildKart(k, tint).group; g.rotation.y = -0.7; portraits['k_' + k.id] = shot(g, [0, 3.2, 6.2], [0, 0.6, 0]); }
+  for (const c of CHARACTERS) { const d = buildDriver(c); d.rotation.y = -0.45; portraits['c_' + c.id] = shot(d, [0, 0.8, 2.7], [0, 0.48, 0]); }
+  for (const k of KARTS) { const g = buildKart(k).group; g.rotation.y = -0.7; portraits['k_' + k.id] = shot(g, [0, 3.4, 6.6], [0, 0.6, 0]); }
   for (const gl of GLIDERS) { const g = buildGlider(gl); g.rotation.x = 0.9; portraits['g_' + gl.id] = shot(g, [0, 1.5, 6.5], [0, 0, 0]); }
   pr.dispose(); pr.forceContextLoss?.();
 }
@@ -174,20 +181,8 @@ function renderGarage() {
     save.sel[selKey] = id;
     save.fresh = save.fresh.filter((f) => f !== pre + id);
     persist();
-    if (key === 'chars') refreshKartPortraits();
     showMenuRacer(); renderGarage();
   }));
-}
-function refreshKartPortraits() {
-  // karts are painted in the driver's color
-  const pr = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-  pr.setSize(160, 160); pr.outputColorSpace = THREE.SRGBColorSpace;
-  const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aabb, 2));
-  const dl = new THREE.DirectionalLight(0xffffff, 1.4); dl.position.set(2, 3, 4); sc.add(dl);
-  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 3.2, 6.2); cam.lookAt(0, 0.6, 0);
-  const s = sel(), tint = s.char.color === 0xf7f7f7 || s.char.color === 0xfaf4ff ? s.char.accent : s.char.color;
-  for (const k of KARTS) { const g = buildKart(k, tint).group; g.rotation.y = -0.7; sc.add(g); pr.render(sc, cam); portraits['k_' + k.id] = pr.domElement.toDataURL(); sc.remove(g); }
-  pr.dispose(); pr.forceContextLoss?.();
 }
 let msgTimer;
 function flashMsg(text) {
@@ -484,13 +479,21 @@ $('#quit').addEventListener('click', () => toMenu());
 document.addEventListener('visibilitychange', () => { if (document.hidden) pauseRace(); });
 
 // ---------------- boot ----------------
-makePortraits();
-showMenuRacer();
 setMusic(save.settings.music); setSfx(save.settings.sfx);
-$('#title').addEventListener('pointerup', () => {
+let ready = false;
+$('#tapStart').textContent = 'Loading… 0%';
+preload(allModelPaths(), (f) => { $('#tapStart').textContent = `Loading… ${Math.round(f * 100)}%`; }).then(() => {
+  makePortraits();
+  showMenuRacer();
+  ready = true;
+  $('#tapStart').textContent = 'Tap to play';
+});
+$('#title').addEventListener('pointerup', function start() {
+  if (!ready) return;
+  $('#title').removeEventListener('pointerup', start);
   unlock(); sfx.go(); musicStart(3, 120);
   go('menu');
-}, { once: true });
+});
 
 let lastT = performance.now();
 function loop(now) {

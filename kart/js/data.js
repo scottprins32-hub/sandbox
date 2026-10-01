@@ -2,23 +2,32 @@
 // Stats are 1-5. weight affects bumping, speed top speed, accel how fast you get there,
 // handling how sharp you turn.
 
+// Drivers are Kenney "Cube Pets" models (CC0). color is used for the minimap dot and kart trim.
 export const CHARACTERS = [
-  { id: 'pip',    name: 'Pip',    species: 'penguin', color: 0x2f6fde, accent: 0xffffff, cls: 'light',  start: true },
-  { id: 'rosa',   name: 'Rosa',   species: 'bunny',   color: 0xff8fc4, accent: 0xffffff, cls: 'light',  start: true },
-  { id: 'bruno',  name: 'Bruno',  species: 'bear',    color: 0x8a5a33, accent: 0xe8c89a, cls: 'heavy',  start: true },
-  { id: 'mia',    name: 'Mia',    species: 'cat',     color: 0xff9a2e, accent: 0xfff1dc, cls: 'medium' },
-  { id: 'kiki',   name: 'Kiki',   species: 'fox',     color: 0xe8541c, accent: 0xffffff, cls: 'light'  },
-  { id: 'ribbit', name: 'Ribbit', species: 'frog',    color: 0x4cc23a, accent: 0xd9f7a6, cls: 'medium' },
-  { id: 'hoot',   name: 'Hoot',   species: 'owl',     color: 0x7a4fc4, accent: 0xf2e4ff, cls: 'medium' },
-  { id: 'rex',    name: 'Rex',    species: 'dino',    color: 0xf2a33a, accent: 0xfff0c2, cls: 'heavy'  },
-  { id: 'bolt',   name: 'Bolt',   species: 'robot',   color: 0xa9b6c8, accent: 0x3ad1ff, cls: 'heavy'  },
-  { id: 'mochi',  name: 'Mochi',  species: 'panda',   color: 0xf7f7f7, accent: 0x222222, cls: 'medium' },
-  { id: 'duke',   name: 'Duke',   species: 'duck',    color: 0xffd23a, accent: 0xff8a1e, cls: 'light'  },
-  { id: 'hamlet', name: 'Hamlet', species: 'pig',     color: 0xffa8b8, accent: 0xff7f98, cls: 'medium' },
-  { id: 'luna',   name: 'Luna',   species: 'unicorn', color: 0xfaf4ff, accent: 0xc77dff, cls: 'light'  },
-  { id: 'nana',   name: 'Nana',   species: 'monkey',  color: 0x9a6338, accent: 0xf0c9a0, cls: 'medium' },
-  { id: 'coco',   name: 'Coco',   species: 'koala',   color: 0x9aa3ad, accent: 0xf0f0f0, cls: 'medium' },
-  { id: 'leo',    name: 'Leo',    species: 'lion',    color: 0xf2c14e, accent: 0xb5651d, cls: 'heavy'  },
+  { id: 'pip',     name: 'Pip',     model: 'penguin',     color: 0x2b2f45, cls: 'light',  start: true },
+  { id: 'rosa',    name: 'Rosa',    model: 'bunny',       color: 0xd9824f, cls: 'light',  start: true },
+  { id: 'rufus',   name: 'Rufus',   model: 'dog',         color: 0xc7773f, cls: 'medium', start: true },
+  { id: 'mia',     name: 'Mia',     model: 'cat',         color: 0x5d6270, cls: 'medium' },
+  { id: 'kiki',    name: 'Kiki',    model: 'fox',         color: 0xf08a3a, cls: 'light'  },
+  { id: 'leo',     name: 'Leo',     model: 'lion',        color: 0xe98e3c, cls: 'heavy'  },
+  { id: 'mochi',   name: 'Mochi',   model: 'panda',       color: 0xf2f2f2, cls: 'medium' },
+  { id: 'hamlet',  name: 'Hamlet',  model: 'pig',         color: 0xf28fb5, cls: 'medium' },
+  { id: 'nana',    name: 'Nana',    model: 'monkey',      color: 0xc0754a, cls: 'medium' },
+  { id: 'coco',    name: 'Coco',    model: 'koala',       color: 0x7c7f91, cls: 'medium' },
+  { id: 'peep',    name: 'Peep',    model: 'chick',       color: 0xf7c33c, cls: 'light'  },
+  { id: 'buzz',    name: 'Buzz',    model: 'bee',         color: 0xf5c02e, cls: 'light'  },
+  { id: 'polly',   name: 'Polly',   model: 'parrot',      color: 0xe0402f, cls: 'light'  },
+  { id: 'pinch',   name: 'Pinch',   model: 'crab',        color: 0xe8462f, cls: 'light'  },
+  { id: 'daisy',   name: 'Daisy',   model: 'cow',         color: 0xf4f0ea, cls: 'heavy'  },
+  { id: 'ellie',   name: 'Ellie',   model: 'elephant',    color: 0x9aa0c9, cls: 'heavy'  },
+  { id: 'gigi',    name: 'Gigi',    model: 'giraffe',     color: 0xf2b53c, cls: 'medium' },
+  { id: 'stripes', name: 'Stripes', model: 'tiger',       color: 0xf08a2e, cls: 'heavy'  },
+  { id: 'snowy',   name: 'Snowy',   model: 'polar',       color: 0xeeeef8, cls: 'heavy'  },
+  { id: 'benny',   name: 'Benny',   model: 'beaver',      color: 0xa65e34, cls: 'medium' },
+  { id: 'willow',  name: 'Willow',  model: 'deer',        color: 0xb8683d, cls: 'medium' },
+  { id: 'hank',    name: 'Hank',    model: 'hog',         color: 0xa8603a, cls: 'heavy'  },
+  { id: 'finn',    name: 'Finn',    model: 'fish',        color: 0xf07c2e, cls: 'light'  },
+  { id: 'inchy',   name: 'Inchy',   model: 'caterpillar', color: 0x3f9a4a, cls: 'medium' },
 ];
 
 export const CLASS_STATS = {
@@ -27,15 +36,19 @@ export const CLASS_STATS = {
   heavy:  { speed: 5, accel: 2, handling: 2, weight: 5 },
 };
 
+// Karts are Kenney "Toy Car Kit" models (CC0). seat: where the driver sits [height, forward offset].
 export const KARTS = [
-  { id: 'classic',   name: 'Classic',    style: 'classic',   mod: { speed: 0,  accel: 0,  handling: 0 },  start: true },
-  { id: 'buggy',     name: 'Buggy',      style: 'buggy',     mod: { speed: -1, accel: 1,  handling: 1 } },
-  { id: 'bubble',    name: 'Bubble',     style: 'bubble',    mod: { speed: 0,  accel: 1,  handling: 0 } },
-  { id: 'rocket',    name: 'Rocket',     style: 'rocket',    mod: { speed: 1,  accel: -1, handling: 0 } },
-  { id: 'teacup',    name: 'Teacup',     style: 'teacup',    mod: { speed: -1, accel: 0,  handling: 2 } },
-  { id: 'monster',   name: 'Big Wheels', style: 'monster',   mod: { speed: 1,  accel: 0,  handling: -1 } },
+  { id: 'racer',     name: 'Racer',      model: 'racer',         seat: [0.77, -0.15], mod: { speed: 0,  accel: 0,  handling: 0 },  start: true },
+  { id: 'speedster', name: 'Speedster',  model: 'speedster',     seat: [0.72, -0.25],  mod: { speed: 1,  accel: -1, handling: 0 } },
+  { id: 'lowrider',  name: 'Low Rider',  model: 'racer-low',     seat: [0.72, -0.2],   mod: { speed: 0,  accel: 1,  handling: 0 } },
+  { id: 'dragster',  name: 'Dragster',   model: 'drag-racer',    seat: [0.67, -0.3],  mod: { speed: 2,  accel: -1, handling: -1 } },
+  { id: 'vintage',   name: 'Vintage',    model: 'vintage-racer', seat: [0.67, -0.2],  mod: { speed: -1, accel: 1,  handling: 1 } },
+  { id: 'monster',   name: 'Monster Truck', model: 'monster-truck', seat: [2.05, -0.2], mod: { speed: 1,  accel: 0,  handling: -1 } },
+  { id: 'suv',       name: 'Jeep',       model: 'suv',           seat: [1.40, -0.3],  mod: { speed: -1, accel: 1,  handling: 1 } },
+  { id: 'truck',     name: 'Ice Cream Truck', model: 'truck',    seat: [1.55, -0.55],  mod: { speed: 1,  accel: -1, handling: 0 } },
 ];
 
+// Gliders are built from simple shapes in models.js (no free glider models exist).
 export const GLIDERS = [
   { id: 'wing',      name: 'Paper Wing', style: 'wing',      color: 0xffffff, start: true },
   { id: 'parasol',   name: 'Parasol',    style: 'parasol',   color: 0xff6fae },
@@ -113,3 +126,25 @@ export const DIFFICULTY = {
 export const POINTS = [15, 12, 10, 8, 6, 4, 2, 1];
 export const PLACE_COINS = [50, 35, 25, 18, 12, 10, 8, 6];
 export const GIFT_COST = 100;
+
+// Scenery per track theme (Kenney Nature, Holiday and Food kits, CC0): [model, height, how often]
+export const DECO = {
+  trees:  [['nature/tree_default.glb', 9, 3], ['nature/tree_oak.glb', 10, 3], ['nature/tree_detailed.glb', 9, 2], ['nature/tree_fat.glb', 8, 2], ['nature/plant_bushLarge.glb', 2.5, 3], ['nature/flower_redA.glb', 1.2, 2], ['nature/flower_yellowA.glb', 1.2, 2], ['nature/mushroom_redGroup.glb', 1.8, 1], ['nature/rock_largeA.glb', 3, 1]],
+  palms:  [['nature/tree_palmTall.glb', 13, 4], ['nature/tree_palmBend.glb', 11, 3], ['nature/tree_palmDetailedTall.glb', 12, 3], ['nature/rock_largeC.glb', 3, 2], ['nature/plant_bushLarge.glb', 2.5, 2]],
+  cactus: [['nature/cactus_tall.glb', 7, 4], ['nature/cactus_short.glb', 4, 4], ['nature/rock_largeA.glb', 4, 2], ['nature/rock_largeE.glb', 5, 2], ['nature/statue_obelisk.glb', 12, 1]],
+  pines:  [['holiday/tree-snow-a.glb', 11, 3], ['holiday/tree-snow-b.glb', 9, 3], ['holiday/tree-snow-c.glb', 12, 3], ['holiday/snowman.glb', 3.2, 2], ['holiday/snowman-hat.glb', 3.2, 1], ['holiday/tree-decorated-snow.glb', 10, 1], ['holiday/present-a-cube.glb', 1.5, 1], ['holiday/rocks-large.glb', 3, 1]],
+  candy:  [['food/cupcake.glb', 6, 3], ['food/donut-sprinkles.glb', 4, 3], ['food/ice-cream.glb', 8, 2], ['food/cake-birthday.glb', 6, 2], ['food/cookie-chocolate.glb', 2.5, 2], ['food/donut-chocolate.glb', 4, 2], ['holiday/candy-cane-red.glb', 7, 3], ['holiday/candy-cane-green.glb', 7, 2]],
+  stars:  [['holiday/lantern.glb', 3, 2]],
+};
+// Start-line dressing from the Kenney Racing and Toy Car kits
+export const TRACK_PROPS = ['cars/gate-finish.glb', 'race/grandStandCovered.glb', 'race/grandStand.glb', 'race/bannerTowerRed.glb', 'race/bannerTowerGreen.glb', 'race/flagCheckers.glb', 'race/tent.glb', 'race/lightPostModern.glb', 'cars/item-cone.glb'];
+export const ITEM_MODELS = ['cars/item-box.glb', 'cars/item-coin-gold.glb', 'cars/item-banana.glb'];
+
+export function allModelPaths() {
+  return [
+    ...CHARACTERS.map((c) => `pets/animal-${c.model}.glb`),
+    ...KARTS.map((k) => `cars/vehicle-${k.model}.glb`),
+    ...Object.values(DECO).flat().map((d) => d[0]),
+    ...TRACK_PROPS, ...ITEM_MODELS,
+  ];
+}
