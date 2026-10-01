@@ -10,8 +10,14 @@ const wrapAng = (a) => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
 export class Race {
-  constructor({ renderer, track, player, others, difficulty, settings, hud, input, onFinish }) {
+  constructor({ renderer, track, player, others, difficulty, settings, hud, input, onFinish, mode = 'race' }) {
     this.renderer = renderer; this.def = track; this.diff = difficulty; this.settings = settings;
+    // mode: 'race' (8 karts), 'coinrush' (solo, 60s, grab coins), 'rings' (solo, 2 laps through rings)
+    this.mode = mode; this.solo = mode !== 'race';
+    this.laps = mode === 'rings' ? 2 : mode === 'coinrush' ? 99 : track.laps;
+    this.timeLimit = mode === 'coinrush' ? 60 : 0;
+    this.score = 0; this.combo = 0; this.comboTimer = 0; this.lastPlace = 8;
+    this.stats = { drifts: 0, hits: 0, tricks: 0, glides: 0, passes: 0, coins: 0, slips: 0, frenzies: 0, rings: 0, ringsTotal: 0 };
     this.hud = hud; this.input = input; this.onFinish = onFinish;
     this.scene = new THREE.Scene();
     const th = track.theme;
@@ -28,7 +34,8 @@ export class Race {
 
     // racers
     this.racers = [];
-    const slots = 8, playerSlot = 7; // start at the back: more karts to pass, nothing blocking the camera
+    // start at the back: more karts to pass, nothing blocking the camera. Bonus challenges are solo.
+    const slots = this.solo ? 1 : 8, playerSlot = this.solo ? 0 : 7;
     const rest = [...others];
     for (let s = 0; s < slots; s++) {
       const isPlayer = s === playerSlot;
@@ -37,14 +44,14 @@ export class Race {
     }
     this.player = this.racers[playerSlot];
 
-    this.boxes = []; this.coins = []; this.hazards = []; this.shots = [];
+    this.boxes = []; this.coins = []; this.hazards = []; this.shots = []; this.rings = [];
     this.placePickups();
 
     this.state = 'countdown'; this.clock = 0; this.raceTime = 0; this.finishOrder = [];
     this.paused = false; this.startHeld = 0;
     this.camPos = new THREE.Vector3(); this.camLook = new THREE.Vector3(); this.camHeading = this.player.heading;
     this.snapCamera();
-    this.hud.setup({ track: this.t, laps: track.laps });
+    this.hud.setup({ track: this.t, laps: this.laps, mode });
     engineStart();
     musicStart(track.id.length * 7 + track.points.length, track.theme.night ? 160 : 148);
   }
@@ -66,7 +73,7 @@ export class Race {
       heading: this.t.hd[idx], speed: 0, vy: 0, idx, prevIdx: idx, lat,
       lap: 0, checkpoint: false, finished: false, finishTime: 0, place: slot + 1, coins: 0, collected: 0,
       drift: 0, driftCharge: 0, driftLevel: 0, hardSteer: 0, boost: 0, star: 0, spin: 0, shrink: 0,
-      item: null, itemCount: 0, rolling: 0, gliding: false, wallCd: 0, bodyYaw: 0, wheelSpin: 0, steer: 0,
+      item: null, itemCount: 0, rolling: 0, frenzy: 0, itemCd: 0, hop: false, trick: false, trickSpin: 0, slip: 0, gliding: false, wallCd: 0, bodyYaw: 0, wheelSpin: 0, steer: 0,
       ai: isPlayer ? null : { offset: lat, nextOffset: 2 + Math.random() * 3, skill: this.diff.ai * (0.96 + Math.random() * 0.06) * (slot < 3 ? 1.02 : 1), itemWait: 0 },
     };
     // star aura
@@ -88,6 +95,30 @@ export class Race {
         const b = { x: t.px[i] + t.rx[i] * lat, z: t.pz[i] + t.rz[i] * lat, y: t.py[i] + 1.4, mesh: m, wait: 0 };
         m.position.set(b.x, b.y, b.z); this.boxes.push(b);
       }
+    }
+    if (this.mode === 'coinrush') {
+      // coins every few meters, weaving across the road
+      for (let i = 30, k = 0; i < t.N - 10; i += 9, k++) {
+        if (t.nearGap(i, 4)) continue;
+        const lat = Math.sin(k * 0.55) * t.hw * 0.6;
+        const m = buildCoin(); this.scene.add(m);
+        const c = { x: t.px[i] + t.rx[i] * lat, z: t.pz[i] + t.rz[i] * lat, y: t.py[i] + 1.1, mesh: m, wait: 0 };
+        m.position.set(c.x, c.y, c.z); this.coins.push(c);
+      }
+      return;
+    }
+    if (this.mode === 'rings') {
+      const ringGeo = new THREE.TorusGeometry(3, 0.35, 10, 28);
+      for (let i = 45, k = 0; i < t.N - 20; i += 38, k++) {
+        if (t.nearGap(i, 10)) continue;
+        const lat = Math.sin(k * 1.7) * t.hw * 0.5;
+        const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x3ad1ff }));
+        m.position.set(t.px[i] + t.rx[i] * lat, t.py[i] + 3.2, t.pz[i] + t.rz[i] * lat);
+        m.rotation.y = t.hd[i];
+        this.scene.add(m);
+        this.rings.push({ idx: i, lat, mesh: m, lap: 0 });
+      }
+      this.stats.ringsTotal = this.rings.length * this.laps;
     }
     for (const [n, f] of this.def.coins.entries()) {
       const lat = [0, -0.45, 0.45][n % 3] * t.hw;
@@ -118,7 +149,7 @@ export class Race {
       if (c <= 0.6) {
         this.state = 'racing'; this.hud.countdown('GO!'); sfx.go();
         for (const r of this.racers) { r.speed = r.top * 0.3; if (r.ai && Math.random() < 0.5) r.boost = 0.8; }
-        if (this.startHeld > 0.4) { this.player.boost = 1.4; this.player.speed = this.player.top; sfx.boost(); this.hud.toast('Rocket start!'); }
+        if (this.startHeld > 0.4) { this.player.boost = 1.4; this.player.speed = this.player.top; sfx.boost(); this.award('Rocket Start', 120); }
       }
       this.updateCamera(dt, true);
       this.animate(dt);
@@ -141,22 +172,32 @@ export class Race {
     this.updatePickups(dt);
     this.updateShots(dt);
     this.rank();
+    this.comboTimer -= dt;
+    if (this.comboTimer <= 0 && this.combo) { this.combo = 0; this.hud.combo(0); }
+    // each position pays once, so karts swapping back and forth can't be farmed
+    if (!this.solo && this.state === 'racing' && P.place < this.lastPlace) { this.award('Pass', 50 * (this.lastPlace - P.place)); this.stats.passes += this.lastPlace - P.place; this.lastPlace = P.place; }
+    if (this.timeLimit && this.state === 'racing' && this.raceTime >= this.timeLimit) this.finishRacer(P);
     this.animate(dt);
     this.updateCamera(dt, false);
 
     engineSet(clamp(P.speed / P.top, 0, 1.3), P.boost > 0 || P.star > 0);
-    this.hud.update({ place: P.place, lap: clamp(P.lap, 1, this.def.laps), coins: P.coins, time: this.raceTime, racers: this.racers, player: P });
+    this.hud.update({ place: P.place, lap: clamp(P.lap, 1, this.laps), coins: P.coins, time: this.timeLimit ? Math.max(0, this.timeLimit - this.raceTime) : this.raceTime, racers: this.racers, player: P, score: this.score, collected: P.collected, rings: this.stats.rings, ringsTotal: this.stats.ringsTotal, slip: P.slip > 0.35 });
 
     if (this.state === 'finished') {
       this.finishClock += dt;
-      if (this.finishClock > 4 && !this.reported) { this.reported = true; this.report(); }
+      if (this.finishClock > (this.solo ? 2.5 : 4) && !this.reported) { this.reported = true; this.report(); }
     }
   }
 
   // ---------------- driving ----------------
   physics(r, dt) {
     const t = this.t;
-    r.wallCd -= dt; r.boost -= dt; r.star -= dt; r.shrink -= dt;
+    r.wallCd -= dt; r.boost -= dt; r.star -= dt; r.shrink -= dt; r.itemCd -= dt; r.safe = (r.safe || 0) - dt;
+    if (r.frenzy > 0) {
+      r.frenzy -= dt;
+      if (r.ai && r.itemCd <= 0) this.useItem(r);
+      if (r.frenzy <= 0) { r.item = null; r.itemCount = 0; if (r.isPlayer) this.hud.item(null); }
+    }
     if (r.rolling > 0) {
       r.rolling -= dt;
       if (r.isPlayer && Math.random() < 0.5) sfx.roulette();
@@ -186,7 +227,7 @@ export class Race {
       const lvl = r.driftCharge > 2.6 ? 3 : r.driftCharge > 1.6 ? 2 : r.driftCharge > 0.8 ? 1 : 0;
       if (lvl > r.driftLevel) { r.driftLevel = lvl; if (r.isPlayer) sfx['drift' + lvl](); }
       if (letGo) {
-        if (r.driftLevel > 0) { r.boost = Math.max(r.boost, [0, 0.7, 1.2, 1.8][r.driftLevel]); if (r.isPlayer) sfx.boost(); }
+        if (r.driftLevel > 0) { r.boost = Math.max(r.boost, [0, 0.7, 1.2, 1.8][r.driftLevel]); if (r.isPlayer) { sfx.boost(); this.award(['', 'Mini-Turbo', 'Super Turbo', 'Ultra Turbo'][r.driftLevel], [0, 40, 80, 150][r.driftLevel]); this.stats.drifts++; } }
         r.drift = 0; r.driftCharge = 0; r.driftLevel = 0;
       }
     }
@@ -236,9 +277,34 @@ export class Race {
       if (!r.gliding && onRamp) {
         r.gliding = true; r.vy = 10; r.mesh.glider.visible = true; r.mesh.glider.scale.setScalar(0.01);
         r.drift = 0;
-        if (r.isPlayer) { sfx.glide(); this.hud.toast('Glide!'); }
+        if (r.isPlayer) { sfx.glide(); this.award('Glide', 40); this.stats.glides++; }
       }
     }
+    // trick ramps: hop, and do a trick in the air for a boost on landing
+    for (const p of t.pads) {
+      if (p.kind !== 'jump' || r.hop || r.gliding) continue;
+      const inside = p.a < p.b ? r.idx >= p.a && r.idx <= p.b : r.idx >= p.a || r.idx <= p.b;
+      if (inside) {
+        r.hop = true; r.vy = 9; r.trick = false; r.hopSteer = r.steer; r.hopHeld = this.input.holding;
+        if (r.ai && Math.random() < 0.6) r.trick = true;
+      }
+    }
+    if (r.hop && !r.trick && r.isPlayer) {
+      // swipe or tap while airborne
+      if (Math.abs(r.steer - r.hopSteer) > 0.35 || (this.input.holding && !r.hopHeld)) { r.trick = true; sfx.drift2(); }
+      r.hopHeld = r.hopHeld && this.input.holding;
+    }
+    // slipstream: tuck in right behind another kart
+    if (!this.solo && r.speed > r.top * 0.6 && r.boost <= 0 && !r.gliding) {
+      const fx0 = Math.sin(r.heading), fz0 = Math.cos(r.heading);
+      const behindSomeone = this.racers.some((o) => {
+        if (o === r) return false;
+        const dx = o.x - r.x, dz = o.z - r.z, d = Math.hypot(dx, dz);
+        return d > 2.5 && d < 16 && (dx * fx0 + dz * fz0) / d > 0.96;
+      });
+      r.slip = behindSomeone ? r.slip + dt : Math.max(0, r.slip - dt * 2);
+      if (r.slip > 1.3) { r.slip = 0; r.boost = 1.0; if (r.isPlayer) { sfx.boost(); this.award('Slipstream', 50); this.stats.slips++; } }
+    } else r.slip = Math.max(0, r.slip - dt * 2);
     // boost pads
     for (const p of t.pads) {
       if (p.kind !== 'boost') continue;
@@ -257,6 +323,14 @@ export class Race {
       }
       // safety: if somehow far from the gap, land
       if (!t.nearGap(r.idx, 80)) { r.gliding = false; r.y = roadY; }
+    } else if (r.hop) {
+      r.vy -= 26 * dt; r.y += r.vy * dt;
+      if (r.trick) r.trickSpin += dt * 13;
+      if (r.y <= roadY && r.vy < 0) {
+        r.y = roadY; r.hop = false; r.trickSpin = 0;
+        if (r.trick) { r.boost = Math.max(r.boost, 0.9); if (r.isPlayer) { sfx.boost(); this.award('Trick!', 60); this.stats.tricks++; } }
+        r.trick = false;
+      }
     } else {
       r.y += (roadY - r.y) * Math.min(1, dt * 12);
     }
@@ -266,9 +340,9 @@ export class Race {
     if (r.prevIdx > N * 0.75 && r.idx < N * 0.25) {
       if (r.lap === 0 || r.checkpoint) {
         r.lap++; r.checkpoint = false;
-        if (r.lap > this.def.laps && !r.finished) this.finishRacer(r);
+        if (r.lap > this.laps && !r.finished) this.finishRacer(r);
         else if (r.isPlayer && r.lap > 1) {
-          if (r.lap === this.def.laps) { sfx.finalLap(); this.hud.banner('Final lap!'); }
+          if (r.lap === this.laps) { sfx.finalLap(); this.hud.banner('Final lap!'); }
           else { sfx.lap(); this.hud.banner(`Lap ${r.lap}`); }
         }
       }
@@ -322,6 +396,17 @@ export class Race {
     }
   }
 
+  // points for stylish driving, with a combo multiplier for actions close together (player only)
+  award(label, pts) {
+    if (this.state === 'finished') return;
+    this.combo = this.comboTimer > 0 ? this.combo + 1 : 1;
+    this.comboTimer = 2.5;
+    const total = Math.round(pts * (1 + Math.min(this.combo - 1, 10) * 0.1));
+    this.score += total;
+    this.hud.points(label, total);
+    this.hud.combo(this.combo);
+  }
+
   rank() {
     const sorted = [...this.racers].sort((a, b) => {
       if (a.finished && b.finished) return a.finishTime - b.finishTime;
@@ -339,8 +424,8 @@ export class Race {
       const dx = b.x - a.x, dz = b.z - a.z, d2 = dx * dx + dz * dz;
       if (d2 > 4.8 || d2 < 1e-6) continue;
       const d = Math.sqrt(d2), over = 2.2 - d, nx = dx / d, nz = dz / d;
-      if (a.star > 0 && b.star <= 0) { this.hit(b); continue; }
-      if (b.star > 0 && a.star <= 0) { this.hit(a); continue; }
+      if (a.star > 0 && b.star <= 0) { this.hit(b, a); continue; }
+      if (b.star > 0 && a.star <= 0) { this.hit(a, b); continue; }
       const wa = b.weight / (a.weight + b.weight), wb = 1 - wa;
       a.x -= nx * over * wa; a.z -= nz * over * wa;
       b.x += nx * over * wb; b.z += nz * over * wb;
@@ -348,8 +433,10 @@ export class Race {
     }
   }
 
-  hit(r) {
-    if (r.star > 0 || r.spin > 0) return;
+  hit(r, by) {
+    if (r.star > 0 || r.spin > 0 || r.safe > 0) return;
+    r.safe = 2.2; // a moment of protection after a hit, so nobody gets juggled
+    if (by && by.isPlayer && !r.isPlayer) { this.award('Hit!', 100); this.stats.hits++; }
     r.spin = 1.1; r.speed *= 0.5; r.boost = 0;
     r.coins = Math.max(0, r.coins - 2);
     if (r.isPlayer) { sfx.hit(); this.hud.shake(); }
@@ -359,7 +446,7 @@ export class Race {
   rollItem(r) {
     if (r.item || r.rolling > 0) return;
     r.rolling = r.isPlayer ? 1.4 : 0.8;
-    if (r.isPlayer) { sfx.box(); this.hud.item({ rolling: true }); }
+    if (r.isPlayer) { sfx.box(); this.hud.item({ rolling: true }); this.award('Item Box', 10); }
   }
   giveItem(r) {
     r.rolling = 0; // the countdown overshoots below zero; a leftover -0.01 used to block every later box
@@ -368,20 +455,28 @@ export class Race {
     const total = names.reduce((s, n) => s + ITEMS[n].w[grp], 0);
     let x = Math.random() * total, pick = names[0];
     for (const n of names) { x -= ITEMS[n].w[grp]; if (x <= 0) { pick = n; break; } }
+    if (this.mode === 'coinrush') pick = Math.random() < 0.6 ? 'coin' : 'boost';
     r.item = pick; r.itemCount = pick === 'triple' ? 3 : 1;
-    if (r.ai) r.ai.itemWait = 1 + Math.random() * 3;
+    // Frenzy: the roulette lands on three of a kind. Invincible, and the item never runs out for a while.
+    const frenzyChance = (this.mode !== 'race' ? 0.1 : [0.02, 0.06, 0.12][grp]) * (r.ai ? 0.33 : 1);
+    if (Math.random() < frenzyChance && pick !== 'zap' && pick !== 'coin') {
+      r.frenzy = 7; r.star = Math.max(r.star, 7); r.itemCount = Infinity;
+      if (r.isPlayer) { sfx.star(); this.hud.banner('FRENZY!'); this.award('Frenzy!', 100); this.stats.frenzies++; }
+    }
+    if (r.ai) r.ai.itemWait = (this.diff.ai < 0.9 ? 3 : 1) + Math.random() * 3; // easy: rivals are slower to use items
     if (r.isPlayer) { sfx.got(); this.hud.item({ item: pick, count: r.itemCount }); }
   }
   useItem(r) {
-    if (!r.item || r.rolling > 0) return;
+    if (!r.item || r.rolling > 0 || r.itemCd > 0) return;
+    if (r.frenzy > 0) r.itemCd = r.ai ? 0.6 : 0.25;
     const t = this.t, kind = r.item;
-    const done = () => { r.itemCount--; if (r.itemCount <= 0) r.item = null; if (r.isPlayer) this.hud.item(r.item ? { item: r.item, count: r.itemCount } : null); };
+    const done = () => { if (r.frenzy > 0) return; r.itemCount--; if (r.itemCount <= 0) r.item = null; if (r.isPlayer) this.hud.item(r.item ? { item: r.item, count: r.itemCount } : null); };
     switch (kind) {
       case 'peel': {
         const m = buildPeel(); this.scene.add(m);
         const x = r.x - Math.sin(r.heading) * 3, z = r.z - Math.cos(r.heading) * 3;
         const idx = t.nearest(x, z, r.idx);
-        this.hazards.push({ x, z, idx, lat: t.lateral(idx, x, z), mesh: m, y: t.py[idx] });
+        this.hazards.push({ x, z, idx, lat: t.lateral(idx, x, z), mesh: m, y: t.py[idx], owner: r });
         m.position.set(x, t.py[idx], z);
         if (r.isPlayer) sfx.drop();
         break;
@@ -397,10 +492,10 @@ export class Race {
       case 'boost': case 'triple': r.boost = Math.max(r.boost, 1.3); r.speed = Math.max(r.speed, r.top); if (r.isPlayer) sfx.boost(); break;
       case 'star': r.star = 7; r.spin = 0; if (r.isPlayer) sfx.star(); break;
       case 'zap':
-        for (const o of this.racers) if (o !== r && o.star <= 0) { this.hit(o); o.shrink = 3.5; }
+        for (const o of this.racers) if (o !== r && o.star <= 0) { this.hit(o, r); o.shrink = 3.5; }
         sfx.zap(); this.hud.flash();
         break;
-      case 'coin': r.coins = Math.min(r.coins + 3, 10); r.collected += 3; if (r.isPlayer) sfx.coin(); break;
+      case 'coin': r.coins = Math.min(r.coins + 3, 10); r.collected += 3; if (r.isPlayer) { sfx.coin(); this.stats.coins += 3; } break;
     }
     done();
   }
@@ -421,16 +516,32 @@ export class Race {
       for (const r of this.racers) {
         if ((r.x - c.x) ** 2 + (r.z - c.z) ** 2 < 4 && Math.abs(r.y + 1 - c.y) < 3) {
           c.wait = 8; c.mesh.visible = false; r.coins = Math.min(r.coins + 1, 10); r.collected++;
-          if (r.isPlayer) sfx.coin();
+          if (r.isPlayer) { sfx.coin(); this.award('Coin', this.mode === 'coinrush' ? 30 : 15); this.stats.coins++; }
           break;
         }
+      }
+    }
+    if (this.rings.length) {
+      const P = this.player, N = this.t.N;
+      for (const g of this.rings) {
+        g.mesh.rotation.z += dt * 2;
+        if (g.lap >= P.lap || P.lap < 1 || P.finished) continue;
+        // did the player just cross this ring's spot on the track?
+        const crossed = ((P.idx - g.idx + N) % N) < 20 && ((P.prevIdx - g.idx + N) % N) > N - 20;
+        if (!crossed) continue;
+        g.lap = P.lap;
+        if (Math.abs(P.lat - g.lat) < 3.4) {
+          this.stats.rings++; sfx.got(); this.award('Ring', 80);
+          g.mesh.material.color.setHex(0xffd23a);
+        } else g.mesh.material.color.setHex(0x888888);
+        setTimeout(() => g.mesh.material.color.setHex(0x3ad1ff), 2500);
       }
     }
     for (let i = this.hazards.length - 1; i >= 0; i--) {
       const h = this.hazards[i];
       for (const r of this.racers) {
         if (!r.gliding && (r.x - h.x) ** 2 + (r.z - h.z) ** 2 < 3.2) {
-          this.hit(r); this.scene.remove(h.mesh); this.hazards.splice(i, 1); break;
+          this.hit(r, h.owner); this.scene.remove(h.mesh); this.hazards.splice(i, 1); break;
         }
       }
     }
@@ -458,7 +569,7 @@ export class Race {
       let gone = s.life <= 0;
       for (const r of this.racers) {
         if (r === s.owner && s.safe > 0) continue;
-        if ((r.x - s.x) ** 2 + (r.z - s.z) ** 2 < 4 && Math.abs(r.y - s.y) < 3) { this.hit(r); gone = true; break; }
+        if ((r.x - s.x) ** 2 + (r.z - s.z) ** 2 < 4 && Math.abs(r.y - s.y) < 3) { this.hit(r, s.owner); gone = true; break; }
       }
       for (let j = this.hazards.length - 1; j >= 0 && !gone; j--) {
         const h = this.hazards[j];
@@ -482,7 +593,7 @@ export class Race {
       const driftYaw = r.drift ? r.drift * -0.45 : 0;
       m.body.rotation.y += (driftYaw + r.bodyYaw - m.body.rotation.y) * Math.min(1, dt * 10);
       if (r.spin <= 0 && Math.abs(r.bodyYaw) < 0.01) r.bodyYaw = 0;
-      m.body.rotation.z = -r.steer * 0.08 * clamp(r.speed / r.top, 0, 1);
+      m.body.rotation.z = r.trickSpin ? -r.trickSpin : -r.steer * 0.08 * clamp(r.speed / r.top, 0, 1);
       m.body.position.y = r.drift ? Math.abs(Math.sin(this.clock * 30)) * 0.05 : 0;
       r.wheelSpin += r.speed * dt / 0.4;
       for (const w of m.wheels) w.rotation.x = r.wheelSpin * (m.spinSign || 1);
@@ -553,13 +664,14 @@ export class Race {
     const results = [...this.racers].sort((a, b) => a.place - b.place).map((r) => ({
       name: r.char.name, char: r.char, isPlayer: r.isPlayer, place: r.place, time: r.finished ? r.finishTime : null,
     }));
-    this.onFinish({ results, place: this.player.place, coins: this.player.collected, time: this.player.finishTime });
+    const placeBonus = this.solo ? 0 : [1500, 1200, 1000, 800, 650, 500, 400, 300][this.player.place - 1];
+    this.onFinish({ results, place: this.player.place, coins: this.player.collected, time: this.player.finishTime, mode: this.mode, actionScore: this.score, placeBonus, score: this.score + placeBonus, stats: this.stats });
   }
 
   dispose() {
     engineStop(); musicStop();
     // racers share cached geometry, so only free what the track built
-    this.t.group.traverse((o) => { o.geometry?.dispose(); o.material?.map?.dispose(); });
+    this.t.group.traverse((o) => { o.geometry?.dispose(); for (const m of [].concat(o.material || [])) m.map?.dispose(); });
   }
 }
 
