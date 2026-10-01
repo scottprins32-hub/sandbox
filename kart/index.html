@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Kart Party</title>
+<meta name="description" content="A cheerful kart racer: tracks, gliders, power-ups and lots of drivers to unlock.">
+<meta name="theme-color" content="#2f6fde">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kart Party">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+<style>
+:root{
+  --red:#e8423f; --red-d:#a92320; --yellow:#ffd23a; --yellow-d:#c99a00; --blue:#2f6fde; --blue-d:#1b46a0;
+  --green:#3fbf4a; --green-d:#23812c; --ink:#1d1b2e; --paper:#fffaf0; --mute:#6b6880;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+  color-scheme: light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#8fd3ff;font-family:Fredoka,ui-rounded,"SF Pro Rounded",system-ui,sans-serif;color:var(--ink);overscroll-behavior:none;touch-action:none}
+canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;padding:calc(16px + var(--safe-t)) calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l));overflow-y:auto;touch-action:pan-y}
+.screen.on{display:flex}
+.shade{background:linear-gradient(180deg,rgba(20,30,80,.55),rgba(20,30,80,.15) 40%,rgba(20,30,80,.55))}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:.01em}
+h2{font-size:28px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn{appearance:none;border:0;font:inherit;font-weight:700;font-size:20px;color:#fff;background:var(--c,var(--blue));border-radius:18px;padding:14px 22px;min-height:56px;box-shadow:0 6px 0 var(--cd,var(--blue-d)),0 10px 18px rgba(0,0,0,.18);transform:translateY(0);transition:transform .08s,box-shadow .08s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--cd,var(--blue-d)),0 3px 8px rgba(0,0,0,.18)}
+.btn.red{--c:var(--red);--cd:var(--red-d)} .btn.yellow{--c:var(--yellow);--cd:var(--yellow-d);color:var(--ink);text-shadow:none} .btn.green{--c:var(--green);--cd:var(--green-d)}
+.btn.white{--c:#fff;--cd:#c9c6d6;color:var(--ink);text-shadow:none}
+.btn.small{font-size:16px;min-height:44px;padding:8px 14px;border-radius:14px}
+.btn:disabled{filter:grayscale(.8) opacity(.7)}
+.topbar{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.coins{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);color:#fff;font-weight:700;font-size:20px;padding:6px 14px 6px 8px;border-radius:999px}
+.coin-i{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#ffc93a 45%,#d99a00);box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);display:inline-block}
+.panel{width:100%;max-width:560px;background:var(--paper);border-radius:24px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+
+/* title */
+#title{justify-content:center;gap:18px;text-align:center}
+.logo{font-size:clamp(56px,16vw,96px);line-height:.9;color:var(--yellow);-webkit-text-stroke:3px var(--ink);text-shadow:0 7px 0 var(--red),0 12px 20px rgba(0,0,0,.25);transform:rotate(-4deg)}
+.logo small{display:block;font-size:.45em;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:0 4px 0 var(--blue)}
+.pulse{animation:pulse 1.2s ease-in-out infinite;color:#fff;font-size:22px;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+@keyframes pulse{50%{transform:scale(1.07);opacity:.75}}
+
+/* main menu */
+#menu{justify-content:flex-end}
+.menu-grid{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.menu-grid .wide{grid-column:1/-1;font-size:26px;min-height:72px}
+.sel-name{color:#fff;font-size:30px;text-align:center;font-weight:700;text-shadow:0 3px 0 rgba(0,0,0,.3);margin-bottom:auto;margin-top:8px}
+
+/* garage */
+#garage{justify-content:flex-end}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;font:inherit;font-weight:700;font-size:16px;border:0;border-radius:12px;padding:10px 6px;background:#ece7da;color:var(--mute)}
+.tab.on{background:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:min(38vh,320px);overflow-y:auto;padding:2px;touch-action:pan-y}
+.card{position:relative;border:0;padding:4px 2px 6px;border-radius:14px;background:#fff;box-shadow:0 3px 0 #d9d3c3;font:inherit;font-size:13px;font-weight:600;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
+.card.on{outline:4px solid var(--yellow);background:#fff6d0}
+.card.locked img{filter:brightness(0) opacity(.35)}
+.card.locked::after{content:"?";position:absolute;top:22%;left:0;right:0;text-align:center;font-size:30px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.card.new::before{content:"NEW";position:absolute;top:2px;right:2px;background:var(--red);color:#fff;font-size:10px;padding:1px 5px;border-radius:6px;z-index:1}
+.stats{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;font-size:14px;font-weight:600;margin:4px 0 12px}
+.bar{height:10px;background:#e7e2d6;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));border-radius:6px;transition:width .3s}
+
+/* lists */
+.list{display:flex;flex-direction:column;gap:12px;width:100%;max-width:560px}
+.cup{display:flex;align-items:center;gap:14px;text-align:left;justify-content:flex-start}
+.cup .ico{font-size:40px}
+.cup small{display:block;font-size:14px;font-weight:600;opacity:.9}
+.trophy{margin-left:auto;font-size:28px}
+
+/* gift */
+#gift{justify-content:center;gap:16px;text-align:center}
+.giftbox{font-size:130px;line-height:1;filter:drop-shadow(0 10px 0 rgba(0,0,0,.2));transition:transform .2s}
+.giftbox.shake{animation:shake .5s ease-in-out 3}
+@keyframes shake{25%{transform:rotate(-12deg) scale(1.05)}75%{transform:rotate(12deg) scale(1.05)}}
+.reveal{display:none;flex-direction:column;align-items:center;gap:8px}
+.reveal.on{display:flex;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.reveal img{width:200px;height:200px;background:radial-gradient(circle,#fff6c0,transparent 70%);border-radius:50%}
+@keyframes pop{from{transform:scale(.2);opacity:0}}
+.gift-text{color:#fff;font-size:20px;font-weight:600;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+
+/* settings */
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #ece6d8;font-size:18px;font-weight:600}
+.row:last-child{border:0}
+.row small{display:block;font-size:13px;color:var(--mute);font-weight:500}
+.seg{display:flex;background:#ece7da;border-radius:12px;padding:3px}
+.seg button{font:inherit;font-weight:700;font-size:15px;border:0;background:none;padding:8px 10px;border-radius:10px;color:var(--mute)}
+.seg button.on{background:var(--blue);color:#fff}
+.switch{width:58px;height:34px;border-radius:999px;background:#d8d3c6;border:0;position:relative;flex:none;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.switch.on{background:var(--green)} .switch.on::after{transform:translateX(24px)}
+
+/* HUD */
+#hud{padding:0;pointer-events:none;touch-action:none}
+#hud .h-place{position:absolute;left:calc(12px + var(--safe-l));top:calc(10px + var(--safe-t));font-size:64px;font-weight:700;line-height:1;color:#fff;-webkit-text-stroke:3px var(--ink);text-shadow:0 4px 0 var(--ink)}
+#hud .h-place sup{font-size:.42em;vertical-align:top;margin-left:2px}
+#hud .h-info{position:absolute;right:calc(12px + var(--safe-r));top:calc(12px + var(--safe-t));text-align:right;color:#fff;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.45);font-size:20px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#hud .h-coins{display:flex;align-items:center;gap:6px;font-size:22px}
+#hud .h-coins .coin-i{width:22px;height:22px}
+#hud .h-map{position:absolute;right:calc(10px + var(--safe-r));top:calc(112px + var(--safe-t));width:110px;height:110px;opacity:.95}
+.h-item{pointer-events:auto;position:absolute;right:calc(18px + var(--safe-r));bottom:calc(24px + var(--safe-b));width:96px;height:96px;border-radius:24px;border:5px solid #fff;background:rgba(20,20,40,.45);font-size:52px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.25);color:#fff;font-family:inherit}
+.h-item.ready{animation:ready 0.9s ease-in-out infinite;background:rgba(255,210,58,.55)}
+@keyframes ready{50%{transform:scale(1.08)}}
+.h-item .cnt{position:absolute;right:4px;bottom:0;font-size:20px;font-weight:700;text-shadow:0 2px 0 #000}
+.h-pause{pointer-events:auto;position:absolute;left:calc(12px + var(--safe-l));bottom:calc(24px + var(--safe-b));width:52px;height:52px;border-radius:16px;border:0;background:rgba(20,20,40,.45);color:#fff;font-size:22px;font-weight:700;font-family:inherit}
+.h-center{position:absolute;left:0;right:0;top:32%;text-align:center;font-size:110px;font-weight:700;color:var(--yellow);-webkit-text-stroke:4px var(--ink);text-shadow:0 7px 0 var(--ink);opacity:0}
+.h-center.go{animation:count .9s ease-out forwards}
+@keyframes count{0%{transform:scale(2.2);opacity:0}20%{transform:scale(1);opacity:1}75%{opacity:1}100%{transform:scale(.8);opacity:0}}
+.h-banner{position:absolute;left:0;right:0;top:20%;text-align:center;font-size:40px;font-weight:700;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:0 4px 0 var(--ink);opacity:0}
+.h-banner.go{animation:count 1.6s ease-out forwards}
+.h-toast{position:absolute;left:50%;bottom:calc(140px + var(--safe-b));transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:999px;padding:8px 18px;font-weight:700;font-size:18px;opacity:0;transition:opacity .2s;white-space:nowrap}
+.h-toast.on{opacity:1}
+.h-hint{position:absolute;left:0;right:0;bottom:calc(150px + var(--safe-b));text-align:center;color:#fff;font-weight:600;font-size:17px;text-shadow:0 2px 0 rgba(0,0,0,.5);padding:0 24px;transition:opacity .4s}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flash.go{animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+.shake{animation:hshake .4s}
+@keyframes hshake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* results */
+#results{justify-content:center}
+.res{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.res li{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:6px 12px 6px 6px;font-weight:600;font-size:18px;box-shadow:0 2px 0 #e2dccd}
+.res li.me{background:var(--yellow);box-shadow:0 2px 0 var(--yellow-d)}
+.res .p{width:34px;text-align:center;font-weight:700;font-size:22px}
+.res img{width:40px;height:40px}
+.res .pts{margin-left:auto;font-weight:700}
+.earned{display:flex;justify-content:center;gap:16px;margin:14px 0;font-size:20px;font-weight:700;align-items:center}
+.btnrow{display:flex;gap:10px;margin-top:12px}
+.btnrow .btn{flex:1}
+@media (orientation:landscape) and (max-height:540px){
+  #menu,#garage{align-items:flex-end;justify-content:center}
+  #menu .menu-grid,#garage .panel{max-width:min(380px,48vw)}
+  #menu .sel-name,#garage .sel-name{position:absolute;left:calc(16px + var(--safe-l));bottom:calc(16px + var(--safe-b));margin:0;text-align:left}
+  #menu .topbar,#garage .topbar{position:absolute;top:calc(12px + var(--safe-t));left:calc(16px + var(--safe-l));right:calc(16px + var(--safe-r));width:auto;max-width:none}
+  .grid{max-height:calc(100vh - 210px)}
+  .menu-grid .wide{min-height:60px}
+}
+.tip{color:#fff;font-size:15px;opacity:.9;text-align:center;margin-top:10px;text-shadow:0 1px 0 rgba(0,0,0,.3);max-width:420px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<section class="screen on" id="title">
+  <div class="logo">Kart<small>Party!</small></div>
+  <div class="pulse" id="tapStart">Tap to play</div>
+  <p class="tip">Tip: tap Share, then “Add to Home Screen” to play full screen like an app.</p>
+</section>
+
+<section class="screen" id="menu">
+  <div class="topbar"><span class="coins"><i class="coin-i"></i><span data-coins>0</span></span><button class="btn small white" data-go="settings">⚙️ Settings</button></div>
+  <div class="sel-name" id="selName"></div>
+  <div class="menu-grid">
+    <button class="btn red wide" data-go="cups">🏆 Grand Prix</button>
+    <button class="btn" data-go="tracks">🏁 Quick Race</button>
+    <button class="btn green" data-go="garage">🚗 Garage</button>
+    <button class="btn yellow wide" data-go="gift">🎁 Gift Box <span id="giftBadge"></span></button>
+  </div>
+</section>
+
+<section class="screen" id="garage">
+  <div class="topbar"><button class="btn small white" data-go="menu">← Back</button><span class="coins"><i class="coin-i"></i><span data-coins>0</span></span></div>
+  <div class="sel-name" id="garName" style="font-size:22px"></div>
+  <div class="panel">
+    <div class="tabs"><button class="tab on" data-tab="chars">Drivers</button><button class="tab" data-tab="karts">Karts</button><button class="tab" data-tab="gliders">Gliders</button></div>
+    <div class="stats" id="stats"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="screen shade" id="cups">
+  <div class="topbar"><button class="btn small white" data-go="menu">← Back</button><span class="coins"><i class="coin-i"></i><span data-coins>0</span></span></div>
+  <h2 style="margin:8px 0 16px">Grand Prix</h2>
+  <div class="list" id="cupList"></div>
+  <p class="tip">Finish a cup in the top 3 to open the next one. Win it for a free gift!</p>
+</section>
+
+<section class="screen shade" id="tracks">
+  <div class="topbar"><button class="btn small white" data-go="menu">← Back</button><span class="coins"><i class="coin-i"></i><span data-coins>0</span></span></div>
+  <h2 style="margin:8px 0 16px">Quick Race</h2>
+  <div class="list" id="trackList"></div>
+</section>
+
+<section class="screen shade" id="gift">
+  <div class="topbar"><button class="btn small white" data-go="menu">← Back</button><span class="coins"><i class="coin-i"></i><span data-coins>0</span></span></div>
+  <div class="giftbox" id="giftBox">🎁</div>
+  <div class="reveal" id="reveal"><img id="revealImg" alt=""><h2 id="revealName"></h2><div class="gift-text" id="revealKind"></div></div>
+  <div class="gift-text" id="giftText"></div>
+  <button class="btn yellow" id="openGift" style="min-width:240px">Open for <i class="coin-i"></i> 100</button>
+</section>
+
+<section class="screen shade" id="settings">
+  <div class="topbar"><button class="btn small white" data-back>← Back</button></div>
+  <div class="panel">
+    <div class="row"><div>Speed</div><div class="seg" id="diffSeg"><button data-d="easy">Easy</button><button data-d="normal">Normal</button><button data-d="fast">Fast</button></div></div>
+    <div class="row"><div>Smart steering<small>Keeps you on the road</small></div><button class="switch" data-set="assist"></button></div>
+    <div class="row"><div>Tilt to steer<small>Tilt the phone like a wheel</small></div><button class="switch" data-set="tilt"></button></div>
+    <div class="row"><div>Music</div><button class="switch" data-set="music"></button></div>
+    <div class="row"><div>Sound effects</div><button class="switch" data-set="sfx"></button></div>
+    <div class="row"><div>How to play<small>Drag left/right to steer. Hold a hard turn to drift; let go for a boost. Tap the item box to use items.</small></div></div>
+    <div class="row"><div>Start over<small>Clears coins and unlocks</small></div><button class="btn small red" id="resetBtn">Reset</button></div>
+  </div>
+</section>
+
+<section class="screen" id="hud">
+  <div class="h-place" id="hPlace">1<sup>st</sup></div>
+  <div class="h-info"><div id="hLap">Lap 1/3</div><div id="hTime">0:00.0</div><div class="h-coins"><i class="coin-i"></i><span id="hCoins">0</span></div></div>
+  <canvas class="h-map" id="hMap" width="220" height="220"></canvas>
+  <div class="h-center" id="hCenter"></div>
+  <div class="h-banner" id="hBanner"></div>
+  <div class="h-toast" id="hToast"></div>
+  <div class="h-hint" id="hHint">Drag left or right to steer<br>Hold the screen as the “2” disappears for a rocket start!</div>
+  <button class="h-pause" id="hPause" aria-label="Pause">II</button>
+  <button class="h-item" id="hItem" aria-label="Use item"></button>
+</section>
+
+<section class="screen shade" id="pause" style="justify-content:center">
+  <div class="panel" style="max-width:360px;display:flex;flex-direction:column;gap:14px">
+    <h2 style="color:var(--ink);text-shadow:none;text-align:center">Paused</h2>
+    <button class="btn green" id="resume">Keep racing</button>
+    <button class="btn" id="restart">Restart</button>
+    <button class="btn white" data-go="settings">Settings</button>
+    <button class="btn red" id="quit">Quit</button>
+  </div>
+</section>
+
+<section class="screen shade" id="results">
+  <div class="panel">
+    <h2 id="resTitle" style="color:var(--ink);text-shadow:none;text-align:center;margin-bottom:10px"></h2>
+    <ul class="res" id="resList"></ul>
+    <div class="earned" id="earned"></div>
+    <div class="btnrow" id="resBtns"></div>
+  </div>
+</section>
+<div class="flash" id="flash"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
