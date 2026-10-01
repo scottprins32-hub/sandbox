@@ -183,6 +183,25 @@ export function buildTrack(def) {
     addPad(i, side * hw * 0.45, 7, '#ff8a1e', 'boost');
   }
 
+  // trick ramps: a striped wedge across the road; karts hop off the top
+  for (const f of [0.2, 0.63]) {
+    let i = Math.round(f * N);
+    if (nearGap(i, 40)) i = (gapB + 70) % N;
+    if (pads.some((p) => Math.abs(p.a - i) < 25)) i = (i + 40) % N;
+    const len = 6;
+    const tex = canvasTex((x, w, h) => {
+      for (let k = 0; k < 8; k++) { x.fillStyle = k % 2 ? '#1d1b2e' : '#ffd23a'; x.fillRect((k * w) / 8, 0, w / 8 + 1, h); }
+      x.fillStyle = 'rgba(255,255,255,.9)'; x.font = 'bold 40px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('▲ JUMP ▲', w / 2, h / 2);
+    }, 256, 64);
+    const j = (i + Math.round(len / 2)) % N;
+    const ramp = new THREE.Mesh(new THREE.BoxGeometry(def.width, 0.6, len), [mat(0x1d1b2e), mat(0x1d1b2e), new THREE.MeshLambertMaterial({ map: tex }), mat(0x1d1b2e), mat(0xffd23a), mat(0xffd23a)]);
+    ramp.position.set(px[j], py[j] + 0.25, pz[j]);
+    ramp.rotation.order = 'YXZ';
+    ramp.rotation.set(-0.1, hd[j], 0);
+    group.add(ramp);
+    pads.push({ a: (i + len - 1) % N, b: (i + len + 1) % N, lateral: 0, half: hw, kind: 'jump' });
+  }
+
   // ---------- ground + scenery ----------
   let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
   for (let i = 0; i < N; i++) { minX = Math.min(minX, px[i]); maxX = Math.max(maxX, px[i]); minZ = Math.min(minZ, pz[i]); maxZ = Math.max(maxZ, pz[i]); }

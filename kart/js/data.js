@@ -112,10 +112,50 @@ export const TRACKS = [
   },
 ];
 
+// Reverse ("R") versions: same start point, driven the other way round.
+for (const t of [...TRACKS]) {
+  const n = t.points.length;
+  TRACKS.push({
+    ...t, id: t.id + '-r', name: t.name + ' R', reverse: true,
+    points: t.points.map((_, k) => t.points[(n - k) % n]),
+    glide: t.glide ? [n - t.glide[1], n - t.glide[0]] : undefined,
+    boxes: t.boxes.map((f) => 1 - f).sort(), coins: t.coins.map((f) => (1.04 - f) % 1).sort(),
+  });
+}
+
+// Tour-style cups: three races and a bonus challenge. Each event earns up to 5 stars;
+// stars open the next cup.
 export const CUPS = [
-  { id: 'sunshine', name: 'Sunshine Cup', icon: '🌞', tracks: ['meadow', 'beach', 'desert'] },
-  { id: 'moonlight', name: 'Moonlight Cup', icon: '🌙', tracks: ['snow', 'candy', 'starlight'] },
+  { id: 'sunshine', name: 'Sunshine Cup', icon: '🌞', need: 0, events: [['meadow', 'race'], ['beach', 'race'], ['desert', 'race'], ['meadow', 'coinrush']] },
+  { id: 'moonlight', name: 'Moonlight Cup', icon: '🌙', need: 8, events: [['snow', 'race'], ['candy', 'race'], ['starlight', 'race'], ['beach', 'rings']] },
+  { id: 'sunshine-r', name: 'Sunset Cup', icon: '🌅', need: 18, events: [['meadow-r', 'race'], ['beach-r', 'race'], ['desert-r', 'race'], ['desert-r', 'rings']] },
+  { id: 'moonlight-r', name: 'Starfall Cup', icon: '🌠', need: 30, events: [['snow-r', 'race'], ['candy-r', 'race'], ['starlight-r', 'race'], ['candy-r', 'coinrush']] },
 ];
+export const MODES = {
+  race: { label: 'Race', icon: '🏁', goal: 'Score points: finish high, drift, do tricks and hit rivals' },
+  coinrush: { label: 'Coin Rush', icon: '🪙', goal: 'Grab as many coins as you can in 60 seconds' },
+  rings: { label: 'Ring Race', icon: '⭕', goal: 'Drive through the rings over 2 laps' },
+};
+// what each star needs, by mode (race: score, coinrush: coins, rings: % of rings)
+export const STARS = { race: [1500, 2400, 3300, 4300, 5400], coinrush: [20, 35, 50, 65, 80], rings: [40, 60, 75, 88, 100] };
+
+// Challenges: goals on lifetime stats; each claim raises the goal for next time.
+export const CHALLENGES = [
+  { key: 'races', name: 'Race {n} times', icon: '🏁', goal: 5, reward: 50 },
+  { key: 'wins', name: 'Win {n} races', icon: '🏆', goal: 2, reward: 100 },
+  { key: 'drifts', name: 'Do {n} drift boosts', icon: '💨', goal: 20, reward: 70 },
+  { key: 'tricks', name: 'Do {n} jump tricks', icon: '🤸', goal: 10, reward: 70 },
+  { key: 'glides', name: 'Glide {n} times', icon: '🪂', goal: 8, reward: 60 },
+  { key: 'hits', name: 'Hit rivals {n} times', icon: '🎯', goal: 15, reward: 90 },
+  { key: 'coins', name: 'Collect {n} coins in races', icon: '🪙', goal: 150, reward: 90 },
+  { key: 'frenzies', name: 'Get {n} Frenzies', icon: '🌈', goal: 2, reward: 100 },
+  { key: 'passes', name: 'Pass {n} karts', icon: '⏩', goal: 40, reward: 70 },
+  { key: 'slips', name: 'Slipstream {n} times', icon: '🌬️', goal: 8, reward: 60 },
+  { key: 'rings', name: 'Drive through {n} rings', icon: '⭕', goal: 25, reward: 80 },
+  { key: 'stars', name: 'Earn {n} stars', icon: '⭐', goal: 10, reward: 150 },
+];
+export const DAILY = [{ coins: 50 }, { coins: 80 }, { gift: 1 }, { coins: 120 }, { coins: 150 }, { gift: 1 }, { coins: 300 }];
+export const xpForLevel = (lv) => 400 + (lv - 1) * 250; // xp needed to go from lv to lv+1
 
 export const DIFFICULTY = {
   easy:   { label: 'Easy',   speed: 24, ai: 0.82 },
