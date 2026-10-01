@@ -2,6 +2,8 @@
 // scenery, and the lookup tables the physics uses (one sample per ~1 unit of road).
 import * as THREE from 'three';
 import { canvasTex, mat } from './models.js';
+import { DECO } from './data.js';
+import { fitted, instanced, has } from './assets.js';
 
 export function buildTrack(def) {
   const group = new THREE.Group();
@@ -105,18 +107,48 @@ export function buildTrack(def) {
   start.rotation.set(-Math.PI / 2, hd[0], 0);
   start.position.set(px[0], py[0] + 0.08, pz[0]);
   group.add(start);
-  // start arch
-  const arch = new THREE.Group();
-  for (const s of [-1, 1]) arch.add(placed(new THREE.Mesh(new THREE.BoxGeometry(0.8, 9, 0.8), mat(th.edgeB)), s * (hw + 2), 4.5, 0));
-  const banner = canvasTex((x, w, h) => {
-    x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
-    x.fillStyle = '#e8423f'; x.font = 'bold 44px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillText('KART PARTY', w / 2, h / 2 + 2);
-  }, 512, 64);
-  const ban = new THREE.Mesh(new THREE.BoxGeometry(def.width + 4.8, 2, 0.6), new THREE.MeshLambertMaterial({ map: banner }));
-  ban.position.y = 9; arch.add(ban);
-  arch.position.set(px[0], py[0], pz[0]); arch.rotation.y = hd[0];
-  group.add(arch);
+  // start area: finish gate, grandstands, flags (Kenney Racing + Toy Car kits)
+  const place = (obj, i, lateral, rot = 0, y = 0) => {
+    const j = ((i % N) + N) % N;
+    obj.position.set(px[j] + rx[j] * lateral, py[j] + y, pz[j] + rz[j] * lateral);
+    obj.rotation.y = hd[j] + rot;
+    group.add(obj);
+    return obj;
+  };
+  if (has('cars/gate-finish.glb')) {
+    place(fitted('cars/gate-finish.glb', def.width + 5, 'w'), 0, 0, 0);
+    // grandstands just past the line, seats facing the road
+    for (const [i, side] of [[34, 1], [34, -1], [62, 1], [62, -1]]) {
+      place(fitted(i === 34 ? 'race/grandStandCovered.glb' : 'race/grandStand.glb', 15, 'w'), i, side * (hw + 9), side > 0 ? Math.PI / 2 : -Math.PI / 2);
+    }
+    for (const side of [-1, 1]) {
+      place(fitted('race/bannerTowerRed.glb', 9), 22, side * (hw + 3.2), 0);
+      place(fitted('race/bannerTowerGreen.glb', 9), -90, side * (hw + 3.2), 0);
+      place(fitted('race/flagCheckers.glb', 5), 6, side * (hw + 3.4), side > 0 ? -Math.PI / 2 : Math.PI / 2);
+      place(fitted('race/tent.glb', 6, 'w'), 90, side * (hw + 9), side > 0 ? Math.PI / 2 : -Math.PI / 2);
+    }
+    // light posts and cones around the lap
+    for (let i = 40, k = 0; i < N - 40; i += 55, k++) {
+      if (nearGap(i, 12)) continue;
+      const side = k % 2 ? 1 : -1;
+      place(fitted('race/lightPostModern.glb', 9), i, side * (hw + 2.6), side > 0 ? Math.PI : 0);
+      for (let c = 0; c < 3; c++) place(fitted('cars/item-cone.glb', 1.1), i + 8 + c * 3, -side * (hw + 2.4), 0);
+    }
+  } else {
+    // start arch
+    const arch = new THREE.Group();
+    for (const s of [-1, 1]) arch.add(placed(new THREE.Mesh(new THREE.BoxGeometry(0.8, 9, 0.8), mat(th.edgeB)), s * (hw + 2), 4.5, 0));
+    const banner = canvasTex((x, w, h) => {
+      x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+      x.fillStyle = '#e8423f'; x.font = 'bold 44px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText('KART PARTY', w / 2, h / 2 + 2);
+    }, 512, 64);
+    const ban = new THREE.Mesh(new THREE.BoxGeometry(def.width + 4.8, 2, 0.6), new THREE.MeshLambertMaterial({ map: banner }));
+    ban.position.y = 9; arch.add(ban);
+    arch.position.set(px[0], py[0], pz[0]); arch.rotation.y = hd[0];
+    group.add(arch);
+
+  }
 
   // ---------- glider ramp + gap water ----------
   const pads = [];
@@ -167,10 +199,11 @@ export function buildTrack(def) {
   };
   const rand = mulberry(def.id.length * 977 + def.points.length);
   const decoSpots = [];
-  for (let tries = 0; tries < 900 && decoSpots.length < 170; tries++) {
+  for (let tries = 0; tries < 1400 && decoSpots.length < 250; tries++) {
     const x = minX - 90 + rand() * (maxX - minX + 180), z = minZ - 90 + rand() * (maxZ - minZ + 180);
     const d = distToTrack(x, z);
-    if (d > hw + 9 && d < 120) decoSpots.push([x, z, 0.7 + rand() * 0.8, rand() * Math.PI * 2]);
+    const nearStart = (x - px[48]) ** 2 + (z - pz[48]) ** 2 < 55 * 55;
+    if (d > hw + 9 && d < 120 && !nearStart) decoSpots.push([x, z, 0.7 + rand() * 0.8, rand() * Math.PI * 2]);
   }
   group.add(buildDeco(th, decoSpots, rand));
   // distant hills ring
@@ -214,7 +247,10 @@ export function buildTrack(def) {
 }
 
 function buildDeco(th, spots, rand) {
+  const kit = DECO[th.deco];
+  if (kit && kit.every(([p]) => has(p)) && th.deco !== 'stars') return buildKitDeco(kit, spots, rand);
   const g = new THREE.Group();
+  if (th.deco === 'stars' && kit && has(kit[0][0])) g.add(buildKitDeco(kit, spots.filter((_, i) => i % 4 === 0), rand));
   const kinds = {
     trees: () => { const t = new THREE.Group(); t.add(cyl(0x8a5a33, 0.5, 3, 0, 1.5)); t.add(ball(0x3fae49, 2.6, 0, 4.6)); t.add(ball(0x56c25d, 1.8, 1.2, 5.6)); return t; },
     palms: () => { const t = new THREE.Group(); const tr = cyl(0xa0784a, 0.4, 8, 0, 4); tr.rotation.z = 0.15; t.add(tr); for (let i = 0; i < 6; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.15, 1.1), mat(0x2fae4a)); l.position.set(Math.cos(i) * 2 + 1.2, 8, Math.sin(i) * 2); l.rotation.y = -i; l.rotation.z = -0.4; t.add(l); } return t; },
@@ -227,6 +263,19 @@ function buildDeco(th, spots, rand) {
   for (const [x, z, s, r] of spots) {
     const d = make(); d.position.set(x, 0, z); d.scale.setScalar(s); d.rotation.y = r; g.add(d);
   }
+  return g;
+}
+function buildKitDeco(kit, spots, rand) {
+  const g = new THREE.Group();
+  const total = kit.reduce((a, k) => a + k[2], 0);
+  const byModel = new Map();
+  for (const [x, z, sc, r] of spots) {
+    let pick = rand() * total, m = kit[0];
+    for (const k of kit) { pick -= k[2]; if (pick <= 0) { m = k; break; } }
+    if (!byModel.has(m)) byModel.set(m, []);
+    byModel.get(m).push([x, 0, z, r, sc]);
+  }
+  for (const [[path, h], list] of byModel) g.add(instanced(path, list, h));
   return g;
 }
 function cyl(color, r, h, x, y, horizontal) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 8), mat(color)); m.position.set(x, y, 0); if (horizontal) m.rotation.z = Math.PI / 2; return m; }

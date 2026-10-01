@@ -485,7 +485,7 @@ export class Race {
       m.body.rotation.z = -r.steer * 0.08 * clamp(r.speed / r.top, 0, 1);
       m.body.position.y = r.drift ? Math.abs(Math.sin(this.clock * 30)) * 0.05 : 0;
       r.wheelSpin += r.speed * dt / 0.4;
-      for (const w of m.wheels) w.rotation.x = r.wheelSpin;
+      for (const w of m.wheels) w.rotation.x = r.wheelSpin * (m.spinSign || 1);
       if (m.driver.userData.head) m.driver.userData.head.rotation.y = -r.steer * 0.3;
       const s = r.shrink > 0 ? 0.6 : 1;
       m.root.scale.setScalar(m.root.scale.x + (s - m.root.scale.x) * Math.min(1, dt * 8));
