@@ -302,7 +302,7 @@ export class Race {
     a.rubber = a.skill * (r.finished ? 0.8 : gap > 90 ? 0.9 : gap > 40 ? 0.96 : gap < -90 ? 1.1 : gap < -40 ? 1.05 : 1);
 
     // items
-    if (r.item && !r.rolling && !r.finished) {
+    if (r.item && r.rolling <= 0 && !r.finished) {
       a.itemWait -= dt;
       if (a.itemWait <= 0) {
         let use = true;
@@ -357,11 +357,12 @@ export class Race {
 
   // ---------------- items ----------------
   rollItem(r) {
-    if (r.item || r.rolling) return;
+    if (r.item || r.rolling > 0) return;
     r.rolling = r.isPlayer ? 1.4 : 0.8;
     if (r.isPlayer) { sfx.box(); this.hud.item({ rolling: true }); }
   }
   giveItem(r) {
+    r.rolling = 0; // the countdown overshoots below zero; a leftover -0.01 used to block every later box
     const grp = r.place <= 2 ? 0 : r.place <= 5 ? 1 : 2;
     const names = Object.keys(ITEMS);
     const total = names.reduce((s, n) => s + ITEMS[n].w[grp], 0);
