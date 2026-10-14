@@ -23,11 +23,11 @@
 <link rel="icon" href="./assets/icons/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="./site.webmanifest">
-<link rel="preload" href="./assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/fonts/archivo-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" type="image/avif" imagesrcset="./assets/img/kip-grillen-800.avif 800w, ./assets/img/kip-grillen-1600.avif 1600w" imagesizes="(min-width: 900px) 40vw, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="./assets/css/site.css?v=1">
+<link rel="stylesheet" href="./assets/css/site.css?v=3">
 <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__dilek)document.documentElement.classList.remove('js')},2500)</script>
-<script src="./assets/js/site.js?v=1" defer></script>
+<script src="./assets/js/site.js?v=3" defer></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://scottprins32-hub.github.io/sandbox/dilek/#org", "name": "Dilek Chicken", "url": "https://scottprins32-hub.github.io/sandbox/dilek/", "logo": "https://scottprins32-hub.github.io/sandbox/dilek/assets/img/logo-971.png", "email": "info@dilek-chicken.nl", "sameAs": ["https://www.instagram.com/dilekchicken", "https://www.tiktok.com/@dilekchicken", "https://www.facebook.com/dilekchicken"]}, {"@type": "Restaurant", "@id": "https://scottprins32-hub.github.io/sandbox/dilek/#osdorp", "name": "Dilek Chicken Osdorp", "parentOrganization": {"@id": "https://scottprins32-hub.github.io/sandbox/dilek/#org"}, "url": "https://scottprins32-hub.github.io/sandbox/dilek/contact/#loc-osdorp", "image": "https://scottprins32-hub.github.io/sandbox/dilek/assets/img/loc-osdorp-1280.webp", "telephone": "+31646465044", "servesCuisine": ["Gegrilde kip", "Halal"], "priceRange": "€", "hasMenu": "https://scottprins32-hub.github.io/sandbox/dilek/menu/", "address": {"@type": "PostalAddress", "streetAddress": "Osdorper Ban 156", "postalCode": "1069 BC", "addressLocality": "Amsterdam", "addressCountry": "NL"}, "geo": {"@type": "GeoCoordinates", "latitude": 52.359137, "longitude": 4.7842675}, "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "10:30", "closes": "20:00"}]}, {"@type": "Restaurant", "@id": "https://scottprins32-hub.github.io/sandbox/dilek/#westpoort", "name": "Dilek Chicken Westpoort", "parentOrganization": {"@id": "https://scottprins32-hub.github.io/sandbox/dilek/#org"}, "url": "https://scottprins32-hub.github.io/sandbox/dilek/contact/#loc-westpoort", "image": "https://scottprins32-hub.github.io/sandbox/dilek/assets/img/loc-westpoort-1280.webp", "telephone": "+31658909294", "servesCuisine": ["Gegrilde kip", "Halal"], "priceRange": "€", "hasMenu": "https://scottprins32-hub.github.io/sandbox/dilek/menu/", "address": {"@type": "PostalAddress", "streetAddress": "Sierenborch 11", "postalCode": "1046 BB", "addressLocality": "Amsterdam", "addressCountry": "NL"}, "geo": {"@type": "GeoCoordinates", "latitude": 52.390146, "longitude": 4.8046349}, "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "10:00", "closes": "19:00"}]}, {"@type": "Restaurant", "@id": "https://scottprins32-hub.github.io/sandbox/dilek/#haarlem", "name": "Dilek Chicken Haarlem", "parentOrganization": {"@id": "https://scottprins32-hub.github.io/sandbox/dilek/#org"}, "url": "https://scottprins32-hub.github.io/sandbox/dilek/contact/#loc-haarlem", "image": "https://scottprins32-hub.github.io/sandbox/dilek/assets/img/loc-haarlem-1280.webp", "telephone": "+31658909294", "servesCuisine": ["Gegrilde kip", "Halal"], "priceRange": "€", "hasMenu": "https://scottprins32-hub.github.io/sandbox/dilek/menu/", "address": {"@type": "PostalAddress", "streetAddress": "Van Zeggelenplein 131", "postalCode": "2032 KE", "addressLocality": "Haarlem", "addressCountry": "NL"}, "geo": {"@type": "GeoCoordinates", "latitude": 52.3788241, "longitude": 4.6596036}, "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "10:30", "closes": "19:00"}]}]}</script>
 </head>
 <body class="page-home">
@@ -57,14 +57,14 @@
         <span class="hero-line" aria-hidden="true">Elke dag</span>
         <span class="spit" aria-hidden="true">
           <span class="spit-rod"></span>
-          <span class="drum">
+          <span class="spit-band"><span class="drum">
             <span class="face">vers van het spit.</span>
             <span class="face">100% halal.</span>
             <span class="face">goudbruin.</span>
             <span class="face">krokant.</span>
             <span class="face">open.</span>
             <span class="face">kip bij Dilek.</span>
-          </span>
+          </span></span>
         </span>
       </h1>
       <p class="hero-lede">Hele kippen, kippenbouten, kipvingers en grillworst. Gegrild met onze eigen kruidenmix, <strong>100% halal</strong>, sinds 2014.</p>
@@ -79,6 +79,11 @@
           <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l12-7z" fill="currentColor"/></svg>
           <span class="t-pause">Spit pauzeren</span><span class="t-play">Spit laten draaien</span>
         </button>
+        <button class="sound-toggle" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="i-waves" d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="i-mute" d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Geluid
+        </button>
+        <span class="spit-hint" aria-hidden="true">↕ Sleep aan het spit</span>
       </div>
     </div>
     <div class="hero-media">

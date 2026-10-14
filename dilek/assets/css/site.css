@@ -2,7 +2,7 @@
    Tokens: charcoal grill, bread-crust paper, Dilek red, spit gold.
    Type: Archivo (variable width + weight) for everything, DM Mono for labels and prices. */
 
-@font-face{font-family:"Archivo";src:url(../fonts/archivo-var-latin.woff2) format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Archivo";src:url(../fonts/archivo-subset.woff2) format("woff2");font-weight:400 900;font-stretch:62% 100%;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"DM Mono";src:url(../fonts/dmmono-400-latin.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"DM Mono";src:url(../fonts/dmmono-500-latin.woff2) format("woff2");font-weight:500;font-display:swap}
 
@@ -123,15 +123,19 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- hero + the spit ---------- */
 .hero{position:relative;background:var(--ink);color:var(--paper);overflow:clip;padding-block:clamp(28px,5vw,72px) clamp(56px,7vw,104px)}
-.hero::before{content:"";position:absolute;inset:-20% -10% auto 30%;height:110%;background:radial-gradient(closest-side,rgb(244 181 68 / .16),rgb(238 106 44 / .06) 55%,transparent 75%);pointer-events:none}
+.hero::before{content:"";position:absolute;inset:-180px -10% auto 30%;height:1100px;background:radial-gradient(closest-side,rgb(244 181 68 / .16),rgb(238 106 44 / .06) 55%,transparent 75%);pointer-events:none}
 .hero-grid{position:relative;display:grid;gap:clamp(32px,5vw,72px);align-items:center}
 @media (min-width:900px){.hero-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr);min-height:calc(100svh - var(--header-h) - 140px);max-height:980px}}
-.hero-copy{min-width:0}
+.hero-copy{min-width:0;container-type:inline-size}
 .hero .eyebrow{color:var(--mute-d);display:flex;flex-wrap:wrap;gap:.4em 1em;margin-bottom:clamp(20px,3vw,36px)}
 .hero .eyebrow span+span::before{content:"·";margin-right:1em;color:var(--gold)}
 .hero-title{font-stretch:62%;font-weight:850;text-transform:uppercase;font-size:var(--spit-size,clamp(2.6rem,.4rem + 8.2vw,8rem));line-height:.9;letter-spacing:-.005em}
+/* start at the fitted size (the longest phrase is ~7.1em wide) so nothing shifts when JS refines it */
+@supports (font-size:1cqi){.hero-title{font-size:var(--spit-size,min(168px,100cqi / 7.24))}}
 .hero-line{display:block}
-.spit{--face-h:1em;--r:calc(var(--face-h) * .866);--band:.42em;position:relative;display:block;height:calc(var(--face-h) + var(--band) * 2);margin-block:calc(var(--band) * -1 + .02em) calc(var(--band) * -1 + .06em);perspective:16em;perspective-origin:20% 50%;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 calc(var(--band) * .9),#000 calc(100% - var(--band) * .9),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 calc(var(--band) * .9),#000 calc(100% - var(--band) * .9),transparent 100%)}
+.spit{--face-h:1em;--r:calc(var(--face-h) * .866);--band:.42em;position:relative;display:block;height:calc(var(--face-h) + var(--band) * 2);margin-block:calc(var(--band) * -1 + .02em) calc(var(--band) * -1 + .06em)}
+/* the fade band lives on an inner layer so the rod can run out to the screen edge */
+.spit-band{position:absolute;inset:0;display:block;perspective:16em;perspective-origin:20% 50%;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 calc(var(--band) * .9),#000 calc(100% - var(--band) * .9),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 calc(var(--band) * .9),#000 calc(100% - var(--band) * .9),transparent 100%)}
 .spit-rod{position:absolute;top:50%;left:calc(var(--gutter) * -1 - 4px);right:-.9em;height:max(5px,.05em);transform:translateY(-50%);background:linear-gradient(180deg,#5d534c 0%,#e9e0d4 30%,#a99c91 55%,#3b332d 100%);clip-path:polygon(0 0,calc(100% - .45em) 0,100% 50%,calc(100% - .45em) 100%,0 100%);opacity:.9}
 .drum{position:absolute;inset:var(--band) 0;transform-style:preserve-3d;transform:translateZ(calc(var(--r) * -1)) rotateX(var(--rot,0deg));will-change:transform}
 .face{position:absolute;inset:0;display:flex;align-items:center;white-space:nowrap;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateX(calc(var(--i) * -60deg)) translateZ(var(--r));background:linear-gradient(180deg,var(--gold-2) 10%,var(--gold) 45%,var(--flame) 95%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.2em}
@@ -153,6 +157,21 @@ button,input,select,textarea{font:inherit;color:inherit}
 .spit-toggle .i-play,.spit-toggle .t-play{display:none}
 .spit-toggle.is-paused .i-play,.spit-toggle.is-paused .t-play{display:inline}
 .spit-toggle.is-paused .i-pause,.spit-toggle.is-paused .t-pause{display:none}
+.sound-toggle{display:none;align-items:center;gap:.6em;min-height:44px;padding:0 .2em;border:0;background:none;font:inherit;color:var(--mute-d);cursor:pointer;text-transform:uppercase;letter-spacing:.06em}
+.js .sound-toggle{display:inline-flex}
+.sound-toggle:hover,.sound-toggle[aria-pressed="true"]{color:var(--gold)}
+.sound-toggle svg{width:20px;height:20px}
+.sound-toggle .i-waves,.sound-toggle[aria-pressed="false"] .i-mute{display:inline}
+.sound-toggle[aria-pressed="false"] .i-waves,.sound-toggle .i-mute{display:none}
+.spit-hint{display:none;color:rgb(183 168 152 / .7)}
+@media (hover:hover) and (pointer:fine){
+  .js .spit-hint{display:inline}
+  .js .spit{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+  .js .spit.is-grabbing{cursor:grabbing}
+}
+/* heat haze canvas sits exactly over the grill photo and fades in once the GPU is warm */
+.heat{position:absolute;inset:0;width:100%;height:100%;border-radius:var(--radius);opacity:0;transition:opacity 1.2s var(--ease-out-quart);pointer-events:none}
+.heat.is-on{opacity:1}
 .hero-media{position:relative;min-width:0}
 .hero-media picture{border-radius:var(--radius);overflow:hidden;aspect-ratio:4/5;background:var(--ink-2);box-shadow:0 40px 80px -30px rgb(0 0 0 / .7)}
 .hero-media picture img{width:100%;height:100%;object-fit:cover}
@@ -481,8 +500,26 @@ button,input,select,textarea{font:inherit;color:inherit}
 .prose h2{font-stretch:75%;font-weight:800;text-transform:uppercase;font-size:1.5rem;margin-top:2em;margin-bottom:.4em}
 .prose p+p{margin-top:1em}
 
+/* ---------- page transitions: the page turns over like the spit (native, no JS) ---------- */
+@view-transition{navigation:auto}
+.site-header{view-transition-name:site-header}
+.mbar{view-transition-name:mbar}
+::view-transition-old(root){animation:spit-out .45s var(--ease-inout-quart) both;transform-origin:50% 50%}
+::view-transition-new(root){animation:spit-in .75s var(--ease-out-expo) both;transform-origin:50% 50%}
+@keyframes spit-out{to{opacity:0;transform:perspective(1400px) rotateX(16deg) translateY(-8vh) scale(.97)}}
+@keyframes spit-in{from{opacity:0;transform:perspective(1400px) rotateX(-14deg) translateY(10vh) scale(.98)}}
+
+/* ---------- photos open up as they scroll in (CSS scroll-driven, no JS) ---------- */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .step-img img,.day-card img,.g-item img,.story-img img,.cta-band picture img,.strip img{animation:photo-in linear both;animation-timeline:view();animation-range:entry 0% cover 35%}
+    @keyframes photo-in{from{clip-path:inset(14% 0 0 0);scale:1.14}to{clip-path:inset(0);scale:1}}
+  }
+}
+
 /* ---------- reduced motion: substitute, don't delete ---------- */
 @media (prefers-reduced-motion:reduce){
+  @view-transition{navigation:none}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important}
   .js [data-reveal],.js .hero .hero-line,.js .hero .hero-lede,.js .hero .hero-cta,.js .hero .hero-meta,.js .hero .eyebrow,.js .hero-media,.js .page-title{transform:none!important}

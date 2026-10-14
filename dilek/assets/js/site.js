@@ -52,7 +52,9 @@
   const ready = (el) => requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-ready')));
   $$('.page-hero').forEach(ready);
 
-  /* ---------- the spit: a drum of phrases that turns like a rotisserie ---------- */
+  /* ---------- the spit: a drum of phrases that turns like a rotisserie ----------
+     One shared state drives three things: the drum, the heat haze on the grill photo
+     (it flares when the spit spins fast) and the optional sizzle (it clicks per phrase). */
   const hero = $('.hero');
   if (hero) initSpit(hero);
 
@@ -66,15 +68,17 @@
     if (!N) { ready(hero); return; }
     const STEP = 360 / N;
     faces.forEach((f, i) => f.style.setProperty('--i', i));
+    const state = { vel: 0, paused: false, visible: true, onTick: null };
 
     let rot = reduce ? 0 : -360; // intro: one full spin back, then settle on face 0
     let base = 0;
     let scrollRot = 0;
     let raf = 0;
-    let paused = false;
-    let visible = true;
     let lastScroll = 0;
     let snapTimer = 0;
+    let lastFace = 0;
+    let lastTick = 0;
+    let dragging = false;
 
     const paint = () => {
       drum.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
@@ -83,14 +87,21 @@
         const c = Math.cos((a * Math.PI) / 180);
         f.style.setProperty('--light', c > 0.5 ? (((c - 0.5) / 0.5) ** 2).toFixed(3) : '0');
       });
+      const face = Math.round(rot / STEP);
+      const now = performance.now();
+      if (face !== lastFace && now - lastTick > 45) { lastTick = now; if (state.onTick) state.onTick(); }
+      lastFace = face;
     };
     const frame = () => {
       raf = 0;
       const target = base + scrollRot;
       const d = target - rot;
+      const prev = rot;
       rot = Math.abs(d) < 0.05 ? target : rot + d * 0.085;
+      state.vel = rot - prev;
       paint();
-      if (rot !== target) raf = requestAnimationFrame(frame);
+      if (rot !== target || dragging) raf = requestAnimationFrame(frame);
+      else state.vel = 0;
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
 
@@ -114,7 +125,7 @@
 
     paint();
     ready(hero);
-    if (reduce) { if (btn) btn.hidden = true; return; }
+    if (reduce) { if (btn) btn.hidden = true; $$('.sound-toggle,.spit-hint', hero).forEach((el) => { el.hidden = true; }); return; }
     kick();
 
     // Scroll turns the spit; when scrolling stops it settles on the nearest phrase.
@@ -132,19 +143,245 @@
       kick();
     }, { passive: true });
 
+    // Grab the spit (mouse or pen) and turn it by hand; fling it and it coasts, then settles.
+    // Touch already turns it by scrolling, so touch keeps scrolling the page.
+    let lastY = 0;
+    let lastT = 0;
+    let flick = 0;
+    spit.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch' || e.button !== 0) return;
+      dragging = true;
+      spit.setPointerCapture(e.pointerId);
+      spit.classList.add('is-grabbing');
+      lastY = e.clientY; lastT = performance.now(); flick = 0;
+      clearTimeout(snapTimer);
+      e.preventDefault();
+      kick();
+    });
+    spit.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const now = performance.now();
+      const perPx = STEP / (parseFloat(getComputedStyle(title).fontSize) || 80);
+      const deg = -(e.clientY - lastY) * perPx;
+      base += deg;
+      flick = (deg / Math.max(8, now - lastT)) * 16;
+      lastY = e.clientY; lastT = now; lastScroll = now;
+      kick();
+    });
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      spit.classList.remove('is-grabbing');
+      if (performance.now() - lastT < 80) base += Math.max(-STEP * 4, Math.min(STEP * 4, flick * 9));
+      lastScroll = performance.now();
+      snap();
+    };
+    spit.addEventListener('pointerup', release);
+    spit.addEventListener('pointercancel', release);
+
     // Left alone, it keeps turning — one phrase every few seconds. Pausable.
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(spit);
+      new IntersectionObserver(([en]) => { state.visible = en.isIntersecting; if (state.wake) state.wake(); }).observe(hero);
     }
     setInterval(() => {
-      if (!paused && visible && !document.hidden && performance.now() - lastScroll > 1500) { base += STEP; kick(); }
+      if (!state.paused && state.visible && !dragging && !document.hidden && performance.now() - lastScroll > 1500) { base += STEP; kick(); }
     }, 3200);
     if (btn) {
       btn.addEventListener('click', () => {
-        paused = !paused;
-        btn.classList.toggle('is-paused', paused);
+        state.paused = !state.paused;
+        btn.classList.toggle('is-paused', state.paused);
+        if (state.wake) state.wake();
       });
     }
+
+    initHeat($('.hero-media', hero), state);
+    initSound($('.sound-toggle', hero), state);
+  }
+
+  /* ---------- heat haze: the grill photo shimmers and throws embers (WebGL, optional) ---------- */
+  function initHeat(media, state) {
+    const pic = media && $('picture', media);
+    const img = pic && $('img', pic);
+    if (!img) return;
+    // A desktop enhancement: phones keep the spit and the plain photo (battery, and they scroll past).
+    // ?heat=1 forces it on for demos.
+    const force = /[?&]heat=1(&|$)/.test(location.search);
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const saveData = navigator.connection && navigator.connection.saveData;
+    if (!force && (!fine || saveData)) return;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'heat';
+    canvas.setAttribute('aria-hidden', 'true');
+    // failIfMajorPerformanceCaveat: no GPU (software WebGL) means the plain photo, not a CPU-burning shader.
+    const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true });
+    if (!gl) return;
+    // Software WebGL (VMs, old laptops, headless browsers) would burn the CPU: skip it.
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || '');
+    if (!force && /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)) return;
+
+    const VS = 'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
+    const FS = `precision mediump float;
+      varying vec2 v;uniform sampler2D T;uniform vec2 R,I;uniform float t,h;
+      float H(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float N(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+        return mix(mix(H(i),H(i+vec2(1,0)),u.x),mix(H(i+vec2(0,1)),H(i+vec2(1,1)),u.x),u.y);}
+      vec2 cover(vec2 uv){float c=R.x/R.y,a=I.x/I.y;vec2 s=c>a?vec2(1.,a/c):vec2(c/a,1.);return (uv-.5)*s+.5;}
+      void main(){
+        vec2 uv=v;
+        float rise=smoothstep(0.,.85,uv.y);
+        vec2 d=vec2(N(vec2(uv.x*7.,uv.y*11.-t*1.7))-.5,N(vec2(uv.x*15.+3.,uv.y*24.-t*2.9))-.5);
+        vec3 col=texture2D(T,cover(uv+d*(.0016+.0075*h*h)*(.35+.65*rise))).rgb;
+        float glow=N(vec2(t*1.1,uv.x*2.));
+        col+=vec3(1.,.42,.1)*(.025+.06*h)*glow*(1.-uv.y);
+        float e=0.;vec2 q=vec2(uv.x*R.x/R.y,uv.y);
+        for(int i=0;i<3;i++){float k=float(i);
+          vec2 g=q*vec2(9.+k*5.,6.+k*3.);g.y-=t*(.55+k*.3)*(1.+h*.8);g.x+=sin(g.y*1.3+k*5.)*.3;
+          vec2 c=floor(g),f=fract(g)-.5;float r=H(c+k*17.);
+          vec2 o=vec2(H(c*1.7)-.5,H(c*2.3)-.5)*.55;
+          float l=length(f-o);e+=step(.84-.06*h,r)*(smoothstep(.06,0.,l)+.35*smoothstep(.2,0.,l))*(.55+.45*sin(t*9.+r*50.))*(.35+.65*uv.y);}
+        col+=vec3(1.,.55,.18)*e*(.9+.6*h);
+        gl_FragColor=vec4(col,1.);
+      }`;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
+    const vs = sh(gl.VERTEX_SHADER, VS);
+    const fs = sh(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return;
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const U = (n) => gl.getUniformLocation(prog, n);
+    const uR = U('R'); const uI = U('I'); const uT = U('t'); const uH = U('h');
+
+    const resize = () => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1); // the photo must stay as sharp as the <img> it covers
+      canvas.width = Math.max(1, Math.round(canvas.clientWidth * dpr));
+      canvas.height = Math.max(1, Math.round(canvas.clientHeight * dpr));
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uR, canvas.width, canvas.height);
+    };
+
+    let raf = 0;
+    let heat = 0.4;
+    let last = 0;
+    const t0 = performance.now();
+    const draw = (now) => {
+      raf = 0;
+      // Idle shimmer runs at ~30 fps; a spinning spit gets the full frame rate.
+      if (heat < 0.5 && now - last < 30) { raf = requestAnimationFrame(draw); return; }
+      last = now;
+      heat += (Math.min(1, 0.35 + Math.abs(state.vel) * 0.09) - heat) * 0.06;
+      gl.uniform1f(uT, (performance.now() - t0) / 1000);
+      gl.uniform1f(uH, heat);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      state.heat = heat;
+      if (!canvas.classList.contains('is-on')) canvas.classList.add('is-on');
+      if (state.visible && !state.paused && !document.hidden) raf = requestAnimationFrame(draw);
+    };
+    state.wake = () => { if (!raf && state.visible && !document.hidden) raf = requestAnimationFrame(draw); };
+    document.addEventListener('visibilitychange', state.wake);
+
+    const start = () => {
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img); } catch { return; }
+      gl.uniform2f(uI, img.naturalWidth, img.naturalHeight);
+      pic.after(canvas);
+      resize();
+      if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
+      state.wake();
+    };
+    // Wait for the photo, then for an idle moment, before warming up the GPU.
+    const go = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 2000 }) : setTimeout(start, 400));
+    if (img.complete && img.naturalWidth) go(); else img.addEventListener('load', go, { once: true });
+  }
+
+  /* ---------- sizzle: synthesized, off by default, clicks as each phrase lands ---------- */
+  function initSound(btn, state) {
+    if (!btn || !(window.AudioContext || window.webkitAudioContext)) { if (btn) btn.hidden = true; return; }
+    let ctx = null;
+    let master = null;
+    let noise = null;
+    let on = false;
+    let timer = 0;
+
+    const build = () => {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+      noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+      const d = noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = noise; src.loop = true;
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2800;
+      const pk = ctx.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 7200; pk.gain.value = 5;
+      const g = ctx.createGain(); g.gain.value = 0.035;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.3;
+      const lg = ctx.createGain(); lg.gain.value = 0.015;
+      lfo.connect(lg).connect(g.gain);
+      src.connect(hp).connect(pk).connect(g).connect(master);
+      src.start(); lfo.start();
+    };
+    const pop = (amp, freq, len) => {
+      const t = ctx.currentTime;
+      const s = ctx.createBufferSource(); s.buffer = noise; s.playbackRate.value = 0.6 + Math.random() * 1.2;
+      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 2.5;
+      const e = ctx.createGain();
+      e.gain.setValueAtTime(0.0001, t);
+      e.gain.exponentialRampToValueAtTime(amp, t + 0.002);
+      e.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      s.connect(f).connect(e).connect(master);
+      s.start(t, Math.random() * 1.5, len + 0.02);
+    };
+    const crackle = () => {
+      if (!on) return;
+      if (state.visible) pop(0.06 + Math.random() * 0.2, 1800 + Math.random() * 4200, 0.015 + Math.random() * 0.05);
+      timer = setTimeout(crackle, 40 + Math.random() * (320 - 200 * (state.heat || 0.4)));
+    };
+    const tick = () => {
+      if (!on || !state.visible) return;
+      const t = ctx.currentTime;
+      const o = ctx.createOscillator(); o.type = 'triangle';
+      o.frequency.setValueAtTime(210, t); o.frequency.exponentialRampToValueAtTime(80, t + 0.09);
+      const e = ctx.createGain();
+      e.gain.setValueAtTime(0.0001, t); e.gain.exponentialRampToValueAtTime(0.22, t + 0.004); e.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      o.connect(e).connect(master); o.start(t); o.stop(t + 0.14);
+      pop(0.12, 3400, 0.03);
+    };
+    const level = () => {
+      if (!ctx) return;
+      const target = on && state.visible && !document.hidden ? 0.7 : 0;
+      master.gain.setTargetAtTime(target, ctx.currentTime, 0.12);
+    };
+    btn.addEventListener('click', () => {
+      on = !on;
+      btn.setAttribute('aria-pressed', String(on));
+      if (on) {
+        if (!ctx) build();
+        ctx.resume();
+        crackle();
+      } else {
+        clearTimeout(timer);
+      }
+      level();
+    });
+    state.onTick = tick;
+    const prevWake = state.wake;
+    state.wake = () => { if (prevWake) prevWake(); level(); };
+    document.addEventListener('visibilitychange', level);
   }
 
   /* ---------- live opening status (Europe/Amsterdam) ---------- */
