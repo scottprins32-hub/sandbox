@@ -1,0 +1,138 @@
+<main id="main">
+
+<section class="page-hero" aria-labelledby="page-t">
+  <div class="wrap page-hero-grid">
+    <div>
+      <p class="eyebrow">Catering · 10 tot 50 personen</p>
+      <div class="skewer"><h1 class="page-title" id="page-t"><span>Catering.</span></h1></div>
+      <p class="page-lede">Verjaardag, bedrijfsfeest of gewoon een gezellige bijeenkomst: wij zorgen voor de gegrilde kip en de hapjes. Alles vers bereid en op tijd geleverd.</p>
+      <div class="hero-cta"><a class="btn btn-gold" href="#aanvraag">Aanvraag doen <span class="arr" aria-hidden="true">→</span></a><a class="btn btn-line" href="#pakketten">Bekijk pakketten</a></div>
+    </div>
+    <div class="page-hero-media">{{pic tafel-hele-kip | Een feesttafel met een hele gegrilde kip, friet, worstjes, vleugels en sauzen | sizes="(min-width: 900px) 32vw, 92vw" loading="eager" fetchpriority="high"}}</div>
+  </div>
+</section>
+
+<section class="section section-paper page-paper" id="pakketten" aria-labelledby="pkg-t">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Pakketten</p>
+        <h2 class="h2" id="pkg-t">Kies je <em>formaat.</em></h2>
+      </div>
+      <div class="usp" style="grid-template-columns:1fr">
+        <div><b>Gratis bezorging</b><span>Bestel minimaal 24 uur van tevoren.</span></div>
+      </div>
+    </div>
+    {{packages}}
+    <div class="usp" style="margin-top:clamp(32px,4vw,56px)">
+      <div><b>Verse kwaliteit</b><span>Dagelijks vers bereid met de beste ingrediënten.</span></div>
+      <div><b>Op tijd geleverd</b><span>Betrouwbare levering, precies wanneer jij het nodig hebt.</span></div>
+      <div><b>Scherpe prijzen</b><span>Heerlijk eten voor een eerlijke prijs.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-paper2 page-paper" aria-label="Zo ziet het eruit" style="padding-block:0">
+  <div class="wrap" style="padding-block:clamp(16px,2vw,24px)">
+    <div class="strip">
+      <figure data-reveal>{{pic borrelhapjes-closeup | Een kippenvleugel wordt van een volle schaal borrelhapjes geprikt | sizes="31vw"}}</figure>
+      <figure data-reveal>{{pic kipvingers-closeup | Een bord kleverige kipvingers met een glas jus d'orange | sizes="31vw"}}</figure>
+      <figure data-reveal>{{pic grillworst-dip | Een plakje grillworst wordt in saus gedoopt | sizes="31vw"}}</figure>
+    </div>
+  </div>
+</section>
+
+<section class="section section-paper page-paper" id="aanvraag" aria-labelledby="form-t">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Aanvraag</p>
+        <h2 class="h2" id="form-t">Jouw <em>bon.</em></h2>
+      </div>
+      <p class="lede muted">Vul in wat je wilt, de bon rekent mee. Versturen opent je mailapp met de aanvraag klaar. We bevestigen zo snel mogelijk.</p>
+    </div>
+
+    <form class="order" id="catering-form" data-to="{{email}}" action="mailto:{{email}}" method="post" enctype="text/plain">
+      <div class="order-fields">
+        <fieldset class="fieldset">
+          <legend>Pakket</legend>
+          <div class="choices">
+{{package_options}}
+          </div>
+        </fieldset>
+
+        <div class="field-row">
+          <div class="field"><label for="f-personen">Aantal personen</label><input id="f-personen" name="personen" type="number" inputmode="numeric" min="1" max="500" required></div>
+          <div class="field"><label for="f-datum">Datum</label><input id="f-datum" name="datum" type="date" required><p class="hint">Minimaal 24 uur van tevoren.</p></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-tijd">Gewenste tijd</label><input id="f-tijd" name="tijd" type="time" step="900"></div>
+          <fieldset class="fieldset">
+            <legend>Bezorgen of ophalen</legend>
+            <div class="seg">
+              <label class="choice"><input type="radio" name="levering" value="bezorgen" checked required><span class="choice-body"><span class="choice-name">Bezorgen</span><span class="choice-meta">Gratis</span></span></label>
+              <label class="choice"><input type="radio" name="levering" value="ophalen" required><span class="choice-body"><span class="choice-name">Ophalen</span><span class="choice-meta">Bij een vestiging</span></span></label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="field" data-when="bezorgen"><label for="f-adres">Bezorgadres</label><textarea id="f-adres" name="adres" rows="2" autocomplete="street-address" required></textarea></div>
+        <div class="field" data-when="ophalen" hidden>
+          <label for="f-locatie">Ophalen bij</label>
+          <select id="f-locatie" name="locatie" disabled>
+            <option value="">Kies een vestiging</option>
+            <option>Osdorp</option><option>Westpoort</option><option>Haarlem</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-naam">Naam</label><input id="f-naam" name="naam" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="f-tel">Telefoon</label><input id="f-tel" name="telefoon" type="tel" autocomplete="tel" inputmode="tel" required></div>
+        </div>
+        <div class="field"><label for="f-mail">E-mail <span class="muted">(optioneel)</span></label><input id="f-mail" name="email" type="email" autocomplete="email"></div>
+        <div class="field"><label for="f-opm">Opmerkingen <span class="muted">(optioneel)</span></label><textarea id="f-opm" name="opmerkingen" rows="3" placeholder="Allergieën, extra sauzen, broodjes erbij…"></textarea></div>
+      </div>
+
+      <div class="bon-wrap">
+        <aside class="bon" data-bon aria-label="Overzicht van je aanvraag" aria-live="polite">
+          <div class="bon-head">
+            <img src="{{root}}assets/img/logo-480.webp" width="480" height="80" alt="Dilek Chicken">
+            <p>Catering-aanvraag · dilek-chicken.nl</p>
+          </div>
+          <div class="bon-lines">
+            <p class="bon-line"><span>Pakket</span><span data-bon-pakket>Nog geen pakket</span></p>
+            <p class="bon-line"><span>Gasten</span><span data-bon-personen>—</span></p>
+            <p class="bon-line"><span>Wanneer</span><span data-bon-datum>—</span></p>
+            <p class="bon-line"><span>Levering</span><span data-bon-levering>—</span></p>
+            <p class="bon-line"><span>Naam</span><span data-bon-naam>—</span></p>
+          </div>
+          <ul class="bon-items" data-bon-items hidden></ul>
+          <div class="bon-lines">
+            <p class="bon-line"><span>Bezorging</span><span data-bon-bezorg>Gratis</span></p>
+          </div>
+          <p class="bon-total"><span>Totaal</span><b data-bon-totaal>€ —</b></p>
+          <div class="bon-bar" aria-hidden="true"></div>
+          <p class="bon-foot">Bedankt &amp; eet smakelijk!</p>
+        </aside>
+      </div>
+
+      <div class="order-submit">
+        <button class="btn btn-red" type="submit">Verstuur aanvraag <span class="arr" aria-hidden="true">→</span></button>
+        <p class="form-note">Je mailapp opent met je aanvraag ingevuld; jij drukt op versturen. Geen mailapp? Mail naar <a href="mailto:{{email}}">{{email}}</a> of bel <a href="tel:+31646465044">06 46 46 50 44</a>.</p>
+        <p class="form-note" data-form-note hidden role="status">Je mailapp is geopend met je aanvraag. Niets gebeurd? Bel ons gerust op <a href="tel:+31646465044">06 46 46 50 44</a>.</p>
+        <p class="form-note">We gebruiken je gegevens alleen om je aanvraag te beantwoorden. Lees de <a href="{{root}}privacy/">privacyverklaring</a>.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="section section-red" aria-labelledby="call-t">
+  <div class="wrap call-band">
+    <div>
+      <p class="eyebrow">Liever even overleggen?</p>
+      <h2 class="h2" id="call-t">Bel voor <em>advies.</em></h2>
+      <p class="muted" style="margin-top:16px;max-width:46ch">Specifieke wensen? We stellen een pakket op maat samen dat precies bij jouw evenement past.</p>
+    </div>
+    <a class="btn btn-gold" href="tel:+31646465044">06 46 46 50 44</a>
+  </div>
+</section>
+
+</main>

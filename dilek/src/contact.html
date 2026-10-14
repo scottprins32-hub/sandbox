@@ -1,0 +1,74 @@
+<main id="main">
+
+<section class="page-hero" aria-labelledby="page-t">
+  <div class="wrap page-hero-grid">
+    <div>
+      <p class="eyebrow">Contact · locaties &amp; openingstijden</p>
+      <div class="skewer"><h1 class="page-title" id="page-t"><span>Kom langs.</span></h1></div>
+      <p class="page-lede">Drie vestigingen, elke dag open. Vragen of speciale wensen? Bel de vestiging of mail ons.</p>
+    </div>
+    <div class="page-hero-media">{{pic kipvingers-saus | Iemand houdt een bakje kipvingers met saus omhoog voor de Dilek Chicken-zaak | sizes="(min-width: 900px) 32vw, 92vw" loading="eager" fetchpriority="high"}}</div>
+  </div>
+</section>
+
+<section class="section section-paper page-paper" id="locaties" aria-labelledby="loc-t">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Onze drie vestigingen</p>
+        <h2 class="h2" id="loc-t">Bezoek <em>ons.</em></h2>
+      </div>
+      <div class="locs-head">
+        <button class="btn btn-ink" type="button" data-near>Welke is het dichtst bij mij?</button>
+        <p class="near-msg" data-near-msg aria-live="polite"></p>
+      </div>
+    </div>
+    {{locations}}
+  </div>
+</section>
+
+<section class="section section-paper2 page-paper" aria-labelledby="reach-t">
+  <div class="wrap">
+    <h2 class="sr-only" id="reach-t">Mail en social media</h2>
+    <div class="reach">
+      <div class="reach-card">
+        <p class="eyebrow">Mail ons</p>
+        <a class="reach-mail" href="mailto:{{email}}">{{email}}</a>
+        <p class="muted">Voor vragen, catering of speciale wensen.</p>
+      </div>
+      <div class="reach-card alt">
+        <p class="eyebrow">Volg ons</p>
+        <div class="reach-social">
+          <a href="https://www.instagram.com/dilekchicken" target="_blank" rel="noopener">Instagram <span aria-hidden="true">↗</span></a>
+          <a href="https://www.tiktok.com/@dilekchicken" target="_blank" rel="noopener">TikTok <span aria-hidden="true">↗</span></a>
+          <a href="https://www.facebook.com/dilekchicken" target="_blank" rel="noopener">Facebook <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-paper page-paper" aria-labelledby="gal-t">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Fotogalerij</p>
+        <h2 class="h2" id="gal-t">Beleef <em>Dilek.</em></h2>
+      </div>
+      <p class="lede muted">Een kijkje achter de toonbank. Kom langs en ervaar het zelf.</p>
+    </div>
+    <div class="gallery">
+      <figure class="g-item" data-reveal>{{pic bakje-kipvingers-straat | Een hand pakt een kipvinger uit een bakje, op straat voor de zaak | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Krokante perfectie</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic broodje-grillworst-tang | Grillworst gaat met de tang in een broodje | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Grillworst op z'n best</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic drie-broodjes | Drie broodjes hotdog in de hand | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Naturel, pittig of mix</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic grill-mix | Spiesen met kip en worst boven elkaar in de grill | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Vers van het spit</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic bakje-grillworst | Een bakje grillworst in de hand voor de zaak | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Smullen maar</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic verse-broodjes | Verse broodjes worden opgewarmd op het rooster | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Altijd vers</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic hotdog-tang | Hotdogs worden met de tang uit de bak gehaald | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Hotdogs, warm</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic grill-hele-kip | Rijen hele kippen aan het spit | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Goudbruin gegrild</span></figcaption></figure>
+      <figure class="g-item" data-reveal>{{pic broodjes-en-bakje | Een broodje en een bakje boven de tafel | sizes="(min-width: 900px) 30vw, 46vw"}}<figcaption><span>Broodje of bakje</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+</main>
