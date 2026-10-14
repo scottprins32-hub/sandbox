@@ -67,9 +67,11 @@
     if (!N) { ready(hero); return; }
     const STEP = 360 / N;
     faces.forEach((f, i) => f.style.setProperty('--i', i));
+    spit.style.setProperty('--step', `${STEP}deg`);
+    spit.style.setProperty('--r', `calc(var(--face-h) * ${(0.5 / Math.tan(Math.PI / N)).toFixed(4)})`);
     const state = { vel: 0, paused: false, visible: true };
 
-    let rot = reduce ? 0 : -360; // intro: one full spin back, then settle on face 0
+    let rot = reduce ? 0 : -0.45 * STEP; // intro: "Dilek." rolls up into place on the first frame
     let base = 0;
     let scrollRot = 0;
     let raf = 0;
@@ -105,7 +107,7 @@
     const fit = () => {
       title.style.removeProperty('--spit-size');
       const avail = spit.clientWidth;
-      const widest = Math.max(...faces.map((f) => { probe.textContent = f.textContent; return probe.offsetWidth; }));
+      const widest = Math.max(...faces.map((f) => { probe.textContent = ($('.face-big', f) || f).textContent; return probe.offsetWidth; }));
       if (!widest) return;
       const fs = parseFloat(getComputedStyle(title).fontSize);
       title.style.setProperty('--spit-size', `${Math.min(168, Math.floor((fs * avail * 0.98) / widest))}px`);
@@ -139,9 +141,16 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([en]) => { state.visible = en.isIntersecting; if (state.wake) state.wake(); }).observe(hero);
     }
+    // "Dilek." holds longest; the three locations follow.
+    let lastTurn = performance.now() + 1200;
     setInterval(() => {
-      if (!state.paused && state.visible && !document.hidden && performance.now() - lastScroll > 1500) { base += STEP; kick(); }
-    }, 3200);
+      const now = performance.now();
+      const face = ((Math.round((base + scrollRot) / STEP) % N) + N) % N;
+      const hold = face === 0 ? 5200 : 2600;
+      if (!state.paused && state.visible && !document.hidden && now - lastScroll > 1500 && now - lastTurn > hold) {
+        base += STEP; lastTurn = now; kick();
+      }
+    }, 250);
     if (btn) {
       btn.addEventListener('click', () => {
         state.paused = !state.paused;
