@@ -33,7 +33,7 @@ SITE = Path(__file__).resolve().parent.parent
 SRC = SITE / "src"
 DOMAIN = "https://dilek-chicken.nl/"
 PREVIEW = False  # set by --preview: noindex everywhere, absolute URLs point at the preview host
-VERSION = "4"  # bump when site.css / site.js change, to bust caches
+VERSION = "5"  # bump when site.css / site.js change, to bust caches
 
 EMAIL = "info@dilek-chicken.nl"
 SOCIAL = [
@@ -127,7 +127,7 @@ PAGES = [
          title="Dilek Chicken · Kip eten doe je bij Dilek",
          description="Elke dag vers gegrilde kip, kippenbouten, kipvingers en grillworst. 100% halal. "
                      "In Amsterdam Osdorp, Westpoort en Haarlem.",
-         preload=("kip-grillen", "(min-width: 900px) 40vw, 100vw"), ld="org"),
+         preload=("kip-grillen", "(min-width: 900px) 45vw, 100vw"), ld="org"),
     dict(src="menu.html", out="menu/index.html", path="menu/", nav="menu",
          title="Menu · Dilek Chicken",
          description="Het hele menu van Dilek Chicken met prijzen: hele kip, kippenbouten, borrelhapjes, "

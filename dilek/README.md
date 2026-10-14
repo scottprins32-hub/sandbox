@@ -2,7 +2,7 @@
 
 A redesign of [dilek-chicken.nl](https://dilek-chicken.nl): static HTML, one CSS file and one small script, with no frameworks. The page URLs match the current site (`/menu/`, `/catering/`, `/vacatures/`, `/contact/`), so the switch-over needs no redirects.
 
-**Idea:** *het spit staat nooit stil* (the spit never stops). On the homepage the headline sits on a rotisserie drum that turns. Each phrase is skewered on a steel rod, the drum turns one phrase every few seconds, scrolling spins it, and it settles when you stop. The subpage titles use the same skewer and click into place when the page loads. Everything else is kept quiet and fast. Prices are never hidden behind an animation.
+**Idea:** *het spit staat nooit stil* (the spit never stops). The homepage opens in full Dilek red with the grill photo to the edge. The headline "Kip eten doe je bij **Dilek.**" sits on a rotisserie drum, skewered by a steel rod that runs into the photo, and the mascot is stuck on like a sticker. The drum holds on "Dilek." and then turns through the three locations ("Vers van het spit in Osdorp.", "Elke dag open in Westpoort.", "100% halal in Haarlem."); scrolling spins it too. The subpage heroes use the same red and the same skewer, and their titles click into place. Everything else is kept quiet and fast. Prices are never hidden behind an animation.
 
 The spit also drives the photo next to it: a WebGL heat haze with rising embers sits over the grill photo and flares up when the spit spins fast.
 
