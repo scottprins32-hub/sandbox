@@ -33,7 +33,7 @@ SITE = Path(__file__).resolve().parent.parent
 SRC = SITE / "src"
 DOMAIN = "https://dilek-chicken.nl/"
 PREVIEW = False  # set by --preview: noindex everywhere, absolute URLs point at the preview host
-VERSION = "3"  # bump when site.css / site.js change, to bust caches
+VERSION = "4"  # bump when site.css / site.js change, to bust caches
 
 EMAIL = "info@dilek-chicken.nl"
 SOCIAL = [
@@ -355,6 +355,7 @@ def head(page, root):
 <link rel="manifest" href="{root}site.webmanifest">
 <link rel="preload" href="{root}assets/fonts/archivo-subset.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="{root}assets/css/site.css?v={VERSION}">
+<script type="speculationrules">{{"prefetch":[{{"source":"document","where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"selector_matches":"[target=_blank], [download]"}}}}]}},"eagerness":"moderate"}}]}}</script>
 <script>document.documentElement.classList.add('js');setTimeout(function(){{if(!window.__dilek)document.documentElement.classList.remove('js')}},2500)</script>
 <script src="{root}assets/js/site.js?v={VERSION}" defer></script>
 {ld}</head>'''

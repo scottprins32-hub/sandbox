@@ -157,18 +157,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 .spit-toggle .i-play,.spit-toggle .t-play{display:none}
 .spit-toggle.is-paused .i-play,.spit-toggle.is-paused .t-play{display:inline}
 .spit-toggle.is-paused .i-pause,.spit-toggle.is-paused .t-pause{display:none}
-.sound-toggle{display:none;align-items:center;gap:.6em;min-height:44px;padding:0 .2em;border:0;background:none;font:inherit;color:var(--mute-d);cursor:pointer;text-transform:uppercase;letter-spacing:.06em}
-.js .sound-toggle{display:inline-flex}
-.sound-toggle:hover,.sound-toggle[aria-pressed="true"]{color:var(--gold)}
-.sound-toggle svg{width:20px;height:20px}
-.sound-toggle .i-waves,.sound-toggle[aria-pressed="false"] .i-mute{display:inline}
-.sound-toggle[aria-pressed="false"] .i-waves,.sound-toggle .i-mute{display:none}
-.spit-hint{display:none;color:rgb(183 168 152 / .7)}
-@media (hover:hover) and (pointer:fine){
-  .js .spit-hint{display:inline}
-  .js .spit{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
-  .js .spit.is-grabbing{cursor:grabbing}
-}
 /* heat haze canvas sits exactly over the grill photo and fades in once the GPU is warm */
 .heat{position:absolute;inset:0;width:100%;height:100%;border-radius:var(--radius);opacity:0;transition:opacity 1.2s var(--ease-out-quart);pointer-events:none}
 .heat.is-on{opacity:1}
@@ -508,14 +496,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 ::view-transition-new(root){animation:spit-in .75s var(--ease-out-expo) both;transform-origin:50% 50%}
 @keyframes spit-out{to{opacity:0;transform:perspective(1400px) rotateX(16deg) translateY(-8vh) scale(.97)}}
 @keyframes spit-in{from{opacity:0;transform:perspective(1400px) rotateX(-14deg) translateY(10vh) scale(.98)}}
-
-/* ---------- photos open up as they scroll in (CSS scroll-driven, no JS) ---------- */
-@supports (animation-timeline:view()){
-  @media (prefers-reduced-motion:no-preference){
-    .step-img img,.day-card img,.g-item img,.story-img img,.cta-band picture img,.strip img{animation:photo-in linear both;animation-timeline:view();animation-range:entry 0% cover 35%}
-    @keyframes photo-in{from{clip-path:inset(14% 0 0 0);scale:1.14}to{clip-path:inset(0);scale:1}}
-  }
-}
 
 /* ---------- reduced motion: substitute, don't delete ---------- */
 @media (prefers-reduced-motion:reduce){

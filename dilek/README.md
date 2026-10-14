@@ -4,12 +4,9 @@ A redesign of [dilek-chicken.nl](https://dilek-chicken.nl): static HTML, one CSS
 
 **Idea:** *het spit staat nooit stil* (the spit never stops). On the homepage the headline sits on a rotisserie drum that turns. Each phrase is skewered on a steel rod, the drum turns one phrase every few seconds, scrolling spins it, and it settles when you stop. The subpage titles use the same skewer and click into place when the page loads. Everything else is kept quiet and fast. Prices are never hidden behind an animation.
 
-The spit is one system with three outputs:
-- **The drum.** It turns on its own, on scroll, or by hand: drag it with a mouse and fling it, and it coasts and lands on a phrase.
-- **The heat.** A WebGL heat haze with rising embers sits over the grill photo and flares up when the spit spins fast.
-- **The sound (optional).** The sizzle is synthesized in the browser, its crackle speeds up with the heat, and it clicks as each phrase lands. It is off by default.
+The spit also drives the photo next to it: a WebGL heat haze with rising embers sits over the grill photo and flares up when the spit spins fast.
 
-Page changes reuse the idea: the old page tips away and the new one turns in, using the browser's native view transitions.
+Page changes reuse the idea: the old page tips away and the new one turns in, using the browser's native view transitions. Links are prefetched when you hover over them (Speculation Rules), so the page turn is instant.
 
 ## Preview
 
@@ -46,10 +43,10 @@ This rewrites the HTML pages, `sitemap.xml` and the structured data Google reads
 - Full menu with prices, each category with its own section and sticky category chips.
 - Mobile action bar with the main action for each page (route, call, request, apply).
 - Self-hosted fonts (Archivo + DM Mono, OFL). No Google requests, no cookies, no trackers.
-- AVIF images with WebP fallback, in two sizes each, with width and height set so nothing shifts. Photos open up as they scroll in, using CSS scroll-driven animation (no JS).
+- AVIF images with WebP fallback, in two sizes each, with width and height set so nothing shifts.
 - **Heat haze policy:** it only runs on desktops with a real GPU. Phones, Save-Data users and software WebGL (VMs, headless browsers) get the plain photo. It renders at about 30 fps while the spit is idle, and it stops when off-screen, paused or in a background tab. Add `?heat=1` to the URL to force it on for a demo.
 - The Archivo font is subset to the glyphs and weight/width ranges the site uses (90 KB → 55 KB).
-- Accessibility: skip link, visible focus, one `h1` per page, real links, alt text, reduced-motion substitutes, and a pause control for the turning spit and the heat. With reduced motion on, the drum, heat, sound, page transitions and photo reveals all switch off. axe reports no violations on any page at 390px and 1440px.
+- Accessibility: skip link, visible focus, one `h1` per page, real links, alt text, reduced-motion substitutes, and a pause control for the turning spit and the heat. With reduced motion on, the drum, heat and page transitions all switch off. axe reports no violations on any page at 390px and 1440px.
 
 **Lighthouse** (production build behind gzip, Lighthouse 12; the online preview's noindex lowers its SEO score):
 
