@@ -53,8 +53,7 @@
   $$('.page-hero').forEach(ready);
 
   /* ---------- the spit: a drum of phrases that turns like a rotisserie ----------
-     One shared state drives three things: the drum, the heat haze on the grill photo
-     (it flares when the spit spins fast) and the optional sizzle (it clicks per phrase). */
+     The drum's spin speed also drives the heat haze on the grill photo: it flares when the spit turns fast. */
   const hero = $('.hero');
   if (hero) initSpit(hero);
 
@@ -68,17 +67,16 @@
     if (!N) { ready(hero); return; }
     const STEP = 360 / N;
     faces.forEach((f, i) => f.style.setProperty('--i', i));
-    const state = { vel: 0, paused: false, visible: true, onTick: null };
+    spit.style.setProperty('--step', `${STEP}deg`);
+    spit.style.setProperty('--r', `calc(var(--face-h) * ${(0.5 / Math.tan(Math.PI / N)).toFixed(4)})`);
+    const state = { vel: 0, paused: false, visible: true };
 
-    let rot = reduce ? 0 : -360; // intro: one full spin back, then settle on face 0
+    let rot = reduce ? 0 : -0.45 * STEP; // intro: "Dilek." rolls up into place on the first frame
     let base = 0;
     let scrollRot = 0;
     let raf = 0;
     let lastScroll = 0;
     let snapTimer = 0;
-    let lastFace = 0;
-    let lastTick = 0;
-    let dragging = false;
 
     const paint = () => {
       drum.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
@@ -87,10 +85,6 @@
         const c = Math.cos((a * Math.PI) / 180);
         f.style.setProperty('--light', c > 0.5 ? (((c - 0.5) / 0.5) ** 2).toFixed(3) : '0');
       });
-      const face = Math.round(rot / STEP);
-      const now = performance.now();
-      if (face !== lastFace && now - lastTick > 45) { lastTick = now; if (state.onTick) state.onTick(); }
-      lastFace = face;
     };
     const frame = () => {
       raf = 0;
@@ -100,7 +94,7 @@
       rot = Math.abs(d) < 0.05 ? target : rot + d * 0.085;
       state.vel = rot - prev;
       paint();
-      if (rot !== target || dragging) raf = requestAnimationFrame(frame);
+      if (rot !== target) raf = requestAnimationFrame(frame);
       else state.vel = 0;
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
@@ -113,7 +107,7 @@
     const fit = () => {
       title.style.removeProperty('--spit-size');
       const avail = spit.clientWidth;
-      const widest = Math.max(...faces.map((f) => { probe.textContent = f.textContent; return probe.offsetWidth; }));
+      const widest = Math.max(...faces.map((f) => { probe.textContent = ($('.face-big', f) || f).textContent; return probe.offsetWidth; }));
       if (!widest) return;
       const fs = parseFloat(getComputedStyle(title).fontSize);
       title.style.setProperty('--spit-size', `${Math.min(168, Math.floor((fs * avail * 0.98) / widest))}px`);
@@ -125,7 +119,7 @@
 
     paint();
     ready(hero);
-    if (reduce) { if (btn) btn.hidden = true; $$('.sound-toggle,.spit-hint', hero).forEach((el) => { el.hidden = true; }); return; }
+    if (reduce) { if (btn) btn.hidden = true; return; }
     kick();
 
     // Scroll turns the spit; when scrolling stops it settles on the nearest phrase.
@@ -143,49 +137,20 @@
       kick();
     }, { passive: true });
 
-    // Grab the spit (mouse or pen) and turn it by hand; fling it and it coasts, then settles.
-    // Touch already turns it by scrolling, so touch keeps scrolling the page.
-    let lastY = 0;
-    let lastT = 0;
-    let flick = 0;
-    spit.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'touch' || e.button !== 0) return;
-      dragging = true;
-      spit.setPointerCapture(e.pointerId);
-      spit.classList.add('is-grabbing');
-      lastY = e.clientY; lastT = performance.now(); flick = 0;
-      clearTimeout(snapTimer);
-      e.preventDefault();
-      kick();
-    });
-    spit.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      const now = performance.now();
-      const perPx = STEP / (parseFloat(getComputedStyle(title).fontSize) || 80);
-      const deg = -(e.clientY - lastY) * perPx;
-      base += deg;
-      flick = (deg / Math.max(8, now - lastT)) * 16;
-      lastY = e.clientY; lastT = now; lastScroll = now;
-      kick();
-    });
-    const release = () => {
-      if (!dragging) return;
-      dragging = false;
-      spit.classList.remove('is-grabbing');
-      if (performance.now() - lastT < 80) base += Math.max(-STEP * 4, Math.min(STEP * 4, flick * 9));
-      lastScroll = performance.now();
-      snap();
-    };
-    spit.addEventListener('pointerup', release);
-    spit.addEventListener('pointercancel', release);
-
     // Left alone, it keeps turning — one phrase every few seconds. Pausable.
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([en]) => { state.visible = en.isIntersecting; if (state.wake) state.wake(); }).observe(hero);
     }
+    // "Dilek." holds longest; the three locations follow.
+    let lastTurn = performance.now() + 1200;
     setInterval(() => {
-      if (!state.paused && state.visible && !dragging && !document.hidden && performance.now() - lastScroll > 1500) { base += STEP; kick(); }
-    }, 3200);
+      const now = performance.now();
+      const face = ((Math.round((base + scrollRot) / STEP) % N) + N) % N;
+      const hold = face === 0 ? 5200 : 2600;
+      if (!state.paused && state.visible && !document.hidden && now - lastScroll > 1500 && now - lastTurn > hold) {
+        base += STEP; lastTurn = now; kick();
+      }
+    }, 250);
     if (btn) {
       btn.addEventListener('click', () => {
         state.paused = !state.paused;
@@ -195,7 +160,6 @@
     }
 
     initHeat($('.hero-media', hero), state);
-    initSound($('.sound-toggle', hero), state);
   }
 
   /* ---------- heat haze: the grill photo shimmers and throws embers (WebGL, optional) ---------- */
@@ -305,83 +269,6 @@
     // Wait for the photo, then for an idle moment, before warming up the GPU.
     const go = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 2000 }) : setTimeout(start, 400));
     if (img.complete && img.naturalWidth) go(); else img.addEventListener('load', go, { once: true });
-  }
-
-  /* ---------- sizzle: synthesized, off by default, clicks as each phrase lands ---------- */
-  function initSound(btn, state) {
-    if (!btn || !(window.AudioContext || window.webkitAudioContext)) { if (btn) btn.hidden = true; return; }
-    let ctx = null;
-    let master = null;
-    let noise = null;
-    let on = false;
-    let timer = 0;
-
-    const build = () => {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      master = ctx.createGain();
-      master.gain.value = 0;
-      master.connect(ctx.destination);
-      noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-      const d = noise.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      const src = ctx.createBufferSource();
-      src.buffer = noise; src.loop = true;
-      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2800;
-      const pk = ctx.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 7200; pk.gain.value = 5;
-      const g = ctx.createGain(); g.gain.value = 0.035;
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.3;
-      const lg = ctx.createGain(); lg.gain.value = 0.015;
-      lfo.connect(lg).connect(g.gain);
-      src.connect(hp).connect(pk).connect(g).connect(master);
-      src.start(); lfo.start();
-    };
-    const pop = (amp, freq, len) => {
-      const t = ctx.currentTime;
-      const s = ctx.createBufferSource(); s.buffer = noise; s.playbackRate.value = 0.6 + Math.random() * 1.2;
-      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 2.5;
-      const e = ctx.createGain();
-      e.gain.setValueAtTime(0.0001, t);
-      e.gain.exponentialRampToValueAtTime(amp, t + 0.002);
-      e.gain.exponentialRampToValueAtTime(0.0001, t + len);
-      s.connect(f).connect(e).connect(master);
-      s.start(t, Math.random() * 1.5, len + 0.02);
-    };
-    const crackle = () => {
-      if (!on) return;
-      if (state.visible) pop(0.06 + Math.random() * 0.2, 1800 + Math.random() * 4200, 0.015 + Math.random() * 0.05);
-      timer = setTimeout(crackle, 40 + Math.random() * (320 - 200 * (state.heat || 0.4)));
-    };
-    const tick = () => {
-      if (!on || !state.visible) return;
-      const t = ctx.currentTime;
-      const o = ctx.createOscillator(); o.type = 'triangle';
-      o.frequency.setValueAtTime(210, t); o.frequency.exponentialRampToValueAtTime(80, t + 0.09);
-      const e = ctx.createGain();
-      e.gain.setValueAtTime(0.0001, t); e.gain.exponentialRampToValueAtTime(0.22, t + 0.004); e.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
-      o.connect(e).connect(master); o.start(t); o.stop(t + 0.14);
-      pop(0.12, 3400, 0.03);
-    };
-    const level = () => {
-      if (!ctx) return;
-      const target = on && state.visible && !document.hidden ? 0.7 : 0;
-      master.gain.setTargetAtTime(target, ctx.currentTime, 0.12);
-    };
-    btn.addEventListener('click', () => {
-      on = !on;
-      btn.setAttribute('aria-pressed', String(on));
-      if (on) {
-        if (!ctx) build();
-        ctx.resume();
-        crackle();
-      } else {
-        clearTimeout(timer);
-      }
-      level();
-    });
-    state.onTick = tick;
-    const prevWake = state.wake;
-    state.wake = () => { if (prevWake) prevWake(); level(); };
-    document.addEventListener('visibilitychange', level);
   }
 
   /* ---------- live opening status (Europe/Amsterdam) ---------- */
