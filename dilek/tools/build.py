@@ -2,6 +2,11 @@
 """Build the static Dilek Chicken site.
 
     python3 dilek/tools/build.py
+    python3 dilek/tools/build.py --preview https://example.github.io/sandbox/dilek/ --out /tmp/site
+
+The first form writes the production pages into dilek/. The second writes a
+self-contained preview (pages + assets) into --out: every page is noindex and
+absolute URLs (canonical, share image, structured data) point at the preview.
 
 Reads the page bodies in dilek/src/*.html, wraps them in the shared head,
 header, footer and mobile bar, expands the {{tokens}} below and writes plain
@@ -16,15 +21,18 @@ Tokens:
   {{packages}} {{package_options}}  catering cards and the form's package choices
   {{email}} {{mailto_jobs}}    contact address and the job-application mailto
 """
+import argparse
 import html
 import json
 import re
+import shutil
 from pathlib import Path
 from urllib.parse import quote
 
 SITE = Path(__file__).resolve().parent.parent
 SRC = SITE / "src"
 DOMAIN = "https://dilek-chicken.nl/"
+PREVIEW = False  # set by --preview: noindex everywhere, absolute URLs point at the preview host
 VERSION = "1"  # bump when site.css / site.js change, to bust caches
 
 EMAIL = "info@dilek-chicken.nl"
@@ -317,7 +325,8 @@ def head(page, root):
         ld = f'<script type="application/ld+json">{json.dumps(org_ld(), ensure_ascii=False)}</script>\n'
     elif page.get("ld") == "menu":
         ld = f'<script type="application/ld+json">{json.dumps(menu_ld(), ensure_ascii=False)}</script>\n'
-    robots = f'<meta name="robots" content="{page["robots"]}">\n' if page.get("robots") else ""
+    robots = page.get("robots") or ("noindex" if PREVIEW else "")
+    robots = f'<meta name="robots" content="{robots}">\n' if robots else ""
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -444,16 +453,32 @@ def expand(text, root):
 
 
 def main():
+    global DOMAIN, PREVIEW
+    ap = argparse.ArgumentParser(description="Build the Dilek Chicken site.")
+    ap.add_argument("--preview", metavar="URL", help="build a noindex preview that will be served from URL")
+    ap.add_argument("--out", metavar="DIR", help="output directory for --preview")
+    args = ap.parse_args()
+    dest = SITE
+    if args.preview:
+        if not args.out:
+            ap.error("--preview needs --out")
+        DOMAIN = args.preview.rstrip("/") + "/"
+        PREVIEW = True
+        dest = Path(args.out).resolve()
+        shutil.copytree(SITE / "assets", dest / "assets", dirs_exist_ok=True)
+        shutil.copy2(SITE / "site.webmanifest", dest / "site.webmanifest")
     for page in PAGES:
         depth = page["out"].count("/")
         root = "./" if depth == 0 else "../" * depth
         body = (SRC / page["src"]).read_text(encoding="utf-8")
         doc = head(page, root) + "\n" + header(page, root) + "\n" + body.strip() + "\n" + footer(page, root)
         doc = expand(doc, root)
-        out = SITE / page["out"]
+        out = dest / page["out"]
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(doc, encoding="utf-8")
-        print("wrote", out.relative_to(SITE.parent))
+        print("wrote", out)
+    if PREVIEW:
+        return
     urls = "".join(f"  <url><loc>{DOMAIN}{p['path']}</loc></url>\n" for p in PAGES if not p.get("robots"))
     (SITE / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n',

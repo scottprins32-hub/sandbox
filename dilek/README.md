@@ -6,8 +6,19 @@ A redesign of [dilek-chicken.nl](https://dilek-chicken.nl): static HTML, one CSS
 
 ## Preview
 
+Online: **https://scottprins32-hub.github.io/sandbox/dilek/** (GitHub Pages, `gh-pages` branch). Every preview page is noindex, so it can't compete with the real site in search results.
+
+Locally:
+
 ```bash
 cd dilek && python3 -m http.server 8000   # open http://localhost:8000
+```
+
+To republish the online preview after a change, build it into a checkout of `gh-pages`, then commit and push that branch:
+
+```bash
+git worktree add ../ghp gh-pages
+python3 dilek/tools/build.py --preview https://scottprins32-hub.github.io/sandbox/dilek/ --out ../ghp/dilek
 ```
 
 ## Editing
