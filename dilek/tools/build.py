@@ -33,7 +33,7 @@ SITE = Path(__file__).resolve().parent.parent
 SRC = SITE / "src"
 DOMAIN = "https://dilek-chicken.nl/"
 PREVIEW = False  # set by --preview: noindex everywhere, absolute URLs point at the preview host
-VERSION = "1"  # bump when site.css / site.js change, to bust caches
+VERSION = "3"  # bump when site.css / site.js change, to bust caches
 
 EMAIL = "info@dilek-chicken.nl"
 SOCIAL = [
@@ -127,24 +127,26 @@ PAGES = [
          title="Dilek Chicken · Kip eten doe je bij Dilek",
          description="Elke dag vers gegrilde kip, kippenbouten, kipvingers en grillworst. 100% halal. "
                      "In Amsterdam Osdorp, Westpoort en Haarlem.",
-         preload="kip-grillen", ld="org"),
+         preload=("kip-grillen", "(min-width: 900px) 40vw, 100vw"), ld="org"),
     dict(src="menu.html", out="menu/index.html", path="menu/", nav="menu",
          title="Menu · Dilek Chicken",
          description="Het hele menu van Dilek Chicken met prijzen: hele kip, kippenbouten, borrelhapjes, "
                      "grillworst, hotdogs, kipvingers, kipsalon en krieltjes.",
-         ld="menu"),
+         preload=("grill-vlam", "(min-width: 900px) 32vw, 92vw"), ld="menu"),
     dict(src="catering.html", out="catering/index.html", path="catering/", nav="catering",
          title="Catering · Dilek Chicken",
          description="Gegrilde kip voor je feest of evenement. Pakketten voor 10 tot 50 personen vanaf € 199,99, "
-                     "gratis bezorgd. Bestel minimaal 24 uur van tevoren."),
+                     "gratis bezorgd. Bestel minimaal 24 uur van tevoren.",
+         preload=("tafel-hele-kip", "(min-width: 900px) 32vw, 92vw")),
     dict(src="vacatures.html", out="vacatures/index.html", path="vacatures/", nav="vacatures",
          title="Vacatures · Werken bij Dilek Chicken",
          description="Werk mee aan de lekkerste gegrilde kip van de stad. We zoeken medewerkers bediening "
-                     "en een kok / grillmeester."),
+                     "en een kok / grillmeester.",
+         preload=("broodjes-geven", "(min-width: 900px) 32vw, 92vw")),
     dict(src="contact.html", out="contact/index.html", path="contact/", nav="contact",
          title="Contact & locaties · Dilek Chicken",
          description="Adressen, openingstijden en telefoonnummers van Dilek Chicken in Osdorp, Westpoort en Haarlem.",
-         ld="org"),
+         preload=("kipvingers-saus", "(min-width: 900px) 32vw, 92vw"), ld="org"),
     dict(src="privacy.html", out="privacy/index.html", path="privacy/", nav="privacy",
          title="Privacy · Dilek Chicken", description="Privacyverklaring van Dilek Chicken.", robots="noindex"),
 ]
@@ -316,10 +318,10 @@ def head(page, root):
     url = DOMAIN + page["path"]
     preload = ""
     if page.get("preload"):
-        slug = page["preload"]
+        slug, sizes = page["preload"]
         srcset = ", ".join(f"{root}assets/img/{slug}-{w}.avif {w}w" for w, _ in IMAGES[slug])
         preload = (f'<link rel="preload" as="image" type="image/avif" imagesrcset="{srcset}" '
-                   f'imagesizes="(min-width: 900px) 40vw, 100vw" fetchpriority="high">\n')
+                   f'imagesizes="{sizes}" fetchpriority="high">\n')
     ld = ""
     if page.get("ld") == "org":
         ld = f'<script type="application/ld+json">{json.dumps(org_ld(), ensure_ascii=False)}</script>\n'
@@ -351,7 +353,7 @@ def head(page, root):
 <link rel="icon" href="{root}assets/icons/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="{root}assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="{root}site.webmanifest">
-<link rel="preload" href="{root}assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/archivo-subset.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="{root}assets/css/site.css?v={VERSION}">
 <script>document.documentElement.classList.add('js');setTimeout(function(){{if(!window.__dilek)document.documentElement.classList.remove('js')}},2500)</script>
 <script src="{root}assets/js/site.js?v={VERSION}" defer></script>
