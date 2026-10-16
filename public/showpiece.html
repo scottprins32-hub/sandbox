@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Holloway Acoustic Survey — the sound a building makes before it goes</title>
+<meta name="description" content="Holloway Acoustic Survey records the resonance of buildings scheduled for demolition. Strike the page and the room answers. Fictional client, demonstration build.">
+<meta name="theme-color" content="#111110">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111110'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%23CCFF00' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23CCFF00' stroke-width='1' opacity='.5'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Holloway Acoustic Survey">
+<meta property="og:description" content="We record the sound a building makes before it goes. Strike anywhere.">
+<meta property="og:site_name" content="Holloway Acoustic Survey (fictional)">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<script>document.documentElement.className = document.documentElement.className.replace('no-js','js');</script>
+
+<style>
+/* ── tokens ────────────────────────────────────────────────────────────── */
+:root{
+  --paper:#F2EFEA;
+  --ink:#111110;
+  --ink-raise:#18181A;
+  --acc:#CCFF00;
+
+  --ease-out-expo:   cubic-bezier(0.16,1,0.3,1);
+  --ease-out-quart:  cubic-bezier(0.25,1,0.5,1);
+  --ease-inout-expo: cubic-bezier(0.87,0,0.13,1);
+  --ease-inout-quart:cubic-bezier(0.76,0,0.24,1);
+
+  --rule:rgba(242,239,234,.14);
+  --rule-2:rgba(242,239,234,.28);
+  --dim:rgba(242,239,234,.58);
+
+  --gut:clamp(18px, 4.2vw, 64px);
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --disp:"Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--ink); color:var(--paper);
+  font-family:var(--mono); font-size:13px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+::selection{ background:var(--acc); color:var(--ink); }
+
+a{ color:inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible,
+textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--acc); outline-offset:3px; border-radius:1px;
+}
+
+.skip{
+  position:fixed; top:8px; left:8px; z-index:200;
+  background:var(--acc); color:var(--ink); padding:10px 16px;
+  font:500 12px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase;
+  text-decoration:none; transform:translateY(-200%);
+}
+.skip:focus{ transform:none; }
+
+/* ── type ──────────────────────────────────────────────────────────────── */
+.lbl{
+  font:500 11px/1.2 var(--mono); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--dim);
+}
+.lbl-acc{ color:var(--acc); }
+
+h1,h2,h3{ margin:0; font-family:var(--disp); font-weight:700; }
+h1{
+  font-size:clamp(2.2rem, 9vw, 8rem); line-height:.92;
+  letter-spacing:-.025em; font-variation-settings:"wdth" 76,"wght" 700;
+  text-transform:uppercase;
+}
+h2{
+  font-size:clamp(2rem, 6.4vw, 5.2rem); line-height:.94;
+  letter-spacing:-.02em; font-variation-settings:"wdth" 86,"wght" 700;
+  text-transform:uppercase;
+}
+h3{
+  font-size:clamp(1.05rem,2.1vw,1.6rem); line-height:1.05;
+  letter-spacing:-.01em; font-variation-settings:"wdth" 96,"wght" 600;
+  text-transform:uppercase;
+}
+p{ margin:0 0 1.1em; max-width:58ch; }
+.prose{ font-size:clamp(14px,1.35vw,16px); line-height:1.62; color:rgba(242,239,234,.82); }
+
+/* ── shell ─────────────────────────────────────────────────────────────── */
+#field{
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:2; pointer-events:none; opacity:0;
+}
+#stage{ position:relative; z-index:3; }
+section{ position:relative; padding:clamp(72px,11vh,148px) var(--gut); }
+.wrap{ max-width:1440px; margin-inline:auto; width:100%; }
+.hr{ height:1px; background:var(--rule); width:100%; }
+
+/* ── masthead ──────────────────────────────────────────────────────────── */
+.mast{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px var(--gut) 34px;
+  background:linear-gradient(to bottom, rgba(17,17,16,.96) 38%, rgba(17,17,16,0));
+  pointer-events:none;
+}
+.mast > *{ pointer-events:auto; }
+.mark{
+  display:flex; align-items:baseline; gap:10px; text-decoration:none;
+  font:700 13px/1 var(--disp); letter-spacing:.02em; text-transform:uppercase;
+  font-variation-settings:"wdth" 78,"wght" 800;
+}
+.mark b{ font-size:15px; }
+.mark span{ font:500 10px/1 var(--mono); letter-spacing:.14em; color:var(--dim); }
+
+.fict{
+  font:500 9.5px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink); background:var(--acc); padding:5px 8px; white-space:nowrap;
+}
+.mast nav{ display:flex; align-items:center; gap:clamp(10px,1.6vw,22px); }
+.mast nav a{
+  font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  text-decoration:none; color:var(--dim); transition:color .35s var(--ease-out-quart);
+}
+.mast nav a:hover{ color:var(--paper); }
+@media (max-width:760px){ .nav-hide{ display:none; } }
+
+/* ── controls ──────────────────────────────────────────────────────────── */
+.ctl{
+  position:fixed; right:var(--gut); bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
+  z-index:45; display:flex; gap:8px;
+}
+.tgl{
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(24,24,26,.86); border:1px solid var(--rule-2); color:var(--paper);
+  font:500 10.5px/1 var(--mono); letter-spacing:.13em; text-transform:uppercase;
+  padding:9px 12px; cursor:pointer;
+  transition:border-color .35s var(--ease-out-quart), color .35s var(--ease-out-quart);
+}
+.tgl:hover{ border-color:var(--paper); }
+.tgl .dot{ width:7px; height:7px; background:var(--dim); border-radius:50%;
+  transition:background .3s var(--ease-out-quart), box-shadow .3s var(--ease-out-quart); }
+.tgl[aria-pressed="true"]{ border-color:var(--acc); color:var(--acc); }
+.tgl[aria-pressed="true"] .dot{ background:var(--acc); box-shadow:0 0 0 3px rgba(204,255,0,.18); }
+
+/* ── loader ────────────────────────────────────────────────────────────── */
+#loader{
+  position:fixed; inset:0; z-index:80; background:var(--ink);
+  display:grid; place-items:center; grid-template-rows:1fr auto 1fr;
+}
+#loader .ldr-mid{ width:min(88vw,900px); }
+#loader .ldr-line{ display:block; width:100%; height:64px; overflow:visible; }
+#loader .ldr-read{
+  display:flex; justify-content:space-between; gap:16px; margin-top:14px;
+  opacity:0;
+}
+.html-loaded #loader{ display:none; }
+html.no-js #loader{ display:none; }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.hero{
+  min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
+  padding-top:clamp(90px,14vh,160px); padding-bottom:clamp(40px,7vh,84px);
+}
+.hero-top{ display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  margin-bottom:auto; padding-top:clamp(20px,6vh,60px); }
+.hero-copy{ position:relative; }
+.layer-b{
+  position:absolute; inset:0; margin:0; pointer-events:none; color:var(--acc);
+  font-family:var(--disp); font-size:clamp(2.2rem, 9vw, 8rem); line-height:.92;
+  letter-spacing:-.025em; text-transform:uppercase;
+  font-variation-settings:"wdth" 62,"wght" 800;
+  background:var(--ink); inset:-10px -18px; padding:10px 18px;
+  clip-path:circle(var(--ring-r,0px) at var(--ring-x,50%) var(--ring-y,50%));
+  will-change:clip-path;
+}
+.line-mask{ overflow:hidden; display:block; }
+.js .reveal-line{ opacity:0; }
+.js .reveal{ opacity:0; }
+.js .panel-clip[data-clip="open"]{ clip-path:none; }
+.hero-rule{ height:1px; background:var(--rule-2); width:100%; margin:clamp(22px,3.4vh,40px) 0 18px; transform-origin:0 50%; }
+.hero-foot{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
+.hint{
+  display:inline-flex; align-items:center; gap:10px;
+  border:1px solid var(--rule-2); padding:10px 14px; background:transparent;
+  color:var(--paper); font:500 11px/1 var(--mono); letter-spacing:.14em;
+  text-transform:uppercase; cursor:pointer;
+  transition:border-color .4s var(--ease-out-quart), color .4s var(--ease-out-quart);
+}
+.hint:hover{ border-color:var(--acc); color:var(--acc); }
+.hint .pulse{ width:8px; height:8px; border-radius:50%; background:var(--acc); }
+.hero-meta{ display:grid; gap:4px; text-align:right; }
+@media (max-width:640px){ .hero-meta{ text-align:left; } }
+
+/* ── chapter panels (section transition) ───────────────────────────────── */
+.panel{ position:relative; }
+.js .panel-clip{ clip-path:inset(0 0 100% 0); will-change:clip-path; }
+.chapter-head{
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:20px;
+  scroll-margin-top:96px;
+  align-items:end; padding-bottom:clamp(26px,4vh,48px);
+  border-bottom:1px solid var(--rule); margin-bottom:clamp(34px,5vh,64px);
+}
+.cols{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(20px,3vw,56px); }
+@media (max-width:860px){ .cols{ grid-template-columns:1fr; gap:34px; } }
+.col-n{ font:700 clamp(2.6rem,5.6vw,4.4rem)/1 var(--disp);
+  font-variation-settings:"wdth" 62,"wght" 800; color:var(--acc); display:block; margin-bottom:10px; }
+
+/* ── scrubbed sequence ─────────────────────────────────────────────────── */
+.scrub{ padding:0; }
+.scrub-in{
+  min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(88px,12vh,140px) var(--gut) clamp(56px,8vh,96px);
+}
+.scope{
+  position:relative; width:100%; border:1px solid var(--rule);
+  background:linear-gradient(180deg, rgba(204,255,0,.035), rgba(204,255,0,0) 62%);
+}
+.scope svg{ display:block; width:100%; height:auto; }
+#seqDraw{ /* clipped by #seqClip, userSpaceOnUse */ }
+.play-head{ transform:translateX(var(--px,0px)); will-change:transform; }
+.readout{
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--rule);
+}
+.readout div{ padding:12px 14px; border-right:1px solid var(--rule); }
+.readout div:last-child{ border-right:0; }
+.readout b{ display:block; font:500 clamp(14px,2vw,22px)/1.15 var(--mono);
+  color:var(--acc); letter-spacing:-.01em; margin-top:5px; font-variant-numeric:tabular-nums; }
+@media (max-width:700px){
+  .readout{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .readout div{ border-bottom:1px solid var(--rule); }
+}
+
+/* ── index ─────────────────────────────────────────────────────────────── */
+.rows{ border-top:1px solid var(--rule); }
+.row{
+  display:grid; grid-template-columns:96px minmax(0,1fr) 110px 104px 34px;
+  align-items:center; gap:clamp(10px,2vw,28px);
+  width:100%; text-align:left; background:none; border:0; color:inherit;
+  border-bottom:1px solid var(--rule); padding:clamp(16px,2.4vh,26px) 4px;
+  cursor:pointer; font-family:var(--mono); position:relative;
+  transition:background-color .5s var(--ease-out-quart);
+}
+.row::after{
+  content:""; position:absolute; left:0; bottom:-1px; height:1px; width:100%;
+  background:var(--acc); transform:scaleX(0); transform-origin:0 50%;
+  transition:transform .7s var(--ease-out-expo);
+}
+.row:hover::after, .row:focus-visible::after{ transform:scaleX(1); }
+.row:hover{ background-color:rgba(204,255,0,.03); }
+.row .rn{ font:500 11px/1 var(--mono); letter-spacing:.14em; color:var(--dim); }
+.row .rt{ font-family:var(--disp); font-variation-settings:"wdth" 88,"wght" 600;
+  font-size:clamp(15px,2.3vw,26px); line-height:1.08; text-transform:uppercase; letter-spacing:-.01em; }
+.row .rv{ font:500 12px/1 var(--mono); color:var(--paper); font-variant-numeric:tabular-nums; }
+.row .rg{ font:500 12px/1 var(--mono); color:var(--dim); font-variant-numeric:tabular-nums; }
+.row .rk{ justify-self:end; color:var(--dim); transition:color .4s var(--ease-out-quart), transform .5s var(--ease-out-expo); }
+.row:hover .rk{ color:var(--acc); transform:translateX(3px); }
+.row.is-dead .rv{ color:var(--dim); }
+@media (max-width:760px){
+  .row{ grid-template-columns:62px minmax(0,1fr) 34px; row-gap:6px; }
+  .row .rv{ grid-column:2; }
+  .row .rg{ grid-column:2; }
+}
+.bars{ display:flex; gap:2px; align-items:flex-end; height:16px; }
+.bars i{ width:2.5px; background:var(--acc); height:45%; display:block; opacity:.4;
+  transition:height .4s var(--ease-out-quart), opacity .4s var(--ease-out-quart); }
+.row:hover .bars i{ opacity:.75; }
+.row:hover .bars i:nth-child(2){ height:78% } .row:hover .bars i:nth-child(3){ height:100% }
+.row:hover .bars i:nth-child(4){ height:64% } .row:hover .bars i:nth-child(5){ height:34% }
+
+/* ── commission ────────────────────────────────────────────────────────── */
+.docket{ border:1px solid var(--rule-2); }
+.docket-hd{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  padding:14px 18px; border-bottom:1px solid var(--rule); background:rgba(204,255,0,.04); }
+.form{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (max-width:760px){ .form{ grid-template-columns:1fr; } }
+.fld{ border-bottom:1px solid var(--rule); border-right:1px solid var(--rule); padding:16px 18px; }
+.fld:nth-child(2n){ border-right:0; }
+.fld.full{ grid-column:1/-1; border-right:0; }
+.fld label{ display:block; margin-bottom:8px; }
+.fld input, .fld textarea, .fld select{
+  width:100%; background:transparent; border:0; border-bottom:1px solid var(--rule-2);
+  color:var(--paper); font:400 15px/1.4 var(--mono); padding:7px 0;
+}
+.fld textarea{ resize:vertical; min-height:74px; }
+.fld input::placeholder, .fld textarea::placeholder{ color:rgba(242,239,234,.3); }
+.fld input:focus, .fld textarea:focus, .fld select:focus{ outline:none; border-bottom-color:var(--acc); }
+.fld select{ border-bottom:1px solid var(--rule-2); }
+.fld select option{ background:var(--ink-raise); color:var(--paper); }
+.docket-ft{ display:flex; justify-content:space-between; align-items:center; gap:16px;
+  flex-wrap:wrap; padding:16px 18px; }
+.btn{
+  display:inline-flex; align-items:center; gap:10px; cursor:pointer;
+  background:var(--acc); color:var(--ink); border:1px solid var(--acc);
+  font:500 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase;
+  padding:14px 20px; text-decoration:none;
+  transition:background-color .4s var(--ease-out-quart), color .4s var(--ease-out-quart);
+}
+.btn:hover{ background:transparent; color:var(--acc); }
+.stub{ border-left:2px solid var(--acc); padding:10px 0 10px 12px; color:var(--dim);
+  font:400 11.5px/1.5 var(--mono); max-width:52ch; }
+
+footer{ padding:clamp(48px,7vh,90px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 74px);
+  border-top:1px solid var(--rule); }
+.fgrid{ display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; align-items:flex-end; }
+
+/* ── cursor that names its action ──────────────────────────────────────── */
+#cursor{
+  position:fixed; top:0; left:0; z-index:90; pointer-events:none;
+  transform:translate3d(-100px,-100px,0); will-change:transform; opacity:0;
+  display:flex; align-items:center; gap:9px;
+}
+#cursor .xh{ position:relative; width:20px; height:20px; flex:0 0 20px; }
+#cursor .xh::before, #cursor .xh::after{
+  content:""; position:absolute; background:var(--acc);
+}
+#cursor .xh::before{ left:50%; top:0; width:1px; height:100%; transform:translateX(-50%); }
+#cursor .xh::after{ top:50%; left:0; height:1px; width:100%; transform:translateY(-50%); }
+#cursor .cl{
+  font:500 10px/1 var(--mono); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink); background:var(--acc); padding:5px 7px; white-space:nowrap;
+}
+@media (hover:none), (pointer:coarse){ #cursor{ display:none !important; } }
+html.js body{ cursor:auto; }
+html.cursor-on, html.cursor-on *{ cursor:none !important; }
+
+/* ── 404, CSS-only via :target ─────────────────────────────────────────── */
+#no-return{ display:none; }
+#no-return:target{
+  display:flex; flex-direction:column; justify-content:space-between;
+  position:fixed; inset:0; z-index:60; background:var(--ink);
+  padding:calc(env(safe-area-inset-top,0px) + 18px) var(--gut)
+          calc(env(safe-area-inset-bottom,0px) + 22px);
+  overflow-y:auto;
+}
+body:has(#no-return:target) #stage,
+body:has(#no-return:target) #loader,
+body:has(#no-return:target) .ctl{ display:none !important; }
+.nr-mid{ display:grid; gap:18px; align-content:center; flex:1; padding:40px 0; }
+.nr-flat{ width:100%; max-width:760px; height:1px; background:var(--rule-2); }
+#no-return > p.lbl{ max-width:none; }
+
+/* ── reduced motion substitutes ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .row::after{ transition-duration:.18s; }
+  .bars i{ animation:none !important; }
+}
+html.rm-off .hint .pulse{ animation:none !important; }
+@keyframes bar{ 0%,100%{ height:18% } 50%{ height:100% } }
+.row[data-playing="true"] .bars i{ animation:bar .5s var(--ease-inout-quart) infinite; opacity:1; }
+.row[data-playing="true"] .bars i:nth-child(2){ animation-delay:.07s }
+.row[data-playing="true"] .bars i:nth-child(3){ animation-delay:.14s }
+.row[data-playing="true"] .bars i:nth-child(4){ animation-delay:.21s }
+.row[data-playing="true"] .bars i:nth-child(5){ animation-delay:.28s }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<canvas id="field" aria-hidden="true"></canvas>
+
+<div id="cursor" aria-hidden="true"><span class="xh"></span><span class="cl">Strike</span></div>
+
+<!-- ── loader: the first frame of the hero ───────────────────────────── -->
+<div id="loader" role="status" aria-label="Loading">
+  <div></div>
+  <div class="ldr-mid">
+    <svg class="ldr-line" viewBox="0 0 900 64" preserveAspectRatio="none" aria-hidden="true">
+      <path id="ldrPath" d="M0 32 L900 32" fill="none" stroke="#CCFF00" stroke-width="1.5"
+            vector-effect="non-scaling-stroke"/>
+    </svg>
+    <div class="ldr-read">
+      <span class="lbl">Room 00 — anechoic</span>
+      <span class="lbl lbl-acc" id="ldrState">No signal</span>
+    </div>
+  </div>
+  <div></div>
+</div>
+
+<div id="stage">
+
+<header class="mast">
+  <a class="mark" href="#top" data-cursor="Home">
+    <b>HOLLOWAY</b><span>Acoustic Survey</span>
+  </a>
+  <span class="fict">Fictional client · demo build</span>
+  <nav aria-label="Primary">
+    <a class="nav-hide" href="#method" data-cursor="Read">Method</a>
+    <a class="nav-hide" href="#decay" data-cursor="Read">Decay</a>
+    <a href="#index" data-cursor="Read">Index</a>
+    <a href="#commission" data-cursor="Read">Commission</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- ── hero ───────────────────────────────────────────────────────────── -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-top">
+      <p class="lbl" style="max-width:34ch">Acoustic survey &amp; demolition record<br>Est. 2011 — field unit 4</p>
+      <p class="lbl">51.5563° N / 0.1163° W<br>Working: GMT+0</p>
+    </div>
+
+    <div class="hero-copy" id="strikeZone">
+      <h1 class="layer-a" id="heroA">
+        <span class="line-mask"><span class="reveal-line">We record</span></span>
+        <span class="line-mask"><span class="reveal-line">how a room</span></span>
+        <span class="line-mask"><span class="reveal-line">sounds before</span></span>
+        <span class="line-mask"><span class="reveal-line">it is gone.</span></span>
+      </h1>
+      <p class="layer-b" id="heroB" aria-hidden="true">
+        <span style="display:block">Room 07</span>
+        <span style="display:block">RT60 2.41 s</span>
+        <span style="display:block">63 Hz · −18 dB</span>
+        <span style="display:block">Archived 2024.</span>
+      </p>
+    </div>
+
+    <div class="hero-rule" id="heroRule"></div>
+
+    <div class="hero-foot">
+      <button class="hint" id="strikeBtn" type="button" data-cursor="Strike">
+        <span class="pulse" aria-hidden="true"></span>
+        <span id="strikeLabel">Strike anywhere</span>
+      </button>
+      <div class="hero-meta">
+        <span class="lbl reveal">Every room answers differently.</span>
+        <span class="lbl reveal">Hit it once and listen to what comes back.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── method ─────────────────────────────────────────────────────────── -->
+<section class="panel" id="method">
+  <div class="wrap panel-clip">
+    <div class="chapter-head">
+      <h2 class="section-title">The method<br>is one hit.</h2>
+      <span class="lbl">Fig. 01 / 03</span>
+    </div>
+    <div class="cols">
+      <div>
+        <span class="col-n">01</span>
+        <h3 class="reveal">Strike</h3>
+        <p class="prose reveal">A single starter pistol at the geometric centre, 1.4 m from the floor. One shot only. A second shot is a second room — the air has already been told what the first one did.</p>
+      </div>
+      <div>
+        <span class="col-n">02</span>
+        <h3 class="reveal">Return</h3>
+        <p class="prose reveal">Six omnidirectional capsules on the perimeter catch what comes back. The direct sound arrives first and is discarded. Everything after it is the building talking about itself.</p>
+      </div>
+      <div>
+        <span class="col-n">03</span>
+        <h3 class="reveal">Record</h3>
+        <p class="prose reveal">We keep the decay, the fundamental and the flutter. Filed, dated, and handed to the archive the week the machines arrive. The room is demolished. The room is still playable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── scrubbed sequence ──────────────────────────────────────────────── -->
+<section class="scrub panel" id="decay">
+  <div class="scrub-in" id="scrubIn">
+    <div class="wrap">
+      <div class="chapter-head">
+        <h2 class="section-title">Decay,<br>scrubbed.</h2>
+        <span class="lbl">Room 07 · impulse 001 · 120 frames</span>
+      </div>
+
+      <div class="scope">
+        <svg viewBox="0 0 1200 300" preserveAspectRatio="none" role="img"
+             aria-label="Impulse response of Room 07: a decaying waveform that fades to silence over 2.41 seconds.">
+          <defs><clipPath id="seqClip" clipPathUnits="userSpaceOnUse">
+            <rect id="seqRect" x="0" y="0" width="0" height="300"/>
+          </clipPath></defs>
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="0" y1="150" x2="1200" y2="150"/>
+            <line x1="0" y1="75"  x2="1200" y2="75"  opacity=".5"/>
+            <line x1="0" y1="225" x2="1200" y2="225" opacity=".5"/>
+          </g>
+          <g id="seqDraw" clip-path="url(#seqClip)">
+            <path id="seqWave" d="" fill="none" stroke="#CCFF00" stroke-width="1.4"
+                  vector-effect="non-scaling-stroke"/>
+            <g id="seqTicks" stroke="#CCFF00" stroke-width="1" opacity=".45"
+               vector-effect="non-scaling-stroke"></g>
+          </g>
+          <g class="play-head" id="playHead">
+            <line x1="0" y1="0" x2="0" y2="300" stroke="#F2EFEA" stroke-width="1"
+                  vector-effect="non-scaling-stroke" opacity=".85"/>
+          </g>
+        </svg>
+        <div class="readout">
+          <div><span class="lbl">Frame</span><b id="roFrame">000 / 120</b></div>
+          <div><span class="lbl">Elapsed</span><b id="roTime">0.00 s</b></div>
+          <div><span class="lbl">Level</span><b id="roDb">0 dB</b></div>
+          <div><span class="lbl">Reflections</span><b id="roRef">0</b></div>
+        </div>
+      </div>
+
+      <p class="prose reveal" style="margin-top:22px">
+        2.41 seconds of a cold store, stretched across the length of your scroll.
+        Scroll back and the room un-rings.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── index ──────────────────────────────────────────────────────────── -->
+<section class="panel" id="index">
+  <div class="wrap panel-clip">
+    <div class="chapter-head">
+      <h2 class="section-title">The index.<br>Five gone.</h2>
+      <span class="lbl">Sound on to hear them</span>
+    </div>
+    <div class="rows" id="rows">
+      <button class="row" type="button" data-cursor="Strike" data-hz="63"  data-rt="2.41">
+        <span class="rn">Room 07</span><span class="rt">Marlow Street cold store</span>
+        <span class="rv">2.41 s</span><span class="rg">63 Hz</span>
+        <span class="rk bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+      <button class="row" type="button" data-cursor="Strike" data-hz="31"  data-rt="6.80">
+        <span class="rn">Room 12</span><span class="rt">Gasholder No.2, Kelvin Wharf</span>
+        <span class="rv">6.80 s</span><span class="rg">31 Hz</span>
+        <span class="rk bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+      <button class="row" type="button" data-cursor="Strike" data-hz="84"  data-rt="3.95">
+        <span class="rn">Room 19</span><span class="rt">St Alder's swimming baths</span>
+        <span class="rv">3.95 s</span><span class="rg">84 Hz</span>
+        <span class="rk bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+      <button class="row" type="button" data-cursor="Strike" data-hz="220" data-rt="1.12">
+        <span class="rn">Room 24</span><span class="rt">Carder Lane telephone exchange</span>
+        <span class="rv">1.12 s</span><span class="rg">220 Hz</span>
+        <span class="rk bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+      <a class="row is-dead" href="#no-return" data-cursor="No return" data-hz="0" data-rt="0.00"
+         style="text-decoration:none">
+        <span class="rn">Room 31</span><span class="rt">Anechoic cell, building F</span>
+        <span class="rv">0.00 s</span><span class="rg">No return</span>
+        <span class="rk" aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── commission (main action) ───────────────────────────────────────── -->
+<section class="panel" id="commission">
+  <div class="wrap panel-clip">
+    <div class="chapter-head">
+      <h2 class="section-title">Book a<br>survey.</h2>
+      <span class="lbl">Docket 4-B</span>
+    </div>
+
+    <form class="docket" id="docket" novalidate>
+      <div class="docket-hd">
+        <span class="lbl">Holloway Acoustic Survey — request for attendance</span>
+        <span class="lbl lbl-acc">Demo: connect to Formspark</span>
+      </div>
+      <div class="form">
+        <div class="fld">
+          <label class="lbl" for="f-bldg">Building</label>
+          <input id="f-bldg" name="building" type="text" placeholder="What is it called" autocomplete="off">
+        </div>
+        <div class="fld">
+          <label class="lbl" for="f-addr">Where it stands</label>
+          <input id="f-addr" name="address" type="text" placeholder="Street, town" autocomplete="street-address">
+        </div>
+        <div class="fld">
+          <label class="lbl" for="f-date">Date the machines arrive</label>
+          <input id="f-date" name="demolition" type="date">
+        </div>
+        <div class="fld">
+          <label class="lbl" for="f-vol">Rough volume</label>
+          <select id="f-vol" name="volume">
+            <option>Under 500 m³</option>
+            <option>500 – 5,000 m³</option>
+            <option>5,000 – 50,000 m³</option>
+            <option>Bigger than that</option>
+          </select>
+        </div>
+        <div class="fld full">
+          <label class="lbl" for="f-note">Anything we should know about the room</label>
+          <textarea id="f-note" name="note" placeholder="Hard floor, water, a ceiling nobody has seen since 1974"></textarea>
+        </div>
+        <div class="fld full">
+          <label class="lbl" for="f-mail">Where the recording should go</label>
+          <input id="f-mail" name="email" type="email" placeholder="you@example.org" autocomplete="email">
+        </div>
+      </div>
+      <div class="docket-ft">
+        <button class="btn" type="submit" data-cursor="Send">Request attendance</button>
+        <p class="stub">[stub: privacy &amp; data-retention wording — client's approved text before launch]<br>
+        [stub: survey terms &amp; site-access conditions]</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <p class="lbl" style="margin-bottom:6px">Holloway Acoustic Survey</p>
+      <p class="lbl" style="color:var(--dim);max-width:40ch">
+        A fictional client, invented for this demonstration. No real firm, building,
+        person or measurement is described anywhere on this page.
+      </p>
+    </div>
+    <div style="display:grid;gap:5px;">
+      <a class="lbl" href="#no-return" data-cursor="No return">See a room that isn't there ↗</a>
+      <span class="lbl" style="color:var(--dim)">Built to the awwwards-site catalogue · Spectacle tier</span>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /#stage -->
+
+<!-- ── controls ───────────────────────────────────────────────────────── -->
+<div class="ctl">
+  <button class="tgl" id="motionBtn" type="button" aria-pressed="true" data-cursor="Toggle">
+    <span class="dot" aria-hidden="true"></span> Motion
+  </button>
+  <button class="tgl" id="soundBtn" type="button" aria-pressed="false" data-cursor="Toggle">
+    <span class="dot" aria-hidden="true"></span> Sound
+  </button>
+</div>
+
+<!-- ── 404: a strike with nothing coming back ─────────────────────────── -->
+<section id="no-return" aria-label="Page not found">
+  <div class="fgrid">
+    <a class="mark" href="#top" data-cursor="Back"><b>HOLLOWAY</b><span>Acoustic Survey</span></a>
+    <span class="fict">Fictional client · demo build</span>
+  </div>
+  <div class="nr-mid">
+    <span class="lbl">Error 404 — room 31, anechoic cell, building F</span>
+    <h2 style="font-size:clamp(2.4rem,11vw,7rem)">No return.</h2>
+    <div class="nr-flat"></div>
+    <p class="prose" style="max-width:46ch">
+      You struck a room that isn't there. The walls took the whole of it
+      and gave nothing back — no reflection, no decay, no page.
+    </p>
+    <p><a class="btn" href="#top" data-cursor="Back">← Back to a room that rings</a></p>
+  </div>
+  <p class="lbl" style="color:var(--dim)">RT60 0.00 s · reflections 0 · signal returned 0 %</p>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+
+<script>
+(function(){
+"use strict";
+var D = document, W = window, root = D.documentElement;
+
+/* ── hard fallback: no GSAP, no page dependency on it ─────────────────── */
+function bail(){
+  root.classList.remove('js');
+  var l = D.getElementById('loader'); if (l) l.style.display = 'none';
+}
+if (!W.gsap) { bail(); return; }
+
+gsap.registerPlugin(ScrollTrigger);
+var hasSplit = !!W.SplitText;
+if (hasSplit) gsap.registerPlugin(SplitText);
+
+var EO = 'expo.out', EIO = 'expo.inOut';
+var reduceQ = W.matchMedia('(prefers-reduced-motion: reduce)');
+var fineQ   = W.matchMedia('(hover:hover) and (pointer:fine)');
+var motionOn = !reduceQ.matches;
+
+/* ══ 1. the field — one persistent canvas, one uniform set per impulse ══ */
+var cv = D.getElementById('field'), gl = null, prog = null, loc = {}, running = false;
+var IMP = [ {x:0,y:0,r:0,a:0}, {x:0,y:0,r:0,a:0}, {x:0,y:0,r:0,a:0} ];
+var FIELD_SCALE = 0.75;                     /* a glow does not need 1:1 pixels */
+var dpr = Math.min(1.5, W.devicePixelRatio || 1) * FIELD_SCALE;
+var lastStrike = 0, frames = 0, slowAcc = 0, degraded = false;
+
+var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+var FS = [
+'precision highp float;',
+'uniform vec2 uRes; uniform vec3 uImp[3]; uniform float uAmp[3]; uniform vec3 uTint;',
+'float ring(vec2 f, vec3 im, float a){',
+'  if(a<=0.002) return 0.0;',
+'  float d=distance(f,im.xy), r=im.z;',
+'  float w=24.0+r*0.11;',
+'  float q=(d-r)/w;',
+'  float band=exp(-q*q);',
+'  float trail=0.0;',
+'  if(d<r){ float k=r-d; trail=max(0.0,sin(k*0.072))*exp(-k*0.0062)*0.34; }',
+'  return (band+trail)*a;',
+'}',
+'void main(){',
+'  vec2 f=vec2(gl_FragCoord.x, uRes.y-gl_FragCoord.y);',
+'  float a=0.0;',
+'  for(int i=0;i<3;i++){ a+=ring(f,uImp[i],uAmp[i]); }',
+'  a=clamp(a,0.0,1.0)*0.82;',
+'  gl_FragColor=vec4(uTint*a, a);',
+'}'].join('\n');
+
+function sh(t, s){ var o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; }
+
+function initGL(){
+  try{
+    gl = cv.getContext('webgl', {alpha:true, premultipliedAlpha:true, antialias:false,
+                                depth:false, stencil:false, powerPreference:'low-power'});
+  }catch(e){ gl = null; }
+  if(!gl) return false;
+  prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ gl = null; return false; }
+  gl.useProgram(prog);
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  var ap = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(ap);
+  gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+  loc.res = gl.getUniformLocation(prog, 'uRes');
+  loc.tint = gl.getUniformLocation(prog, 'uTint');
+  loc.imp = [0,1,2].map(function(i){ return gl.getUniformLocation(prog, 'uImp[' + i + ']'); });
+  loc.amp = [0,1,2].map(function(i){ return gl.getUniformLocation(prog, 'uAmp[' + i + ']'); });
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  gl.uniform3f(loc.tint, 0.80, 1.0, 0.0);
+  sizeGL();
+  gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);   /* warm the program */
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gsap.set(cv, {opacity:1});
+  return true;
+}
+function sizeGL(){
+  if(!gl) return;
+  var w = Math.round(W.innerWidth * dpr), h = Math.round(W.innerHeight * dpr);
+  if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
+  gl.viewport(0,0,w,h);
+  gl.uniform2f(loc.res, w, h);
+}
+function render(time, dt){
+  if(!gl) return;
+  if(dt > 22){ slowAcc++; } else { slowAcc = Math.max(0, slowAcc - 1); }
+  if(!degraded && slowAcc > 26){ degraded = true; dpr = 0.6; sizeGL(); }
+  var live = 0;
+  gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+  for (var i=0;i<3;i++){
+    var m = IMP[i];
+    gl.uniform3f(loc.imp[i], m.x*dpr, m.y*dpr, m.r*dpr);
+    gl.uniform1f(loc.amp[i], m.a);
+    if (m.a > 0.002) live++;
+  }
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  if (live === 0){ frames++; if (frames > 6) stopLoop(); } else { frames = 0; }
+}
+function startLoop(){ if(running || !gl) return; running = true; frames = 0; gsap.ticker.add(render); }
+function stopLoop(){ if(!running) return; running = false; gsap.ticker.remove(render); }
+function killField(){
+  IMP.forEach(function(m){ gsap.killTweensOf(m); m.a = 0; m.r = 0; });
+  if (gl){ gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES,0,3); }
+  stopLoop();
+}
+
+/* ══ 2. the strike — the one signature ════════════════════════════════ */
+var maxR = function(){ return Math.hypot(W.innerWidth, W.innerHeight) * 1.08; };
+var heroA = D.getElementById('heroA'), heroB = D.getElementById('heroB');
+var ringState = {r:0};
+
+function strike(x, y, opt){
+  opt = opt || {};
+  var now = performance.now();
+  if (now - lastStrike < 120) return false;          /* red-team: retrigger floor */
+  lastStrike = now;
+
+  if (gl){
+    var slot = IMP[0];
+    for (var i=1;i<3;i++){ if (IMP[i].a < slot.a) slot = IMP[i]; }   /* max 3 concurrent */
+    gsap.killTweensOf(slot);
+    slot.x = x; slot.y = y; slot.r = 0; slot.a = opt.power || 1;
+    if (motionOn){
+      gsap.to(slot, {r: maxR() * (opt.reach || 1), duration: 1.3 * (opt.slow || 1), ease:EO});
+      gsap.to(slot, {a: 0, duration: 1.15 * (opt.slow || 1), ease:'power2.in'});
+    } else {
+      slot.r = maxR();                                  /* reduced: a static wash */
+      gsap.fromTo(slot, {a:(opt.power||1)*0.5}, {a:0, duration:0.3, ease:'power2.inOut'});
+    }
+    startLoop();
+  }
+
+  if (opt.hero !== false) revealMeasured(x, y);
+  if (opt.sound !== false) impulse(opt.hz || 63, opt.rt || 2.41, opt.gain || 1);
+  return true;
+}
+
+/* the second layer: different words, not a glow (ambiguity critic) */
+var revealTl = null;
+function revealMeasured(px, py){
+  if (!heroA || !heroB) return;
+  var b = heroB.getBoundingClientRect();
+  if (b.bottom < -40 || b.top > W.innerHeight + 40) return;      /* only when on screen */
+  var x = px - b.left, y = py - b.top;
+  var reach = Math.hypot(Math.max(x, b.width - x), Math.max(y, b.height - y)) * 1.06;
+  heroB.style.setProperty('--ring-x', x + 'px');
+  heroB.style.setProperty('--ring-y', y + 'px');
+  if (revealTl) revealTl.kill();
+  gsap.set(heroB, {opacity:1, willChange:'clip-path, opacity'});
+  ringState.r = 0;
+  var put = function(){ heroB.style.setProperty('--ring-r', ringState.r + 'px'); };
+  put();
+  if (!motionOn){
+    ringState.r = reach; put();
+    revealTl = gsap.timeline()
+      .to(heroB, {opacity:1, duration:0.3, ease:'power2.inOut'})
+      .to(heroB, {opacity:0, duration:0.3, ease:'power2.inOut', delay:0.8,
+                  onComplete:function(){ ringState.r=0; put(); gsap.set(heroB,{willChange:'auto'}); }});
+    return;
+  }
+  revealTl = gsap.timeline()
+    .to(ringState, {r: reach, duration:0.9, ease:EO, onUpdate:put})
+    .to(heroB, {opacity:0, duration:0.45, ease:'power2.inOut', delay:0.55,
+                onComplete:function(){ ringState.r = 0; put();
+                  gsap.set(heroB, {opacity:1, willChange:'auto'}); }});
+}
+
+/* ══ 3. sound — synthesised, off by default ═══════════════════════════ */
+var AC = null, master = null, noiseBuf = null, soundOn = false, voices = 0;
+function buildAudio(){
+  if (AC) return true;
+  var Ctx = W.AudioContext || W.webkitAudioContext;
+  if (!Ctx) return false;
+  AC = new Ctx();
+  master = AC.createGain(); master.gain.value = 0.85; master.connect(AC.destination);
+  var n = Math.floor(AC.sampleRate * 1.6);
+  noiseBuf = AC.createBuffer(1, n, AC.sampleRate);
+  var ch = noiseBuf.getChannelData(0);
+  for (var i=0;i<n;i++) ch[i] = (Math.random()*2 - 1) * 0.6;
+  return true;
+}
+function impulse(hz, rt, gain){
+  if (!soundOn || !AC || voices >= 3) return;             /* red-team: 3-voice cap */
+  if (AC.state === 'suspended') AC.resume();
+  voices++;
+  var t = AC.currentTime, dur = Math.max(0.28, Math.min(rt, 2.6));
+
+  var src = AC.createBufferSource(); src.buffer = noiseBuf;
+  var bp = AC.createBiquadFilter(); bp.type = 'bandpass';
+  bp.frequency.value = Math.max(70, hz * 5.2); bp.Q.value = 1.25;
+  var g1 = AC.createGain();
+  g1.gain.setValueAtTime(0.0001, t);
+  g1.gain.exponentialRampToValueAtTime(0.42 * gain, t + 0.012);
+  g1.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(bp); bp.connect(g1); g1.connect(master);
+
+  var osc = AC.createOscillator(); osc.type = 'sine'; osc.frequency.value = Math.max(28, hz);
+  var g2 = AC.createGain();
+  g2.gain.setValueAtTime(0.0001, t);
+  g2.gain.exponentialRampToValueAtTime(0.24 * gain, t + 0.02);
+  g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.85);
+  osc.connect(g2); g2.connect(master);
+
+  src.start(t); osc.start(t);
+  src.stop(t + dur); osc.stop(t + dur);
+  src.onended = function(){ voices = Math.max(0, voices - 1); };
+}
+function duck(fast){
+  if (!AC) return;
+  master.gain.cancelScheduledValues(AC.currentTime);
+  master.gain.linearRampToValueAtTime(fast ? 0.22 : 0.85, AC.currentTime + 0.14);
+}
+
+/* ══ 4. cursor that names its action ══════════════════════════════════ */
+var cur = D.getElementById('cursor'), curLab = cur.querySelector('.cl');
+var cX = -100, cY = -100, tX = -100, tY = -100, curOn = false, curWord = '';
+function cursorTick(){
+  cX += (tX - cX) * 0.22; cY += (tY - cY) * 0.22;
+  cur.style.transform = 'translate3d(' + cX.toFixed(1) + 'px,' + cY.toFixed(1) + 'px,0)';
+}
+function wordFor(el){
+  var t = el && el.closest ? el.closest('[data-cursor]') : null;
+  if (t) return t.getAttribute('data-cursor');
+  return location.hash === '#no-return' ? 'No return' : 'Strike';
+}
+function bindCursor(){
+  if (!fineQ.matches) return;
+  root.classList.add('cursor-on');
+  gsap.ticker.add(cursorTick);
+  W.addEventListener('pointermove', function(e){
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    tX = e.clientX - 10; tY = e.clientY - 10;
+    if (!curOn){ curOn = true; cX = tX; cY = tY; gsap.to(cur, {opacity:1, duration:0.3}); }
+    var w = wordFor(e.target);
+    if (w !== curWord){ curWord = w; curLab.textContent = w; }
+  }, {passive:true});
+  D.addEventListener('pointerleave', function(){ curOn = false; gsap.to(cur, {opacity:0, duration:0.25}); });
+}
+
+/* ══ 5. scrubbed sequence — an SVG line drawn by scroll ═══════════════ */
+var seqWave = D.getElementById('seqWave'), seqTicks = D.getElementById('seqTicks');
+var seqRect = D.getElementById('seqRect'), head = D.getElementById('playHead');
+var roF = D.getElementById('roFrame'), roT = D.getElementById('roTime'),
+    roD = D.getElementById('roDb'), roR = D.getElementById('roRef');
+var REF = [0.018,0.047,0.088,0.145,0.225,0.335,0.475,0.655,0.875];
+
+function buildSequence(){
+  var d = 'M0 150', x, t, env, y;
+  for (x = 0; x <= 1200; x += 2){
+    t = x / 1200;
+    env = Math.exp(-5.1 * t);
+    y = 150 - Math.sin(t * 143) * Math.sin(0.35 + t * 9.1) * 122 * env;
+    d += ' L' + x + ' ' + y.toFixed(1);
+  }
+  seqWave.setAttribute('d', d);
+  var mk = '';
+  REF.forEach(function(p, i){
+    var px = (p * 1200).toFixed(0), o = (0.5 - i * 0.045).toFixed(2);
+    mk += '<line x1="' + px + '" y1="34" x2="' + px + '" y2="266" opacity="' + o + '"/>';
+  });
+  seqTicks.innerHTML = mk;
+}
+function setSeq(p){
+  p = Math.max(0, Math.min(1, p));
+  seqRect.setAttribute('width', (p * 1200).toFixed(1));
+  head.style.setProperty('--px', (p * 1200).toFixed(1) + 'px');
+  var fr = Math.round(p * 120), n = 0, i;
+  for (i = 0; i < REF.length; i++) if (REF[i] <= p) n++;
+  roF.textContent = (fr < 100 ? (fr < 10 ? '00' : '0') : '') + fr + ' / 120';
+  roT.textContent = (p * 2.41).toFixed(2) + ' s';
+  roD.textContent = (p <= 0 ? '0' : '−' + Math.round(p * 60)) + ' dB';
+  roR.textContent = n;
+}
+
+/* ══ 6. build / teardown (reduced-motion substitution) ════════════════ */
+var splits = [], heroTween = null;
+
+function build(){
+  /* hero lines — hand-masked so they survive a SplitText failure */
+  if (!heroTween){
+    gsap.set('.reveal-line', {yPercent:105, opacity:1});
+    gsap.set('.hero .reveal', {opacity:0, y:16});
+  }
+
+  /* section titles — catalogue SplitText, lines, masked */
+  if (hasSplit){
+    var st = SplitText.create('.section-title', {
+      type:'lines', mask:'lines', autoSplit:true,
+      onSplit:function(s){
+        return motionOn
+          ? gsap.from(s.lines, {yPercent:105, duration:0.9, stagger:0.06, ease:EO,
+              scrollTrigger:{trigger:s.lines[0], start:'top 90%'}})
+          : gsap.from(s.lines, {opacity:0, duration:0.3, stagger:0.02, ease:'power2.out',
+              scrollTrigger:{trigger:s.lines[0], start:'top 92%'}});
+      }
+    });
+    splits = [].concat(st);
+  }
+
+  /* supporting copy — items stagger 0.1 per the catalogue table */
+  gsap.utils.toArray('.panel-clip').forEach(function(sec){
+    if (sec.dataset.rev) return;
+    var bits = sec.querySelectorAll('.reveal');
+    if (!bits.length) return;
+    gsap.set(bits, {opacity:0, y:16});
+    gsap.to(bits, {
+      opacity:1, y:0, duration: motionOn ? 0.8 : 0.3, stagger: motionOn ? 0.1 : 0.02,
+      ease: motionOn ? EO : 'power2.out', clearProps:'transform',
+      scrollTrigger:{trigger:sec, start:'top 78%',
+        onEnter:function(){ sec.dataset.rev = '1'; }}
+    });
+  });
+
+  /* section transition: clip wipe + the same strike at full bleed */
+  gsap.utils.toArray('.panel-clip').forEach(function(p){
+    if (p.dataset.clip) return;
+    gsap.set(p, {clipPath:'inset(0 0 100% 0)', willChange:'clip-path'});
+    ScrollTrigger.create({
+      trigger:p, start:'top 82%', once:true,
+      onEnter:function(){
+        p.dataset.clip = 'open';
+        var r = p.getBoundingClientRect();
+        gsap.to(p, {
+          clipPath:'inset(0% 0 0% 0)',
+          duration: motionOn ? 1.0 : 0.3,
+          ease: motionOn ? EIO : 'power2.inOut',
+          onComplete:function(){ gsap.set(p, {clipPath:'none', willChange:'auto'}); }
+        });
+        strike(r.left + r.width * 0.5, Math.max(0, r.top) + 8,
+               {power:0.62, slow:1.25, reach:0.9, hero:false, sound:false});
+      }
+    });
+  });
+
+  /* the scrubbed sequence */
+  if (motionOn){
+    ScrollTrigger.create({
+      trigger:'#decay', start:'top top', end:'+=190%', pin:'#scrubIn', scrub:0.55,
+      onUpdate:function(s){ setSeq(s.progress); }
+    });
+  } else {
+    /* substitute: no pin, same scrub, same readout */
+    ScrollTrigger.create({
+      trigger:'#decay', start:'top 85%', end:'bottom 25%', scrub:0.3,
+      onUpdate:function(s){ setSeq(s.progress); }
+    });
+  }
+  ScrollTrigger.refresh();
+}
+function teardown(){
+  ScrollTrigger.getAll().forEach(function(t){ t.kill(true); });
+  splits.forEach(function(s){ if (s && s.revert) s.revert(); });
+  splits = [];
+  gsap.set('.panel-clip', {clearProps:'clipPath,willChange'});
+}
+
+/* ══ 7. smooth scroll — one rAF, GSAP's ticker ════════════════════════ */
+var lenis = null, lastV = 0;
+function startLenis(){
+  if (lenis || !W.Lenis || !motionOn) return;
+  lenis = new Lenis();
+  lenis.on('scroll', function(e){
+    ScrollTrigger.update();
+    var v = Math.abs(e.velocity || 0);
+    if ((v > 28) !== (lastV > 28)) duck(v > 28);
+    lastV = v;
+  });
+  gsap.ticker.add(lenisRaf);
+  gsap.ticker.lagSmoothing(0);
+}
+function lenisRaf(t){ if (lenis) lenis.raf(t * 1000); }
+function stopLenis(){
+  if (!lenis) return;
+  gsap.ticker.remove(lenisRaf); lenis.destroy(); lenis = null; duck(false);
+}
+
+/* ══ 8. loader — the first frame of the hero ══════════════════════════ */
+function loaderIn(){
+  var ld = D.getElementById('loader');
+  if (!ld || location.hash === '#no-return'){ if (ld) ld.style.display = 'none'; heroIn(); return; }
+
+  var path = D.getElementById('ldrPath'), mid = ld.querySelector('.ldr-mid'),
+      read = ld.querySelector('.ldr-read'), state = D.getElementById('ldrState');
+
+  /* the flat line IS the impulse at scaleY 0 — it resolves, it does not count */
+  var d = 'M0 32', x, t, env, y;
+  for (x = 0; x <= 900; x += 2){
+    t = x / 900;
+    env = Math.exp(-5.6 * t);
+    y = 32 - Math.sin(t * 118) * Math.sin(0.3 + t * 8.4) * 30 * env;
+    d += ' L' + x + ' ' + y.toFixed(1);
+  }
+  path.setAttribute('d', d);
+  gsap.set(path, {transformOrigin:'0px 32px', scaleY:0});
+  gsap.set(mid, {opacity:0});
+
+  var tl = gsap.timeline({onComplete:function(){ ld.style.display = 'none'; }});
+  tl.to(mid, {opacity:1, duration:0.5, ease:'power2.out'})
+    .to(read, {opacity:1, duration:0.4, ease:'power2.out'}, '-=0.2')
+    .add(function(){ state.textContent = 'Struck'; }, '+=0.25')
+    .to(path, {scaleY:1, duration: motionOn ? 0.75 : 0.3, ease:EO})
+    .add(function(){
+      var rl = D.getElementById('heroRule'), a = mid.getBoundingClientRect(),
+          b = rl ? rl.getBoundingClientRect() : a;
+      gsap.to(mid, {y: b.top - a.top - 20, duration:1.05, ease:EIO});
+      gsap.to(path, {scaleY:0.02, duration:1.05, ease:EIO});
+      gsap.to(read, {opacity:0, duration:0.4, ease:'power2.inOut'});
+      gsap.to(ld, {opacity:0, duration:0.55, ease:'power2.inOut', delay:0.5});
+      strike(W.innerWidth * 0.5, W.innerHeight * 0.5, {power:0.9, hero:false, sound:false});
+      heroIn();
+    })
+    .to({}, {duration:1.15});
+}
+function heroIn(){
+  var rl = D.getElementById('heroRule');
+  if (heroTween) return;
+  heroTween = gsap.timeline();
+  if (motionOn){
+    heroTween
+      .to('.reveal-line', {yPercent:0, duration:0.9, stagger:0.06, ease:EO})
+      .fromTo(rl, {scaleX:0}, {scaleX:1, duration:1.1, ease:EIO}, '-=0.55')
+      .to('.hero .reveal', {opacity:1, y:0, duration:0.8, stagger:0.1, ease:EO,
+                            clearProps:'transform'}, '-=0.8');
+  } else {
+    heroTween
+      .to('.reveal-line', {yPercent:0, opacity:1, duration:0.3, stagger:0.02, ease:'power2.out'})
+      .fromTo(rl, {opacity:0}, {opacity:1, duration:0.3}, 0)
+      .to('.hero .reveal', {opacity:1, y:0, duration:0.3, stagger:0.02, clearProps:'transform'}, 0);
+  }
+}
+
+/* ══ 9. wiring ════════════════════════════════════════════════════════ */
+var INTERACTIVE = 'a,button,input,textarea,select,label,[role="button"]';
+
+var down = null;
+function pageDown(e){
+  down = null;
+  if (location.hash === '#no-return') return;
+  if (e.target && e.target.closest && e.target.closest(INTERACTIVE)) return;
+  if (e.pointerType === 'mouse'){
+    if (e.button !== 0) return;
+    strike(e.clientX, e.clientY, {hz:63, rt:2.41});
+    return;
+  }
+  down = {x:e.clientX, y:e.clientY, t:performance.now()};   /* touch: wait for a tap */
+}
+function pageUp(e){
+  if (!down) return;
+  var moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+  var held  = performance.now() - down.t;
+  if (moved < 12 && held < 550) strike(e.clientX, e.clientY, {hz:63, rt:2.41});
+  down = null;
+}
+
+function wire(){
+  D.addEventListener('pointerdown', pageDown, {passive:true});
+  D.addEventListener('pointerup', pageUp, {passive:true});
+  D.addEventListener('pointercancel', function(){ down = null; }, {passive:true});
+
+  var sb = D.getElementById('strikeBtn');
+  sb.addEventListener('click', function(){
+    var r = sb.getBoundingClientRect();
+    strike(r.left + r.width / 2, r.top + r.height / 2, {hz:63, rt:2.41});
+  });
+  if (!fineQ.matches) D.getElementById('strikeLabel').textContent = 'Tap to strike';
+
+  /* index rows: click, tap and Enter all do the same thing */
+  gsap.utils.toArray('#rows .row').forEach(function(row){
+    if (row.tagName !== 'BUTTON') return;
+    row.addEventListener('click', function(e){
+      var r = row.getBoundingClientRect();
+      var hz = parseFloat(row.getAttribute('data-hz')), rt = parseFloat(row.getAttribute('data-rt'));
+      var ox = (e.clientX || r.left + r.width * 0.12), oy = (e.clientY || r.top + r.height / 2);
+      strike(ox, oy, {hz:hz, rt:rt, power:0.85, reach:0.75, hero:false});
+      row.setAttribute('data-playing', 'true');
+      gsap.delayedCall(Math.min(rt, 2.2), function(){ row.removeAttribute('data-playing'); });
+    });
+  });
+
+  /* sound toggle — off by default, built inside the gesture */
+  var sndBtn = D.getElementById('soundBtn');
+  sndBtn.addEventListener('click', function(){
+    if (!soundOn){
+      if (!buildAudio()){ sndBtn.textContent = 'No audio'; sndBtn.disabled = true; return; }
+      if (AC.state === 'suspended') AC.resume();
+      soundOn = true; sndBtn.setAttribute('aria-pressed', 'true');
+      impulse(63, 1.4, 0.7);
+    } else {
+      soundOn = false; sndBtn.setAttribute('aria-pressed', 'false');
+    }
+  });
+
+  /* motion toggle doubles as the pause control */
+  var motBtn = D.getElementById('motionBtn');
+  motBtn.setAttribute('aria-pressed', String(motionOn));
+  motBtn.addEventListener('click', function(){
+    userMotion = !userMotion;
+    motionOn = userMotion && !prefersReduce;
+    motBtn.setAttribute('aria-pressed', String(motionOn));
+    root.classList.toggle('rm-off', !motionOn);
+    killField();
+    if (motionOn) startLenis(); else stopLenis();
+    teardown(); build();
+  });
+
+  /* the form cannot submit — no fake success */
+  D.getElementById('docket').addEventListener('submit', function(e){
+    e.preventDefault();
+    var n = D.createElement('p');
+    n.className = 'stub';
+    n.setAttribute('role', 'status');
+    n.textContent = 'Demo build — not sent. Wire this form to Formspark before launch.';
+    var ft = D.querySelector('.docket-ft');
+    if (!ft.querySelector('[role="status"]')) ft.appendChild(n);
+  });
+
+  /* 404: the field goes silent — a strike that returns nothing */
+  W.addEventListener('hashchange', function(){
+    if (location.hash === '#no-return'){ killField(); if (lenis) lenis.stop(); }
+    else if (lenis) lenis.start();
+  });
+  if (location.hash === '#no-return') killField();
+
+  W.addEventListener('resize', function(){ sizeGL(); }, {passive:true});
+}
+
+/* ══ 10. boot ═════════════════════════════════════════════════════════ */
+var userMotion = true, prefersReduce = reduceQ.matches;
+initGL();
+buildSequence();
+bindCursor();
+
+var mm = gsap.matchMedia();
+mm.add({ok:'(prefers-reduced-motion: no-preference)', reduce:'(prefers-reduced-motion: reduce)'},
+  function(ctx){
+    prefersReduce = !!ctx.conditions.reduce;
+    motionOn = userMotion && !prefersReduce;
+    root.classList.toggle('rm-off', !motionOn);
+    var mb = D.getElementById('motionBtn');
+    if (mb) mb.setAttribute('aria-pressed', String(motionOn));
+    build();
+    if (motionOn) startLenis(); else stopLenis();
+    return function(){ teardown(); stopLenis(); };
+  });
+
+wire();
+setSeq(0);
+
+var started = false;
+function go(){ if (started) return; started = true; loaderIn(); }
+if (D.fonts && D.fonts.ready) { D.fonts.ready.then(go); }
+setTimeout(go, 1600);                 /* fonts never settle → start anyway */
+setTimeout(function(){                /* watchdog: the loader can never trap the page */
+  var l = D.getElementById('loader');
+  if (l && l.style.display !== 'none'){ l.style.display = 'none'; heroIn(); }
+}, 5000);
+W.addEventListener('load', function(){ ScrollTrigger.refresh(); });
+
+})();
+</script>
+</body>
+</html>
