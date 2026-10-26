@@ -1,6 +1,6 @@
 # Design and UX skill set
 
-Seventeen skills covering interface work end to end, in three layers. They are project-agnostic — written to
+Seventeen design and UX skills in three layers, plus a separate six-skill game-development set (below). They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
 The agent loads a skill automatically when a task matches its `description`. You can also invoke one by name.
@@ -139,3 +139,21 @@ skills deliberately refuse to answer themselves.
   encoding on every series.
 
 Everything else — all seventeen skills and their references — resolves inside this directory.
+
+## AI game-development stack — 6 skills
+
+A separate set, built from a short-form video that lists five open-source repos for making a game with Claude
+Code. Each skill was written from the repo's own README (read 2026-10-26), not from the video, and
+`ai-game-dev-stack/references/source-reel.md` records where the video and the READMEs differ.
+
+| Skill | Answers |
+|---|---|
+| **ai-game-dev-stack** | Router. Which of the five tools to use for which job, in what order, and what to verify first. Names the UE 5.7 vs 5.6 version trap and the licence gaps. |
+| **claude-code-game-studios** | Setting up and driving the 49-agent, 74-skill studio template, and when its process weight is not worth it. |
+| **godot-mcp-workflow** | The run → read error → fix loop through the Godot MCP server. |
+| **unrealclaude-editor-workflow** | Claude inside the Unreal 5.7 editor, including the permissive security defaults to change. |
+| **ace-step-game-music** | Local music generation: model tier by VRAM, writing a track, and the unstated weights licence. |
+| **audio2face-character-lip-sync** | Choosing SDK, Maya, Unreal plugin or NIM for face animation, and the component-by-component licences. |
+
+These describe third-party tools that change; re-read the repo README before relying on a version, flag or
+requirement stated here.
