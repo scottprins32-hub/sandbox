@@ -19,7 +19,9 @@ claude mcp add godot -e GODOT_PATH=/path/to/godot -e DEBUG=true -- npx @coding-s
 
 From source: `git clone https://github.com/Coding-Solo/godot-mcp.git && cd godot-mcp && npm install && npm run build`, then point the client at `build/index.js`. Check `/mcp` in Claude Code to confirm the server is connected before relying on it.
 
-## Tools (14, per the README)
+## Tools (14 named in the README)
+
+The README has no tool table; these come from its example `autoApprove` list, and its Features text names no others. Confirm against the server's own tool listing (`/mcp`) if one matters.
 
 `launch_editor`, `run_project`, `get_debug_output`, `stop_project`, `get_godot_version`, `list_projects`, `get_project_info`, `create_scene`, `add_node`, `load_sprite`, `export_mesh_library`, `save_scene`, `get_uid`, `update_project_uids`. The last two need **Godot 4.4+**. The project path must contain a `project.godot`.
 
@@ -33,7 +35,7 @@ From source: `git clone https://github.com/Coding-Solo/godot-mcp.git && cd godot
 
 ## What it does not do
 
-The tool list has no input simulation, screenshotting or node-property editing beyond what `create_scene` / `add_node` take. Gameplay correctness (does the jump feel right, is the level winnable) still needs a human or a test you write.
+The README does not mention input simulation, screenshots, or a tool that modifies an existing node's properties (`add_node` takes properties when it creates a node). Treat those as unavailable until the tool listing shows otherwise. Gameplay correctness (does the jump feel right, is the level winnable) still needs a human or a test you write.
 
 ## Failure modes
 

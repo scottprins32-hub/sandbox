@@ -27,17 +27,18 @@ The MCP server starts with the editor on **port 3000**. `curl http://localhost:3
 
 ## Tools
 
-Categories: actors, level management, Blueprints, Animation Blueprint state machines, assets, characters, materials, Enhanced Input, utilities, async task queue. Named: `unreal_status`, `unreal_get_ue_context` (UE 5.7 API docs by category or keyword; use it before writing engine code from memory). Parameter docs live in the separate ue5-mcp-bridge repo.
+The README says "20+" MCP tools. Categories: actors, level management, Blueprints, Animation Blueprint state machines, assets, characters, materials, Enhanced Input, utilities, async task queue. Named: `unreal_status`, `unreal_get_ue_context` (UE 5.7 API docs by category or keyword; use it before writing engine code from memory). Parameter docs live in the separate ue5-mcp-bridge repo.
 
 ## Working rules
 
 - Start each task with `unreal_status`, then `unreal_get_ue_context` for any engine API you are about to use.
 - **Blueprint editing is the weak spot**: the README says it has "few bugs" and should not be fully relied on. Inspect the Blueprint after every edit.
-- Keep long operations on the async task queue; they time out otherwise.
+- Long operations go through the async task queue, which the README says "won't timeout". Poll for the result rather than re-issuing the call. The only hang guard documented is a watchdog that warns after 60 s.
 
 ## Security (change before real use)
 
-- Tools run with `--skip-permissions` by default and the default allowed tools include `Bash` and `Write`.
+- The command the README shows the plugin executing is `claude -p --skip-permissions ...`, and by default Claude is given `Read`, `Write`, `Edit`, `Grep`, `Glob` and `Bash`. The README does not explain the flag; treat the editor session as having shell and file-write access.
+- Script execution is gated by a permission dialog.
 - `execute_script`, `run_console_command`, `cleanup_scripts`, `get_script_history` are hidden from the model by default but callable by exact name (`HIDDEN_TOOL_NAMES` in `tool-router.js`). Un-hiding `run_console_command` allows arbitrary code through the Python interpreter.
 - "Auto-approve script execution" defaults OFF. Leave it off unless the connected client is trusted.
 

@@ -16,4 +16,4 @@ READMEs read on 2026-10-26.
 - **"Builds levels":** the README lists level management, but also says Blueprint editing has "few bugs" and should not be fully relied on.
 - **"Under 10 seconds":** the README gives this for an RTX 3090 and under 2 s on an A100, as the authors' own figures, with no stated methodology.
 - **Lip-sync:** confirmed. The README is a hub page; GPU and input-format requirements live in the linked repos.
-- **Not mentioned in the reel:** UE version mismatch, ACE-Step weights licence, Audio2Emotion/dataset licence limits, and UnrealClaude's default `--skip-permissions`.
+- **Not mentioned in the reel:** UE version mismatch, ACE-Step weights licence, Audio2Emotion/dataset licence limits, and that UnrealClaude's documented launch command includes `--skip-permissions` with Bash and Write allowed.

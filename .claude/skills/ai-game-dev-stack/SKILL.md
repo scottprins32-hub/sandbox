@@ -47,6 +47,10 @@ These repos install hooks, agents, plugins or MCP servers that execute with your
 
 See `references/source-reel.md`. Short version: the reel is accurate on counts (49 agents) and the ACE-Step speed (authors' own RTX 3090 figure), but says "builds levels" for Unreal where the README warns Blueprint editing has bugs, and omits the 5.7 / 5.6 mismatch above.
 
+## Verification status
+
+Each tool skill was checked against the repo README (and, for ACE-Step, `docs/en/INFERENCE.md`) on 2026-10-26. Nothing here was installed or run. Statements marked as judgement are mine, not the projects'. Re-read the README before relying on any version, flag or requirement.
+
 ## Ship checklist
 
 - [ ] One engine tool chosen; the other is not installed.

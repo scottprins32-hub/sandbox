@@ -30,7 +30,7 @@ GPU model, VRAM, driver and OS requirements, and the audio input format and samp
 
 1. Lock the voice lines first; re-recording invalidates the animation.
 2. Run one line through the chosen route; export weights or keyframes.
-3. Check the rig mapping: wrong blendshape names are the usual cause of a dead or distorted face.
+3. Check the rig mapping. (Practical heuristic, not from NVIDIA's page: when a face looks dead or distorted, suspect mismatched blendshape names or ordering first.)
 4. Review mouth shapes at game camera distance and speed; judge on screen, not in the plugin preview.
 5. Batch the rest, keeping the model version and settings per file.
 

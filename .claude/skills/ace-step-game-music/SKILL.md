@@ -27,12 +27,16 @@ CLI details are in `docs/en/CLI.md` and the Python API in `docs/en/INFERENCE.md`
 
 ## Writing a game track
 
-- **Caption**: style tags plus mood and instrumentation ("cozy pixel village, upbeat 8-bit, chiptune, major key"). The LM can expand tags automatically.
-- **Duration**: 10 s to 600 s. Generate loop stems at 30-90 s and loop in the engine; do not expect seamless loops by default, and check the join.
-- **Metadata**: BPM, key/scale and time signature can be set; fix them when tracks must crossfade.
-- **Instrumental**: leave lyrics empty or mark instrumental per the docs.
-- **Batch**: up to 8 variations at once; generate several and choose.
-- **Steps**: 8 for turbo models, 50 for base/sft.
+Parameter names below are from `docs/en/INFERENCE.md` (Python API); the REST and Gradio field names may differ, so check them.
+
+- **`caption`** (max 512 chars): style tags plus mood and instrumentation ("cozy pixel village, upbeat 8-bit, chiptune, major key"). The LM can expand tags automatically.
+- **`duration`**: 10 s to 600 s; `-1` (or <= 0) lets the model choose from the lyrics. Values above your VRAM tier's limit are clamped with a warning, so check the result's real length.
+- **`bpm`** (30-300, `None` = auto-detect), **`keyscale`**, **`timesignature`**: fix them when tracks must crossfade.
+- **Instrumental**: set `instrumental=True` in `GenerationParams`, or `lyrics="[Instrumental]"`. `lyrics` max 4096 chars.
+- **`seed`**: `-1` is random. Record it for any track you keep.
+- **`batch_size`** (in `GenerationConfig`, default 2, range 1-8): generate several variations and choose.
+- **`inference_steps`**: default 8 (turbo 1-20, base 1-200).
+- **Loops** (my judgement, not from the docs, which do not mention looping): generate 30-90 s pieces, loop them in the engine, and check the join by ear.
 - **LoRA**: about 8 songs, about 1 hour on a 12 GB RTX 3090 (README figure), via the Gradio LoRA Training tab. Only train on audio you have rights to.
 
 ## Verify before it goes in the game
