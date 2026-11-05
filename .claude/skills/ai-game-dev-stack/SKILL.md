@@ -49,7 +49,7 @@ See `references/source-reel.md`. Short version: the reel is accurate on counts (
 
 ## Verification status
 
-Each tool skill was checked against the repo README (and, for ACE-Step, `docs/en/INFERENCE.md`) on 2026-10-26. Nothing here was installed or run. Statements marked as judgement are mine, not the projects'. Re-read the README before relying on any version, flag or requirement.
+Each tool skill was checked against the repo README on 2026-10-26, and a second pass on 2026-11-05 read the repos' own files: godot-mcp `src/index.ts` and `package.json`; UnrealClaude `.uplugin`, LICENSE and the `ue5-mcp-bridge` README and `tool-router.js`; the Audio2Face SDK and Samples READMEs and the v3.0 model card; and Game Studios' `settings.json`, `project.yaml`, one agent, two skills and two hooks. Files not read are named in each skill. Nothing here was installed or run. Statements marked as judgement are mine, not the projects'. Re-read the README before relying on any version, flag or requirement.
 
 ## Ship checklist
 

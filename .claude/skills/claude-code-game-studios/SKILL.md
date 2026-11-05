@@ -43,6 +43,16 @@ Inspect or change with `/settings`, `/settings modes.rigor=full` (team-wide) or 
 
 Design `/brainstorm`, `/map-systems`, `/design-system`; planning `/create-epics`, `/create-stories`, `/sprint-plan`; build `/dev-story`, `/prototype`, `/vertical-slice`; checks `/code-review`, `/design-review`, `/gate-check`, `/qa-plan`, `/smoke-check`; release `/release-checklist`, `/changelog`, `/patch-notes`; team runs `/team-combat`, `/team-ui`, `/team-qa`, etc. Run `/help` for the full list rather than trusting this summary.
 
+## What it changes (read from `.claude/settings.json`, hooks and agent files)
+
+- **Permissions:** `defaultMode: default`; 3 allow rules (`dir`, `python -m pytest`, `py -m pytest`) and about 110 deny rules: recursive-force `rm`, force `git push`, `git reset --hard`, forced `git clean`, `sudo`, `chmod 777`, reading or editing `.env*`, editing `.uasset`/`.umap`, plus PowerShell equivalents. No `ask` rules.
+- **Hooks wired in settings:** SessionStart (`session-start.sh`, `detect-gaps.sh`); PreToolUse on Bash/PowerShell (`validate-commit.sh`, `validate-push.sh`), on Write/Edit (`validate-registry.sh`, `validate-write.sh`), on Read (`validate-read.sh`); PostToolUse (`validate-assets.sh`, `validate-skill-change.sh`); Notification, PreCompact, Stop (async), SubagentStart/Stop. Only `session-start.sh` and `validate-commit.sh` were read.
+- **`validate-commit.sh`** blocks (exit 2) only when staged JSON under the data folders is invalid or Python 3 is missing; everything else is advisory (missing GDD sections, hardcoded gameplay numbers, TODO/FIXME without an owner).
+- **`session-start.sh`** prints a context banner (branch, last 5 commits, review mode, schema errors, sprint, open bugs); its update check uses a cache, no network call.
+- **Agent files** are Claude Code subagents: frontmatter `name`, `description`, `tools`, `model`, `maxTurns`, `memory: project`, `disallowedTools`. `creative-director` is `model: opus`, has `Bash` disallowed, and must get user approval before writing documents. **Skills** carry `user-invocable`, `allowed-tools`, `model: sonnet`, and a `!` line that runs `yaml-helper.sh resolve_config` at invocation.
+- **`project.yaml`** ships almost empty (`schema_version: 1`, `framework.version: 1.2.0`); its comments say the review/workflow/density/QA/granularity/team knobs must not be seeded there. Per-developer overrides go in gitignored `project.local.yaml`. Skill fallbacks stated: workflow `minimal`, review mode `solo`, automation `collaborative`, docs density `terse`. The README calls the process-weight setting `modes.rigor`; the files use `modes.workflow` / `modes.review_mode`, so use `/settings` to see the live names.
+- **Engines:** `/setup-engine` names Godot, Unity and Unreal; its version step searches the web and probes the installed binary instead of pinning a version.
+
 ## Caveats from the README
 
 - Hook counts are inconsistent in the docs (15 vs 18 scripts); do not depend on an exact figure.

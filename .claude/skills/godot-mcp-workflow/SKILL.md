@@ -19,11 +19,28 @@ claude mcp add godot -e GODOT_PATH=/path/to/godot -e DEBUG=true -- npx @coding-s
 
 From source: `git clone https://github.com/Coding-Solo/godot-mcp.git && cd godot-mcp && npm install && npm run build`, then point the client at `build/index.js`. Check `/mcp` in Claude Code to confirm the server is connected before relying on it.
 
-## Tools (14 named in the README)
+**Package-name mismatch:** the README's install commands use the scoped `@coding-solo/godot-mcp`, but `package.json` names the package `godot-mcp` (version 0.1.1). Run `npm view @coding-solo/godot-mcp` first and confirm the publisher before `npx` executes anything.
 
-The README has no tool table; these come from its example `autoApprove` list, and its Features text names no others. Confirm against the server's own tool listing (`/mcp`) if one matters.
+## Tools (14, confirmed from `src/index.ts`)
 
-`launch_editor`, `run_project`, `get_debug_output`, `stop_project`, `get_godot_version`, `list_projects`, `get_project_info`, `create_scene`, `add_node`, `load_sprite`, `export_mesh_library`, `save_scene`, `get_uid`, `update_project_uids`. The last two need **Godot 4.4+**. The project path must contain a `project.godot`.
+| Tool | Required params | Notes |
+|---|---|---|
+| `launch_editor` | `projectPath` | |
+| `run_project` | `projectPath` | optional `scene` |
+| `get_debug_output` | none | stdout/stderr text of the running project |
+| `stop_project` | none | |
+| `get_godot_version` | none | |
+| `list_projects` | `directory` | optional `recursive` |
+| `get_project_info` | `projectPath` | |
+| `create_scene` | `projectPath`, `scenePath` | optional `rootNodeType` |
+| `add_node` | `projectPath`, `scenePath`, `nodeType`, `nodeName` | optional `parentNodePath`, `properties` (set on the new node) |
+| `load_sprite` | `projectPath`, `scenePath`, `nodePath`, `texturePath` | sets a texture on an existing Sprite2D |
+| `export_mesh_library` | `projectPath`, `scenePath`, `outputPath` | optional `meshItemNames` |
+| `save_scene` | `projectPath`, `scenePath` | optional `newPath` |
+| `get_uid` | `projectPath`, `filePath` | Godot 4.4+ |
+| `update_project_uids` | `projectPath` | Godot 4.4+ |
+
+The project path must contain a `project.godot`. Only the UID tools have a stated Godot minimum (4.4); no overall minimum is stated. The scene operations run through `src/scripts/godot_operations.gd`, which was not read, so their edge-case behaviour (existing nodes, overwrites) is unverified: inspect the saved `.tscn` after each change.
 
 ## The loop
 
@@ -35,7 +52,7 @@ The README has no tool table; these come from its example `autoApprove` list, an
 
 ## What it does not do
 
-The README does not mention input simulation, screenshots, or a tool that modifies an existing node's properties (`add_node` takes properties when it creates a node). Treat those as unavailable until the tool listing shows otherwise. Gameplay correctness (does the jump feel right, is the level winnable) still needs a human or a test you write.
+Confirmed from source: **no tool sends input** (keyboard, mouse, simulated), **none takes screenshots**, and there is **no generic "set property on an existing node" tool**; the only output channel is the text from `run_project` + `get_debug_output`. Gameplay correctness (does the jump feel right, is the level winnable) still needs a human or a test you write.
 
 ## Failure modes
 
