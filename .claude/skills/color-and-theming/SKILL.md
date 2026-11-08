@@ -25,7 +25,7 @@ that keeps them true in two themes at once.
   colour", "the disabled state is unreadable", "our greens and reds look wrong next to each other".
 - Any theme toggle, `prefers-color-scheme` work, or a flash of the wrong theme.
 
-Go elsewhere when: the question is *how much space* between things (`spacing-and-layout`); *which of six
+Go elsewhere when: the question is *how much of the screen each colour should own* - the 60/30/10 proportion of dominant, secondary and accent, and measuring it (`color-proportion-60-30-10`; this skill supplies the ramps and tokens it assigns) - or *how much space* between things (`spacing-and-layout`); *which of six
 states* a button needs and what changes per state (`ui-signifiers-and-states` — it owns the state matrix and
 the `color-mix()` state-layer deltas; this skill owns where `--action` comes from); *shadow specs and layering*
 (`depth-and-overlays` — this skill supplies the dark-mode surface ladder that replaces shadow, that one

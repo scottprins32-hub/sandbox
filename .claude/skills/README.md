@@ -1,6 +1,6 @@
 # Design and UX skill set
 
-Seventeen design and UX skills in three layers, plus a separate six-skill game-development set (below). They are project-agnostic — written to
+Eighteen design and UX skills in three layers, plus a separate six-skill game-development set (below). They are project-agnostic — written to
 be copied into any future website or app repo, not tied to this codebase.
 
 The agent loads a skill automatically when a task matches its `description`. You can also invoke one by name.
@@ -37,7 +37,7 @@ they cannot answer.
 |---|---|
 | **decision-screen-design** | The moment someone decides to pay, book, subscribe or pick a plan. Its spine is an element-by-element question audit; it also owns pricing *display* and the mechanics of reference pricing and auto-renewal (Art. 6a and what it does not cover). Whether a specific claim on the screen is true and lawful is `ethical-persuasion-audit` move 4 — that split is stated here and nowhere else. |
 
-### Craft — 7 skills
+### Craft — 8 skills
 
 | Skill | Answers |
 |---|---|
@@ -45,6 +45,7 @@ they cannot answer.
 | **typography-system** | Typefaces, the size scale with tracking and line-height per step, measure, tabular figures, webfont loading. Start here on a new project — most of a UI is text. |
 | **spacing-and-layout** | The spacing scale and why, space within a group vs between groups as numbers, grids and when they don't apply, container queries, reflow. |
 | **color-and-theming** | Brand hue to 50–950 ramps in OKLCH, semantic tokens, contrast as a generation constraint, dark mode as re-derivation not inversion. |
+| **color-proportion-60-30-10** | How much of the screen each colour owns - dominant, secondary and accent as token roles, where the rule bends (dense apps, dark mode, status and data colour), and a Pillow script that measures the real proportions. Flags that the rule is a heuristic with no traced source. |
 | **depth-and-overlays** | Elevation scale, layered shadows, dark-mode depth via lightness, and text over imagery with guaranteed contrast. |
 | **ui-signifiers-and-states** | Affordances, and the full state matrix — rest, hover, active, focus-visible, disabled, loading, selected, expanded, error, empty. |
 | **print-and-physical-artefacts** | What happens when the output stops being a screen: paper geometry, type sized from viewing distance, monochrome-first colour, QR module size and error correction, and forms people fill in with a pen. |
@@ -68,13 +69,13 @@ you the set doesn't fit you.
 **A surface nobody's design blog covers** — a phone used outdoors or with gloves, a tool someone's employer
 handed them, a public page reached from a QR code, an interface in two languages, a screen that gets printed
 (`print-and-physical-artefacts` owns that one outright).
-The vocabulary these arrive in is missing from most of the seventeen `description` fields, which were written
+The vocabulary these arrive in is missing from most of the eighteen `description` fields, which were written
 from consumer and SaaS symptoms, so auto-triggering on a term like *offline*, *field worker* or *no-account
 page* lands on the two routers rather than the specialist. That is the intended path: name the surface to
 `ux-psychology` for the posture and `ui-craft` for the values, and let them route. Invoke a specialist by
 name if you already know which layer owns it.
 
-**Reviewing a PR** — each of the fifteen specialist skills ends with a ship checklist written to run against
+**Reviewing a PR** — each of the sixteen specialist skills ends with a ship checklist written to run against
 a screen or a diff. The two routers end with a checklist of a different kind: `ux-psychology`'s diagnosis
 checklist, run before you open anything, and `ui-craft`'s system checklist, run against the token file and
 the seams between layers rather than any one screen.
@@ -138,7 +139,7 @@ skills deliberately refuse to answer themselves.
   sequential ramps monotonic in lightness (viridis, cividis), direct labels at line ends, and a non-hue
   encoding on every series.
 
-Everything else — all seventeen skills and their references — resolves inside this directory.
+Everything else — all eighteen design and UX skills and their references — resolves inside this directory.
 
 ## AI game-development stack — 6 skills
 

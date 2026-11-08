@@ -130,6 +130,7 @@ Build a new system in this order — each stage depends on the one above it.
 | 1 | `typography-system` | Typeface choice, type scale, tracking and line-height per step, measure, density by product type. Start here: most of a UI is text, and type sizes drive spacing. |
 | 2 | `spacing-and-layout` | Spacing scale and why 8pt, whitespace as hierarchy, proximity as actual numbers, grids and when they don't apply, layout primitives, container queries, reflow. |
 | 3 | `color-and-theming` | Primary and accent, perceptual ramps in OKLCH, semantic colour, contrast as a generation constraint, and dark mode as a re-derivation. |
+| 3b | `color-proportion-60-30-10` | How much of each colour a screen carries: the dominant / secondary / accent split assigned to tokens, where it bends for dense apps and dark mode, and a script that measures it from a screenshot. Apply after the colour tokens exist. |
 | 4 | `depth-and-overlays` | Elevation scale, layered shadows, borders vs shadows, dark-mode depth via lightness, and text over imagery with guaranteed contrast. |
 | 5 | `ui-signifiers-and-states` | Affordances and signifiers, the full state matrix for every interactive component, feedback by latency, and micro-interactions that confirm outcomes. |
 | — | `print-and-physical-artefacts` | **Not part of the build sequence.** Where the output stops being a screen: paper sizes and page geometry, type sized from viewing distance, monochrome-first colour, QR module size, and the `@page` layer. Reach for it the moment anything gets printed or rendered to a fixed-page PDF. |

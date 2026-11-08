@@ -84,7 +84,7 @@ Work in this order when building something new. Each row is a sibling skill in t
 
 This set decides *what a screen should do*. It does not tell you that a shadow is 0 2px 8px at 6% opacity,
 or which six states a button needs. That is `ui-craft` and its five specialists — `typography-system`,
-`spacing-and-layout`, `color-and-theming`, `depth-and-overlays`, `ui-signifiers-and-states`.
+`spacing-and-layout`, `color-and-theming`, `color-proportion-60-30-10`, `depth-and-overlays`, `ui-signifiers-and-states`.
 
 Both layers are needed on real work. Theory without values produces a design review full of adjectives;
 values without theory produce a tidy screen that emphasises the wrong thing. Read `attention-and-hierarchy`
