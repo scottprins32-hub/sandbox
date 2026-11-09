@@ -67,7 +67,7 @@ Found by writing and running `examples/baseball_kit.py`, not from the docs.
 - **Builds are deterministic** (checked): two fresh processes gave identical SHA-256 for the STL, GLB and URDF. `s3d.fingerprint()` and `s3d.__version__` identify the library that built a file.
 - **Harmless noise:** `Draco is not available` and `MeshOptimizer is not available` on stderr (the GLB is simply uncompressed), plus glTF `INFO` lines. Filter them.
 - **Errors are specific.** Seen: `at: 't' was used up by cut(a, ...) on line 8 ... pass s3d.copy(t)`; `pose 'j': 120° is outside its range (0, 90)`; `a has no edge named ['rim']; its edge names: [...]`; `at: 'b' moves by its joint 'j' ... s3d.transform it`; `at() on line 20 placed a profile that nothing used; write p = s3d.at(p, ...)`. Read the message before changing the program.
-- **Speed, 4 CPU cores, no GPU:** the kit (29 meshes, 6 joints) builds and exports four formats in about 7 s. A 1280×720 preview at 32 samples takes about 15 s.
+- **Speed, 4 CPU cores, no GPU:** the kit (29 meshes, 6 joints) builds and exports four formats in about 7 s. A 1280×720 preview at 32 samples takes about 15 s. The 90-frame animation at 960×540 and 24 samples took 10 min 49 s, while other renders shared the CPU.
 
 ## Example
 
@@ -82,7 +82,15 @@ Found by writing and running `examples/baseball_kit.py`, not from the docs.
 
 `examples/baseball_kit_animate.py` poses the joints frame by frame and renders each frame; join them with ffmpeg. `examples/renders/` holds the results: `hero.jpg`, `closeups.jpg` (ball, machine posed, bat) and `baseball_kit.mp4`.
 
-`examples/viewer.html` is a web page that loads the GLB with three.js, builds a slider for each joint from `extras.s3d_joint`, and moves the parts live. It expects `baseball_kit.glb`, `hero.jpg` and `baseball_kit.mp4` beside it. It was tested in headless Chromium at desktop and phone widths.
+`examples/viewer.html` is a web page that loads the GLB with three.js, builds a slider for each joint from `extras.s3d_joint`, and moves the parts live. It expects `baseball_kit.glb.json`, `hero.jpg` and `baseball_kit.mp4` beside it. It was tested in headless Chromium at desktop and phone widths, then published as a Claude artifact.
+
+The model is wrapped as base64 in JSON because Claude artifacts do not serve `.glb` files (the publish was refused), and the page decodes it and hands the bytes to `GLTFLoader.parse`. To make the wrapper:
+
+```bash
+python3 -c "import base64,json,sys; json.dump({'glb': base64.b64encode(open(sys.argv[1],'rb').read()).decode()}, open(sys.argv[1]+'.json','w'))" baseball_kit.glb
+```
+
+The page uses three.js 0.147.0, the last release line with plain-script builds of the loader and controls, which is what a page limited to CDN script tags needs.
 
 ## Claims not checked
 

@@ -241,7 +241,7 @@ code { font-family: var(--mono); font-size: .92em; }
     requestAnimationFrame(frame);
   }
 
-  new THREE.GLTFLoader().load('baseball_kit.glb', function (gltf) {
+  function ready(gltf) {
     gltf.scene.traverse(function (n) {
       if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; if (n.material) n.material.envMapIntensity = 0.55; }
       var def = n.userData && n.userData.s3d_joint;
@@ -256,6 +256,13 @@ code { font-family: var(--mono); font-size: .92em; }
     poster.hidden = true; note.textContent = 'Drag to orbit \u00b7 scroll or pinch to zoom';
     window.__kit = { joints: joints, setJoint: setJoint, render: function () { renderer.render(scene, camera); } };
     requestAnimationFrame(frame);
-  }, undefined, function () { fail('The 3D model did not load. This is the rendered still instead.'); });
+  }
+  // The model travels as base64 inside JSON, because not every host serves .glb files.
+  function lost() { fail('The 3D model did not load. This is the rendered still instead.'); }
+  fetch('baseball_kit.glb.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+    var bin = atob(d.glb), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    new THREE.GLTFLoader().parse(bytes.buffer, '', ready, lost);
+  }).catch(lost);
 })();
 </script>
