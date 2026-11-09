@@ -156,5 +156,7 @@ Code. Each skill was written from the repo's own README (read 2026-10-26), not f
 | **ace-step-game-music** | Local music generation: model tier by VRAM, writing a track, and the unstated weights licence. |
 | **audio2face-character-lip-sync** | Choosing SDK, Maya, Unreal plugin or NIM for face animation, and the component-by-component licences. |
 
+Separately, `raea-render-engine` covers shinyobjectz/raea, a code-first renderer for videos, motion graphics and small 3D scenes that an agent can render and check itself. It is pre-release (canary) and under the FSL licence, and the skill says how to install it without piping a script to a shell.
+
 These describe third-party tools that change; re-read the repo README before relying on a version, flag or
 requirement stated here.

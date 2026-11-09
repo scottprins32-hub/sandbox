@@ -47,6 +47,10 @@ These repos install hooks, agents, plugins or MCP servers that execute with your
 
 See `references/source-reel.md`. Short version: the reel is accurate on counts (49 agents) and the ACE-Step speed (authors' own RTX 3090 figure), but says "builds levels" for Unreal where the README warns Blueprint editing has bugs, and omits the 5.7 / 5.6 mismatch above.
 
+## Related
+
+For a trailer, cutscene or other video made as code (rather than generated), see `raea-render-engine`. It is a separate, pre-release tool and is not part of the five-tool stack above.
+
 ## Verification status
 
 Each tool skill was checked against the repo README on 2026-10-26, and a second pass on 2026-11-05 read the repos' own files: godot-mcp `src/index.ts` and `package.json`; UnrealClaude `.uplugin`, LICENSE and the `ue5-mcp-bridge` README and `tool-router.js`; the Audio2Face SDK and Samples READMEs and the v3.0 model card; and Game Studios' `settings.json`, `project.yaml`, one agent, two skills and two hooks. Files not read are named in each skill. Nothing here was installed or run. Statements marked as judgement are mine, not the projects'. Re-read the README before relying on any version, flag or requirement.
