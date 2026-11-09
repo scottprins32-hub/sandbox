@@ -43,7 +43,7 @@ function Title() {
   const opacity = interpolate(f, [0, 12], [0, 1], clamp);
   const y = interpolate(f, [0, 18], [24, 0], { ...clamp, easing: Easing.out(Easing.cubic) });
   return (
-    <div style={{ position: "absolute", left: 120, top: 96, opacity, transform: `translateY(${y}px)` }}>
+    <div style={{ position: "absolute", left: 120, top: 130, opacity, transform: `translateY(${y}px)` }}>
       <div style={{ color: MUTED, fontSize: 30, letterSpacing: 4 }}>PITCH BREAKDOWN</div>
       <div style={{ color: INK, fontSize: 64, fontWeight: 700, marginTop: 8 }}>{PITCH.type}</div>
       <div style={{ color: MUTED, fontSize: 28, marginTop: 8 }}>{PITCH.pitcher} · sample data</div>
@@ -51,8 +51,9 @@ function Title() {
   );
 }
 
+// Everything stays inside 120 px top/bottom, 60 px sides: raea check's safe area.
 // Strike zone 360x450 at a fixed spot; the ball flies in from the release point.
-const ZONE = { left: 1300, top: 330, w: 360, h: 450 };
+const ZONE = { left: 1300, top: 320, w: 360, h: 450 };
 
 function Zone() {
   const f = useCurrentFrame();
@@ -102,7 +103,7 @@ function Stat({ label, value, unit, index, highlight }: {
   const shown = interpolate(f, [index * 6, index * 6 + 20], [0, value], clamp);
   const decimals = Number.isInteger(value) ? 0 : 1;
   return (
-    <div style={{ width: 460, padding: "22px 28px", background: PANEL, borderRadius: 14, marginBottom: 18,
+    <div style={{ width: 460, padding: "18px 28px", background: PANEL, borderRadius: 14, marginBottom: 14,
                   opacity: enter, transform: `translateX(${(1 - enter) * -60}px)` }}>
       <div style={{ color: MUTED, fontSize: 24, letterSpacing: 2 }}>{label}</div>
       <div style={{ color: highlight ? ACCENT : INK, fontSize: 64, fontWeight: 700 }}>
@@ -120,7 +121,7 @@ function PitchBreakdown() {
       <Sequence from={10} layout="none"><Zone /></Sequence>
       <Sequence from={24} layout="none"><Ball /></Sequence>
       <Sequence from={44} layout="none">
-        <div style={{ position: "absolute", left: 120, top: 330 }}>
+        <div style={{ position: "absolute", left: 120, top: 320 }}>
           <Stat label="VELOCITY" value={PITCH.velo} unit="mph" index={0} highlight />
           <Stat label="SPIN RATE" value={PITCH.spin} unit="rpm" index={1} />
           <Stat label="INDUCED VERT. BREAK" value={PITCH.ivb} unit="in" index={2} />

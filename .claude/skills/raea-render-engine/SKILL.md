@@ -54,7 +54,21 @@ raea ships its own craft guides and agent skills (`raea guide`, `raea skills ins
 
 `examples/pitch-breakdown.tsx` is a 5-second baseball graphic: a pitch flies from release into a strike zone with an impact ring, then velocity, spin and break cards spring in with counting numbers. The numbers are illustrative for a fictional pitcher. It uses only exports confirmed in the SDK source, follows the 60/30/10 colour split (`color-proportion-60-30-10`), and every text colour clears 4.5:1 (lowest: the orange figures on the panels, 5.20:1). It **typechecks with zero errors** against raea's own `tsconfig.check.json`, with the check confirmed to cover the file by planting two wrong props and seeing both rejected.
 
-**Rendered on a machine with no GPU** (2026-11-09, commit b85409d). The release build of `raea-cli` with `--no-default-features` took 26 minutes on 4 cores. Rendering then ran on Mesa's software Vulkan driver (lavapipe/llvmpipe; on Debian/Ubuntu, `mesa-vulkan-drivers`, plus `vulkan-tools` to see it with `vulkaninfo`), which the docs do not mention. The first render refused at frame 100 with the `Intl` error above. Once that was fixed, a still took about 9 s wall-clock (284 ms a frame in React and bevy_ui): `examples/pitch-breakdown-frame100.png`. Bevy prints hundreds of harmless `CommandQueue has un-applied commands` warnings, so filter them out. Each render also prints an EXPOSURE line; on this deliberately dark design it warns "-2.9 stops under mid grey", which is advice, not a failure.
+**Rendered on a machine with no GPU** (2026-11-09, commit b85409d). The release build of `raea-cli` with `--no-default-features` took 26 minutes on 4 cores. Rendering then ran on Mesa's software Vulkan driver (lavapipe/llvmpipe; on Debian/Ubuntu, `mesa-vulkan-drivers`, plus `vulkan-tools` to see it with `vulkaninfo`), which the docs do not mention. The first render refused at frame 100 with the `Intl` error above. Once that was fixed, a still took about 9 s wall-clock (284 ms a frame in React and bevy_ui): `examples/pitch-breakdown-frame100.png`. Bevy prints hundreds of harmless `CommandQueue has un-applied commands` warnings, so filter them out. Each render also prints an EXPOSURE line; on this deliberately dark design it warns "-2.9 stops under mid grey", which is advice, not a failure. The full 150-frame mp4 (H.264 via OpenH264, 1920×1080, 30 fps, 520 KB) rendered in about 10.6 s at about 65 ms a frame, so the CPU path is usable for short motion graphics.
+
+**The check loop, as it actually ran:**
+
+- `raea check` on the file alone said "nothing to fix", but it only ran freeze, flashing and blotching. There is no audio, so loudness was skipped.
+- Re-rendering with `--manifest render.json` (a `raea render` flag) and checking with `--manifest render.json --shape 16:9` found three issues:
+  - Two P1 safe-area issues: the title sat at 96 px from the top, and the last card ended near y=983. The UI zones are 120 px top and bottom, 60 px at the sides.
+  - One P2: "964 rpm" was on screen for 0.2 s, an in-between value of the count-up.
+- Moving the title to 130 and tightening the cards cleared both P1s, and the check exits 0.
+- The P2 remains. Any count-up animation will trip it, because its in-between values are not meant to be read; leave it, or drop the count-up if it has to be clean.
+
+**Lessons:**
+
+- A file-only check can look clean while the text checks never ran.
+- After the check passed, a contact sheet of every 10th frame (`examples/pitch-breakdown-contact-sheet.png`) was the "actually watch it" step. The finished render is `examples/pitch-breakdown.mp4`.
 
 ## Failure modes
 
@@ -73,4 +87,6 @@ raea ships its own craft guides and agent skills (`raea guide`, `raea skills ins
 - [ ] Claude Code not opened inside a `raea-skills` checkout unless its hook and MCP server were read.
 - [ ] Commit pinned; `RAEA_OFFLINE=1` set unless a network step is needed.
 - [ ] A still frame inspected before the full render.
+- [ ] Rendered with `--manifest render.json` and checked with the same `--manifest` (plus `--shape`/`--platform`), so the text, safe-area and contrast checks actually ran.
 - [ ] `raea check` clean and the video actually watched.
+- [ ] No `Intl`/`toLocaleString` in the composition.
