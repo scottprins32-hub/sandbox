@@ -30,6 +30,14 @@ const PITCH = {
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
+// raea's JS runtime has no Intl, so toLocaleString() throws at render time
+// (it typechecks fine). Group thousands by hand.
+const formatNumber = (n: number, decimals: number) => {
+  const [int, frac] = n.toFixed(decimals).split(".");
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return frac ? `${grouped}.${frac}` : grouped;
+};
+
 function Title() {
   const f = useCurrentFrame();
   const opacity = interpolate(f, [0, 12], [0, 1], clamp);
@@ -98,7 +106,7 @@ function Stat({ label, value, unit, index, highlight }: {
                   opacity: enter, transform: `translateX(${(1 - enter) * -60}px)` }}>
       <div style={{ color: MUTED, fontSize: 24, letterSpacing: 2 }}>{label}</div>
       <div style={{ color: highlight ? ACCENT : INK, fontSize: 64, fontWeight: 700 }}>
-        {shown.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
+        {formatNumber(shown, decimals)}
         <span style={{ fontSize: 30, color: MUTED, marginLeft: 10 }}>{unit}</span>
       </div>
     </div>
