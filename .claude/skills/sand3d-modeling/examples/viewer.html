@@ -1,0 +1,261 @@
+<title>Baseball Kit in sand3d</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a workbench. The 3D stage and its joint controls sit side by side; the program and the facts follow below. */
+:root {
+  --bg: #f2f3ef; --surface: #ffffff; --ink: #15233a; --muted: #566375; --line: #d3d8d4;
+  --accent: #b81d24; --on-accent: #ffffff; --navy: #1f4e8c; --stage: #cfd9e6; --clay: #b9805a; --code-bg: #e8ebe6;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1826; --surface: #172334; --ink: #eef1f4; --muted: #9aa7b8; --line: #2a3a50;
+  --accent: #f0565c; --on-accent: #0f1826; --navy: #7fb0ec; --stage: #1b2a3f; --clay: #7a5238; --code-bg: #121d2c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1826; --surface: #172334; --ink: #eef1f4; --muted: #9aa7b8; --line: #2a3a50;
+  --accent: #f0565c; --on-accent: #0f1826; --navy: #7fb0ec; --stage: #1b2a3f; --clay: #7a5238; --code-bg: #121d2c; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 28px; }
+h1, h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(34px, 6vw, 54px); }
+h2 { font-size: 24px; }
+p { margin: 0; max-width: 65ch; }
+.eyebrow { font: 600 14px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+header { display: flex; flex-direction: column; gap: 10px; }
+.lede { color: var(--muted); font-size: 18px; }
+
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+.stage { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--stage); border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.stage img, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage img { object-fit: cover; }
+.stage canvas { touch-action: none; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.note { position: absolute; left: 10px; bottom: 10px; right: 10px; font: 500 13px/1.3 var(--body); color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 88%, transparent); padding: 6px 10px; border-radius: 4px; width: fit-content; max-width: calc(100% - 20px); }
+
+.panel { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.joint { display: flex; flex-direction: column; gap: 4px; }
+.joint label { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; }
+.joint output { font: 500 14px/1.6 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.joint small { color: var(--muted); font: 400 12px/1.3 var(--mono); }
+input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; height: 28px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+button { font: 600 15px/1 var(--body); padding: 11px 14px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+button.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button[aria-pressed="true"] { border-color: var(--navy); color: var(--navy); }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+
+.two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.two > div { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font: 400 13px/1.55 var(--mono); color: var(--ink); }
+pre .c { color: var(--muted); }
+pre .k { color: var(--navy); font-weight: 500; }
+dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; }
+dt { font: 600 15px/1.5 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+dd { margin: 0; }
+video { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; border: 1px solid var(--line); background: var(--stage); display: block; }
+.fine { color: var(--muted); font-size: 14px; }
+code { font-family: var(--mono); font-size: .92em; }
+@media (max-width: 820px) { .bench, .two { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">sand3d &middot; 3D written as Python</span>
+    <h1>A baseball practice kit, built from 150 lines of code</h1>
+    <p class="lede">Home plate, a tee, a bat, stitched balls and a pitching machine. No modelling tool was opened: a Python program describes each part and how it moves. Drag to look around, then move the joints.</p>
+  </header>
+
+  <section class="bench" aria-label="3D model and joint controls">
+    <div class="stage" id="stage">
+      <img id="poster" src="hero.jpg" alt="Rendered still of the kit: a pitching machine on a tripod throws a ball toward a tee standing on home plate, with a bat on the ground.">
+      <p class="note" id="note">Loading the 3D model&hellip;</p>
+    </div>
+    <div class="panel">
+      <h2>Joints</h2>
+      <div id="joints"></div>
+      <div class="buttons">
+        <button class="primary" id="throw" type="button">Throw a pitch</button>
+        <button id="wheels" type="button" aria-pressed="false">Run the wheels</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+      <p class="fine">The sliders and their limits are read from the exported file, not typed into this page. The pitch plays in slow motion.</p>
+    </div>
+  </section>
+
+  <section class="two">
+    <div>
+      <h2>The machine, as written</h2>
+      <pre><span class="k">def</span> pitching_machine(h=980, arm_h=330, wheel_d=270, gap=BALL_D - 4):
+    stand = tripod(h)
+    swivel_f = s3d.local(stand, z=h)
+    fork = s3d.at(yoke(arm_h), on=swivel_f)
+    s3d.joint(<span class="k">"swivel"</span>, fork, swivel_f, axis="+Z", range=(-40, 40))
+
+    tilt_f = s3d.local(fork, z=arm_h)
+    head = s3d.at(cradle(wheel_d, gap), on=tilt_f)
+    s3d.joint(<span class="k">"tilt"</span>, head, tilt_f, axis="+Y", range=(-10, 25))
+
+    reach = (wheel_d + gap) / 2
+    top_f = s3d.local(head, z=reach, rx=90)        <span class="c"># its normal is the axle</span>
+    top = s3d.at(wheel("wheel_top", wheel_d), on=top_f)
+    s3d.joint(<span class="k">"wheel_top_spin"</span>, top, top_f, kind="continuous")
+    bottom_f = s3d.local(head, z=-reach, rx=90)
+    bottom = s3d.at(wheel("wheel_bottom", wheel_d), on=bottom_f)
+    s3d.joint(<span class="k">"wheel_bottom_spin"</span>, bottom, bottom_f, kind="continuous",
+              follows="wheel_top_spin", ratio=-1)   <span class="c"># counter-rotates</span>
+    <span class="k">return</span> s3d.assembly("pitching_machine", stand, fork, head, top, bottom)</pre>
+      <p class="fine">Each part (<code>tripod</code>, <code>yoke</code>, <code>cradle</code>, <code>wheel</code>) is its own short function. Sizes are in millimetres.</p>
+    </div>
+    <div>
+      <h2>What was measured</h2>
+      <dl>
+        <dt>Program</dt><dd>About 150 lines of Python, 6 joints, 29 meshes</dd>
+        <dt>Build</dt><dd>About 7 seconds on 4 CPU cores, no graphics card</dd>
+        <dt>Exports</dt><dd>GLB (this page), URDF and USD for robot simulators, STL for printing</dd>
+        <dt>Repeatable</dt><dd>Two separate builds gave byte-identical files</dd>
+        <dt>Sizes</dt><dd>Plate 17 in, ball 73.7 mm, bat 34 in. The rest is plausible, not a product drawing</dd>
+      </dl>
+      <video id="clip" controls muted loop playsinline preload="metadata" poster="hero.jpg" aria-label="Rendered animation of the kit: the machine aims, then throws two pitches">
+        <source src="baseball_kit.mp4" type="video/mp4">
+      </video>
+      <p class="fine">The same joints, posed frame by frame and rendered offline with Blender's Cycles on the CPU.</p>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  var stage = document.getElementById('stage'), note = document.getElementById('note'), poster = document.getElementById('poster');
+  var LABELS = { swivel: 'Machine swivel', tilt: 'Machine tilt', tee_slide: 'Tee height', pitch_flight: 'Ball travel' };
+  var ORDER = ['swivel', 'tilt', 'tee_slide', 'pitch_flight'];
+  function fail(msg) { note.hidden = false; note.textContent = msg; }
+  if (!window.THREE || !THREE.GLTFLoader) { fail('3D could not start here. This is the rendered still instead.'); return; }
+
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+  catch (e) { fail('3D is not available in this view. This is the rendered still instead.'); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(30, 16 / 10, 0.05, 200);
+  var target = new THREE.Vector3(0.85, 0.62, 0);
+  camera.position.set(-0.516, 0.225, 0.826).multiplyScalar(5.6).add(target);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.copy(target); controls.enableDamping = true; controls.dampingFactor = 0.12;
+  controls.minDistance = 0.5; controls.maxDistance = 14; controls.maxPolarAngle = Math.PI / 2 - 0.03;
+  controls.update();
+
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var sun = new THREE.DirectionalLight(0xffffff, 2.4);
+  sun.position.set(-2.5, 6, 4); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  var sc = sun.shadow.camera; sc.left = -3.5; sc.right = 3.5; sc.top = 3.5; sc.bottom = -3.5; sc.near = 0.5; sc.far = 20;
+  sun.shadow.bias = -0.0004; sun.target.position.copy(target); scene.add(sun, sun.target);
+  var ground = new THREE.Mesh(new THREE.CircleGeometry(60, 64), new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0, envMapIntensity: 0.25 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+
+  var dirty = true;
+  function token(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function paint() {
+    var bg = new THREE.Color(token('--stage') || '#cfd9e6');
+    scene.background = bg; scene.fog = new THREE.Fog(bg, 9, 34);
+    ground.material.color.set(token('--clay') || '#b9805a'); dirty = true;
+  }
+  paint();
+  new MutationObserver(paint).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', paint); }
+
+  function fit() {
+    var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+  }
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(stage); else addEventListener('resize', fit);
+  controls.addEventListener('change', function () { dirty = true; });
+
+  var joints = {};
+  var axis = new THREE.Vector3(), q = new THREE.Quaternion();
+  function setJoint(name, value) {
+    var J = joints[name]; if (!J) return;
+    J.value = value; axis.fromArray(J.def.axis);
+    if (J.def.type === 'prismatic') J.node.position.copy(J.p0).add(axis.applyQuaternion(J.q0).multiplyScalar(value * J.perMetre));
+    else J.node.quaternion.copy(J.q0).multiply(q.setFromAxisAngle(axis.normalize(), value));
+    for (var other in joints) { var m = joints[other].def.mimic; if (m && m.joint === name) setJoint(other, value * m.multiplier); }
+    if (J.input && document.activeElement !== J.input) J.input.value = value;
+    if (J.out) J.out.textContent = show(J.def, value);
+    dirty = true;
+  }
+  function show(def, v) {
+    if (def.type === 'prismatic') { var mm = v * 1000; return Math.round(mm) + ' mm \u00b7 ' + (mm / 25.4).toFixed(1) + ' in'; }
+    return (v * 180 / Math.PI).toFixed(0) + '\u00b0';
+  }
+  function buildControls() {
+    var box = document.getElementById('joints'); box.className = 'panel';
+    ORDER.concat(Object.keys(joints).filter(function (n) { return ORDER.indexOf(n) < 0; })).forEach(function (name) {
+      var J = joints[name]; if (!J || J.def.mimic || J.def.type === 'continuous' || J.def.lower === undefined) return;
+      var row = document.createElement('div'); row.className = 'joint';
+      var id = 'joint-' + name;
+      var label = document.createElement('label'); label.htmlFor = id; label.textContent = LABELS[name] || name;
+      var out = document.createElement('output'); out.htmlFor = id; label.appendChild(out);
+      var input = document.createElement('input'); input.type = 'range'; input.id = id;
+      input.min = J.def.lower; input.max = J.def.upper; input.step = (J.def.upper - J.def.lower) / 400; input.value = 0;
+      var small = document.createElement('small');
+      small.textContent = name + ' \u00b7 ' + J.def.type + ' \u00b7 ' + show(J.def, J.def.lower).split(' \u00b7 ')[0] + ' to ' + show(J.def, J.def.upper).split(' \u00b7 ')[0];
+      input.addEventListener('input', function () { if (name === 'pitch_flight') throwing = false; setJoint(name, parseFloat(input.value)); });
+      J.input = input; J.out = out; out.textContent = show(J.def, 0);
+      row.appendChild(label); row.appendChild(input); row.appendChild(small); box.appendChild(row);
+    });
+  }
+
+  var spinning = false, throwing = false, throwStart = 0, last = 0;
+  var wheelsBtn = document.getElementById('wheels');
+  function setSpin(on) { spinning = on; wheelsBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); wheelsBtn.textContent = on ? 'Stop the wheels' : 'Run the wheels'; }
+  wheelsBtn.addEventListener('click', function () { setSpin(!spinning); });
+  document.getElementById('throw').addEventListener('click', function () { if (!joints.pitch_flight) return; setSpin(true); throwing = true; throwStart = performance.now(); });
+  document.getElementById('reset').addEventListener('click', function () {
+    throwing = false; setSpin(false);
+    for (var n in joints) if (!joints[n].def.mimic) { setJoint(n, 0); if (joints[n].input) joints[n].input.value = 0; }
+  });
+
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 0.1); last = now;
+    if (spinning && joints.wheel_top_spin) setJoint('wheel_top_spin', joints.wheel_top_spin.value + dt * 9);
+    if (throwing) {
+      var J = joints.pitch_flight, u = (now - throwStart) / 1400;
+      if (u >= 1) { throwing = false; u = 1; }
+      setJoint('pitch_flight', J.def.upper * u); if (J.input) J.input.value = J.value;
+    }
+    if (controls.update() || dirty) { dirty = false; renderer.render(scene, camera); }
+    requestAnimationFrame(frame);
+  }
+
+  new THREE.GLTFLoader().load('baseball_kit.glb', function (gltf) {
+    gltf.scene.traverse(function (n) {
+      if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; if (n.material) n.material.envMapIntensity = 0.55; }
+      var def = n.userData && n.userData.s3d_joint;
+      if (def) joints[def.name] = { node: n, def: def, p0: n.position.clone(), q0: n.quaternion.clone(), value: 0, perMetre: 1 };
+    });
+    scene.add(gltf.scene); scene.updateMatrixWorld(true);
+    // Limits are in metres, but node positions are in the program's unit under a scaled root: convert.
+    var ws = new THREE.Vector3();
+    for (var jn in joints) if (joints[jn].node.parent) joints[jn].perMetre = 1 / (joints[jn].node.parent.getWorldScale(ws).x || 1);
+    buildControls();
+    stage.appendChild(renderer.domElement); fit();
+    poster.hidden = true; note.textContent = 'Drag to orbit \u00b7 scroll or pinch to zoom';
+    window.__kit = { joints: joints, setJoint: setJoint, render: function () { renderer.render(scene, camera); } };
+    requestAnimationFrame(frame);
+  }, undefined, function () { fail('The 3D model did not load. This is the rendered still instead.'); });
+})();
+</script>

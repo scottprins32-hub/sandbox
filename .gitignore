@@ -21,3 +21,6 @@ coverage/
 # misc
 .DS_Store
 *.tsbuildinfo
+
+# python
+__pycache__/

@@ -51,6 +51,8 @@ See `references/source-reel.md`. Short version: the reel is accurate on counts (
 
 For a trailer, cutscene or other video made as code (rather than generated), see `raea-render-engine`. It is a separate, pre-release tool and is not part of the five-tool stack above.
 
+For props, mechanisms and other hard-surface 3D models written as code and exported to GLB for an engine, see `sand3d-modeling`. It is also outside the five-tool stack.
+
 ## Verification status
 
 Each tool skill was checked against the repo README on 2026-10-26, and a second pass on 2026-11-05 read the repos' own files: godot-mcp `src/index.ts` and `package.json`; UnrealClaude `.uplugin`, LICENSE and the `ue5-mcp-bridge` README and `tool-router.js`; the Audio2Face SDK and Samples READMEs and the v3.0 model card; and Game Studios' `settings.json`, `project.yaml`, one agent, two skills and two hooks. Files not read are named in each skill. Nothing here was installed or run. Statements marked as judgement are mine, not the projects'. Re-read the README before relying on any version, flag or requirement.
