@@ -5,7 +5,7 @@ description: Decides whether and how to use raea (Render Anything Engine, shinyo
 
 # raea (Render Anything Engine)
 
-A code-first renderer: you write a composition in TSX, `raea render` turns it into MP4 or a PNG frame on the local GPU, and `raea check` flags problems an agent can then fix. Everything below is from the repo's README, `Cargo.toml`, LICENSE and commit page, read 2026-11-09. Nothing was installed or run, and the claims marked "README" were not checked against the code.
+A code-first renderer: you write a composition in TSX, `raea render` turns it into MP4 or a PNG frame on the local GPU, and `raea check` flags problems an agent can then fix. Everything below is from the repo's own files, read 2026-11-09: README, `Cargo.toml`, LICENSE, the two install scripts, `.claude-plugin/`, `SECURITY.md`, `NOTICE`, `docs/settings.md`, `rust-toolchain.toml`, and the `raea-skills` repo. Claims marked "README" were not checked against the code.
 
 ## Decide first
 
@@ -16,29 +16,43 @@ A code-first renderer: you write a composition in TSX, `raea render` turns it in
 
 ## Install safely
 
-The README's installer is `curl -fsSL https://raea.io/install | sh` (and `irm https://raea.io/install.ps1 | iex` on Windows). It writes to `~/.raea`, links `~/.local/bin/raea`, and **adds agent skills to `~/.claude/skills`**, which changes what your agent loads. The install script and the plugin files were not read here. So:
+The README's installer is `curl -fsSL https://raea.io/install | sh` (and `irm https://raea.io/install.ps1 | iex` on Windows). What the scripts actually do, read from their source:
 
-- Download the script, read it, and run it as a separate step; do not pipe it to a shell.
+- Download a release tarball from GitHub and verify it against a **SHA-256 file fetched from the same release**. That catches a corrupt download, not a tampered release: there is no signature check.
+- Replace `~/.raea/bin` and `~/.raea/share` (`rm -rf` first), and link `~/.local/bin/raea`.
+- Copy each bundled skill into **`~/.claude/skills/<name>`, deleting any existing folder of the same name first**, which changes what your agent loads. `RAEA_NO_SKILLS` skips this.
+- POSIX: does not edit shell rc files (it only prints a suggested PATH line). macOS: strips the quarantine flag from the whole install. **Windows: permanently prepends to your User PATH.**
+- Run nothing from the download itself.
+
+So:
+
+- Download the script, read it, and run it as a separate step; do not pipe it to a shell. Back up any skill in `~/.claude/skills` that shares a name with raea's.
 - Prefer building from source, which the README documents:
   ```bash
   git clone https://github.com/shinyobjectz/raea && cd raea
   cargo build --release -p raea-cli --no-default-features
   for d in sdk/raea sdk/react/js sdk/react/tw; do (cd $d && bun install); done
   ```
-  Needs Rust (version pinned in `rust-toolchain.toml`), bun, CMake, and per-OS system packages listed in the README (Linux: ALSA, fontconfig, udev, xkbcommon, Vulkan, NASM). `--no-default-features` excludes the hosted Content Credentials signing service that the default build includes (README).
-- Set **`RAEA_OFFLINE=1`** to refuse network use. The README says there is no telemetry or update check and that network happens only on request (remote URLs, first-use model downloads, `raea gen` with your provider key); that is a README claim, not verified.
-- Before enabling the Claude Code plugin (`/plugin marketplace add shinyobjectz/raea`) or the skills submodule, read `.claude-plugin/` and the skills for hooks or auto-run behaviour. Plugins you load into a composition (`RAEA_PLUGINS`, `~/.raea/plugins`) run inside the engine; sandboxing was not checked.
+  Needs Rust **1.99.1** (pinned in `rust-toolchain.toml`; rustup installs it inside the checkout), bun, CMake, and per-OS system packages listed in the README (Linux: ALSA, fontconfig, udev, xkbcommon, Vulkan, NASM). `--no-default-features` excludes the hosted Content Credentials signing service that the default build includes (README).
+- Set **`RAEA_OFFLINE=1`** to refuse network use. `docs/settings.md` defines it: no uncached remote URLs, no model or sample downloads, no `fetch()`/WebSocket from a composition, no `raea gen`; what is on disk keeps working. Settings are read from the environment, then `~/.raea/env`. Note the defaults that *do* use the network: audio models install on first use (`RAEA_AUDIO_AUTOSETUP=0` turns that off; the TokenSynth cache is about 6 GB), and `raea check` can call a judge model on Cloudflare Workers AI if `CLOUDFLARE_ACCOUNT_ID`/`CLOUDFLARE_API_TOKEN` are set. "No telemetry" and the hosted Content Credentials signing service appear only in the README; no doc or source read here confirms either.
+- **The Claude Code plugin** (`/plugin marketplace add shinyobjectz/raea`) declares only a skills path: no hooks, MCP servers, commands or agents. Its bundled `raea` skill adds a hook only if you opt in (`raea skills install --agent claude --pin quieter` adds one that runs `raea check --quick` after a save).
+- **The separate `raea-skills` repo is different.** Its `.claude/settings.json` has an automatic `PreToolUse` hook (`monty guard`) on every write or edit, and its `.mcp.json` starts an MCP server through `uvx` from **another repo's unpinned `main` branch**. These load only if you open Claude Code inside a checkout of that repo, so don't, unless you have read them.
+- Plugins you load into a composition (`RAEA_PLUGINS`, `~/.raea/plugins`) run inside the engine; the raea skill says feed artifacts run sandboxed, which was not checked.
 
 ## The loop
 
 Commands the README names: `raea init`, `raea render FILE -o OUT` (`-o frame.png --frame 45` for a still), `raea play`, `raea check FILE.mp4`, `raea guide`, `raea context PROJECT`, `raea skills install --agent NAME`, plus `raea cut`, `raea gen`, `raea export-game`, `raea sao`, `raea tokensynth`. Run `raea --help` for the live list; the CLI changes daily.
 
-1. Write the composition (`registerRoot(() => <Composition id=… width={1920} height={1080} fps={30} durationInFrames={90} … />)` with `import {...} from "raea"`).
+1. Write the composition (`registerRoot(() => <Composition id=… width={1920} height={1080} fps={30} durationInFrames={90} … />)` with `import {...} from "raea"`). Shapes and text are plain `div`s with `style` objects; animate with `useCurrentFrame()` + `interpolate`/`spring`, and time scenes with `<Sequence from=… layout="none">`. **Pass `{ extrapolateRight: "clamp" }` to `interpolate`**: the default is `"extend"`, so the root README's hello example keeps raising opacity past 1 after its last keyframe. `registerRoot` may be called once, and the registry does not look inside components that use hooks, so keep `<Composition>` at the top of the root.
 2. **Render a still first**, a frame or two, and look at it before rendering the whole clip.
-3. Render the video, then `raea check` it; the README says it checks clipped text, contrast, loudness and freezes.
+3. Render the video, then `raea check` it (needs `ffprobe` on PATH). From `apps/check/src/lib.rs`: on the file alone it checks loudness and true peak, sound that stops dead, freezes, flashing, dark-area blotching and a placeholder brand kit. **Text checks (clipped text, text in platform UI zones, too briefly on screen, caption contrast) need `--manifest render.json`**; voice-versus-bed checks need `--words`. Issues are ranked P0 (breaks the piece) to P3; exit code 1 means a P0 or P1 was found; `-o check.json` writes them as JSON.
 4. Fix what the check reports, re-render, repeat. A clean check is not a good video: watch it.
 
 raea ships its own craft guides and agent skills (`raea guide`, `raea skills install`). Use those for composition API and craft detail rather than relying on this skill, which deliberately does not duplicate them.
+
+## Example
+
+`examples/pitch-breakdown.tsx` is a 5-second baseball graphic: a pitch flies from release into a strike zone with an impact ring, then velocity, spin and break cards spring in with counting numbers. The numbers are illustrative for a fictional pitcher. It uses only exports confirmed in the SDK source, follows the 60/30/10 colour split (`color-proportion-60-30-10`), and every text colour clears 4.5:1 (lowest: the orange figures on the panels, 5.20:1). It **typechecks with zero errors** against raea's own `tsconfig.check.json`, with the check confirmed to cover the file by planting two wrong props and seeing both rejected. It has not been rendered yet: the machine that wrote it has no GPU, and a CPU-only (Mesa lavapipe) render is being tried.
 
 ## Failure modes
 
@@ -48,12 +62,13 @@ raea ships its own craft guides and agent skills (`raea guide`, `raea skills ins
 
 ## Not read
 
-`docs/settings.md`, `SECURITY.md`, `CONTRIBUTING.md`, `NOTICE`, the install scripts, `.claude-plugin/`, the `raea-skills` submodule, and any source code. Repo metadata when read: about 1.5k stars, 109 forks, 12 open issues, last commit 2026-11-09.
+`CONTRIBUTING.md`, the engine and CLI source, the `raea-skills` repo's `scripts/`, `.github/`, `justfile`, `.monty/` and reference guides. `SECURITY.md` only says to report vulnerabilities privately through GitHub's Security tab. Repo metadata when read: about 1.5k stars, 109 forks, 12 open issues, last commit 2026-11-09.
 
 ## Ship checklist
 
 - [ ] Licence read, and the intended use is not a "Competing Use".
-- [ ] Install script and plugin/skills files read before running or enabling them.
+- [ ] Install script read and run as its own step, not piped; same-named skills in `~/.claude/skills` backed up.
+- [ ] Claude Code not opened inside a `raea-skills` checkout unless its hook and MCP server were read.
 - [ ] Commit pinned; `RAEA_OFFLINE=1` set unless a network step is needed.
 - [ ] A still frame inspected before the full render.
 - [ ] `raea check` clean and the video actually watched.
