@@ -162,5 +162,7 @@ Also separate, `sand3d-modeling` covers Sandflow-ai/sand3d, a Python library ove
 
 One more separate set covers free and self-hosted replacements for paid apps, from a reel listing nine. `self-hosted-app-alternatives` is the router; it points to `cal-diy-scheduling` (Calendly), `chatwoot-support-desk` (Intercom), `appflowy-workspace` (Notion), `cap-screen-recording` (Loom) and `openproject-project-management` (Asana). The other four of the nine already exist as globally installed skills and were not rebuilt. Each skill states what was read and what was not; none of the five apps was installed or run.
 
+Another separate set covers a creator's video toolchain, from a reel of five GitHub tools. `creator-video-toolkit` is the router and the pipeline; it points to `yt-dlp-media-download`, `whisper-cpp-transcription`, `auto-editor-silence-cutting`, `remotion-react-video` (with the licence terms that apply to Claude Code users) and `postiz-social-scheduling`. Each skill says what was read and what was not; none of the tools was installed or run.
+
 These describe third-party tools that change; re-read the repo README before relying on a version, flag or
 requirement stated here.
