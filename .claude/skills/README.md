@@ -160,5 +160,7 @@ Separately, `raea-render-engine` covers shinyobjectz/raea, a code-first renderer
 
 Also separate, `sand3d-modeling` covers Sandflow-ai/sand3d, a Python library over Blender's `bpy` for writing 3D objects as short programs with named parts and joints, exported to GLB, URDF, USD, OBJ or STL. It was installed and run for the skill, which ships a CPU-only preview renderer and a worked baseball example with renders.
 
+One more separate set covers free and self-hosted replacements for paid apps, from a reel listing nine. `self-hosted-app-alternatives` is the router; it points to `cal-diy-scheduling` (Calendly), `chatwoot-support-desk` (Intercom), `appflowy-workspace` (Notion), `cap-screen-recording` (Loom) and `openproject-project-management` (Asana). The other four of the nine already exist as globally installed skills and were not rebuilt. Each skill states what was read and what was not; none of the five apps was installed or run.
+
 These describe third-party tools that change; re-read the repo README before relying on a version, flag or
 requirement stated here.
