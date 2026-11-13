@@ -1,6 +1,6 @@
 ---
 name: self-hosted-app-alternatives
-description: Router for free or self-hosted open-source replacements of paid SaaS apps, from a reel listing nine: Whisper Flow, Higgsfield, Calendly, Intercom, Notion, Loom, SEMrush, ElevenLabs and Asana. Use this whenever the user asks for a free, open-source or self-hosted alternative to a paid app, wants to stop paying for a subscription, or asks what to use instead of one of those nine - even if they never name a repo. Says which skill covers each, checks fit and licence honestly, and warns where "free" has limits.
+description: Router for free or self-hosted open-source replacements of paid SaaS apps, from a reel listing nine: Wispr Flow, Higgsfield, Calendly, Intercom, Notion, Loom, SEMrush, ElevenLabs and Asana. Use this whenever the user asks for a free, open-source or self-hosted alternative to a paid app, wants to stop paying for a subscription, or asks what to use instead of one of those nine - even if they never name a repo. Says which skill covers each, checks fit and licence honestly, and warns where "free" has limits.
 ---
 
 # Free and self-hosted alternatives
@@ -14,20 +14,21 @@ From one reel (2026-11-10, by an Instagram creator; the post only lists names an
 | Notion | AppFlowy (`AppFlowy-IO/AppFlowy`) | `appflowy-workspace` |
 | Loom | Cap (`CapSoftware/Cap`) | `cap-screen-recording` |
 | Asana | OpenProject (`opf/openproject`) | `openproject-project-management` |
-| Whisper Flow | OpenWhispr | the globally installed `openwhispr-route-diagnostics` skill |
-| Higgsfield | Open Generative AI / Open Higgsfield | the globally installed `open-higgsfield-studio-workflow` and `openhiggsfield-studio-analysis` skills |
-| SEMrush | Open SEO | the globally installed `openseo-project-readiness` skill |
-| ElevenLabs | Voice Studio | the globally installed `voicestudio-local-readiness` skill |
+| Wispr Flow | OpenWhispr (`OpenWhispr/openwhispr`) | `openwhispr-dictation` |
+| Higgsfield | Open Generative AI (`Anil-matcha/Open-Generative-AI`) | `open-generative-ai-studio` |
+| SEMrush | OpenSEO (`every-app/open-seo`) | `openseo-self-hosted-seo` |
+| ElevenLabs | VoiceStudio (`debpalash/VoiceStudio`) | `voicestudio-local-voice` |
 
-The last four were not rebuilt: they already exist as global skills in this environment, and they are not copied into this directory.
+All nine now live in this directory. Four similarly named skills are also installed globally in some environments (`openwhispr-route-diagnostics`, `open-higgsfield-studio-workflow`, `openseo-project-readiness`, `voicestudio-local-readiness`); these were not read, so these repo skills were written from the repos themselves.
 
 ## How "free" breaks, in order of surprise
 
 1. **The server is not free after all.** AppFlowy's current self-hosted server is closed source with a one-seat free tier; the open server repo is archived.
 2. **"Open source" with a paid core.** Chatwoot's `enterprise/` folder needs a subscription in production; OpenProject lists LDAP, SCIM and more as Enterprise add-ons.
-3. **Free for personal use only.** Cap's pricing page excludes commercial use from the free tier.
-4. **Not for production.** Cal.diy's README says personal, non-production use only.
-5. **You become the operator:** TLS, secrets, backups, upgrades and security patches. Cap offers no support for self-hosting; Chatwoot supports only the latest version.
+3. **Free for personal use only.** Cap's pricing page excludes commercial use from the free tier, and VoiceStudio's default voice weights are CC-BY-NC.
+4. **The software is free, the service behind it is not.** OpenSEO's data is bought from DataForSEO ($50 minimum top-up); Open Generative AI sends cloud generation through the paid Muapi.ai service.
+5. **Not for production.** Cal.diy's README says personal, non-production use only.
+6. **You become the operator:** TLS, secrets, backups, upgrades and security patches. Cap offers no support for self-hosting; Chatwoot supports only the latest version.
 
 ## Before recommending any of them
 
