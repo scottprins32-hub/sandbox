@@ -1,0 +1,258 @@
+<title>Pitch Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a film room. A skeleton stage with its voice-note timeline on the left, the validation evidence on the right. */
+:root{
+  --bg:#f1efe8; --panel:#fbfaf6; --ink:#14212e; --muted:#5a6672; --line:#d9d5c8; --clay:#b4532a; --clay-text:#9c4520; --clay-ink:#fff; --navy:#1b3556; --grass:#2f6b4f;
+  --stage:#e6e2d4; --stage-ink:#14212e; --bone:#1b3556; --glove:#6b7a8a; --warn:#9a5b00; --ok:#1d6b43; --bad:#a3271f;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1a26; --panel:#142335; --ink:#eef0f2; --muted:#9db0c3; --line:#26394f; --clay:#e8845a; --clay-text:#e8845a; --clay-ink:#0e1a26; --navy:#8db4e8; --grass:#6fcf9b;
+  --stage:#0b1520; --stage-ink:#eef0f2; --bone:#cfe0f5; --glove:#7f93a8; --warn:#e0a24a; --ok:#6fcf9b; --bad:#ff8a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1a26; --panel:#142335; --ink:#eef0f2; --muted:#9db0c3; --line:#26394f; --clay:#e8845a; --clay-text:#e8845a; --clay-ink:#0e1a26; --navy:#8db4e8; --grass:#6fcf9b;
+  --stage:#0b1520; --stage-ink:#eef0f2; --bone:#cfe0f5; --glove:#7f93a8; --warn:#e0a24a; --ok:#6fcf9b; --bad:#ff8a80; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:26px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(30px,5vw,46px);letter-spacing:-.02em;font-weight:760}
+h2{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:650}
+p{margin:0;max-width:66ch}
+.kicker{font:600 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--clay-text)}
+.lede{color:var(--muted);font-size:18px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+#stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:8px;overflow:hidden;background:var(--stage)}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#cv:active{cursor:grabbing}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:600 15px/1 var(--sans);padding:11px 14px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;min-height:44px}
+button.primary{background:var(--clay);color:var(--clay-ink);border-color:var(--clay)}
+button[aria-pressed="true"]{border-color:var(--navy);color:var(--navy)}
+button:focus-visible,input:focus-visible,video:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+input[type=range]{flex:1 1 220px;min-width:140px;accent-color:var(--clay);height:44px}
+.phase{font:600 14px/1 var(--mono);color:var(--muted);min-width:9ch}
+.notes{display:flex;flex-direction:column;gap:8px}
+.note{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;text-align:left;align-items:baseline;width:100%;font-weight:450;padding:10px 12px}
+.note[aria-current="true"]{border-color:var(--clay);box-shadow:inset 3px 0 0 var(--clay)}
+.note b{font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--clay-text)}
+.note span{color:var(--ink)}
+.tag{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid currentColor;border-radius:99px;padding:4px 8px;color:var(--muted);white-space:nowrap;align-self:flex-start}
+.tag.est{color:var(--warn)}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat small{color:var(--muted);font:500 12px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.stat strong{font:700 24px/1.2 var(--sans);font-variant-numeric:tabular-nums}
+.stat em{font-style:normal;color:var(--muted);font-size:13px}
+.good{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+svg{width:100%;height:auto;display:block;max-width:100%}
+video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:8px;background:var(--stage);display:block}
+svg text{fill:var(--muted);font:500 11px var(--mono)}
+.callout{border-left:4px solid var(--warn);padding:8px 12px;background:color-mix(in srgb,var(--warn) 10%,transparent);border-radius:0 6px 6px 0}
+ul.how{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.how li{max-width:70ch} code{font:500 .92em var(--mono)}
+.fine{color:var(--muted);font-size:14px}
+body.render header,body.render .clip,body.render .side,body.render footer,body.render .controls,body.render .notes,body.render .meta{display:none!important}
+body.render .wrap{max-width:none;padding:0;gap:0}
+body.render .grid{display:block}
+body.render .card{border:0;padding:0;border-radius:0;background:transparent}
+body.render #stage{border-radius:0;position:fixed;inset:0;width:100vw;height:100vh;aspect-ratio:auto}
+body.render{margin:0}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){#stage{aspect-ratio:4/3}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+<div class="wrap">
+ <header>
+  <span class="kicker">synthetic demo &middot; nothing here is a real athlete</span>
+  <h1>Pitch Lab</h1>
+  <p class="lede">A pitching motion you can scrub, with a coach talking over it, and the evidence for whether the estimate can be trusted. Every number comes from a script that was tested first.</p>
+ </header>
+ <section class="grid" aria-label="Motion viewer and validation">
+  <div class="card">
+   <div id="stage"><canvas id="cv" role="img" aria-label="Synthetic stick-figure pitcher. Drag to rotate."></canvas></div>
+   <div class="controls">
+    <button class="primary" id="play" type="button">Play</button>
+    <label class="phase" for="scrub" id="phaseLabel">START</label>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Scrub the pitch">
+    <button id="spin" type="button" aria-pressed="false">Orbit</button>
+   </div>
+   <div class="notes" id="notes" aria-label="Coach voice notes pinned to the video"></div>
+   <p class="fine meta">The notes are a scripted example of live text that is later replaced by the final transcript. They are not recorded speech. Drag the figure to rotate it.</p>
+  </div>
+  <aside class="card side" aria-label="Validation of the estimate">
+   <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><h2>Can the estimate be trusted?</h2><span class="tag est">estimated, synthetic data</span></div>
+   <p>Claim tested: <b>peak hip-shoulder separation from video is within &plusmn;5&deg; of the lab system</b>, on 40 simulated pitches. The bound was fixed before the data.</p>
+   <div class="verdict" id="verdict"></div>
+   <div id="forest"></div>
+   <div class="callout"><b>Equivalent on average, not on every pitch.</b> The mean difference sits well inside &plusmn;5&deg;, but one pitch can be off by 7&deg;. Both statements are true, and a coach needs the second one.</div>
+   <div id="curve"></div>
+   <p class="fine">The estimate lags the reference by <b id="lagN"></b> samples. At 60 fps that is <b id="lagMs"></b> ms, a few frames of release timing.</p>
+  </aside>
+ </section>
+ <section class="card clip" aria-label="Rendered clip">
+  <h2>The rendered clip</h2>
+  <video controls muted loop playsinline preload="metadata" poster="poster.jpg" src="render.mp4" aria-label="Rendered clip of the synthetic pitch: the figure moves through ten phases while scripted coach notes appear as live text and are replaced by the final text"></video>
+  <p class="fine">150 frames at 1280&times;720, rendered without a graphics card in about 14 seconds. Frame <i>i</i> is drawn from <i>i</i> alone: five frames rendered twice, in a different order, came out byte-identical.</p>
+ </section>
+ <footer class="card">
+  <h2>How this was made</h2>
+  <ul class="how">
+   <li><b>Statistics:</b> <code>estimated-motion-validation</code>. The script reproduces a published ICC table before it is trusted.</li>
+   <li><b>Video:</b> <code>deterministic-frame-rendering</code>. This page renders frame <i>i</i> from <i>i</i> alone, so the same video comes out every time.</li>
+   <li><b>Page:</b> <code>web-design-review-loop</code>. Screenshots at three widths, a machine audit, a squint test, fixes.</li>
+   <li><b>The figure is hand-authored:</b> ten phase poses blended with cubic curves and two-bone leg IK. It is an illustration of how such a viewer behaves, not pitching biomechanics.</li>
+  </ul>
+ </footer>
+</div>
+<script>
+(function(){
+'use strict';
+var VAL={"agree": {"n": 40, "bias": -0.6790000000000005, "sd_diff": 3.214404917610564, "mae": 2.5035, "rmse": 3.2457864994481693, "loa_low": -6.979233638516706, "loa_high": 5.621233638516705, "pearson_r": 0.8902964575913047, "ICC(3,1)": 0.8828892381556108, "ICC(2,1)": 0.8808651692471312}, "equiv5": {"n": 40, "mean_diff": -0.6790000000000005, "bound": 5.0, "p_lower": 1.0262524163806575e-10, "p_upper": 5.037512743435997e-14, "p_tost": 1.0262524163806575e-10, "ci90": [-1.5353243742010203, 0.17732437420101932], "equivalent": true}, "equiv3": {"n": 40, "mean_diff": -0.6790000000000005, "bound": 3.0, "p_lower": 2.4312578035923238e-05, "p_upper": 5.049945272132613e-09, "p_tost": 2.4312578035923238e-05, "ci90": [-1.5353243742010203, 0.17732437420101932], "equivalent": true}, "skill": {"skill": 0.7188703033271775, "ci95": [0.550106848841976, 0.8386539993080211], "control": "mean", "n": 40}, "lag": {"lag_samples": 2, "mse_at_lag": 1.6906217033898308, "mse_at_zero": 10.915380675000002}, "ref_curve": [8.0, 7.85, 7.7, 7.55, 7.4, 7.25, 7.1, 6.97, 6.88, 6.86, 7.0, 7.44, 8.38, 10.07, 12.79, 16.68, 21.67, 27.38, 33.05, 37.72, 40.45, 40.63, 38.18, 33.49, 27.11, 19.19, 9.24, -2.9, -15.23, -23.33, -23.63, -17.16, -8.66, -2.22, 1.08, 2.24, 2.46, 2.39, 2.25, 2.1], "est_curve": [7.95, 8.31, 5.76, 7.92, 8.12, 8.17, 7.52, 7.49, 5.93, 6.62, 8.22, 6.67, 8.92, 7.1, 11.66, 13.55, 17.31, 22.59, 30.36, 32.97, 36.96, 36.35, 38.93, 36.08, 32.94, 23.56, 12.48, 3.9, -5.94, -18.28, -22.18, -22.74, -13.53, -5.71, -0.87, 1.25, 3.29, 3.13, 0.57, 1.05]};
+var RENDER=/[?&]render=1/.test(location.search);
+if(RENDER)document.body.classList.add('render');
+var D=Math.PI/180;
+var PH=['start','leg lift','load','hip lock','footplant','block','arm cock','rotation','release','finish'];
+var PT=[0,.14,.30,.43,.55,.63,.72,.79,.85,1];
+// keyframes per phase: pelvis x, pelvis height, pelvis yaw, trunk twist, lean, tilt
+var K={px:[0,0,.12,.45,.95,1.05,1.12,1.18,1.22,1.35],py:[.93,.9,.84,.8,.79,.83,.88,.9,.9,.86],
+ yaw:[-90,-90,-92,-84,-62,-42,-12,10,26,42],tw:[0,0,-4,-14,-34,-30,-6,12,14,10],lean:[0,2,6,10,12,20,28,38,46,60],tilt:[0,0,2,4,8,12,22,22,16,10],
+ rua:[[30,40],[30,40],[55,70],[88,95],[95,100],[95,110],[100,70],[100,35],[100,15],[60,-10]],
+ rfa:[[60,50],[60,50],[30,75],[65,100],[130,100],[165,110],[140,60],[105,25],[95,5],[40,-15]],
+ lua:[[30,35],[30,35],[50,40],[80,20],[85,10],[70,-30],[45,-40],[40,-30],[40,-20],[40,-10]],
+ lfa:[[60,35],[60,35],[70,40],[90,15],[95,5],[120,-20],[130,-40],[120,-40],[110,-30],[100,-20]],
+ // ankle targets (x,y,z) in metres: right = stance/trailing foot, left = stride foot
+ ra:[[0,.06,.1],[0,.06,.1],[0,.06,.1],[.08,.06,.1],[.25,.06,.1],[.45,.07,.1],[.7,.08,.1],[.95,.1,.1],[1.1,.2,.1],[1.5,.35,.1]],
+ la:[[0,.06,-.1],[.1,.62,-.1],[.3,.5,-.12],[.8,.3,-.14],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18]]};
+function hermite(vals,t){var n=PT.length,i=0;while(i<n-2&&t>PT[i+1])i++;
+ var t0=PT[i],t1=PT[i+1],h=t1-t0,u=Math.min(1,Math.max(0,(t-t0)/h));
+ function m(j){var a=Math.max(0,j-1),b=Math.min(n-1,j+1);return (vals[b]-vals[a])/(PT[b]-PT[a]);}
+ var u2=u*u,u3=u2*u;return (2*u3-3*u2+1)*vals[i]+(u3-2*u2+u)*h*m(i)+(-2*u3+3*u2)*vals[i+1]+(u3-u2)*h*m(i+1);}
+function ch(arr,k,t){return hermite(arr.map(function(v){return v[k];}),t);}
+function vadd(a,b){return [a[0]+b[0],a[1]+b[1],a[2]+b[2]];} function vmul(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+function vsub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];} function vdot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function vlen(a){return Math.sqrt(vdot(a,a));} function vnorm(a){var l=vlen(a)||1;return vmul(a,1/l);}
+function frame(a){var c=Math.cos(a*D),s=Math.sin(a*D);return {f:[c,0,-s],u:[0,1,0],r:[s,0,c]};}
+function lean(fr,l,t){var cl=Math.cos(l*D),sl=Math.sin(l*D);var f=vadd(vmul(fr.f,cl),vmul(fr.u,-sl)),u=vadd(vmul(fr.u,cl),vmul(fr.f,sl)),r=fr.r;
+ var ct=Math.cos(t*D),st=Math.sin(t*D);return {f:f,u:vadd(vmul(u,ct),vmul(r,st)),r:vadd(vmul(r,ct),vmul(u,-st))};}
+function dir(fr,el,az){var se=Math.sin(el*D),ce=Math.cos(el*D);return vadd(vmul(fr.u,-ce),vmul(vadd(vmul(fr.f,Math.cos(az*D)),vmul(fr.r,Math.sin(az*D))),se));}
+function leg(hip,target,pole){var a=.44,b=.43,v=vsub(target,hip),d=vlen(v),max=(a+b)*.999;if(d>max){target=vadd(hip,vmul(vnorm(v),max));v=vsub(target,hip);d=max;}
+ var n=vnorm(v),ca=Math.max(-1,Math.min(1,(a*a+d*d-b*b)/(2*a*d))),sa=Math.sqrt(1-ca*ca);
+ var p=vsub(pole,vmul(n,vdot(pole,n)));p=vnorm(p);return {knee:vadd(hip,vadd(vmul(n,ca*a),vmul(p,sa*a))),ankle:target};}
+function pose(t){t=Math.min(1,Math.max(0,t));
+ var yaw=hermite(K.yaw,t),f0=frame(yaw),P=[hermite(K.px,t),hermite(K.py,t),0];
+ var f1=lean(frame(yaw+hermite(K.tw,t)),hermite(K.lean,t),hermite(K.tilt,t));
+ var hipR=vadd(P,vmul(f0.r,.1)),hipL=vadd(P,vmul(f0.r,-.1));
+ var S=vadd(P,vmul(f1.u,.5)),shR=vadd(S,vmul(f1.r,.19)),shL=vadd(S,vmul(f1.r,-.19));
+ var ra=[ch(K.ra,0,t),ch(K.ra,1,t),ch(K.ra,2,t)],la=[ch(K.la,0,t),ch(K.la,1,t),ch(K.la,2,t)];
+ var rl=leg(hipR,ra,f0.f),ll=leg(hipL,la,f0.f);
+ var eR=vadd(shR,vmul(dir(f1,ch(K.rua,0,t),ch(K.rua,1,t)),.3)),wR=vadd(eR,vmul(dir(f1,ch(K.rfa,0,t),ch(K.rfa,1,t)),.27));
+ var eL=vadd(shL,vmul(dir(f1,ch(K.lua,0,t),ch(K.lua,1,t)),.3)),wL=vadd(eL,vmul(dir(f1,ch(K.lfa,0,t),ch(K.lfa,1,t)),.27));
+ return {P:P,hipR:hipR,hipL:hipL,S:S,shR:shR,shL:shL,eR:eR,wR:wR,eL:eL,wL:wL,kR:rl.knee,aR:rl.ankle,kL:ll.knee,aL:ll.ankle,head:vadd(S,vmul(f1.u,.27)),neck:vadd(S,vmul(f1.u,.1)),f0:f0,yaw:yaw};}
+// ---- view
+var cv=document.getElementById('cv'),cx=cv.getContext('2d'),view={yaw:32,pitch:10},T=0,playing=false,spin=false,last=0;
+function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var C={};function colours(){['--stage','--stage-ink','--bone','--glove','--clay','--muted','--line','--warn','--ok','--panel','--ink'].forEach(function(n){C[n]=tok(n);});}
+function proj(p,W,H){var cy=Math.cos(view.yaw*D),sy=Math.sin(view.yaw*D),cp=Math.cos(view.pitch*D),sp=Math.sin(view.pitch*D);
+ var x=p[0]-.75,y=p[1]-.95,z=p[2];var xr=x*cy+z*sy,zr=-x*sy+z*cy;var yr=y*cp-zr*sp,dz=y*sp+zr*cp;
+ var s=Math.min(W/3.1,H/2.35)*(1+dz*.04);return [W*.56+xr*s,H*.47-yr*s,dz,s];}
+var BALL=null;
+function ballAt(t){var rel=.85;if(t<rel){var q=pose(t);return vadd(q.wR,vmul(vnorm(vsub(q.wR,q.eR)),.06));}
+ var q=pose(rel),b=vadd(q.wR,vmul(vnorm(vsub(q.wR,q.eR)),.06)),k=(t-rel)/.15;return vadd(b,[k*6.5,-k*k*.35,k*.2]);}
+function activeNote(t){var a=-1;NOTES.forEach(function(n,i){if(t>=n.t&&t<n.t+.16)a=i;});return a;}
+function draw(w,h){colours();cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,w,h);cx.fillStyle=C['--stage'];cx.fillRect(0,0,w,h);
+ var q=pose(T);
+ // ground grid
+ cx.lineWidth=1;cx.strokeStyle=C['--stage-ink'];cx.globalAlpha=.16;
+ for(var gx=-1;gx<=3.5;gx+=.5){var a=proj([gx,0,-1.2],w,h),b=proj([gx,0,1.2],w,h);cx.beginPath();cx.moveTo(a[0],a[1]);cx.lineTo(b[0],b[1]);cx.stroke();}
+ for(var gz=-1.2;gz<=1.21;gz+=.6){var a2=proj([-1,0,gz],w,h),b2=proj([3.5,0,gz],w,h);cx.beginPath();cx.moveTo(a2[0],a2[1]);cx.lineTo(b2[0],b2[1]);cx.stroke();}
+ cx.globalAlpha=1;
+ var rb1=proj([-.05,.005,-.3],w,h),rb2=proj([-.05,.005,.3],w,h);cx.strokeStyle=C['--stage-ink'];cx.lineWidth=4;cx.beginPath();cx.moveTo(rb1[0],rb1[1]);cx.lineTo(rb2[0],rb2[1]);cx.stroke();
+ var sc=proj(q.P,w,h)[3];
+ // wrist trail
+ cx.lineCap='round';cx.lineJoin='round';
+ for(var k=0;k<26;k++){var t0=T-k*.012,t1=T-(k+1)*.012;if(t1<0)break;var a3=proj(pose(t0).wR,w,h),b3=proj(pose(t1).wR,w,h);cx.strokeStyle=C['--clay'];cx.globalAlpha=Math.max(0,.7-k*.027);cx.lineWidth=Math.max(1,3.2-k*.1);cx.beginPath();cx.moveTo(a3[0],a3[1]);cx.lineTo(b3[0],b3[1]);cx.stroke();}
+ cx.globalAlpha=1;
+ // bones, far to near
+ var bones=[['hipL','kL',C['--glove'],7],['kL','aL',C['--glove'],6],['hipR','kR',C['--bone'],7],['kR','aR',C['--bone'],6],['hipL','hipR',C['--bone'],6],
+  ['P','S',C['--bone'],8],['shL','shR',C['--bone'],7],['shL','eL',C['--glove'],5],['eL','wL',C['--glove'],5],['shR','eR',C['--clay'],6],['eR','wR',C['--clay'],5.5]];
+ bones.map(function(b){var A=proj(q[b[0]],w,h),B=proj(q[b[1]],w,h);return {A:A,B:B,c:b[2],wd:b[3],d:(A[2]+B[2])/2};}).sort(function(a,b){return b.d-a.d;}).forEach(function(b){
+  cx.strokeStyle=b.c;cx.lineWidth=b.wd*(b.A[3]/190);cx.beginPath();cx.moveTo(b.A[0],b.A[1]);cx.lineTo(b.B[0],b.B[1]);cx.stroke();});
+ ['kL','kR','eL','eR','wL','wR','shL','shR','hipL','hipR'].forEach(function(j){var p=proj(q[j],w,h);cx.fillStyle=C['--stage'];cx.strokeStyle=(j==='eR'||j==='wR'||j==='shR')?C['--clay']:C['--bone'];cx.lineWidth=2;cx.beginPath();cx.arc(p[0],p[1],3.4*p[3]/190,0,7);cx.fill();cx.stroke();});
+ var hd=proj(q.head,w,h);cx.fillStyle=C['--stage'];cx.strokeStyle=C['--bone'];cx.lineWidth=3*(hd[3]/190);cx.beginPath();cx.arc(hd[0],hd[1],.105*hd[3],0,7);cx.fill();cx.stroke();
+ // ball
+ var bp=proj(ballAt(T),w,h);cx.fillStyle='#f4f1e8';cx.strokeStyle=C['--stage-ink'];cx.lineWidth=1.5;cx.beginPath();cx.arc(bp[0],bp[1],.04*bp[3]+1.5,0,7);cx.fill();cx.stroke();
+ // HUD
+ var ph=0;for(var i=0;i<PT.length;i++)if(T>=PT[i]-.0001)ph=i;
+ var fs=Math.max(12,w/52);cx.textBaseline='top';cx.fillStyle=C['--stage-ink'];cx.font='700 '+(fs*1.5)+'px system-ui,sans-serif';cx.fillText(PH[ph].toUpperCase(),w*.03,h*.045);
+ cx.font='500 '+fs+'px ui-monospace,Menlo,monospace';cx.fillStyle=C['--muted'];cx.fillText('t = '+T.toFixed(2),w*.03,h*.045+fs*2.1);
+ var chip='SYNTHETIC · ESTIMATED',cw=cx.measureText(chip).width+fs*1.4;cx.strokeStyle=C['--warn'];cx.lineWidth=1.5;cx.strokeRect(w-cw-w*.03,h*.045,cw,fs*2);cx.fillStyle=C['--warn'];cx.fillText(chip,w-cw-w*.03+fs*.7,h*.045+fs*.5);
+ // caption: live text first (provisional), then the final transcript replaces it
+ var ni=activeNote(T);
+ if(ni>=0){var n=NOTES[ni],p=(T-n.t)/.07,live=p<1,txt=live?n.live.slice(0,Math.max(1,Math.ceil(p*n.live.length))):n.final;
+  var bw=w*.34,bx=w*.03,by=h*.19;cx.font='500 '+(fs*1.05)+'px system-ui,sans-serif';var nl=lines(n.final,bw-fs*1.4).length,bh=fs*2.2+nl*fs*1.4+fs*.5;cx.fillStyle=C['--panel'];cx.globalAlpha=.92;cx.fillRect(bx,by,bw,bh);cx.globalAlpha=1;cx.strokeStyle=live?C['--muted']:C['--clay'];cx.lineWidth=2;cx.strokeRect(bx,by,bw,bh);
+  cx.fillStyle=live?C['--muted']:C['--clay'];cx.font='700 '+(fs*.8)+'px ui-monospace,Menlo,monospace';cx.fillText(live?'LIVE · PROVISIONAL':'FINAL · FROM FULL AUDIO',bx+fs*.7,by+fs*.6);
+  cx.fillStyle=C['--ink'];cx.font=(live?'italic ':'')+'500 '+(fs*1.05)+'px system-ui,sans-serif';wrap(txt,bx+fs*.7,by+fs*1.9,bw-fs*1.4,fs*1.4);}
+ if(RENDER){var by2=h-h*.035,x0=w*.03,x1=w*.97;cx.fillStyle=C['--line'];cx.fillRect(x0,by2,x1-x0,3);cx.fillStyle=C['--clay'];cx.fillRect(x0,by2,(x1-x0)*T,3);
+  PT.forEach(function(p){cx.fillStyle=C['--muted'];cx.fillRect(x0+(x1-x0)*p-1,by2-4,2,11);});NOTES.forEach(function(n){cx.fillStyle=C['--clay'];cx.beginPath();cx.arc(x0+(x1-x0)*n.t,by2+1.5,5,0,7);cx.fill();});}
+ return ph;}
+function lines(txt,maxw){var out=[],line='';txt.split(' ').forEach(function(wd){var test=line?line+' '+wd:wd;if(cx.measureText(test).width>maxw&&line){out.push(line);line=wd;}else line=test;});out.push(line);return out;}
+function wrap(txt,x,y,maxw,lh){lines(txt,maxw).forEach(function(l,i){cx.fillText(l,x,y+i*lh);});}
+var NOTES=[{t:.43,tag:'hip lock',live:'good tempo into the hip lock, front side is closing up nice',final:'Good tempo into hip lock. The front side is closing up well.'},
+ {t:.55,tag:'footplant',live:'front foot lands closed, shoulders lag the pelvis, good hip shoulder separate asian',final:'Front foot lands closed and the shoulders lag the pelvis: good hip-shoulder separation.'},
+ {t:.85,tag:'release',live:'release point looks a touch early, watch the front side leak',final:'Release looks a touch early. Watch whether the front side leaks.'}];
+// ---- sizing and the frame loop
+function size(){var r=cv.parentNode.getBoundingClientRect(),dpr=RENDER?1:Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cx.setTransform(dpr,0,0,dpr,0,0);return [r.width,r.height];}
+var dims=size();
+function paint(){var ph=draw(dims[0],dims[1]);document.getElementById('phaseLabel')&&(document.getElementById('phaseLabel').textContent=PH[ph].toUpperCase());
+ var a=activeNote(T);[].forEach.call(document.querySelectorAll('.note'),function(b,i){b.setAttribute('aria-current',i===a?'true':'false');});
+ var s=document.getElementById('scrub');if(s&&document.activeElement!==s)s.value=Math.round(T*1000);}
+// deterministic hook for frame-exact rendering: frame i depends on i alone
+window.__ready=true;
+window.renderFrame=function(i,n){n=n||150;T=i/(n-1);view.yaw=26+46*T;view.pitch=10;if(!RENDER)return;dims=size();draw(dims[0],dims[1]);};
+function tick(now){var dt=Math.min(.05,(now-last)/1000);last=now;if(playing){T+=dt/3.2;if(T>=1){T=1;playing=false;document.getElementById('play').textContent='Replay';}}
+ if(spin)view.yaw+=dt*18;paint();requestAnimationFrame(tick);}
+if(!RENDER){
+ var play=document.getElementById('play'),scrub=document.getElementById('scrub'),spinB=document.getElementById('spin'),notes=document.getElementById('notes');
+ play.onclick=function(){if(T>=1)T=0;playing=!playing;play.textContent=playing?'Pause':'Play';};
+ scrub.oninput=function(){T=scrub.value/1000;playing=false;play.textContent='Play';};
+ spinB.onclick=function(){spin=!spin;spinB.setAttribute('aria-pressed',spin);};
+ NOTES.forEach(function(n,i){var b=document.createElement('button');b.type='button';b.className='note';b.innerHTML='<b>'+n.tag+'</b><span>'+n.final+'</span>';b.onclick=function(){T=n.t+.08;playing=false;play.textContent='Play';};notes.appendChild(b);});
+ var drag=null;cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);});
+ cv.addEventListener('pointermove',function(e){if(!drag)return;view.yaw+=(e.clientX-drag.x)*.4;view.pitch=Math.max(-5,Math.min(60,view.pitch+(e.clientY-drag.y)*.3));drag={x:e.clientX,y:e.clientY};});
+ cv.addEventListener('pointerup',function(){drag=null;});
+ new ResizeObserver(function(){dims=size();}).observe(cv.parentNode);requestAnimationFrame(function(n){last=n;tick(n);});
+ // ---- validation panel
+ var A=VAL.agree,E5=VAL.equiv5,S=VAL.skill,L=VAL.lag;
+ function stat(l,v,s,c){return '<div class="stat"><small>'+l+'</small><strong class="'+(c||'')+'">'+v+'</strong><em>'+s+'</em></div>';}
+ document.getElementById('verdict').innerHTML=
+  stat('Mean difference',A.bias.toFixed(1)+'°','est minus reference')+
+  stat('Equivalent ±5°',E5.equivalent?'Yes':'No','TOST p &lt; 0.001',E5.equivalent?'good':'bad')+
+  stat('Single pitch (95%)',A.loa_low.toFixed(1)+' to +'+A.loa_high.toFixed(1)+'°','limits of agreement','warn')+
+  stat('ICC(3,1)',A.icc31!==undefined?A.icc31:A['ICC(3,1)'].toFixed(2),'ranking agreement')+
+  stat('Skill vs mean',S.skill.toFixed(2),'95% CI '+S.ci95[0].toFixed(2)+' to '+S.ci95[1].toFixed(2))+
+  stat('Timing lag',L.lag_samples+' samples','≈ '+Math.round(L.lag_samples/60*1000)+' ms at 60 fps','warn');
+ // forest: mean diff and 90% CI against the +-5 bound, and the single-pitch band
+ var W=520,H=120,x=function(v){return 40+(v+10)/20*(W-80);};
+ var f='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Mean difference with its 90 percent interval inside the plus or minus 5 degree bound, and the wider single-pitch limits of agreement">';
+ f+='<rect x="'+x(-5)+'" y="22" width="'+(x(5)-x(-5))+'" height="76" fill="var(--ok)" opacity=".10"/>';
+ [-10,-5,0,5,10].forEach(function(v){f+='<line x1="'+x(v)+'" x2="'+x(v)+'" y1="22" y2="98" stroke="var(--line)"/><text x="'+x(v)+'" y="114" text-anchor="middle">'+(v>0?'+':'')+v+'°</text>';});
+ f+='<line x1="'+x(-5)+'" x2="'+x(-5)+'" y1="18" y2="102" stroke="var(--ok)" stroke-width="2"/><line x1="'+x(5)+'" x2="'+x(5)+'" y1="18" y2="102" stroke="var(--ok)" stroke-width="2"/>';
+ f+='<line x1="'+x(A.loa_low)+'" x2="'+x(A.loa_high)+'" y1="40" y2="40" stroke="var(--warn)" stroke-width="3"/><text x="'+x(A.loa_low)+'" y="16">single pitch (95% of pitches)</text>';
+ f+='<line x1="'+x(E5.ci90[0])+'" x2="'+x(E5.ci90[1])+'" y1="74" y2="74" stroke="var(--clay)" stroke-width="6" stroke-linecap="round"/><circle cx="'+x(A.bias)+'" cy="74" r="5" fill="var(--panel)" stroke="var(--clay)" stroke-width="2"/><text x="'+x(A.bias)+'" y="96" text-anchor="middle">mean and 90% CI</text></svg>';
+ document.getElementById('forest').innerHTML=f;
+ // curve: reference against estimate
+ var cw=520,chh=150,rc=VAL.ref_curve,ec=VAL.est_curve,mn=Math.min.apply(null,rc.concat(ec))-3,mx=Math.max.apply(null,rc.concat(ec))+3;
+ var px=function(i){return 40+i/(rc.length-1)*(cw-60);},py=function(v){return 12+(mx-v)/(mx-mn)*(chh-34);};
+ var path=function(a){return a.map(function(v,i){return (i?'L':'M')+px(i).toFixed(1)+' '+py(v).toFixed(1);}).join(' ');};
+ var g='<svg viewBox="0 0 '+cw+' '+(chh+8)+'" role="img" aria-label="Hip-shoulder separation over one pitch: reference and the estimate, which lags by two samples">';
+ PT.forEach(function(p,i){g+='<line x1="'+(40+p*(cw-60))+'" x2="'+(40+p*(cw-60))+'" y1="10" y2="'+(chh-20)+'" stroke="var(--line)" stroke-dasharray="2 4"/>';});
+ g+='<path d="'+path(rc)+'" fill="none" stroke="var(--navy)" stroke-width="2.2"/><path d="'+path(ec)+'" fill="none" stroke="var(--clay)" stroke-width="2" stroke-dasharray="5 3"/>';
+ g+='<text x="40" y="'+(chh+4)+'">start</text><text x="'+(cw-20)+'" y="'+(chh+4)+'" text-anchor="end">finish</text><text x="46" y="20" style="fill:var(--navy)">— reference</text><text x="150" y="20" style="fill:var(--clay)">- - estimate</text></svg>';
+ document.getElementById('curve').innerHTML=g;
+ document.getElementById('lagN').textContent=L.lag_samples;document.getElementById('lagMs').textContent=Math.round(L.lag_samples/60*1000);
+}
+paint();
+})();
+</script>
