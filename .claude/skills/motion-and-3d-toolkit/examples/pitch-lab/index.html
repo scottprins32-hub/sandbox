@@ -156,7 +156,7 @@ function tok(n){return getComputedStyle(document.documentElement).getPropertyVal
 var C={};function colours(){['--stage','--stage-ink','--bone','--glove','--clay','--muted','--line','--warn','--ok','--panel','--ink'].forEach(function(n){C[n]=tok(n);});}
 function proj(p,W,H){var cy=Math.cos(view.yaw*D),sy=Math.sin(view.yaw*D),cp=Math.cos(view.pitch*D),sp=Math.sin(view.pitch*D);
  var x=p[0]-.75,y=p[1]-.95,z=p[2];var xr=x*cy+z*sy,zr=-x*sy+z*cy;var yr=y*cp-zr*sp,dz=y*sp+zr*cp;
- var s=Math.min(W/3.1,H/2.35)*(1+dz*.04);return [W*.56+xr*s,H*.47-yr*s,dz,s];}
+ var por=H>W,s=(por?Math.min(W/2.4,H/2.35):Math.min(W/3.1,H/2.35))*(1+dz*.04);return [W*(por?.5:.56)+xr*s,H*(por?.5:.47)-yr*s,dz,s];}
 var BALL=null;
 function ballAt(t){var rel=.85;if(t<rel){var q=pose(t);return vadd(q.wR,vmul(vnorm(vsub(q.wR,q.eR)),.06));}
  var q=pose(rel),b=vadd(q.wR,vmul(vnorm(vsub(q.wR,q.eR)),.06)),k=(t-rel)/.15;return vadd(b,[k*6.5,-k*k*.35,k*.2]);}

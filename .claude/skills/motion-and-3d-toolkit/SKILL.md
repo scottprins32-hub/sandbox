@@ -31,6 +31,13 @@ How the skills were used, in order:
 
 Files: `index.html` (open it in a browser; add `?render=1` for the render mode), `validation.json`, `pairs.csv`, `series.csv`, `render.mp4`, `contact-sheet.png`.
 
+## More examples
+
+- **`examples/validation-lab/`**: an interactive lab. Make a simulated estimate worse (gain error, constant offset, random error, timing lag) and watch which statistics notice. `stats.js` is a JavaScript port of the deterministic statistics; `node crosscheck.mjs` compares it with the Python script on the same files and passes on every value (bias, MAE, limits of agreement, Pearson r, ICC(3,1) and ICC(2,1), TOST p-values and intervals, skill, lag). The bootstrap interval is not ported, because the Python random stream cannot be reproduced. What the presets teach: a constant offset leaves Pearson r and ICC(3,1) at 0.94 while ICC(2,1) drops to 0.48; "right ranking, wrong values" keeps r at 0.91 but only 23% of pitches fall inside ±5°; and an estimate that is **5 samples (83 ms) late** still scores 98% of pitches inside the bound, because amplitude statistics cannot see timing.
+- **`examples/review-before-after/`**: a deliberately flawed page (`before.html`) and its fixed version (`after.html`), with the audit output for both. The audit found 6 MUST items at 375 px and 5 at 1440 px before (page 1160 px wide in a 375 px viewport, 17 text nodes under 4.5:1, with the lowest at 1.61:1, targets under 24 px, an input without a name, an image without alt, no visible focus) and none after.
+- **`examples/pitch-lab/render-vertical.mp4`**: the same page rendered at 720×1280 (90 frames in 7.6 s). The determinism check and the QA passed, and rendering the landscape video again gave a byte-identical file. A new aspect ratio still needed its own framing: the first vertical render was technically clean but showed a small figure off to one side.
+- The GLB inspector on two exports of the same baseball model: 205 meshes and 2.5 MB when unmerged against 29 meshes and 5.9 MB when merged. Merging cut draw calls and grew the file, because shared geometry was no longer instanced. Both exports carry the same root scale of 0.001 and no compression.
+
 What the example does **not** show: a real athlete, real pose-estimation output, real speech, a measured accuracy of any actual pipeline. The skeleton is ten hand-authored phase poses blended with cubic curves and two-bone leg IK, an illustration of how such a viewer behaves, not pitching biomechanics.
 
 ## Related sets

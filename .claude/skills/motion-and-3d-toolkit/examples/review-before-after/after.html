@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fieldnotes</title>
+<!-- The same page after the review loop. Fictional product. -->
+<style>
+:root{--ink:#14212e;--muted:#4b5864;--bg:#fff;--accent:#1b3556;--accent-ink:#fff;--line:#d3d9df;--hero:#14304f}
+@media (prefers-color-scheme:dark){:root{--ink:#eef0f2;--muted:#b5c2cf;--bg:#0e1a26;--accent:#8db4e8;--accent-ink:#0e1a26;--line:#2b3f55;--hero:#16314f}}
+*{box-sizing:border-box}
+body{margin:0;font:400 17px/1.55 system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.page{max-width:1100px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left))}
+nav{display:flex;flex-wrap:wrap;gap:4px}nav a{color:var(--muted);padding:12px 14px;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.hero{background:var(--hero);color:#fff;padding:32px clamp(16px,4vw,40px);border-radius:10px;margin:12px 0 28px}
+.hero h1{font-size:clamp(30px,6vw,46px);margin:0 0 8px;letter-spacing:-.02em}.hero p{margin:0 0 20px;max-width:46ch;color:#dbe6f3}
+.cta{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:6px;font-weight:650;text-decoration:none;border:2px solid #fff;color:#fff;margin:0 8px 8px 0}
+.cta.primary{background:#fff;color:var(--hero)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.hero :focus-visible{outline-color:#fff}
+h2{font-size:24px;margin:32px 0 12px}h3{margin:0 0 6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card{padding:16px;border:1px solid var(--line);border-radius:8px}.card p{margin:0;color:var(--muted)}
+form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+input{min-height:44px;width:min(320px,100%);border:1px solid var(--muted);border-radius:6px;padding:0 12px;font:inherit;background:var(--bg);color:var(--ink)}
+button{min-height:44px;padding:0 20px;border-radius:6px;border:0;background:var(--accent);color:var(--accent-ink);font:650 17px system-ui}
+</style></head><body><div class="page">
+<nav aria-label="Main"><a href="#">Product</a><a href="#">Coaches</a><a href="#">Pricing</a><a href="#">Docs</a></nav>
+<header class="hero"><h1>Fieldnotes</h1><p>Voice notes pinned to the exact frame of a pitch.</p>
+<a class="cta primary" href="#demo">Request a demo</a><a class="cta" href="#coaches">What coaches get</a></header>
+<h2 id="coaches">What coaches get</h2>
+<div class="cards"><div class="card"><h3>Live notes</h3><p>Speak while you scrub the video and the text appears.</p></div>
+<div class="card"><h3>Clear evidence</h3><p>Every estimate says how far it can be trusted.</p></div>
+<div class="card"><h3>Private by default</h3><p>Audio stays on your Mac unless you decide otherwise.</p></div></div>
+<h2 id="demo">Request a demo</h2>
+<form><label for="email">Email<input id="email" type="email" autocomplete="email"></label><button type="submit">Send request</button></form>
+</div></body></html>

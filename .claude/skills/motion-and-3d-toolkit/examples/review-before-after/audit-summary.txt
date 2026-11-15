@@ -1,0 +1,9 @@
+before.html at 375 px and 1440 px (web-design-review-loop/scripts/shoot.mjs)
+light  375px  must 6  should 4  <- horizontal-scroll, text-contrast, target-under-24px, no-accessible-name, image-without-alt, focus-not-visible
+light 1440px  must 5  should 3  <- text-contrast, target-under-24px, no-accessible-name, image-without-alt, focus-not-visible
+11 MUST finding(s): see audit.json
+
+after.html
+light  375px  must 0  should 0
+light 1440px  must 0  should 0
+no MUST findings (that is the floor, not a verdict: look at the screenshots and the squint images)
