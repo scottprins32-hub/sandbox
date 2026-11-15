@@ -1,0 +1,22 @@
+{
+ "reference": {
+  "unique_frame_ids": true,
+  "id_equals_source_frame": true,
+  "visibility_codes_valid": true,
+  "left_right_names_present": true,
+  "points_inside_image": true,
+  "num_keypoints_consistent": true
+ },
+ "fixture": {
+  "unique_frame_ids": true,
+  "id_equals_source_frame": true,
+  "visibility_codes_valid": true,
+  "left_right_names_present": true,
+  "points_inside_image": true,
+  "num_keypoints_consistent": true,
+  "occluded_kept": true,
+  "not_in_frame_kept": true
+ },
+ "all_ok": true,
+ "not_tested": "import into a running CVAT server; CVAT interpolation; annotator agreement (no human labels exist here)"
+}

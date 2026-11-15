@@ -1,0 +1,182 @@
+{
+ "worst_naive": [
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a5",
+   "file": "cam3_f03.png",
+   "err_naive_px": 14.279438097942926,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b7",
+   "file": "cam3_f57.png",
+   "err_naive_px": 14.130965164733311,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621af",
+   "file": "cam3_f33.png",
+   "err_naive_px": 14.065074381284006,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a4",
+   "file": "cam3_f00.png",
+   "err_naive_px": 14.004045021674855,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621aa",
+   "file": "cam3_f18.png",
+   "err_naive_px": 13.945145302497565,
+   "failure": "missed_joints"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621ad",
+   "file": "cam3_f27.png",
+   "err_naive_px": 13.739927916269082,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b6",
+   "file": "cam3_f54.png",
+   "err_naive_px": 13.508865265857775,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b1",
+   "file": "cam3_f39.png",
+   "err_naive_px": 12.371664471967133,
+   "failure": "geometry"
+  }
+ ],
+ "wrong_anatomy": [
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a3",
+   "file": "cam0_f57.png",
+   "err_naive_px": 8.833443188447632,
+   "failure": "wrong_anatomy"
+  }
+ ],
+ "knocked_camera_only": [
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a4",
+   "file": "cam3_f00.png",
+   "err_naive_px": 14.004045021674855,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a5",
+   "file": "cam3_f03.png",
+   "err_naive_px": 14.279438097942926,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a6",
+   "file": "cam3_f06.png",
+   "err_naive_px": 11.824010410381202,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a7",
+   "file": "cam3_f09.png",
+   "err_naive_px": 9.556284190941852,
+   "failure": "ok"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a8",
+   "file": "cam3_f12.png",
+   "err_naive_px": 11.71363281616691,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621a9",
+   "file": "cam3_f15.png",
+   "err_naive_px": 10.868462661506998,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621aa",
+   "file": "cam3_f18.png",
+   "err_naive_px": 13.945145302497565,
+   "failure": "missed_joints"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621ab",
+   "file": "cam3_f21.png",
+   "err_naive_px": 11.971957774628791,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621ac",
+   "file": "cam3_f24.png",
+   "err_naive_px": 11.601322017288897,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621ad",
+   "file": "cam3_f27.png",
+   "err_naive_px": 13.739927916269082,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621ae",
+   "file": "cam3_f30.png",
+   "err_naive_px": 11.460875661834297,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621af",
+   "file": "cam3_f33.png",
+   "err_naive_px": 14.065074381284006,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b0",
+   "file": "cam3_f36.png",
+   "err_naive_px": 12.312540161998767,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b1",
+   "file": "cam3_f39.png",
+   "err_naive_px": 12.371664471967133,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b2",
+   "file": "cam3_f42.png",
+   "err_naive_px": 10.579756522887184,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b3",
+   "file": "cam3_f45.png",
+   "err_naive_px": 11.810682895852292,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b4",
+   "file": "cam3_f48.png",
+   "err_naive_px": 12.275752366978267,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b5",
+   "file": "cam3_f51.png",
+   "err_naive_px": 12.340918323935384,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b6",
+   "file": "cam3_f54.png",
+   "err_naive_px": 13.508865265857775,
+   "failure": "geometry"
+  },
+  {
+   "id": "6afa3b7e9b2d65ba8aa621b7",
+   "file": "cam3_f57.png",
+   "err_naive_px": 14.130965164733311,
+   "failure": "geometry"
+  }
+ ]
+}

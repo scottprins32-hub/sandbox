@@ -1,0 +1,22 @@
+{
+ "id": "fiftyone.core.fields.ObjectIdField",
+ "filepath": "fiftyone.core.fields.StringField",
+ "tags": "fiftyone.core.fields.ListField(fiftyone.core.fields.StringField)",
+ "metadata": "fiftyone.core.fields.EmbeddedDocumentField(fiftyone.core.metadata.ImageMetadata)",
+ "created_at": "fiftyone.core.fields.DateTimeField",
+ "last_modified_at": "fiftyone.core.fields.DateTimeField",
+ "camera": "fiftyone.core.fields.IntField",
+ "frame": "fiftyone.core.fields.IntField",
+ "subject": "fiftyone.core.fields.StringField",
+ "scenario": "fiftyone.core.fields.StringField",
+ "synthetic": "fiftyone.core.fields.BooleanField",
+ "reference": "fiftyone.core.fields.EmbeddedDocumentField(fiftyone.core.labels.Keypoints)",
+ "detector": "fiftyone.core.fields.EmbeddedDocumentField(fiftyone.core.labels.Keypoints)",
+ "prediction_naive": "fiftyone.core.fields.EmbeddedDocumentField(fiftyone.core.labels.Keypoints)",
+ "prediction_repaired": "fiftyone.core.fields.EmbeddedDocumentField(fiftyone.core.labels.Keypoints)",
+ "err_naive_px": "fiftyone.core.fields.FloatField",
+ "err_repaired_px": "fiftyone.core.fields.FloatField",
+ "detector_missing": "fiftyone.core.fields.IntField",
+ "lr_swap": "fiftyone.core.fields.BooleanField",
+ "failure": "fiftyone.core.fields.StringField"
+}

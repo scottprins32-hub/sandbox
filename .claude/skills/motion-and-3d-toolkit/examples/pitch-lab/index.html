@@ -210,6 +210,8 @@ function paint(){var ph=draw(dims[0],dims[1]);document.getElementById('phaseLabe
  var s=document.getElementById('scrub');if(s&&document.activeElement!==s)s.value=Math.round(T*1000);}
 // deterministic hook for frame-exact rendering: frame i depends on i alone
 window.__ready=true;
+// read-only hook for the geometry-lab demo: lets a script sample the synthetic skeleton
+window.__pitchlab={K:K,pose:pose};
 window.renderFrame=function(i,n){n=n||150;T=i/(n-1);view.yaw=26+46*T;view.pitch=10;if(!RENDER)return;dims=size();draw(dims[0],dims[1]);};
 function tick(now){var dt=Math.min(.05,(now-last)/1000);last=now;if(playing){T+=dt/3.2;if(T>=1){T=1;playing=false;document.getElementById('play').textContent='Replay';}}
  if(spin)view.yaw+=dt*18;paint();requestAnimationFrame(tick);}

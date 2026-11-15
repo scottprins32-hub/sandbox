@@ -1,0 +1,24 @@
+{
+ "n_samples": 40,
+ "failure_counts": {
+  "missed_joints": 5,
+  "geometry": 18,
+  "wrong_anatomy": 1,
+  "ok": 16
+ },
+ "mean_err_px_by_camera": {
+  "0": {
+   "naive": 3.8006380031632956,
+   "repaired": 1.337109586117877
+  },
+  "3": {
+   "naive": 12.418066071331374,
+   "repaired": 24.870306157118797
+  }
+ },
+ "saved_views": [
+  "worst_naive",
+  "wrong_anatomy",
+  "knocked_camera_only"
+ ]
+}
