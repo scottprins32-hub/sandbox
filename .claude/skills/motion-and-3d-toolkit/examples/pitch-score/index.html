@@ -1,0 +1,204 @@
+<title>Pitch Score</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a 9:16 stage (the reel) with an accessible metrics table and notes below it. Dark field-night ground, chalk ink, one clay accent; green/amber/red only for status. */
+:root{--bg:#0b1210;--panel:#121c19;--ink:#f1eee4;--muted:#93a39c;--line:#27362f;--clay:#e0793f;--ok:#5bd68a;--mid:#f2c14e;--bad:#ef6a5f;--stage:#0b1210;
+--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef2ef;--panel:#ffffff;--ink:#14201b;--muted:#4f625a;--line:#cdd8d2;--clay:#b4531a;--ok:#1d7a45;--mid:#8a5a00;--bad:#b3261e}}
+:root[data-theme="light"]{--bg:#eef2ef;--panel:#ffffff;--ink:#14201b;--muted:#4f625a;--line:#cdd8d2;--clay:#b4531a;--ok:#1d7a45;--mid:#8a5a00;--bad:#b3261e}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--sans);padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:32px;align-items:start}
+@media(max-width:820px){.wrap{grid-template-columns:minmax(0,1fr)}}
+#stage{width:100%;aspect-ratio:9/16;background:#0b1210;border-radius:14px;overflow:hidden;border:1px solid var(--line)} #stage canvas{display:block;width:100%;height:100%}
+h1{font:700 clamp(30px,5vw,44px)/1.05 var(--sans);letter-spacing:-.02em;margin:0 0 10px} h2{font:700 18px/1.3 var(--sans);margin:26px 0 8px}
+p{margin:0 0 12px;max-width:62ch} .chip{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--mid);color:var(--mid);padding:6px 9px;border-radius:4px;margin-bottom:12px}
+.ctl{display:flex;gap:10px;align-items:center;margin:12px 0} button{font:600 14px var(--sans);background:var(--clay);color:#fff;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;min-height:44px} button:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+input[type=range]{flex:1;min-height:44px;accent-color:var(--clay)} .time{font:500 13px var(--mono);color:var(--muted);min-width:64px;text-align:right}
+table{border-collapse:collapse;width:100%;font-size:14px} th,td{padding:8px 8px;text-align:left;border-bottom:1px solid var(--line)} th{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right} .st{font:600 12px var(--mono)} .ok{color:var(--ok)} .mid{color:var(--mid)} .bad{color:var(--bad)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:4px 10px} ul{padding-left:20px;max-width:62ch;margin:0} li{margin-bottom:8px}
+body.render{padding:0;background:#0b1210} body.render .wrap{display:block;max-width:none} body.render #stage{border:0;border-radius:0;width:100vw;height:100vh;aspect-ratio:auto} body.render .side{display:none}
+</style>
+<div class="wrap">
+<div id="stage"><canvas id="cv" width="720" height="1280" role="img" aria-label="Animated reel: a synthetic pitcher rebuilt in 3D, five phase cards with angles and ranges, then a pitch score"></canvas></div>
+<div class="side">
+<span class="chip">Synthetic skeleton · concept demo · estimates</span>
+<h1>Pitch Score</h1>
+<p>What a phone-to-3D swing score could look like for baseball: film a bullpen, rebuild the body in 3D, read one card per phase of the delivery, and get a score. The skeleton is the scripted Pitch Lab pitcher. The ranges, the weights and the uncertainty are illustrative and unvalidated. This is a concept and is not affiliated with any company.</p>
+<div class="ctl"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="30000" value="11600" aria-label="Position in the 30 second reel"><span class="time" id="clock">0:11.6</span></div>
+<h2>The five cards, as computed from the skeleton</h2>
+<div class="tablewrap"><table><thead><tr><th>Phase</th><th>Measure</th><th>Value</th><th>Target</th><th>Score</th></tr></thead><tbody id="rows"></tbody></table></div>
+<h2>What it shows, and what it does not</h2>
+<ul><li>Every number is computed from the synthetic skeleton, so the demo is consistent with itself and says nothing about a real pitcher.</li>
+<li>The target ranges are placeholders. The hip-shoulder range (35 to 65°) is the one Motion Studio uses, from the sources it cites; the others are rough and unvalidated.</li>
+<li>Each value carries a range (±5° or ±4 points) to show how an estimate can be presented honestly. That size is not measured for any phone pipeline.</li>
+<li>The score is an unweighted mean of the five card scores. No score like this has been validated against outcomes.</li>
+<li>Stride length as a share of height needs the athlete's real height; 1.80 m is assumed here.</li></ul>
+</div></div>
+<script>
+(function(){
+'use strict';
+var RENDER=/[?&]render=1/.test(location.search);
+if(RENDER)document.body.classList.add('render');
+var D=Math.PI/180;
+var PH=['start','leg lift','load','hip lock','footplant','block','arm cock','rotation','release','finish'];
+var PT=[0,.14,.30,.43,.55,.63,.72,.79,.85,1];
+// keyframes per phase: pelvis x, pelvis height, pelvis yaw, trunk twist, lean, tilt
+var K={px:[0,0,.12,.45,.95,1.05,1.12,1.18,1.22,1.35],py:[.93,.9,.84,.8,.79,.83,.88,.9,.9,.86],
+ yaw:[-90,-90,-92,-84,-62,-42,-12,10,26,42],tw:[0,0,-4,-14,-34,-30,-6,12,14,10],lean:[0,2,6,10,12,20,28,38,46,60],tilt:[0,0,2,4,8,12,22,22,16,10],
+ rua:[[30,40],[30,40],[55,70],[88,95],[95,100],[95,110],[100,70],[100,35],[100,15],[60,-10]],
+ rfa:[[60,50],[60,50],[30,75],[65,100],[130,100],[165,110],[140,60],[105,25],[95,5],[40,-15]],
+ lua:[[30,35],[30,35],[50,40],[80,20],[85,10],[70,-30],[45,-40],[40,-30],[40,-20],[40,-10]],
+ lfa:[[60,35],[60,35],[70,40],[90,15],[95,5],[120,-20],[130,-40],[120,-40],[110,-30],[100,-20]],
+ // ankle targets (x,y,z) in metres: right = stance/trailing foot, left = stride foot
+ ra:[[0,.06,.1],[0,.06,.1],[0,.06,.1],[.08,.06,.1],[.25,.06,.1],[.45,.07,.1],[.7,.08,.1],[.95,.1,.1],[1.1,.2,.1],[1.5,.35,.1]],
+ la:[[0,.06,-.1],[.1,.62,-.1],[.3,.5,-.12],[.8,.3,-.14],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18],[1.5,.06,-.18]]};
+function hermite(vals,t){var n=PT.length,i=0;while(i<n-2&&t>PT[i+1])i++;
+ var t0=PT[i],t1=PT[i+1],h=t1-t0,u=Math.min(1,Math.max(0,(t-t0)/h));
+ function m(j){var a=Math.max(0,j-1),b=Math.min(n-1,j+1);return (vals[b]-vals[a])/(PT[b]-PT[a]);}
+ var u2=u*u,u3=u2*u;return (2*u3-3*u2+1)*vals[i]+(u3-2*u2+u)*h*m(i)+(-2*u3+3*u2)*vals[i+1]+(u3-u2)*h*m(i+1);}
+function ch(arr,k,t){return hermite(arr.map(function(v){return v[k];}),t);}
+function vadd(a,b){return [a[0]+b[0],a[1]+b[1],a[2]+b[2]];} function vmul(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+function vsub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];} function vdot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function vlen(a){return Math.sqrt(vdot(a,a));} function vnorm(a){var l=vlen(a)||1;return vmul(a,1/l);}
+function frame(a){var c=Math.cos(a*D),s=Math.sin(a*D);return {f:[c,0,-s],u:[0,1,0],r:[s,0,c]};}
+function lean(fr,l,t){var cl=Math.cos(l*D),sl=Math.sin(l*D);var f=vadd(vmul(fr.f,cl),vmul(fr.u,-sl)),u=vadd(vmul(fr.u,cl),vmul(fr.f,sl)),r=fr.r;
+ var ct=Math.cos(t*D),st=Math.sin(t*D);return {f:f,u:vadd(vmul(u,ct),vmul(r,st)),r:vadd(vmul(r,ct),vmul(u,-st))};}
+function dir(fr,el,az){var se=Math.sin(el*D),ce=Math.cos(el*D);return vadd(vmul(fr.u,-ce),vmul(vadd(vmul(fr.f,Math.cos(az*D)),vmul(fr.r,Math.sin(az*D))),se));}
+function leg(hip,target,pole){var a=.44,b=.43,v=vsub(target,hip),d=vlen(v),max=(a+b)*.999;if(d>max){target=vadd(hip,vmul(vnorm(v),max));v=vsub(target,hip);d=max;}
+ var n=vnorm(v),ca=Math.max(-1,Math.min(1,(a*a+d*d-b*b)/(2*a*d))),sa=Math.sqrt(1-ca*ca);
+ var p=vsub(pole,vmul(n,vdot(pole,n)));p=vnorm(p);return {knee:vadd(hip,vadd(vmul(n,ca*a),vmul(p,sa*a))),ankle:target};}
+function pose(t){t=Math.min(1,Math.max(0,t));
+ var yaw=hermite(K.yaw,t),f0=frame(yaw),P=[hermite(K.px,t),hermite(K.py,t),0];
+ var f1=lean(frame(yaw+hermite(K.tw,t)),hermite(K.lean,t),hermite(K.tilt,t));
+ var hipR=vadd(P,vmul(f0.r,.1)),hipL=vadd(P,vmul(f0.r,-.1));
+ var S=vadd(P,vmul(f1.u,.5)),shR=vadd(S,vmul(f1.r,.19)),shL=vadd(S,vmul(f1.r,-.19));
+ var ra=[ch(K.ra,0,t),ch(K.ra,1,t),ch(K.ra,2,t)],la=[ch(K.la,0,t),ch(K.la,1,t),ch(K.la,2,t)];
+ var rl=leg(hipR,ra,f0.f),ll=leg(hipL,la,f0.f);
+ var eR=vadd(shR,vmul(dir(f1,ch(K.rua,0,t),ch(K.rua,1,t)),.3)),wR=vadd(eR,vmul(dir(f1,ch(K.rfa,0,t),ch(K.rfa,1,t)),.27));
+ var eL=vadd(shL,vmul(dir(f1,ch(K.lua,0,t),ch(K.lua,1,t)),.3)),wL=vadd(eL,vmul(dir(f1,ch(K.lfa,0,t),ch(K.lfa,1,t)),.27));
+ return {P:P,hipR:hipR,hipL:hipL,S:S,shR:shR,shL:shL,eR:eR,wR:wR,eL:eL,wL:wL,kR:rl.knee,aR:rl.ankle,kL:ll.knee,aL:ll.ankle,head:vadd(S,vmul(f1.u,.27)),neck:vadd(S,vmul(f1.u,.1)),f0:f0,yaw:yaw};}
+var PHn=PH;
+// ---------------- metrics, computed from the skeleton ----------------
+var BODY_H=1.80;
+function ang(a,b){var d=vdot(a,b)/(vlen(a)*vlen(b));return Math.acos(Math.max(-1,Math.min(1,d)))/D;}
+function azim(v){return Math.atan2(v[2],v[0])/D;}
+var M=[
+ {short:'KNEE HEIGHT',tag:'LOAD',title:'Lead knee height',T:.14,unit:'% of hip',lo:85,hi:110,max:130,unc:4,cue:'Lift the lead knee to about hip height, head still over the rubber.',
+  val:function(q){return q.kL[1]/q.hipL[1]*100;}},
+ {tag:'FOOTPLANT',title:'Stride length',T:.55,unit:'% of height',lo:80,hi:100,max:120,unc:4,cue:'Land about 85% of your height from the rubber, toes closed.',
+  val:function(q){return (q.aL[0]-(-.05))/BODY_H*100;}},
+ {tag:'FOOTPLANT',title:'Hip-shoulder separation',T:.55,unit:'°',lo:35,hi:65,max:90,unc:5,cue:'Hips open first. Let the chest stay closed a beat longer.',
+  val:function(q){var h=azim(vsub(q.hipR,q.hipL)),s=azim(vsub(q.shR,q.shL)),d=((s-h)%360+540)%360-180;return Math.abs(d);}},
+ {tag:'ARM COCK',title:'Elbow angle',T:.72,unit:'°',lo:80,hi:110,max:180,unc:5,cue:'Keep the elbow near shoulder height as the arm comes through.',
+  val:function(q){return ang(vsub(q.shR,q.eR),vsub(q.wR,q.eR));}},
+ {tag:'RELEASE',title:'Trunk lean at release',T:.85,unit:'°',lo:25,hi:45,max:90,unc:5,cue:'Finish tall over the front leg without collapsing the trunk.',
+  val:function(q){return ang(vsub(q.S,q.P),[0,1,0]);}}];
+M.forEach(function(m){m.q=pose(m.T);m.v=m.val(m.q);var dist=m.v<m.lo?m.lo-m.v:(m.v>m.hi?m.v-m.hi:0);m.dist=dist;
+ m.status=dist===0?'ok':(dist<=.5*(m.hi-m.lo)?'mid':'bad');m.statusText={ok:'IN RANGE',mid:'CLOSE',bad:'FAR OUT'}[m.status];m.score=Math.round(100*Math.max(0,1-dist/(m.hi-m.lo)));});
+var SCORE=Math.round(M.reduce(function(a,m){return a+m.score;},0)/M.length);
+var STC={ok:'#5bd68a',mid:'#f2c14e',bad:'#ef6a5f'};
+// ---------------- timeline: 30 s, frame i depends on i alone ----------------
+var W=720,H=1280,FPS=30,TOTAL=30;
+var SEG=[[0,0],[3,0],[4.2,.14],[6.8,.14],[8.6,.55],[13.6,.55],[15.2,.72],[17.8,.72],[19.2,.85],[21.8,.85],[23.6,1],[30,1]];
+var CARDS=[[0,4.4,6.8],[1,8.7,11.0],[2,11.0,13.6],[3,15.3,17.8],[4,19.3,21.8]];
+function sm(x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);}
+function Tof(s){for(var i=0;i<SEG.length-1;i++){var a=SEG[i],b=SEG[i+1];if(s<=b[0]){if(b[0]===a[0])return b[1];var u=(s-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*(a[1]===b[1]?0:sm(u));}}return 1;}
+var cv=document.getElementById('cv'),cx=cv.getContext('2d');
+var view={yaw:30,pitch:12};
+function proj(p){var cy=Math.cos(view.yaw*D),sy=Math.sin(view.yaw*D),cp=Math.cos(view.pitch*D),sp=Math.sin(view.pitch*D);
+ var x=p[0]-.75,y=p[1]-.95,z=p[2];var xr=x*cy+z*sy,zr=-x*sy+z*cy;var yr=y*cp-zr*sp,dz=y*sp+zr*cp;var s=265*(1+dz*.05);return [W*.6+xr*s,H*.63-yr*s,dz,s];}
+function rgba(hex,a){var n=parseInt(hex.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+function ballAt(t){var rel=.85;if(t<rel){var q=pose(t);return vadd(q.wR,vmul(vnorm(vsub(q.wR,q.eR)),.06));}
+ var q2=pose(rel),b=vadd(q2.wR,vmul(vnorm(vsub(q2.wR,q2.eR)),.06)),k=(t-rel)/.15;return vadd(b,[k*6.5,-k*k*.35,k*.2]);}
+function floor(){
+ cx.lineWidth=1.2;
+ for(var gx=-1.2;gx<=3.3;gx+=.3){var a=proj([gx,0,-1.8]),b=proj([gx,0,1.8]);cx.strokeStyle=rgba('#7fb89a',.20);cx.beginPath();cx.moveTo(a[0],a[1]);cx.lineTo(b[0],b[1]);cx.stroke();}
+ for(var gz=-1.8;gz<=1.81;gz+=.3){var a2=proj([-1.2,0,gz]),b2=proj([3.3,0,gz]);cx.strokeStyle=rgba('#7fb89a',.20);cx.beginPath();cx.moveTo(a2[0],a2[1]);cx.lineTo(b2[0],b2[1]);cx.stroke();}
+ cx.beginPath();for(var i=0;i<=48;i++){var t=i/48*Math.PI*2,p=proj([.1+1.0*Math.cos(t),0,1.0*Math.sin(t)]);if(i)cx.lineTo(p[0],p[1]);else cx.moveTo(p[0],p[1]);}cx.closePath();cx.fillStyle=rgba('#e0793f',.20);cx.fill();cx.strokeStyle=rgba('#e0793f',.55);cx.lineWidth=2;cx.stroke();
+ var r1=proj([-.05,.005,-.3]),r2=proj([-.05,.005,.3]);cx.strokeStyle='#f1eee4';cx.lineWidth=5;cx.beginPath();cx.moveTo(r1[0],r1[1]);cx.lineTo(r2[0],r2[1]);cx.stroke();}
+function capsule(a,b,r0,r1,c1,c2){var A=proj(a),B=proj(b),p0=r0*A[3],p1=r1*B[3],th=Math.atan2(B[1]-A[1],B[0]-A[0]),nx=-Math.sin(th),ny=Math.cos(th);
+ var g=cx.createLinearGradient(A[0]-nx*p0,A[1]-ny*p0,A[0]+nx*p0,A[1]+ny*p0);g.addColorStop(0,c2);g.addColorStop(.55,c1);g.addColorStop(1,c2);
+ cx.fillStyle=g;cx.beginPath();cx.moveTo(A[0]+nx*p0,A[1]+ny*p0);cx.lineTo(B[0]+nx*p1,B[1]+ny*p1);cx.lineTo(B[0]-nx*p1,B[1]-ny*p1);cx.lineTo(A[0]-nx*p0,A[1]-ny*p0);cx.closePath();cx.fill();
+ cx.beginPath();cx.arc(A[0],A[1],p0,0,7);cx.fill();cx.beginPath();cx.arc(B[0],B[1],p1,0,7);cx.fill();return (A[2]+B[2])/2;}
+function body(q){
+ var W1='#e8e6df',W2='#9aa5a1',R1='#efc09c',R2='#b98260';
+ var parts=[['hipL','kL',.085,.06,W1,W2],['kL','aL',.055,.04,W1,W2],['hipR','kR',.085,.06,W1,W2],['kR','aR',.055,.04,W1,W2],
+  ['hipL','hipR',.08,.08,W1,W2],['P','S',.14,.17,W1,W2],['shL','shR',.06,.06,W1,W2],['shL','eL',.05,.04,W1,W2],['eL','wL',.04,.03,W1,W2],
+  ['shR','eR',.05,.04,R1,R2],['eR','wR',.04,.03,R1,R2],['neck','head',.04,.04,W1,W2]];
+ parts.map(function(p){return {p:p,d:(proj(q[p[0]])[2]+proj(q[p[1]])[2])/2};}).sort(function(a,b){return b.d-a.d;}).forEach(function(o){var p=o.p;capsule(q[p[0]],q[p[1]],p[2],p[3],p[4],p[5]);});
+ var h=proj(q.head),g=cx.createRadialGradient(h[0]-.03*h[3],h[1]-.04*h[3],2,h[0],h[1],.11*h[3]);g.addColorStop(0,'#f6f4ee');g.addColorStop(1,'#98a39f');cx.fillStyle=g;cx.beginPath();cx.arc(h[0],h[1],.105*h[3],0,7);cx.fill();}
+function wedge(O,A,B,rad,col,al){var a1=Math.atan2(A[1]-O[1],A[0]-O[0]),a2=Math.atan2(B[1]-O[1],B[0]-O[0]),d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;
+ cx.fillStyle=rgba(col,.30*al);cx.beginPath();cx.moveTo(O[0],O[1]);cx.arc(O[0],O[1],rad,a1,a1+d,d<0);cx.closePath();cx.fill();cx.strokeStyle=rgba(col,al);cx.lineWidth=3;cx.stroke();}
+function line(a,b,col,al,w,dash){var A=proj(a),B=proj(b);cx.strokeStyle=rgba(col,al);cx.lineWidth=w;cx.setLineDash(dash||[]);cx.beginPath();cx.moveTo(A[0],A[1]);cx.lineTo(B[0],B[1]);cx.stroke();cx.setLineDash([]);}
+function tag(p,txt,col,al){var P=proj(p);cx.font='700 26px '+getComputedStyle(document.body).getPropertyValue('--mono');cx.fillStyle=rgba(col,al);cx.textBaseline='middle';cx.fillText(txt,P[0]+14,P[1]);}
+function overlay(i,q,al){var m=M[i],c=STC[m.status];
+ if(i===0){var hy=q.hipL[1],kk=q.kL;line([kk[0],hy,kk[2]],vadd([kk[0],hy,kk[2]],[0,0,.0]),'#f1eee4',al,2);line(vadd(q.hipL,[0,0,0]),[kk[0]+.25,hy,kk[2]],'#f1eee4',al*.7,2,[6,6]);line([kk[0],0,kk[2]],kk,c,al,5);line([kk[0]-.08,kk[1],kk[2]],[kk[0]+.08,kk[1],kk[2]],c,al,5);tag(kk,Math.round(m.v)+'%',c,al);}
+ if(i===1){var a=[-.05,.02,q.aL[2]],b=[q.aL[0],.02,q.aL[2]];line(a,b,c,al,6);line([a[0],0,a[2]-.12],[a[0],0,a[2]+.12],c,al,4);line([b[0],0,b[2]-.12],[b[0],0,b[2]+.12],c,al,4);tag(vadd(a,vmul(vsub(b,a),.5)),Math.round(m.v)+'%',c,al);}
+ if(i===2){var o=[q.P[0],.03,q.P[2]],hd=vnorm([q.hipR[0]-q.hipL[0],0,q.hipR[2]-q.hipL[2]]),sd=vnorm([q.shR[0]-q.shL[0],0,q.shR[2]-q.shL[2]]);
+  var O=proj(o);wedge(O,proj(vadd(o,vmul(hd,.6))),proj(vadd(o,vmul(sd,.6))),90,c,al);line(vadd(q.hipL,vmul(hd,-.12)),vadd(q.hipR,vmul(hd,.12)),'#f1eee4',al*.9,5);line(vadd(q.shL,vmul(sd,-.12)),vadd(q.shR,vmul(sd,.12)),c,al,6);tag(vadd(o,vmul(vadd(hd,sd),.4)),Math.round(m.v)+'°',c,al);}
+ if(i===3){var E=proj(q.eR);line(q.eR,q.shR,c,al,5);line(q.eR,q.wR,c,al,5);wedge(E,proj(q.shR),proj(q.wR),58,c,al);tag(q.eR,Math.round(m.v)+'°',c,al);}
+ if(i===4){var Pp=proj(q.P),Up=proj(vadd(q.P,[0,.7,0])),Ss=proj(vadd(q.P,vmul(vnorm(vsub(q.S,q.P)),.7)));line(q.P,vadd(q.P,[0,.7,0]),'#f1eee4',al*.7,2,[6,6]);line(q.P,vadd(q.P,vmul(vnorm(vsub(q.S,q.P)),.7)),c,al,5);wedge(Pp,Up,Ss,100,c,al);tag(vadd(q.P,vmul(vnorm(vsub(q.S,q.P)),.7)),Math.round(m.v)+'°',c,al);}}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+var MONO='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace',SANS='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+function card(i,al,off){var m=M[i],c=STC[m.status],x=40,y=205+off,w=640,h=272;cx.globalAlpha=al;
+ rr(x,y,w,h,16);cx.fillStyle='rgba(14,22,19,.93)';cx.fill();cx.strokeStyle=rgba(c,.9);cx.lineWidth=2.5;cx.stroke();
+ cx.font='700 14px '+MONO;cx.textBaseline='alphabetic';var tw=cx.measureText(m.tag).width+22;rr(x+24,y+22,tw,26,13);cx.strokeStyle='rgba(241,238,228,.55)';cx.lineWidth=1.5;cx.stroke();cx.fillStyle='#f1eee4';cx.fillText(m.tag,x+35,y+40);
+ cx.font='700 30px '+SANS;cx.fillStyle='#f1eee4';cx.fillText(m.title,x+24,y+86);
+ cx.font='700 64px '+MONO;cx.fillStyle=c;var vt=(m.unit==='° '?'':Math.round(m.v)+'');cx.fillText(vt,x+24,y+152);var vw=cx.measureText(vt).width;
+ cx.font='600 22px '+MONO;cx.fillStyle='rgba(241,238,228,.8)';cx.fillText(m.unit,x+24+vw+8,y+152);
+ cx.font='700 15px '+MONO;cx.fillStyle=c;cx.textAlign='right';cx.fillText(m.statusText+'  ·  SCORE '+m.score,x+w-24,y+118);cx.textAlign='left';
+ // range bar: target band, estimate range, value
+ var bx=x+24,bw=w-48,by=y+176,sx=function(v){return bx+bw*Math.max(0,Math.min(1,v/m.max));};
+ cx.fillStyle='rgba(241,238,228,.14)';rr(bx,by,bw,10,5);cx.fill();cx.fillStyle='rgba(91,214,138,.45)';cx.fillRect(sx(m.lo),by,sx(m.hi)-sx(m.lo),10);
+ cx.strokeStyle='rgba(241,238,228,.95)';cx.lineWidth=3;cx.beginPath();cx.moveTo(sx(m.v-m.unc),by+5);cx.lineTo(sx(m.v+m.unc),by+5);cx.moveTo(sx(m.v-m.unc),by-2);cx.lineTo(sx(m.v-m.unc),by+12);cx.moveTo(sx(m.v+m.unc),by-2);cx.lineTo(sx(m.v+m.unc),by+12);cx.stroke();
+ cx.fillStyle=c;cx.beginPath();cx.moveTo(sx(m.v),by-4);cx.lineTo(sx(m.v)-8,by-18);cx.lineTo(sx(m.v)+8,by-18);cx.closePath();cx.fill();
+ cx.font='500 12px '+MONO;cx.fillStyle='rgba(241,238,228,.7)';cx.fillText('target '+m.lo+'–'+m.hi+'  ·  estimate ±'+m.unc+' (illustrative range)',bx,by+30);
+ cx.font='700 12px '+MONO;cx.fillStyle='#e0793f';cx.fillText('CUE',x+24,y+236);cx.font='500 17px '+SANS;cx.fillStyle='#f1eee4';cx.fillText(m.cue,x+68,y+236);cx.globalAlpha=1;}
+function phone(q,s){var x=28,y=1050,w=150,h=196;rr(x,y,w,h,18);var g=cx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#1a2f2a');g.addColorStop(1,'#2d4a35');cx.fillStyle=g;cx.fill();cx.strokeStyle='rgba(241,238,228,.7)';cx.lineWidth=2;cx.stroke();
+ cx.font='600 12px '+MONO;cx.fillStyle='rgba(241,238,228,.85)';cx.fillText('SIMULATED PHONE VIEW',x,y-8);
+ cx.save();rr(x,y,w,h,18);cx.clip();cx.fillStyle='rgba(120,90,50,.55)';cx.fillRect(x,y+h-46,w,46);
+ var k=66,ox=x+w*.28,oy=y+h-40;function P2(p){return [ox+(p[0]-.1)*k*.62,oy-p[1]*k];}
+ var bones=[['aL','kL'],['kL','hipL'],['aR','kR'],['kR','hipR'],['hipL','hipR'],['P','S'],['shL','shR'],['shL','eL'],['eL','wL'],['shR','eR'],['eR','wR'],['neck','head']];
+ cx.strokeStyle='rgba(241,238,228,.9)';cx.lineWidth=2.5;cx.lineCap='round';bones.forEach(function(b){var A=P2(q[b[0]]),B=P2(q[b[1]]);cx.beginPath();cx.moveTo(A[0],A[1]);cx.lineTo(B[0],B[1]);cx.stroke();});
+ ['hipL','hipR','kL','kR','aL','aR','shL','shR','eL','eR','wL','wR','head'].forEach(function(j){var p=P2(q[j]);cx.fillStyle='#e0793f';cx.beginPath();cx.arc(p[0],p[1],3.6,0,7);cx.fill();});
+ cx.restore();if(Math.floor(s*2)%2===0){cx.fillStyle='#ef6a5f';cx.beginPath();cx.arc(x+w-20,y+20,6,0,7);cx.fill();}
+ cx.font='500 11px '+MONO;cx.fillStyle='rgba(241,238,228,.85)';cx.fillText('16 joints tracked',x+10,y+h-10);}
+function header(s){cx.textBaseline='alphabetic';cx.font='700 18px '+MONO;cx.fillStyle='#e0793f';cx.fillText('PITCH SCORE',40,70);
+ var wd=cx.measureText('PITCH SCORE').width;cx.font='500 18px '+MONO;cx.fillStyle='rgba(241,238,228,.75)';cx.fillText('  ·  concept',40+wd,70);
+ var a=sm((s-3)/.6);cx.globalAlpha=a;cx.font='600 24px '+SANS;cx.fillStyle='#f1eee4';cx.fillText('Film it. See it. Score it. Track it.',40,128);cx.globalAlpha=1;}
+function intro(s){var L=['Film a bullpen','with your phone.','Watch it rebuilt in 3D.','Get a pitch score.','Track it, session to session.'],al=1-sm((s-2.7)/.7);if(al<=0)return;
+ cx.font='700 46px '+SANS;cx.textBaseline='alphabetic';[[0,.2],[1,.2],[2,.85],[3,1.5],[4,2.1]].forEach(function(o){var a=sm((s-o[1])/.4)*al;if(a<=0)return;cx.globalAlpha=a;cx.fillStyle=o[0]===2||o[0]===3?'#e0793f':'#f1eee4';if(o[0]===4)cx.font='700 36px '+SANS;else cx.font='700 46px '+SANS;cx.fillText(L[o[0]],40,230+o[0]*72-(1-sm((s-o[1])/.4))*14);});cx.globalAlpha=1;}
+function scoreScreen(s){var a=sm((s-23.6)/.7);if(a<=0)return;cx.globalAlpha=a;cx.fillStyle='rgba(8,13,11,.94)';cx.fillRect(0,0,W,H);
+ var cxn=360,cyn=360,R=150,u=sm((s-24.2)/2.4),shown=Math.round(SCORE*u);
+ cx.lineWidth=22;cx.strokeStyle='rgba(241,238,228,.14)';cx.beginPath();cx.arc(cxn,cyn,R,0,7);cx.stroke();
+ cx.strokeStyle='#e0793f';cx.lineCap='round';cx.beginPath();cx.arc(cxn,cyn,R,-Math.PI/2,-Math.PI/2+2*Math.PI*SCORE/100*u);cx.stroke();cx.lineCap='butt';
+ cx.textAlign='center';cx.font='700 96px '+MONO;cx.fillStyle='#f1eee4';cx.fillText(String(shown),cxn,cyn+26);cx.font='600 20px '+MONO;cx.fillStyle='rgba(241,238,228,.7)';cx.fillText('/100',cxn,cyn+64);
+ cx.font='700 28px '+SANS;cx.fillStyle='#f1eee4';cx.fillText('PITCH SCORE',cxn,cyn+R+62);cx.textAlign='left';
+ M.forEach(function(m,i){var y=640+i*66,v=sm((s-25-i*.18)/.7),bw=290;cx.font='600 16px '+MONO;cx.fillStyle='rgba(241,238,228,.85)';cx.fillText(['KNEE HEIGHT','STRIDE','SEPARATION','ELBOW','TRUNK LEAN'][i],60,y+14);
+  cx.fillStyle='rgba(241,238,228,.14)';rr(330,y,bw,18,9);cx.fill();cx.fillStyle=STC[m.status];rr(330,y,Math.max(2,bw*m.score/100*v),18,9);cx.fill();cx.font='700 17px '+MONO;cx.fillStyle='#f1eee4';cx.textAlign='right';cx.fillText(String(Math.round(m.score*v)),W-50,y+15);cx.textAlign='left';});
+ var n=sm((s-26.2)/.6);cx.globalAlpha=a*n;cx.font='500 17px '+SANS;cx.fillStyle='rgba(241,238,228,.85)';['A score from one phone is an estimate, so every number','carries a range. Ranges and weights here are illustrative','and unvalidated, on a synthetic pitcher.'].forEach(function(t,i){cx.fillText(t,60,1004+i*26);});cx.globalAlpha=1;}
+function chip(){cx.font='600 12px '+MONO;var t='SYNTHETIC SKELETON · CONCEPT DEMO · NOT AN ATHLETE',w=cx.measureText(t).width+22;cx.strokeStyle='#f2c14e';cx.lineWidth=1.5;cx.strokeRect(W-w-24,H-46,w,26);cx.fillStyle='#f2c14e';cx.fillText(t,W-w-13,H-28);}
+// ---------------- one frame, from the second alone ----------------
+function draw(s){cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,W,H);cx.lineCap='round';cx.lineJoin='round';
+ var g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#08110e');g.addColorStop(.6,'#0f1d18');g.addColorStop(1,'#16291f');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+ var T=Tof(s);view.yaw=26+22*(s/TOTAL);view.pitch=12;var q=pose(T);
+ floor();body(q);if(T>=.85){var bp=proj(ballAt(T));cx.fillStyle='#f4f1e8';cx.beginPath();cx.arc(bp[0],bp[1],.04*bp[3]+2,0,7);cx.fill();}
+ CARDS.forEach(function(c){if(s>=c[1]-.1&&s<c[2]){var ia=sm((s-c[1])/.4),oa=1-sm((s-(c[2]-.35))/.3),al=Math.min(ia,oa);if(al>0){overlay(c[0],q,al);card(c[0],al,(1-ia)*-24);}}});
+ phone(q,s);header(s);intro(s);scoreScreen(s);chip();return T;}
+// ---------------- page wiring ----------------
+var cur=11.6,playing=false,last=0;
+window.__ready=true;
+window.renderFrame=function(i,n){n=n||900;cur=i/FPS;draw(cur);};
+window.__pitchscore={M:M,SCORE:SCORE};
+function rows(){var tb=document.getElementById('rows');if(!tb)return;tb.innerHTML='';M.forEach(function(m){var tr=document.createElement('tr');
+ tr.innerHTML='<td>'+m.tag.toLowerCase()+'</td><td>'+m.title+'</td><td class="n">'+m.v.toFixed(1)+' '+m.unit+' <span class="st '+m.status+'">'+m.statusText+'</span></td><td class="n">'+m.lo+'–'+m.hi+'</td><td class="n">'+m.score+'</td>';tb.appendChild(tr);});
+ var t=document.createElement('tr');t.innerHTML='<td colspan="4"><b>Pitch score</b> (mean of five)</td><td class="n"><b>'+SCORE+'</b></td>';tb.appendChild(t);}
+function clock(){var c=document.getElementById('clock'),sc=document.getElementById('scrub');if(c)c.textContent='0:'+(cur<10?'0':'')+cur.toFixed(1);if(sc&&document.activeElement!==sc)sc.value=Math.round(cur*1000);}
+function tick(now){if(playing){var dt=Math.min(.05,(now-last)/1000);cur+=dt;if(cur>=TOTAL){cur=TOTAL;playing=false;document.getElementById('play').textContent='Replay';}}last=now;draw(cur);clock();requestAnimationFrame(tick);}
+if(!RENDER){rows();var pb=document.getElementById('play'),sc=document.getElementById('scrub');
+ pb.addEventListener('click',function(){if(cur>=TOTAL)cur=0;playing=!playing;pb.textContent=playing?'Pause':'Play';});
+ sc.addEventListener('input',function(){cur=sc.value/1000;playing=false;pb.textContent='Play';draw(cur);clock();});
+ requestAnimationFrame(tick);}else{draw(cur);}
+})();
+</script>
