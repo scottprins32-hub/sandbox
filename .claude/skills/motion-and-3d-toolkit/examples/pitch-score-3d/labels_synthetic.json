@@ -1,20 +1,20 @@
 {
  "page": {
-  "title": "Pitch Score 3D",
+  "title": "Attractor Score 3D",
   "aria": "Animated reel: a synthetic pitcher as a 3D mannequin, one card per phase with reference ranges, then a pitch score with phase bars",
   "chip_side": "Synthetic pitcher \u00b7 estimated \u00b7 demo",
-  "h1": "Pitch Score 3D",
+  "h1": "Attractor Score 3D",
   "intro_html": "<p>A 3D mannequin driven by joint positions, read the way a phone-to-3D swing app reads a swing: one card per phase, green or amber against a range, one cue, and a score. This version runs on the scripted Pitch Lab pitcher at 120 fps, analysed by Motion Studio's own <code>biomech.py</code>. The pitcher is synthetic, so the low scores say something about the script, not about a person.</p>",
   "notes_html": "<h2>What this is not</h2><ul><li>Not a real pitcher: the skeleton is ten hand-made poses blended together.</li><li>Not a validated score: the ranges are published group values, and a single number hides which phase matters.</li></ul>"
  },
  "reel": {
   "who": "synthetic pitcher",
-  "tagline": "Joints in. Mannequin, ranges and a score out.",
+  "tagline": "Joints in. Nine attractors out.",
   "intro": [
    "Joints in.",
    "Mannequin out.",
    "Read in 3D.",
-   "Against published ranges.",
+   "Read through the nine attractors.",
    "Every number an estimate."
   ],
   "cardTag": "SYNTHETIC \u00b7 120 FPS",
@@ -22,8 +22,8 @@
   "chip": "SYNTHETIC PITCHER \u00b7 ESTIMATED \u00b7 NOT A MEASUREMENT",
   "notes": [
    "Synthetic pitcher from Pitch Lab, 120 fps.",
-   "Values from Motion Studio's biomech.py, unchanged.",
-   "Ranges and sources as Motion Studio uses them."
+   "Proxies and start ranges are this demo's own; not validated.",
+   "Attractor names and definitions from the programme."
   ],
   "yaw0": 18,
   "yawSpan": 34,

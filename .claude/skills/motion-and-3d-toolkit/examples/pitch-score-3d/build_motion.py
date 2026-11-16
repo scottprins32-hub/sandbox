@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert Motion Studio outputs into motion.json for the Pitch Score 3D page. Reads only; never writes into Motion Studio.
+"""Convert Motion Studio outputs into motion.json for the Pitch Score 3D page (joints, biomech metrics, attractor proxies). Reads only; never writes into Motion Studio.
 
   build_motion.py --trial trial.js --biomech biomech.json --out motion.json
       [--twocam-log twocam_log.json] [--release-frame N --release-note TEXT]
@@ -43,6 +43,11 @@ def main():
     feet = [n for n in ('LHeel', 'RHeel', 'LBigToe', 'RBigToe', 'LAnkle', 'RAnkle') if n in ix]
     floor = np.nanpercentile(np.min([G[w0:w1, ix[n], 1] for n in feet], 0), 3)
     G[..., 0] -= G[w0, ix[drive], 0] + 0.05; G[..., 1] -= floor; G[..., 2] -= G[w0, ix['Hip'] if 'Hip' in ix else ix['RHip'], 2]
+    sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parent)); import attractors as AT
+    attr = AT.compute(G, names, rate, fc, pk, T)
+    for d in attr:
+        d['at'] -= w0
+        if 'trail' in d: d['trail'] = [t - w0 for t in d['trail']]
     head = 'headc' if 'headc' in ix else 'Head'
     need = ['RHip', 'LHip', 'RKnee', 'LKnee', 'RAnkle', 'LAnkle', 'RShoulder', 'LShoulder', 'RElbow', 'LElbow', 'RWrist', 'LWrist', 'Neck', head, 'RBigToe', 'LBigToe', 'RHeel', 'LHeel']
     sl = slice(w0, w1 + 1); joints, observed = {}, {}
@@ -55,7 +60,7 @@ def main():
     body = np.concatenate([np.array(joints[n]) for n in need if n in joints])
     out = dict(label=trial.get('source_label') or trial.get('source', ''), source=trial.get('source', ''), rate=rate, n=w1 - w0 + 1, window=[w0, w1], throws=T, head=head,
                events=dict(peak_knee_height=pk - w0, foot_contact=fc - w0, release=br - w0), release_source=br_src,
-               metrics=[m for m in bio['metrics'] if m.get('reference')], biomech_quality=bio.get('quality'), height_m=bio.get('height_m'),
+               metrics=[m for m in bio['metrics'] if m.get('reference')], attractors=attr, biomech_quality=bio.get('quality'), height_m=bio.get('height_m'),
                focus=np.round([np.median(body[:, 0]), .95, np.median(body[:, 2])], 3).tolist(), joints=joints, observed=observed, insets={})
     if a.twocam_log:
         rep = json.load(open(a.twocam_log))['report']; out['report'] = {k: rep[k] for k in ('lag_s', 'body_reproj_px', 'rubber_reproj_px', 'limb_spread_pct', 'rejected_pct') if k in rep}
