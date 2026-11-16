@@ -36,7 +36,7 @@ __NOTES_HTML__
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>/*__RANGES__*/</script>
-<script>window.MOTION=/*__MOTION__*/;window.LABELS=/*__LABELS__*/;window.XRAY=/*__XRAY__*/;</script>
+<script>window.MOTION=/*__MOTION__*/;window.LABELS=/*__LABELS__*/;window.XRAY=/*__XRAY__*/;window.BONES=/*__BONES__*/;</script>
 <script>
 (function(){
 'use strict';
@@ -74,9 +74,9 @@ var PANELS=XR.cams.map(function(c,i){var cam=new THREE.Camera(),K=c.K,w=c.size[0
 var cam=PANELS[0].cam,CUR=PANELS[0];
 var SKIN=0x9fe8ff,ARM=0xffb37a,UNSEEN=0xf2c14e;
 var XV='varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}';
-var XF='uniform vec3 c;uniform float k;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);gl_FragColor=vec4(c*(.22+1.5*f),(.12+.85*f)*k);}';
-function xmat(c,k){return new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(c)},k:{value:k}},vertexShader:XV,fragmentShader:XF,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});}
-function mat(c){return xmat(c,1);}
+var XF='uniform vec3 c;uniform float k;uniform float core;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);gl_FragColor=vec4(c*(core+1.5*f),(core*.5+.12+.85*f)*k);}';
+function xmat(c,k,core){return new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(c)},k:{value:k},core:{value:core===undefined?.22:core}},vertexShader:XV,fragmentShader:XF,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});}
+function mat(c){return xmat(c,window.BONES?(LB.bodyGlow||.38):1);}
 function ghost(c){return xmat(UNSEEN,.8);}
 var UP=new THREE.Vector3(0,1,0);
 function Limb(a,b,r0,r1,color){this.a=a;this.b=b;this.solid=mat(color);this.ghost=ghost(color);
@@ -94,7 +94,33 @@ var limbs=[new Limb('RHip','RKnee',.082,.058,SKIN),new Limb('RKnee','RAnkle',.05
  new Limb(TA+'Shoulder',TA+'Elbow',.052,.042,ARM),new Limb(TA+'Elbow',TA+'Wrist',.042,.032,ARM),new Limb(GA+'Shoulder',GA+'Elbow',.052,.042,SKIN),new Limb(GA+'Elbow',GA+'Wrist',.042,.032,SKIN),
  new Limb('Neck',MO.head,.045,.05,SKIN)];
 var pelvis=new Blob(SKIN,.165,.11,.11),chest=new Blob(SKIN,.19,.2,.12),belly=new Blob(SKIN,.15,.17,.105),head=new Blob(SKIN,.095,.115,.1),handT=new Blob(ARM,.045,.06,.03),handG=new Blob(SKIN,.05,.065,.035);
-function updateBody(fi){limbs.forEach(function(l){l.update(fi);});
+// ---------- anatomical bone layer (BodyParts3D, CC BY 4.0) ----------
+var BN=window.BONES,boneSegs=[];
+function b64(s,T){var bin=atob(s),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer);}
+function restM(f){var m=new THREE.Matrix4().makeBasis(new THREE.Vector3().fromArray(f.X),new THREE.Vector3().fromArray(f.Y),new THREE.Vector3().fromArray(f.Z));m.setPosition(new THREE.Vector3().fromArray(f.O));return m;}
+if(BN){Object.keys(BN.segments).forEach(function(name){var d=BN.segments[name],g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(b64(d.pos,Float32Array),3));g.setIndex(new THREE.BufferAttribute(b64(d.idx,d.i32?Uint32Array:Uint16Array),1));g.computeVertexNormals();
+ var m=new THREE.Mesh(g,xmat(LB.boneColor||0xf2fbff,1,.34));m.matrixAutoUpdate=false;m.frustumCulled=false;root.add(m);boneSegs.push({name:name,base:d.base,mesh:m,solid:m.material,amber:xmat(UNSEEN,.9,.3)});});}
+var RESTM={};if(BN)Object.keys(BN.rest).forEach(function(k){RESTM[k]=restM(BN.rest[k]);});
+function segFrame(O,A,r){var y=A.clone().sub(O),len=y.length();y.normalize();var x=r.clone().addScaledVector(y,-r.dot(y));if(x.lengthSq()<1e-10)x=new THREE.Vector3(1,0,0).addScaledVector(y,-y.x);x.normalize();var z=new THREE.Vector3().crossVectors(x,y);return {O:O,X:x,Y:y,Z:z,len:len};}
+var GSCALE=1;
+function animFrames(fi){var g=function(n){return P(n,fi);},F={},hR=g('RHip'),hL=g('LHip'),mid=hR.clone().add(hL).multiplyScalar(.5),nk=g('Neck'),sR=g('RShoulder'),sL=g('LShoulder'),lat=sL.clone().sub(sR);
+ ['R','L'].forEach(function(s){var hip=g(s+'Hip'),kn=g(s+'Knee'),an=g(s+'Ankle'),toe=g(s+'BigToe'),sh=g(s+'Shoulder'),el=g(s+'Elbow'),wr=g(s+'Wrist');
+  F['thigh'+s]=segFrame(hip,kn,s==='L'?hL.clone().sub(hR):hR.clone().sub(hL));F['shank'+s]=segFrame(kn,an,toe.clone().sub(an));F['foot'+s]=segFrame(an,toe,kn.clone().sub(an));
+  var n=sh.clone().sub(el).cross(wr.clone().sub(el));if(n.length()<.15*sh.distanceTo(el)*wr.distanceTo(el))n=lat.clone();F['uarm'+s]=segFrame(sh,el,n);F['farm'+s]=segFrame(el,wr,n);
+  F['girdle'+s]=segFrame(nk,sh,nk.clone().sub(mid));});
+ F.pelvis=segFrame(mid,nk,hL.clone().sub(hR));F.thorax=segFrame(nk,mid,lat);F.head=segFrame(nk,P(MO.head,fi),lat);return F;}
+function segMatrix(F,key,uniformY){var f=F[key],rest=BN.rest[key],ry=uniformY?GSCALE:f.len/rest.len;var m=new THREE.Matrix4().makeBasis(f.X,f.Y,f.Z);m.multiply(new THREE.Matrix4().makeScale(GSCALE,ry,GSCALE));m.setPosition(f.O);return m;}
+function onBase(M,key,base){return M.clone().multiply(RESTM[key].clone().invert()).multiply(RESTM[base]);}
+function blend(A,B,t){var pa=new THREE.Vector3(),qa=new THREE.Quaternion(),sa=new THREE.Vector3(),pb=new THREE.Vector3(),qb=new THREE.Quaternion(),sb=new THREE.Vector3();A.decompose(pa,qa,sa);B.decompose(pb,qb,sb);
+ return new THREE.Matrix4().compose(pa.lerp(pb,t),qa.slerp(qb,t),sa.lerp(sb,t));}
+if(BN){(function(){var r=[],lens={thighR:['RHip','RKnee'],shankR:['RKnee','RAnkle'],uarmR:['RShoulder','RElbow'],farmR:['RElbow','RWrist'],thighL:['LHip','LKnee'],shankL:['LKnee','LAnkle'],uarmL:['LShoulder','LElbow'],farmL:['LElbow','LWrist']};
+ Object.keys(lens).forEach(function(k){var v=[];for(var f=0;f<NF;f+=3)v.push(P(lens[k][0],f).distanceTo(P(lens[k][1],f))/BN.rest[k].len);v.sort(function(a,b){return a-b;});r.push(v[v.length>>1]);});r.sort(function(a,b){return a-b;});GSCALE=r[r.length>>1];})();}
+function segSeen(key,fi){var s=key.slice(-1),map={thigh:['Hip','Knee'],shank:['Knee','Ankle'],foot:['Ankle','BigToe'],uarm:['Shoulder','Elbow'],farm:['Elbow','Wrist'],girdle:['Shoulder']};var b=key.slice(0,-1);
+ if(map[b])return map[b].every(function(j){return seen(s+j,fi);});if(key==='head'||key==='neckv')return seen(MO.head,fi);return seen('RHip',fi)&&seen('LHip',fi)&&seen('RShoulder',fi)&&seen('LShoulder',fi);}
+function updateBones(fi){if(!BN)return;var F=animFrames(fi),M={};Object.keys(BN.rest).forEach(function(k){M[k]=segMatrix(F,k,/^(pelvis|head|girdle)/.test(k));});
+ boneSegs.forEach(function(b){var m;if(b.name==='lumbar')m=blend(M.pelvis,onBase(M.thorax,'thorax','pelvis'),.5);else if(b.name==='neckv')m=blend(M.thorax,onBase(M.head,'head','thorax'),.5);else m=M[b.base];
+  b.mesh.matrix.copy(m);b.mesh.matrixWorldNeedsUpdate=true;b.mesh.material=segSeen(b.name,fi)?b.solid:b.amber;});}
+function updateBody(fi){updateBones(fi);limbs.forEach(function(l){l.update(fi);});
  var hR=P('RHip',fi),hL=P('LHip',fi),sR=P('RShoulder',fi),sL=P('LShoulder',fi),hip=hR.clone().add(hL).multiplyScalar(.5),sh=sR.clone().add(sL).multiplyScalar(.5),sp=sh.clone().sub(hip);
  var okT=seen('RHip',fi)&&seen('LHip',fi)&&seen('RShoulder',fi)&&seen('LShoulder',fi);
  pelvis.place(hip.clone().addScaledVector(sp,.06),hR.clone().sub(hL),sp,okT);belly.place(hip.clone().addScaledVector(sp,.42),hR.clone().sub(hL).add(sR.clone().sub(sL)),sp,okT);chest.place(hip.clone().addScaledVector(sp,.74),sR.clone().sub(sL),sp,okT);
@@ -157,7 +183,7 @@ function summary(s){var a=sm((s-SUM0)/.7);if(a<=0)return;cx.globalAlpha=a;cx.fil
   else{cx.font='600 11px '+MONO;cx.fillStyle=STC.na;cx.fillText(c.status==='nm'?'NOT MEASURED':'NEEDS '+c.minFps+' FPS',W-40,y+13);}cx.textAlign='left';});
  var n=sm((s-SUM0-1.8)/.6);cx.globalAlpha=a*n;cx.font='500 15px '+SANS;cx.fillStyle='rgba(241,238,228,.85)';LB.notes.forEach(function(t,i){cx.fillText(t,50,1030+i*24);});cx.globalAlpha=1;}
 
-function chip(){cx.font='600 11px '+MONO;var t=LB.chip,w=cx.measureText(t).width+20,y=LB.chipY||(H-46);cx.fillStyle='rgba(8,13,11,.85)';cx.fillRect(W-w-24,y,w,24);cx.strokeStyle='#f2c14e';cx.lineWidth=1.5;cx.strokeRect(W-w-24,y,w,24);cx.fillStyle='#f2c14e';cx.fillText(t,W-w-14,y+16);}
+function chip(){if(BN){cx.font='500 10px '+MONO;cx.fillStyle='rgba(235,250,255,.6)';cx.fillText('Bones: '+BN.credit,24,H-12);}cx.font='600 11px '+MONO;var t=LB.chip,w=cx.measureText(t).width+20,y=LB.chipY||(H-46);cx.fillStyle='rgba(8,13,11,.85)';cx.fillRect(W-w-24,y,w,24);cx.strokeStyle='#f2c14e';cx.lineWidth=1.5;cx.strokeRect(W-w-24,y,w,24);cx.fillStyle='#f2c14e';cx.fillText(t,W-w-14,y+16);}
 // ---------- one frame from the time alone ----------
 var bg=document.getElementById('bg'),bx=bg.getContext('2d');
 var BONES=[['RHip','RKnee'],['RKnee','RAnkle'],['LHip','LKnee'],['LKnee','LAnkle'],['RAnkle','RBigToe'],['LAnkle','LBigToe'],['RHip','LHip'],['RShoulder','LShoulder'],['RShoulder','RElbow'],['RElbow','RWrist'],['LShoulder','LElbow'],['LElbow','LWrist'],['Neck',MO.head]];
