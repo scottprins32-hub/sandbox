@@ -36,6 +36,7 @@
   </a>
   <nav class="nav" aria-label="Sections">
     <a href="#today">Today</a>
+    <a href="#climb">Climb</a>
     <a href="#strain">Strain</a>
     <a href="#recovery">Recovery</a>
     <a href="#sleep">Sleep</a>
@@ -135,6 +136,12 @@
               <dl class="facts" id="sleep-facts"></dl>
             </article>
           </div>
+          <a class="climb-chip" id="climb-chip" href="#climb">
+            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 9.5 8l3.5 5 2.5-3L22 20z"/></svg>
+            <span class="cc-alt"><b id="cc-alt">–</b> m</span>
+            <span class="cc-mid"><span class="cc-level" id="cc-level"></span><span class="cc-track"><i id="cc-fill"></i></span><span class="cc-next" id="cc-next"></span></span>
+            <span class="cc-streak" id="cc-streak"></span>
+          </a>
         </div>
       </div>
 
@@ -145,6 +152,32 @@
         </figcaption>
         <div class="river" id="river" tabindex="0"></div>
       </figure>
+    </section>
+
+    <section class="sec" id="climb" aria-labelledby="h-climb">
+      <header class="sec-head" data-reveal>
+        <h2 id="h-climb">Climb</h2>
+        <p id="climb-lede"></p>
+      </header>
+      <figure class="block" data-reveal>
+        <h3>From the polder, one day at a time</h3>
+        <div class="profile" id="profile"></div>
+        <figcaption class="note" id="profile-note"></figcaption>
+      </figure>
+      <div class="climb-grid">
+        <div class="block" data-reveal>
+          <div class="earn-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
+          <ul class="earn" id="earn"></ul>
+        </div>
+        <div class="block" data-reveal>
+          <h3>Streaks</h3>
+          <div class="streaks" id="streaks"></div>
+        </div>
+      </div>
+      <div class="block medals" data-reveal>
+        <h3>Medals <span id="badge-count"></span></h3>
+        <div class="badges" id="badges"></div>
+      </div>
     </section>
 
     <section class="sec" id="strain" aria-labelledby="h-strain">
@@ -291,6 +324,8 @@
     </section>
   </div>
 </aside>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
 
 <noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
 <script type="module" src="js/main.js"></script>

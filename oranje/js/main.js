@@ -1,6 +1,7 @@
 // Oranje: boot, state, and the top of the page.
 
 import { computeAll, recoveryBand } from './core/scores.js';
+import { playGame } from './core/game.js';
 import { setCurve } from './core/strain.js';
 import { fmtClock, fmtDur, fromKey, isNum, todayKey } from './core/util.js';
 import { auth } from './data/auth.js';
@@ -8,6 +9,7 @@ import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { createDial, createMeter } from './ui/dial.js';
+import { announce, renderChip, renderClimb } from './ui/game.js';
 import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js';
 import { createRiver } from './ui/river.js';
 import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js';
@@ -33,6 +35,7 @@ function show(view) {
 function compute() {
   setCurve(state.settings.curve);
   state.ctx = computeAll(state.data.days, state.data.profile, state.settings);
+  state.game = playGame(state.ctx.days);
   const last = state.ctx.days[state.ctx.days.length - 1]?.date;
   if (!state.date || !state.ctx.byDate[state.date]) state.date = last;
 }
@@ -144,12 +147,14 @@ function renderHero(animate, delay = 0) {
   $('#sleep-facts').replaceChildren(h('dt', { text: 'Asleep' }), h('dd', { text: sl ? fmtDur(sl.asleep) : '–' }), h('dt', { text: 'Needed' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
 
   river.set(d, { animate });
+  renderChip(state.game);
 }
 
 function renderAll({ animate = true, delay = 0 } = {}) {
   if (!state.ctx?.days.length) return;
   const d = current();
   renderHero(animate, delay);
+  renderClimb(d, state.game, pick);
   renderStrain(d);
   renderRecovery(d, state.ctx);
   renderSleep(d, state.ctx);
@@ -200,6 +205,7 @@ async function sync() {
     if (firstData) state.date = state.ctx.days[state.ctx.days.length - 1].date;
     show('dash');
     renderAll({ animate: true });
+    announce(state.game, 'google');
   } catch (e) {
     if (e.signIn || e.status === 401) state.signIn = true; else state.error = e.message || 'Sync failed';
     if (!state.data) { show('welcome'); welcomeError(e.signIn ? '' : state.error); }
@@ -224,6 +230,7 @@ function startDemo(seed) {
   state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
   compute(); show('dash'); enter(); renderAll({ delay: 350 });
   window.scrollTo(0, 0);
+  announce(state.game, 'demo');
 }
 
 function welcomeError(msg) { const el = $('#welcome-error'); el.textContent = msg || ''; el.hidden = !msg; }

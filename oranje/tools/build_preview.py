@@ -4,8 +4,9 @@ import os, re, shutil
 import sys
 SRC=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); OUT=os.path.abspath(sys.argv[1])
 site=OUT+'/site'
-shutil.rmtree(site, ignore_errors=True); os.makedirs(site)
-for d in ('css','js','fonts'): shutil.copytree(f'{SRC}/{d}', f'{site}/{d}')
+os.makedirs(site, exist_ok=True)
+# Overwrites in place and never deletes: use a fresh OUT_DIR if files were removed from the app.
+for d in ('css','js','fonts'): shutil.copytree(f'{SRC}/{d}', f'{site}/{d}', dirs_exist_ok=True)
 open(site+'/config.js','w').write("window.ORANJE_CONFIG = { clientId: '', preview: true };\n")
 h=open(SRC+'/index.html').read()
 body=h[h.index('<body'):h.index('</body>')]; body=body[body.index('>')+1:]
