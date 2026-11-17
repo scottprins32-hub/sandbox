@@ -24,7 +24,8 @@ const ls = {
   set: (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch { /* private mode */ } },
 };
 
-let mode = null;            // 'broker' | 'popup' | null
+let mode = null;            // 'broker' | 'popup' | 'unconfigured' | null
+let who = { name: '', email: '' };   // who is signed in (broker only)
 let brokerLinked = false;
 let cached = null;          // { token, exp }
 let gisClient = null;
@@ -74,7 +75,8 @@ export const auth = {
     try {
       const r = await fetch('api/auth/session', { headers: { Accept: 'application/json' }, cache: 'no-store' });
       const j = r.ok && (r.headers.get('content-type') || '').includes('json') ? await r.json() : null;
-      if (j?.broker && j.configured) { mode = 'broker'; brokerLinked = !!j.connected; }
+      if (j?.broker && j.configured) { mode = 'broker'; brokerLinked = !!j.connected; who = { name: j.name || '', email: j.email || '' }; }
+      else if (j?.broker && !window.ORANJE_CONFIG?.clientId) mode = 'unconfigured';   // hosted, but its Google credentials are not set yet
     } catch { /* static hosting: no broker */ }
     if (!mode && clientId()) mode = 'popup';
     if (mode === 'popup') {
@@ -86,10 +88,13 @@ export const auth = {
   // Has an account been connected on this browser (even if the token has lapsed)?
   get linked() { return mode === 'broker' ? brokerLinked : mode === 'popup' && ls.get(KEY_LINKED) === 'popup'; },
   get needsSetup() { return !mode; },
+  get unconfigured() { return mode === 'unconfigured'; },
+  get who() { return who; },
   get missingScopes() { return cached?.missing || []; },
 
   async connect() {
     if (mode === 'broker') { location.assign('api/auth/login'); return new Promise(() => {}); }
+    if (mode === 'unconfigured') throw new Error('unconfigured');
     if (!clientId()) throw new Error('Add an OAuth client ID first.');
     mode = 'popup';
     await loadGis();
@@ -112,7 +117,7 @@ export const auth = {
 
   async disconnect() {
     const t = cached?.token;
-    cached = null; brokerLinked = false;
+    cached = null; brokerLinked = false; who = { name: '', email: '' };
     try { sessionStorage.removeItem(KEY_TOKEN); } catch { /* fine */ }
     ls.set(KEY_LINKED, null);
     if (mode === 'broker') { try { await fetch('api/auth/logout', { method: 'POST' }); } catch { /* offline */ } }

@@ -32,7 +32,7 @@ Google only releases health data to an app you registered yourself, so there is 
 3. **Credentials → Create OAuth client ID → Web application.**
 4. Your Google account must already be signed in to the Google Health (Fitbit) app on your phone. Otherwise Google answers "account not linked".
 
-Then pick one way to host it.
+Then pick one way to host it. To share it with other people, use A.
 
 ### A. Vercel: sign in once, stay signed in (recommended)
 
@@ -42,15 +42,27 @@ The four small functions in `api/auth/` keep Google's refresh token in an encryp
 2. On the OAuth client add
    - Authorised JavaScript origin: `https://YOUR-DOMAIN`
    - Authorised redirect URI: `https://YOUR-DOMAIN/api/auth/callback`
-3. Set three environment variables and redeploy:
+3. Set two environment variables (Settings → Environment Variables) and redeploy:
 
    | Name | Value |
    |---|---|
    | `GOOGLE_CLIENT_ID` | the client ID |
    | `GOOGLE_CLIENT_SECRET` | the client secret |
-   | `ORANJE_SECRET` | any long random string (`openssl rand -base64 32`) |
+
+   Optional: `ORANJE_SECRET`, any long random string, to encrypt the sign-in cookie with its own key instead of one derived from the client secret.
 
 4. Open the site and press **Connect Google account**.
+
+### Sharing it with friends or family
+
+Each person opens the same link, presses **Connect Google account** and signs in with the Google account their own Fitbit Air syncs to. Their data goes from Google to their own browser; nobody sees anyone else's. On a shared phone or laptop, the next person's sign-in clears the previous person's cached days, and settings such as max heart rate are kept per person.
+
+Google needs to know about each person while the app is unverified:
+
+- **Testing** (default): add each person's Google address under **Audience → Test users**. Their sign-in expires every seven days.
+- **In production**: press **Publish app** under **Audience**. Anyone with the link can sign in, sign-ins no longer expire weekly, and an unverified app may have up to 100 users. Everyone sees Google's "Google hasn't verified this app" screen once: **Advanced**, then **Go to Oranje**.
+
+Under **Data access**, add `openid`, `email` and `profile` next to the five Google Health scopes; Oranje uses them only to greet each person by name.
 
 ### B. Any static host: no server at all
 

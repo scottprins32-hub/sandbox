@@ -172,10 +172,14 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
   const today = dateKey(now);
 
   // Is this Google account linked to Google Health at all?
-  try { await api.call('/users/me/identity'); } catch (e) {
+  let userId = null;
+  try { userId = (await api.call('/users/me/identity')).healthUserId || null; } catch (e) {
     if (e.reason === 'ACCOUNT_NOT_LINKED') throw new HealthError(400, 'ACCOUNT_NOT_LINKED', 'This Google account is not linked to Google Health yet. Open the Google Health (Fitbit) app on your phone, sign in with this account, then try again.');
     throw e;
   }
+
+  // Someone else's cache on a shared device: start clean rather than mix data.
+  if (known && known.userId && userId && known.userId !== userId) known = null;
 
   // Re-fetch from the last day we hold (it may have been partial) minus one.
   const knownDays = Object.fromEntries((known?.days || []).map((d) => [d.date, d]));
@@ -306,7 +310,7 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
   const firstReal = Object.values(merged).filter(hasData).map((d) => d.date).sort()[0] || today;
   const keep = [addDays(today, -59), firstReal].sort()[1];
   return {
-    demo: false, profile, device,
+    demo: false, userId, profile, device,
     days: Object.values(merged).filter((d) => d.date >= keep).sort((a, b) => (a.date < b.date ? -1 : 1)),
     syncedAt: now.getTime(),
     issues,

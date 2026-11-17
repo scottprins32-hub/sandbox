@@ -1,4 +1,4 @@
-import { COOKIE, STATE, cookies, googleToken, origin, safeEqual, seal, setCookie } from './_lib.js';
+import { COOKIE, STATE, WHO, cookies, googleToken, origin, safeEqual, seal, setCookie, whoFrom } from './_lib.js';
 
 // Step 2: Google sends the visitor back with a code. Swap it for tokens and
 // keep only the refresh token, encrypted, in an httpOnly cookie.
@@ -15,6 +15,8 @@ export default async function handler(req, res) {
   const t = await googleToken({ code, grant_type: 'authorization_code', redirect_uri: `${origin(req)}/api/auth/callback` });
   if (!t.ok || !t.json.refresh_token) { res.setHeader('Set-Cookie', clearState); return back(`?auth_error=${encodeURIComponent(t.json.error || 'no_refresh_token')}`); }
 
-  res.setHeader('Set-Cookie', [clearState, setCookie(COOKIE, seal(t.json.refresh_token), { maxAge: 60 * 60 * 24 * 180 })]);
+  const who = whoFrom(t.json.id_token);
+  const year = 60 * 60 * 24 * 180;
+  res.setHeader('Set-Cookie', [clearState, setCookie(COOKIE, seal(t.json.refresh_token), { maxAge: year }), setCookie(WHO, seal(JSON.stringify(who || {})), { maxAge: year })]);
   back('?connected=1');
 }

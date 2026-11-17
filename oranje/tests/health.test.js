@@ -76,3 +76,10 @@ test('a second sync only asks for the days it lacks and keeps the rest', async (
   assert.equal(hrCalls.length, 1);
   assert.ok((Date.parse(hrCalls[0].body.range.endTime) - Date.parse(hrCalls[0].body.range.startTime)) / 86400000 < 3.1);
 });
+
+test('another person’s cached days are never merged into a sync', async () => {
+  const theirs = { userId: 'someone-else', profile: {}, days: [{ ...truth.days[0], date: '2026-10-01', steps: 99999, partial: false }] };
+  const { data } = await run({}, { known: theirs });
+  assert.equal(data.userId, '111111256096816351');
+  assert.ok(!data.days.some((d) => d.steps === 99999));
+});

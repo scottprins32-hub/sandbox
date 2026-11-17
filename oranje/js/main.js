@@ -15,6 +15,9 @@ import { createRiver } from './ui/river.js';
 import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
+// Who the Google data belongs to: their email when this site signs people in, else Google's user id.
+const person = () => (state.source === 'google' ? auth.who.email || state.data?.userId || '' : '');
+const saveSettings = () => store.saveSettings(state.settings, person());
 const dial = createDial($('#dial'));
 const recMeter = createMeter($('#recovery-ticks'));
 const sleepMeter = createMeter($('#sleep-ticks'));
@@ -198,14 +201,15 @@ async function sync() {
       getToken: (o) => auth.token(o), known: state.data,
       onProgress: (done, total) => { state.progress = total ? `Syncing ${done}/${total}` : 'Syncing'; $('#status-text').textContent = state.progress; },
     });
-    const firstData = !state.data;
-    state.data = data; state.signIn = false;
-    store.saveCache(data);
+    const firstData = !state.data || state.data.userId !== data.userId;
+    state.data = { ...data, owner: auth.who.email || '' }; state.signIn = false;
+    if (firstData) { state.settings = store.settings(person()); state.date = null; }
+    store.saveCache(state.data);
     compute();
     if (firstData) state.date = state.ctx.days[state.ctx.days.length - 1].date;
     show('dash');
     renderAll({ animate: true });
-    announce(state.game, 'google');
+    announce(state.game, `google:${person()}`);
   } catch (e) {
     if (e.signIn || e.status === 401) state.signIn = true; else state.error = e.message || 'Sync failed';
     if (!state.data) { show('welcome'); welcomeError(e.signIn ? '' : state.error); }
@@ -220,7 +224,11 @@ function enter() {
 function startGoogle() {
   state.source = 'google'; store.demo = false;
   const cache = store.cache();
-  state.data = cache && !cache.demo ? cache : null;
+  // On a shared device, never show one person's cached days to another.
+  const mine = cache && !cache.demo && (!auth.who.email || !cache.owner || cache.owner === auth.who.email);
+  if (cache && !mine) store.clearCache();
+  state.data = mine ? cache : null;
+  state.settings = store.settings(person());
   if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); }
   sync();
 }
@@ -237,6 +245,7 @@ function welcomeError(msg) { const el = $('#welcome-error'); el.textContent = ms
 
 async function connect(btn) {
   welcomeError('');
+  if (auth.unconfigured) { $('#owner-setup').hidden = false; $('#owner-setup').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); return; }
   if (auth.needsSetup) { $('#setup').hidden = false; $('#client-id').focus(); return; }
   if (btn) btn.disabled = true;
   try { await auth.connect(); startGoogle(); }
@@ -245,8 +254,9 @@ async function connect(btn) {
 }
 
 async function disconnect() {
+  store.forget(person());
   await auth.disconnect();
-  store.clearCache(); store.demo = false;
+  store.demo = false; state.settings = store.settings();
   state.source = null; state.data = null; state.ctx = null; state.date = null; state.signIn = false; state.error = null;
   closePanel(); showWelcome();
 }
@@ -255,6 +265,7 @@ let welcomeDial;
 function showWelcome() {
   show('welcome');
   $('#setup-origin').textContent = location.origin;
+  $('#owner-redirect').textContent = `${location.origin}/api/auth/callback`;
   if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'));
   welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 500 });
   roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 1300, delay: 500 });
@@ -274,11 +285,14 @@ function renderPanel() {
     actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Connect Google account', onclick: (e) => { closePanel(); showWelcome(); connect(e.target); } }),
       h('button', { class: 'btn ghost small', type: 'button', text: 'Leave demo', onclick: () => { store.demo = false; state.source = null; closePanel(); showWelcome(); } }));
   } else {
-    acct.innerHTML = state.signIn ? '<b>Sign-in has lapsed.</b> What you see is the last synced copy. Sign in again to load new data.'
-      : `<b>Connected to Google Health.</b> ${auth.mode === 'broker' ? 'This site keeps you signed in.' : 'Google asks for a fresh sign-in about once an hour, because this site runs without a server.'}`;
+    const w = auth.who;
+    acct.replaceChildren(...(w.name || w.email ? [h('b', { text: `Signed in as ${w.name || w.email}` }), w.name && w.email ? ` (${w.email}). ` : '. '] : []),
+      state.signIn ? h('b', { text: 'Sign-in has lapsed. ' }) : '',
+      state.signIn ? 'What you see is the last synced copy. Sign in again to load new data.'
+        : auth.mode === 'broker' ? 'Connected to Google Health; this site keeps you signed in. Everyone who uses this link signs in with their own account and sees only their own data.' : 'Connected to Google Health. Google asks for a fresh sign-in about once an hour, because this site runs without a server.');
     actions.append(
       state.signIn ? h('button', { class: 'btn primary small', type: 'button', text: 'Sign in again', onclick: (e) => connect(e.target) }) : h('button', { class: 'btn primary small', type: 'button', text: 'Sync now', onclick: () => sync() }),
-      h('button', { class: 'btn ghost small', type: 'button', text: 'Disconnect and erase', onclick: disconnect }));
+      h('button', { class: 'btn ghost small', type: 'button', text: w.name ? `Not ${w.name}? Disconnect` : 'Disconnect and erase', onclick: disconnect }));
   }
   const dev = state.data?.device;
   $('#device-sec').hidden = !dev;
@@ -289,11 +303,12 @@ function renderPanel() {
   $('#hrmax-source').textContent = state.ctx ? `· now ${state.ctx.hrMax.value} bpm, ${state.ctx.hrMax.source}` : '';
   $('#set-curve').value = state.settings.curve;
 
+  renderInstall();
   $('#toggles').replaceChildren(...Object.entries(VITAL_DEFS).map(([k, def]) => {
     const input = h('input', { type: 'checkbox', checked: !state.settings.hidden.includes(k) });
     input.addEventListener('change', () => {
       state.settings.hidden = input.checked ? state.settings.hidden.filter((x) => x !== k) : [...state.settings.hidden, k];
-      store.saveSettings(state.settings);
+      saveSettings();
       renderVitals(current(), state.ctx, state.settings.hidden, state.data.issues || []);
     });
     return h('label', { class: 'toggle' }, def.name, input, h('span', { class: 'sw' }));
@@ -343,11 +358,11 @@ $('#status').addEventListener('click', (e) => {
 $('#set-hrmax').addEventListener('change', (e) => {
   const v = Number(e.target.value);
   state.settings.hrMax = v >= 120 && v <= 230 ? v : null;
-  store.saveSettings(state.settings); compute(); renderAll({ animate: true });
+  saveSettings(); compute(); renderAll({ animate: true });
 });
-$('#set-curve').addEventListener('change', (e) => { state.settings.curve = e.target.value; store.saveSettings(state.settings); compute(); renderAll({ animate: true }); });
+$('#set-curve').addEventListener('change', (e) => { state.settings.curve = e.target.value; saveSettings(); compute(); renderAll({ animate: true }); });
 $$('.seg button').forEach((b) => b.addEventListener('click', () => {
-  state.settings.range = Number(b.dataset.range); store.saveSettings(state.settings);
+  state.settings.range = Number(b.dataset.range); saveSettings();
   $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   renderTrends(current(), state.ctx, state.settings.range, pick);
 }));
@@ -397,7 +412,25 @@ document.addEventListener('visibilitychange', () => {
   if (Date.now() - (state.data?.syncedAt || 0) > 10 * 60000) sync();
 });
 
+// ───────── install as an app ─────────
+let installPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; renderPanel(); });
+window.addEventListener('appinstalled', () => { installPrompt = null; renderPanel(); });
+function renderInstall() {
+  const sec = $('#install-sec');
+  if (!sec) return;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  sec.hidden = standalone || PREVIEW;
+  const btn = $('#install-btn');
+  btn.hidden = !installPrompt;
+  btn.onclick = async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice.catch(() => null); installPrompt = null; renderPanel(); };
+}
+
 // ───────── boot ─────────
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) {
+  navigator.serviceWorker.register('sw.js').catch(() => { /* works without it, just not offline */ });
+}
+
 (async function boot() {
   $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
   if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }

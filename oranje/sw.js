@@ -1,0 +1,41 @@
+// Lets Oranje open like an app, and open at all without a connection.
+// Network first for everything, so a new version is never hidden behind an
+// old copy; the cache is only the fallback. Sign-in and Google are never cached.
+
+const CACHE = 'oranje-shell-v1';
+const SHELL = [
+  './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css',
+  'js/boot.js', 'js/main.js',
+  'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
+  'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
+  'js/ui/charts.js', 'js/ui/dial.js', 'js/ui/game.js', 'js/ui/motion.js', 'js/ui/river.js', 'js/ui/sections.js',
+  'fonts/Archivo-100-900.woff2', 'fonts/IBMPlexMono-400.woff2', 'fonts/IBMPlexMono-500.woff2',
+  'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
+];
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+});
+
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+  e.respondWith((async () => {
+    try {
+      const res = await fetch(req);
+      if (res.ok && res.type === 'basic') {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req.mode === 'navigate' ? 'index.html' : req, copy));
+      }
+      return res;
+    } catch {
+      const hit = await caches.match(req.mode === 'navigate' ? 'index.html' : req, { ignoreSearch: true });
+      return hit || Response.error();
+    }
+  })());
+});

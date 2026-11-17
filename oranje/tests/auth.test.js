@@ -28,8 +28,10 @@ test('sign-in round trip: consent URL, state check, sealed cookie, token refresh
   assert.equal(to.origin + to.pathname, 'https://accounts.google.com/o/oauth2/v2/auth');
   assert.equal(to.searchParams.get('redirect_uri'), `https://${HOST}/api/auth/callback`);
   assert.equal(to.searchParams.get('access_type'), 'offline');
-  assert.equal(to.searchParams.get('scope').split(' ').length, 5);
-  assert.ok(to.searchParams.get('scope').split(' ').every((s) => s.endsWith('.readonly')), 'read-only scopes only');
+  const scopes = to.searchParams.get('scope').split(' ');
+  assert.deepEqual(scopes.slice(0, 3), ['openid', 'email', 'profile']);
+  assert.equal(scopes.length, 8);
+  assert.ok(scopes.slice(3).every((s) => s.includes('googlehealth.') && s.endsWith('.readonly')), 'health scopes are read-only');
   const state = to.searchParams.get('state'), stateCookie = cookieOf(start, 'oranje_state');
   assert.match(start.headers['set-cookie'], /HttpOnly; Secure; SameSite=Lax/);
 
@@ -47,7 +49,7 @@ test('sign-in round trip: consent URL, state check, sealed cookie, token refresh
   assert.ok(rt && !rt.includes('rt-secret'), 'refresh token is stored encrypted');
   assert.ok(done.headers['set-cookie'].some((c) => /oranje_rt=.*HttpOnly; Secure; SameSite=Strict/.test(c)));
 
-  assert.deepEqual(JSON.parse((await call(session, { headers: { cookie: rt } })).body), { broker: true, configured: true, connected: true });
+  assert.deepEqual(JSON.parse((await call(session, { headers: { cookie: rt } })).body), { broker: true, configured: true, connected: true, name: '', email: '' });
 
   calls = google({ status: 200, json: { access_token: 'fresh', expires_in: 3599 } });
   const ok = await call(token, { method: 'POST', headers: { cookie: rt, origin: `https://${HOST}` } });
@@ -71,6 +73,31 @@ test('token endpoint refuses other sites, GET, tampered cookies and expired gran
   google({ status: 400, json: { error: 'invalid_grant' } });
   const gone = await call(token, { method: 'POST', headers: { cookie: rt, origin: `https://${HOST}` } });
   assert.equal(gone.statusCode, 401);
-  assert.match(gone.headers['set-cookie'], /oranje_rt=; .*Max-Age=0/);
+  assert.ok(gone.headers['set-cookie'].some((c) => /^oranje_rt=; .*Max-Age=0/.test(c)));
   assert.equal((await call(logout, { method: 'POST', headers: { origin: 'https://evil.example' } })).statusCode, 403);
+});
+
+test('two variables are enough, and the ID token gives each person a name', async () => {
+  const saved = process.env.ORANJE_SECRET;
+  delete process.env.ORANJE_SECRET;
+  try {
+    const { configured, seal, open, whoFrom } = await import('../api/auth/_lib.js');
+    assert.equal(configured(), true);
+    assert.equal(open(seal('hello')), 'hello', 'cookie key derived from the client secret');
+    const part = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+    const idt = (o) => `${part({ alg: 'RS256' })}.${part(o)}.sig`;
+    assert.deepEqual(whoFrom(idt({ aud: process.env.GOOGLE_CLIENT_ID, given_name: 'Anna', email: 'anna@example.com' })), { name: 'Anna', email: 'anna@example.com' });
+    assert.equal(whoFrom(idt({ aud: 'someone-else', given_name: 'Mallory' })), null, 'a token for another app is ignored');
+    assert.equal(whoFrom('garbage'), null);
+
+    const state = new URL((await call(login)).headers.location).searchParams.get('state');
+    google({ status: 200, json: { refresh_token: 'rt3', id_token: idt({ aud: process.env.GOOGLE_CLIENT_ID, given_name: 'Anna', email: 'anna@example.com' }) } });
+    const done = await call(callback, { url: `/api/auth/callback?code=c&state=${state}`, headers: { cookie: `oranje_state=${state}` } });
+    const jar = ['oranje_rt', 'oranje_who'].map((n) => cookieOf(done, n)).join('; ');
+    const s = JSON.parse((await call(session, { headers: { cookie: jar } })).body);
+    assert.deepEqual(s, { broker: true, configured: true, connected: true, name: 'Anna', email: 'anna@example.com' });
+    assert.ok(!jar.includes('anna@example.com'), 'the name and email are sealed too');
+    const out = await call(logout, { method: 'POST', headers: { cookie: jar, origin: `https://${HOST}` } });
+    assert.ok(out.headers['set-cookie'].some((c) => /^oranje_who=;/.test(c)));
+  } finally { if (saved) process.env.ORANJE_SECRET = saved; }
 });

@@ -9,6 +9,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; connect-src 'self' https://health.googleapis.com https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com; img-src 'self' data: https://*.googleusercontent.com; font-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#04102B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Oranje">
 <meta name="color-scheme" content="dark">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -85,6 +89,17 @@
           </div>
           <p class="hint">A client ID is not a secret. It is kept in this browser only.</p>
         </form>
+      </div>
+
+      <div class="setup" id="owner-setup" hidden>
+        <h2>Not connected to Google yet</h2>
+        <p>This copy of Oranje still needs its Google credentials. If someone sent you this link, ask them to finish the setup. If it is yours:</p>
+        <ol>
+          <li>In <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud Console</a>, create a project, enable the <a href="https://console.developers.google.com/apis/library/health.googleapis.com" target="_blank" rel="noopener">Google Health API</a> and set up the consent screen as <b>External</b>.</li>
+          <li>Create an <b>OAuth client ID</b> of type <b>Web application</b> with this authorised redirect URI: <code id="owner-redirect"></code></li>
+          <li>In Vercel, add <b>GOOGLE_CLIENT_ID</b> and <b>GOOGLE_CLIENT_SECRET</b> as environment variables, then redeploy.</li>
+        </ol>
+        <p>The README has every step.</p>
       </div>
 
       <ul class="welcome-facts">
@@ -301,6 +316,11 @@
     <section id="device-sec" hidden>
       <h3>Band</h3>
       <p id="device-line"></p>
+    </section>
+    <section id="install-sec">
+      <h3>On your phone</h3>
+      <p>Put Oranje on your home screen and it opens like an app. In Safari: <b>Share</b>, then <b>Add to Home Screen</b>. In Chrome: the <b>⋮</b> menu, then <b>Install app</b>.</p>
+      <div class="panel-actions"><button class="btn primary small" id="install-btn" type="button" hidden>Install Oranje</button></div>
     </section>
     <section>
       <h3>Your numbers</h3>
