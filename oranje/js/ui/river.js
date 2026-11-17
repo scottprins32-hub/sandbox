@@ -8,7 +8,7 @@ import { ease, h, reduced, tween } from './motion.js';
 
 const STAGE_LABEL = { deep: 'Deep', light: 'Light', rem: 'REM', wake: 'Awake' };
 // rest → max, cool to hot
-const ZONE_COLOR = ['#3E6BD6', '#8FB4FF', '#F4E3CF', '#FFB066', '#FF6A00', '#F0321E'];
+const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);   // theme tokens, rest → max
 let uid = 0;
 
 export function createRiver(root) {
@@ -83,8 +83,8 @@ export function createRiver(root) {
       stops.push([clamp((s.hi - centre) / (s.hi - s.lo), 0, 1), ZONE_COLOR[z]]);
     }
     for (const [o, c] of stops) {
-      grad.append(h('stop', { offset: o.toFixed(3), 'stop-color': c }));
-      fill.append(h('stop', { offset: o.toFixed(3), 'stop-color': c, 'stop-opacity': (0.34 - o * 0.3).toFixed(3) }));
+      grad.append(h('stop', { offset: o.toFixed(3), style: { stopColor: c } }));
+      fill.append(h('stop', { offset: o.toFixed(3), style: { stopColor: c }, 'stop-opacity': (0.34 - o * 0.3).toFixed(3) }));
     }
   }
 

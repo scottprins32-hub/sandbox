@@ -44,7 +44,7 @@ export function sparkline(el, values, { baseline = null, labels = [], onRead } =
   el.onpointermove = read; el.onpointerdown = read; el.onpointerleave = reset; el.onpointercancel = reset;
 }
 
-const STAGE_ROWS = [['wake', 'Awake', 'rgba(246,243,236,.75)'], ['rem', 'REM', '#c3d8ff'], ['light', 'Light', '#5b8def'], ['deep', 'Deep', '#2a56b5']];
+const STAGE_ROWS = [['wake', 'Awake', 'var(--stage-wake)'], ['rem', 'REM', 'var(--stage-rem)'], ['light', 'Light', 'var(--stage-light)'], ['deep', 'Deep', 'var(--stage-deep)']];
 export const STAGE_COLORS = Object.fromEntries(STAGE_ROWS.map(([k, , c]) => [k, c]));
 
 export function hypnogram(el, sleep) {
@@ -63,7 +63,7 @@ export function hypnogram(el, sleep) {
     if (r < 0) continue;
     const x = X(st.t0), w = Math.max(1, X(st.t1) - x), y = PT + r * rowH + 5;
     if (prev) svg.append(h('line', { x1: x, x2: x, y1: Math.min(prev.y, y) + (rowH - 10) / 2, y2: Math.max(prev.y, y) + (rowH - 10) / 2, class: 'h-link' }));
-    svg.append(h('rect', { x, y, width: w, height: rowH - 10, fill: STAGE_ROWS[r][2], class: 'h-seg' }, h('title', { text: `${STAGE_ROWS[r][1]} ${fmtClock(st.t0)}–${fmtClock(st.t1)} (${fmtDur((st.t1 - st.t0) / 60000)})` })));
+    svg.append(h('rect', { x, y, width: w, height: rowH - 10, style: { fill: STAGE_ROWS[r][2] }, class: 'h-seg' }, h('title', { text: `${STAGE_ROWS[r][1]} ${fmtClock(st.t0)}–${fmtClock(st.t1)} (${fmtDur((st.t1 - st.t0) / 60000)})` })));
     prev = { y };
   }
   const first = new Date(sleep.start); first.setMinutes(0, 0, 0); first.setHours(first.getHours() + 1);
@@ -82,7 +82,7 @@ export function strainCurve(el, load, strain) {
   const X = (l) => PL + (Math.min(l, maxL) / maxL) * (W - PL - PR);
   const Y = (s) => PT + (1 - s / STRAIN_MAX) * (H - PT - PB);
   svg.setAttribute('aria-label', `Strain rises quickly at first and flattens. Today's load of ${Math.round(load)} gives strain ${strain.toFixed(1)}.`);
-  svg.append(h('defs', {}, h('linearGradient', { id: 'curve-fill', x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, 'stop-color': '#ff6a00', 'stop-opacity': 0.3 }), h('stop', { offset: 1, 'stop-color': '#ff6a00', 'stop-opacity': 0 }))));
+  svg.append(h('defs', {}, h('linearGradient', { id: 'curve-fill', x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, style: { stopColor: 'var(--oranje)' }, 'stop-opacity': 0.3 }), h('stop', { offset: 1, style: { stopColor: 'var(--oranje)' }, 'stop-opacity': 0 }))));
   for (const s of [10, 14, 18, 21]) {
     svg.append(h('line', { x1: PL, x2: W - PR, y1: Y(s), y2: Y(s), class: 'c-band' }));
     svg.append(h('text', { x: PL - 6, y: Y(s) + 4, 'text-anchor': 'end', class: 'axis', text: s }));
@@ -110,7 +110,7 @@ export function consistency(el, nights) {
   const Y = (m) => PT + ((m - lo) / (hi - lo)) * (H - PT - PB);
   svg.setAttribute('aria-label', 'Bed and wake times for the last seven nights');
   for (let m = Math.ceil(lo / 120) * 120; m <= hi; m += 120) {
-    svg.append(h('line', { x1: PL, x2: W, y1: Y(m), y2: Y(m), class: 't-grid', stroke: 'rgba(246,243,236,.07)' }));
+    svg.append(h('line', { x1: PL, x2: W, y1: Y(m), y2: Y(m), class: 'k-grid' }));
     svg.append(h('text', { x: 0, y: Y(m) + 4, class: 'axis', text: `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:00` }));
   }
   const slot = (W - PL) / nights.length, bw = Math.min(22, slot * 0.46);
@@ -119,7 +119,7 @@ export function consistency(el, nights) {
     svg.append(h('text', { x: cx, y: H - 5, 'text-anchor': 'middle', class: 'axis', text: WD[fromKey(n.date).getDay()] }));
     if (!n.sleep) return;
     const y0 = Y(rel(n.sleep.start)), y1 = Y(rel(n.sleep.end));
-    svg.append(h('rect', { x: cx - bw / 2, y: y0, width: bw, height: Math.max(2, y1 - y0), rx: 3, fill: n.selected ? '#a9c8ff' : '#2a56b5' }, h('title', { text: `${fmtClock(n.sleep.start)} to ${fmtClock(n.sleep.end)}` })));
+    svg.append(h('rect', { x: cx - bw / 2, y: y0, width: bw, height: Math.max(2, y1 - y0), rx: 3, class: n.selected ? 'k-bar sel' : 'k-bar' }, h('title', { text: `${fmtClock(n.sleep.start)} to ${fmtClock(n.sleep.end)}` })));
   });
 }
 

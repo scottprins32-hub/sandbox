@@ -7,7 +7,7 @@ import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/
 import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js';
 import { $, h, roll } from './motion.js';
 
-const ZONE_COLOR = ['#3E6BD6', '#8FB4FF', '#F4E3CF', '#FFB066', '#FF6A00', '#F0321E'];
+const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
 const signed = (v, digits = 0) => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(digits)}`;
 const dayName = (key) => fromKey(key).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });

@@ -23,7 +23,8 @@ const PREVIEW = !!window.ORANJE_CONFIG?.preview;
 
 // ───────── views ─────────
 function show(view) {
-  $('#welcome').hidden = view !== 'welcome';
+  const welcome = $('#welcome');
+  if (welcome) welcome.hidden = view !== 'welcome';
   $('#dash').hidden = view !== 'dash';
   $('#status').hidden = $('#open-panel').hidden = view !== 'dash';
   document.body.classList.toggle('welcoming', view === 'welcome');
@@ -83,13 +84,15 @@ function trend(v, base, goodUp, unit) {
 }
 
 let ribbonKey = '';
+const narrow = window.matchMedia('(max-width: 860px)');
 function renderRibbon() {
   const days = state.ctx.days;
   let end = days.length - 1;
   const sel = days.findIndex((d) => d.date === state.date);
-  if (sel < end - 13) end = Math.min(days.length - 1, sel + 6);
-  const win = days.slice(Math.max(0, end - 13), end + 1);
-  const el = $('#ribbon'), key = win.map((d) => d.date).join();
+  const span = narrow.matches ? 7 : 14;
+  if (sel < end - (span - 1)) end = Math.min(days.length - 1, sel + Math.floor(span / 2));
+  const win = days.slice(Math.max(0, end - (span - 1)), end + 1);
+  const el = $('#ribbon'), key = span + win.map((d) => d.date).join();
   if (key !== ribbonKey) {
     ribbonKey = key;
     el.replaceChildren(...win.map((d) => {
@@ -98,7 +101,7 @@ function renderRibbon() {
         h('span', { class: 'col' }, h('i')), h('span', { class: 'dot' }), h('span', { class: 'wd', text: WD[date.getDay()] }));
       return btn;
     }));
-    for (let i = win.length; i < 14; i++) el.prepend(h('span'));   // a short history sits at the right
+    for (let i = win.length; i < span; i++) el.prepend(h('span'));   // a short history sits at the right
   }
   for (const d of win) {
     const btn = $(`[data-date="${d.date}"]`, el), date = fromKey(d.date);
@@ -178,6 +181,7 @@ function renderStatus() {
   const src = $('#foot-source'), dev = state.data?.device;
   src.textContent = state.source === 'demo' ? 'Showing demo data, generated in this browser. None of it is real.'
     : `Read from Google Health${state.data?.syncedAt ? `, last synced ${new Date(state.data.syncedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}${dev?.name ? `. ${dev.name}${isNum(dev.battery) ? `, battery ${dev.battery}%` : ''}` : ''}.`;
+  $('#foot-privacy').textContent = state.source === 'demo' ? 'Nothing is read from Google or sent anywhere on this page.' : 'Health data is read from Google Health and kept in this browser only.';
   renderPanel();
 }
 
@@ -215,9 +219,9 @@ function startGoogle() {
   sync();
 }
 
-function startDemo() {
+function startDemo(seed) {
   state.source = 'demo'; store.demo = true;
-  state.data = makeDemo(); state.date = null; state.signIn = false; state.error = null;
+  state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
   compute(); show('dash'); enter(); renderAll({ delay: 350 });
   window.scrollTo(0, 0);
 }
@@ -256,7 +260,8 @@ function renderPanel() {
   const acct = $('#acct-line'), actions = $('#acct-actions');
   actions.replaceChildren();
   if (state.source === 'demo' && PREVIEW) {
-    acct.innerHTML = 'This is a <b>preview on demo data</b>. To see your own Fitbit Air, host Oranje and connect your Google account. The README has the steps.';
+    acct.innerHTML = 'Everything here is <b>generated data</b>: a made-up month for one made-up wearer. None of it is yours or anyone\'s.';
+    actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Generate a different month', onclick: () => { closePanel(); startDemo(1 + Math.floor(Math.random() * 1e6)); } }));
   } else if (state.source === 'demo') {
     acct.innerHTML = 'You are looking at <b>demo data</b>. Nothing is being read from Google.';
     actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Connect Google account', onclick: (e) => { closePanel(); showWelcome(); connect(e.target); } }),
@@ -309,9 +314,9 @@ function closePanel() {
 }
 
 // ───────── wiring ─────────
-$('#btn-connect').addEventListener('click', (e) => connect(e.currentTarget));
-$('#btn-demo').addEventListener('click', startDemo);
-$('#setup-form').addEventListener('submit', (e) => {
+$('#btn-connect')?.addEventListener('click', (e) => connect(e.currentTarget));
+$('#btn-demo')?.addEventListener('click', () => startDemo());
+$('#setup-form')?.addEventListener('submit', (e) => {
   e.preventDefault();
   const id = $('#client-id').value.trim();
   if (!/\.apps\.googleusercontent\.com$/.test(id)) { welcomeError('That does not look like an OAuth client ID. It ends in .apps.googleusercontent.com'); return; }
@@ -354,6 +359,20 @@ $('#panel').addEventListener('keydown', (e) => {
   else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
 });
 
+// swipe the opening panel sideways to move a day (touch only)
+{
+  const pane = $('.today-grid');
+  let x0 = 0, y0 = 0, tracking = false;
+  pane.addEventListener('touchstart', (e) => { if (e.touches.length !== 1) return; tracking = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  pane.addEventListener('touchend', (e) => {
+    if (!tracking) return; tracking = false;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.8) step(dx > 0 ? -1 : 1);
+  }, { passive: true });
+  pane.addEventListener('touchcancel', () => { tracking = false; }, { passive: true });
+}
+narrow.addEventListener('change', () => { if (state.ctx && !$('#dash').hidden) renderAll({ animate: false }); });
+
 // section in view → nav highlight
 const links = Object.fromEntries($$('.nav a').map((a) => [a.getAttribute('href').slice(1), a]));
 const spy = new IntersectionObserver((entries) => {
@@ -374,7 +393,7 @@ document.addEventListener('visibilitychange', () => {
 // ───────── boot ─────────
 (async function boot() {
   $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
-  if (PREVIEW) { startDemo(); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
+  if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
   await auth.init();
   const q = new URLSearchParams(location.search);
   const authError = q.get('auth_error');

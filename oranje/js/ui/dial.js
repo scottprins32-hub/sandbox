@@ -5,18 +5,7 @@ import { STRAIN_MAX } from '../core/strain.js';
 import { arcPath, ease, h, polar, tween } from './motion.js';
 
 const C = 300, A0 = -135, SWEEP = 270, N = 210;
-const HEAT = [[0, [255, 205, 150]], [9, [255, 150, 50]], [15, [255, 106, 0]], [21, [240, 50, 30]]];
-
-function heat(v) {
-  for (let i = 1; i < HEAT.length; i++) {
-    if (v <= HEAT[i][0]) {
-      const [a, ca] = HEAT[i - 1], [b, cb] = HEAT[i];
-      const t = (v - a) / (b - a);
-      return `rgb(${ca.map((c, k) => Math.round(c + (cb[k] - c) * t)).join(',')})`;
-    }
-  }
-  return 'rgb(240,50,30)';
-}
+const MID = 12;   // where the colour ramp turns from its first leg to its second
 const angleOf = (v) => A0 + (v / STRAIN_MAX) * SWEEP;
 
 export function createDial(root) {
@@ -28,15 +17,15 @@ export function createDial(root) {
     const major = i % 10 === 0;
     const [x1, y1] = polar(C, C, major ? 222 : 236, angleOf(v));
     const [x2, y2] = polar(C, C, 262, angleOf(v));
-    const line = h('line', { x1: x1.toFixed(2), y1: y1.toFixed(2), x2: x2.toFixed(2), y2: y2.toFixed(2), class: major ? 'tick major' : 'tick' });
-    line._c = heat(v);
+    const line = h('line', { x1: x1.toFixed(2), y1: y1.toFixed(2), x2: x2.toFixed(2), y2: y2.toFixed(2), class: `tick${major ? ' major' : ''} ${v <= MID ? 's1' : 's2'}` });
+    line.style.setProperty('--m', `${Math.round((v <= MID ? v / MID : (v - MID) / (STRAIN_MAX - MID)) * 100)}%`);
     ticks.push(line);
     gTicks.append(line);
   }
   const gScale = h('g', { class: 'dial-scale' });
   for (const v of [0, 10, 14, 18, 21]) {
     const [x, y] = polar(C, C, 198, angleOf(v));
-    gScale.append(h('text', { x: x.toFixed(1), y: (y + 4).toFixed(1), 'text-anchor': 'middle', text: v }));
+    gScale.append(h('text', { x: x.toFixed(1), y: (y + 4).toFixed(1), 'text-anchor': 'middle', class: v === 0 || v === STRAIN_MAX ? 'end' : null, text: v }));
   }
   const target = h('path', { class: 'dial-aim', d: '' });
   const targetCaps = h('path', { class: 'dial-aim-caps', d: '' });
@@ -51,7 +40,7 @@ export function createDial(root) {
     const upto = Math.round(v * 10);
     if (upto !== lit) {
       const [a, b] = upto > lit ? [lit + 1, upto] : [upto + 1, lit];
-      for (let i = Math.max(0, a); i <= Math.min(N, b); i++) ticks[i].style.stroke = i <= upto && v > 0 ? ticks[i]._c : '';
+      for (let i = Math.max(0, a); i <= Math.min(N, b); i++) ticks[i].classList.toggle('on', i <= upto && v > 0);
       lit = upto;
     }
     const ang = angleOf(v);
