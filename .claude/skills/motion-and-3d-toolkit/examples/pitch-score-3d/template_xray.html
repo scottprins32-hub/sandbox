@@ -93,7 +93,7 @@ var limbs=[new Limb('RHip','RKnee',.082,.058,SKIN),new Limb('RKnee','RAnkle',.05
  new Limb('RAnkle','RBigToe',.042,.03,SKIN),new Limb('LAnkle','LBigToe',.042,.03,SKIN),new Limb('RHeel','RAnkle',.035,.042,SKIN),new Limb('LHeel','LAnkle',.035,.042,SKIN),
  new Limb(TA+'Shoulder',TA+'Elbow',.052,.042,ARM),new Limb(TA+'Elbow',TA+'Wrist',.042,.032,ARM),new Limb(GA+'Shoulder',GA+'Elbow',.052,.042,SKIN),new Limb(GA+'Elbow',GA+'Wrist',.042,.032,SKIN),
  new Limb('Neck',MO.head,.045,.05,SKIN)];
-var pelvis=new Blob(SKIN,.165,.11,.11),chest=new Blob(SKIN,.19,.2,.12),belly=new Blob(SKIN,.15,.17,.105),head=new Blob(SKIN,.095,.115,.1),handT=new Blob(ARM,.045,.06,.03),handG=new Blob(SKIN,.05,.065,.035);
+var pelvis=new Blob(SKIN,.165,.11,.11),chest=new Blob(SKIN,.19,.2,.12),belly=new Blob(SKIN,.15,.17,.105),head=window.BONES?new Blob(SKIN,.082,.1,.088):new Blob(SKIN,.095,.115,.1),handT=new Blob(ARM,.045,.06,.03),handG=new Blob(SKIN,.05,.065,.035);
 // ---------- anatomical bone layer (BodyParts3D, CC BY 4.0) ----------
 var BN=window.BONES,boneSegs=[];
 function b64(s,T){var bin=atob(s),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer);}
@@ -102,19 +102,23 @@ if(BN){Object.keys(BN.segments).forEach(function(name){var d=BN.segments[name],g
  var m=new THREE.Mesh(g,xmat(LB.boneColor||0xf2fbff,1,.34));m.matrixAutoUpdate=false;m.frustumCulled=false;root.add(m);boneSegs.push({name:name,base:d.base,mesh:m,solid:m.material,amber:xmat(UNSEEN,.9,.3)});});}
 var RESTM={};if(BN)Object.keys(BN.rest).forEach(function(k){RESTM[k]=restM(BN.rest[k]);});
 function segFrame(O,A,r){var y=A.clone().sub(O),len=y.length();y.normalize();var x=r.clone().addScaledVector(y,-r.dot(y));if(x.lengthSq()<1e-10)x=new THREE.Vector3(1,0,0).addScaledVector(y,-y.x);x.normalize();var z=new THREE.Vector3().crossVectors(x,y);return {O:O,X:x,Y:y,Z:z,len:len};}
-var GSCALE=1;
+var GSCALE=1,HSCALE=1;
 function animFrames(fi){var g=function(n){return P(n,fi);},F={},hR=g('RHip'),hL=g('LHip'),mid=hR.clone().add(hL).multiplyScalar(.5),nk=g('Neck'),sR=g('RShoulder'),sL=g('LShoulder'),lat=sL.clone().sub(sR);
  ['R','L'].forEach(function(s){var hip=g(s+'Hip'),kn=g(s+'Knee'),an=g(s+'Ankle'),toe=g(s+'BigToe'),sh=g(s+'Shoulder'),el=g(s+'Elbow'),wr=g(s+'Wrist');
   F['thigh'+s]=segFrame(hip,kn,s==='L'?hL.clone().sub(hR):hR.clone().sub(hL));F['shank'+s]=segFrame(kn,an,toe.clone().sub(an));F['foot'+s]=segFrame(an,toe,kn.clone().sub(an));
   var n=sh.clone().sub(el).cross(wr.clone().sub(el));if(n.length()<.15*sh.distanceTo(el)*wr.distanceTo(el))n=lat.clone();F['uarm'+s]=segFrame(sh,el,n);F['farm'+s]=segFrame(el,wr,n);
   F['girdle'+s]=segFrame(nk,sh,nk.clone().sub(mid));});
  F.pelvis=segFrame(mid,nk,hL.clone().sub(hR));F.thorax=segFrame(nk,mid,lat);F.head=segFrame(nk,P(MO.head,fi),lat);return F;}
-function segMatrix(F,key,uniformY){var f=F[key],rest=BN.rest[key],ry=uniformY?GSCALE:f.len/rest.len;var m=new THREE.Matrix4().makeBasis(f.X,f.Y,f.Z);m.multiply(new THREE.Matrix4().makeScale(GSCALE,ry,GSCALE));m.setPosition(f.O);return m;}
+function segMatrix(F,key,uniformY){var f=F[key],rest=BN.rest[key],ry=uniformY?GSCALE:f.len/rest.len,sx=GSCALE;if(key==='head'){sx=HSCALE;ry=HSCALE;}var m=new THREE.Matrix4().makeBasis(f.X,f.Y,f.Z);m.multiply(new THREE.Matrix4().makeScale(sx,ry,sx));m.setPosition(f.O);return m;}
 function onBase(M,key,base){return M.clone().multiply(RESTM[key].clone().invert()).multiply(RESTM[base]);}
 function blend(A,B,t){var pa=new THREE.Vector3(),qa=new THREE.Quaternion(),sa=new THREE.Vector3(),pb=new THREE.Vector3(),qb=new THREE.Quaternion(),sb=new THREE.Vector3();A.decompose(pa,qa,sa);B.decompose(pb,qb,sb);
  return new THREE.Matrix4().compose(pa.lerp(pb,t),qa.slerp(qb,t),sa.lerp(sb,t));}
 if(BN){(function(){var r=[],lens={thighR:['RHip','RKnee'],shankR:['RKnee','RAnkle'],uarmR:['RShoulder','RElbow'],farmR:['RElbow','RWrist'],thighL:['LHip','LKnee'],shankL:['LKnee','LAnkle'],uarmL:['LShoulder','LElbow'],farmL:['LElbow','LWrist']};
- Object.keys(lens).forEach(function(k){var v=[];for(var f=0;f<NF;f+=3)v.push(P(lens[k][0],f).distanceTo(P(lens[k][1],f))/BN.rest[k].len);v.sort(function(a,b){return a-b;});r.push(v[v.length>>1]);});r.sort(function(a,b){return a-b;});GSCALE=r[r.length>>1];})();}
+ Object.keys(lens).forEach(function(k){var v=[];for(var f=0;f<NF;f+=3)v.push(P(lens[k][0],f).distanceTo(P(lens[k][1],f))/BN.rest[k].len);v.sort(function(a,b){return a-b;});r.push(v[v.length>>1]);});r.sort(function(a,b){return a-b;});GSCALE=r[r.length>>1];
+ // The skull is sized by this athlete's own neck-to-head distance (session median), never larger than the body scale,
+ // so it neither inflates with long limbs nor pulses frame to frame.
+ var h=[];for(var f=0;f<NF;f+=3){if(seen(MO.head,f))h.push(P('Neck',f).distanceTo(P(MO.head,f))/BN.rest.head.len);}h.sort(function(a,b){return a-b;});
+ HSCALE=h.length?Math.max(.75*GSCALE,Math.min(GSCALE,h[h.length>>1])):GSCALE;})();}
 function segSeen(key,fi){var s=key.slice(-1),map={thigh:['Hip','Knee'],shank:['Knee','Ankle'],foot:['Ankle','BigToe'],uarm:['Shoulder','Elbow'],farm:['Elbow','Wrist'],girdle:['Shoulder']};var b=key.slice(0,-1);
  if(map[b])return map[b].every(function(j){return seen(s+j,fi);});if(key==='head'||key==='neckv')return seen(MO.head,fi);return seen('RHip',fi)&&seen('LHip',fi)&&seen('RShoulder',fi)&&seen('LShoulder',fi);}
 function updateBones(fi){if(!BN)return;var F=animFrames(fi),M={};Object.keys(BN.rest).forEach(function(k){M[k]=segMatrix(F,k,/^(pelvis|head|girdle)/.test(k));});
