@@ -88,7 +88,7 @@ strong { font-weight: 700; }
 
 /* ───────── top bar ───────── */
 .bar {
-  position: sticky; top: 0; z-index: 40; height: var(--bar-h);
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; height: var(--bar-h);
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px;
   padding: 0 var(--gut);
   background: linear-gradient(180deg, rgba(3, 11, 32, .92), rgba(3, 11, 32, .72));

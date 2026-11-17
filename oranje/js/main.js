@@ -18,6 +18,8 @@ const recMeter = createMeter($('#recovery-ticks'));
 const sleepMeter = createMeter($('#sleep-ticks'));
 const river = createRiver($('#river'));
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+// Preview builds (config.js: preview: true) run on demo data only and never offer sign-in.
+const PREVIEW = !!window.ORANJE_CONFIG?.preview;
 
 // ───────── views ─────────
 function show(view) {
@@ -253,7 +255,9 @@ function renderPanel() {
   if ($('#panel').hidden) return;
   const acct = $('#acct-line'), actions = $('#acct-actions');
   actions.replaceChildren();
-  if (state.source === 'demo') {
+  if (state.source === 'demo' && PREVIEW) {
+    acct.innerHTML = 'This is a <b>preview on demo data</b>. To see your own Fitbit Air, host Oranje and connect your Google account. The README has the steps.';
+  } else if (state.source === 'demo') {
     acct.innerHTML = 'You are looking at <b>demo data</b>. Nothing is being read from Google.';
     actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Connect Google account', onclick: (e) => { closePanel(); showWelcome(); connect(e.target); } }),
       h('button', { class: 'btn ghost small', type: 'button', text: 'Leave demo', onclick: () => { store.demo = false; state.source = null; closePanel(); showWelcome(); } }));
@@ -370,6 +374,7 @@ document.addEventListener('visibilitychange', () => {
 // ───────── boot ─────────
 (async function boot() {
   $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
+  if (PREVIEW) { startDemo(); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
   await auth.init();
   const q = new URLSearchParams(location.search);
   const authError = q.get('auth_error');
