@@ -1,3 +1,4 @@
 dist/
 node_modules/
 base44/.app.jsonc
+__pycache__/
