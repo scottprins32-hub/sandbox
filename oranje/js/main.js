@@ -362,6 +362,7 @@ function renderPanel() {
       state.signIn ? h('button', { class: 'btn primary small', type: 'button', text: 'Sign in again', onclick: (e) => connect(e.target) }) : h('button', { class: 'btn primary small', type: 'button', text: 'Sync now', onclick: () => sync() }),
       h('button', { class: 'btn ghost small', type: 'button', text: w.name ? `Not ${w.name}? Disconnect` : 'Disconnect and erase', onclick: disconnect }));
   }
+  if (!PREVIEW) actions.append(h('a', { class: 'btn ghost small', href: 'whoop.html', text: 'WHOOP scores', style: { textDecoration: 'none' } }));
   const dev = state.data?.device;
   $('#device-sec').hidden = !dev;
   if (dev) $('#device-line').innerHTML = `<b>${dev.name}</b>${isNum(dev.battery) ? ` · battery ${dev.battery}%` : dev.batteryStatus ? ` · battery ${dev.batteryStatus.toLowerCase()}` : ''}${dev.lastSync ? ` · last synced to your phone ${new Date(dev.lastSync).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}`;

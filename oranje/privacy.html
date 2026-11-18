@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Privacy · Oranje</title>
-<meta name="description" content="Hoe Oranje omgaat met je Fitbit- en Google-gegevens.">
+<meta name="description" content="Hoe Oranje omgaat met je Fitbit-, Google- en WHOOP-gegevens.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0A1324">
@@ -19,17 +19,17 @@
   <h1>Privacy</h1>
   <p class="doc-meta">Bijgewerkt op 18 november 2026</p>
 
-  <p class="doc-lede">Oranje is een persoonlijke app die laat zien hoe je Fitbit Air je dag meet. Hij wordt gemaakt en beheerd door een privépersoon voor een kleine kring mensen. Er zit geen bedrijf achter, er zijn geen advertenties en er wordt niets verkocht.</p>
+  <p class="doc-lede">Oranje is een persoonlijke app voor je Fitbit Air en WHOOP. Hij wordt gemaakt en beheerd door een privépersoon voor een kleine kring mensen. Er zit geen bedrijf achter, er zijn geen advertenties en er wordt niets verkocht.</p>
 
   <h2>Kort gezegd</h2>
   <ul>
-    <li>Je gezondheidsgegevens gaan van Google rechtstreeks naar je eigen browser en blijven daar.</li>
-    <li>Er is geen database. Niemand anders kan je gegevens zien, ook de beheerder niet.</li>
-    <li>Oranje kan alleen lezen. Hij kan niets veranderen in je Google- of Fitbit-account.</li>
+    <li>Fitbit-gegevens gaan rechtstreeks van Google naar je browser. WHOOP-gegevens gaan via de serverfunctie van Oranje naar je browser.</li>
+    <li>Oranje bewaart geen gezondheidsgegevens in een database.</li>
+    <li>Oranje kan alleen lezen. Hij kan niets veranderen aan je metingen bij Google, Fitbit of WHOOP.</li>
     <li>Je kunt de koppeling altijd verbreken en alles wissen.</li>
   </ul>
 
-  <h2>Wat Oranje leest</h2>
+  <h2>Fitbit via Google Health</h2>
   <p>Alleen nadat je bij Google toestemming geeft, en alleen-lezen, via de Google Health API:</p>
   <ul>
     <li><b>Activiteit en fitness:</b> stappen, afstand, calorieën, zone-minuten, trainingen en cardio-fitness.</li>
@@ -39,9 +39,13 @@
     <li><b>Je naam en e-mailadres</b> van je Google-account, alleen om te laten zien wie er is ingelogd.</li>
   </ul>
 
-  <h2>Waar je gegevens blijven</h2>
+  <h2>Waar je Fitbit-gegevens blijven</h2>
   <p>Je browser haalt de gegevens zelf op bij Google en bewaart ze in de opslag van die browser, zodat de app snel opent. Strain, recovery, slaapscore en de klimgame worden in je browser berekend. Er wordt niets naar een server van Oranje gestuurd.</p>
   <p>Om ingelogd te blijven bewaart Oranje de inlogsleutel die Google afgeeft (een zogenaamd refresh token) en je naam en e-mailadres versleuteld (AES-GCM) in een cookie in jouw browser. Scripts op de pagina kunnen die cookie niet lezen (httpOnly). De kleine inlogfuncties van Oranje gebruiken hem alleen om bij Google een toegangscode van een uur op te halen. Ze slaan niets op en zien geen gezondheidsgegevens.</p>
+
+  <h2>WHOOP</h2>
+  <p>Als je WHOOP koppelt, geef je Oranje bij WHOOP toestemming om je dagcycli, recovery, slaap en trainingen te lezen. De serverfunctie op Base44 haalt de laatste 30 dagen op bij WHOOP en stuurt de benodigde scores en metingen door naar jouw browser. Oranje bewaart die gegevens alleen zolang het scherm open is en slaat ze niet op in een database of in browseropslag.</p>
+  <p>Oranje bewaart de WHOOP-toegangssleutels versleuteld in een afzonderlijke httpOnly-cookie. De cookie blijft tot 30 dagen geldig en wordt vernieuwd bij het verversen van de toegangssleutel. Met <b>Disconnect</b> op het WHOOP-scherm verwijder je de sessie en vraagt Oranje WHOOP om de toegang in te trekken. Je kunt de toegang ook intrekken via je gekoppelde apps in WHOOP.</p>
 
   <h2>Hosting</h2>
   <p>De site en de inlogfuncties draaien bij Base44. Zoals elke webserver kan Base44 technische gegevens verwerken, zoals je IP-adres en het tijdstip van een bezoek, volgens <a href="https://base44.com/about-us/legal/privacy-policy" rel="noopener" target="_blank">het privacybeleid van Base44</a>. Base44 voegt eigen scripts toe aan de pagina. Oranje staat het uitvoeren daarvan niet toe en gebruikt geen statistiek- of advertentiediensten.</p>
@@ -57,7 +61,7 @@
   </ul>
 
   <h2>Geen medisch advies</h2>
-  <p>De scores in Oranje zijn eigen schattingen, gebaseerd op gepubliceerd sportonderzoek. Het zijn niet de scores van Fitbit, Google of WHOOP, en ze zijn geen medisch advies.</p>
+  <p>De scores in de Fitbit-weergave zijn schattingen van Oranje. In de WHOOP-weergave staan de scores van WHOOP zelf. De informatie in Oranje is geen medisch advies.</p>
 
   <h2>Vragen</h2>
   <p>Vragen over je gegevens kun je stellen aan de persoon die je de link naar Oranje heeft gestuurd; dat is de beheerder van deze app.</p>

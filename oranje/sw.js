@@ -4,8 +4,8 @@
 
 const CACHE = 'oranje-shell-v6';
 const SHELL = [
-  './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
-  'js/boot.js?v=6', 'js/main.js?v=6',
+  './', 'index.html', 'whoop.html', 'css/whoop.css', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
+  'js/boot.js?v=6', 'js/main.js?v=6', 'js/whoop.js',
   'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
   'js/ui/charts.js?v=6', 'js/ui/dial.js?v=6', 'js/ui/game.js?v=6', 'js/ui/motion.js?v=6', 'js/ui/river.js?v=6', 'js/ui/ring.js?v=6', 'js/ui/sections.js?v=6',
@@ -25,16 +25,17 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/functions/')) return;
+  const key = req.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html') ? 'index.html' : req;
   e.respondWith((async () => {
     try {
       const res = await fetch(req);
       if (res.ok && res.type === 'basic') {
         const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req.mode === 'navigate' ? 'index.html' : req, copy));
+        caches.open(CACHE).then((c) => c.put(key, copy));
       }
       return res;
     } catch {
-      const hit = await caches.match(req.mode === 'navigate' ? 'index.html' : req, { ignoreSearch: true });
+      const hit = await caches.match(key, { ignoreSearch: true });
       return hit || Response.error();
     }
   })());
