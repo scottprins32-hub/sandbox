@@ -69,7 +69,7 @@ function profile(el, game, selected, onPick) {
     else svg.append(h('text', { x: W - PR + 10, y: y + 4, class: `p-lab${got ? ' got' : ''}`, text: label }));
   }
   if (next && !showNext) {
-    svg.append(h('text', { x: narrow ? PL + 4 : W - PR + 10, y: PT - 12, class: 'p-lab next', text: `↑ ${next.name} ${fmtAlt(next.alt)} m, ${Math.ceil(next.alt - top)} m to go` }));
+    svg.append(h('text', { x: PL + 4, y: PT - 12, class: 'p-lab next', text: `↑ ${next.name} ${fmtAlt(next.alt)} m · ${Math.ceil(next.alt - top)} m to go` }));
   }
 
   // the climb itself: one segment per day, shaded by how much it earned

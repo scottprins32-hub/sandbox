@@ -8,8 +8,8 @@
 @font-face { font-family: 'Plex Mono'; src: url(../fonts/IBMPlexMono-500.woff2) format('woff2'); font-weight: 500; font-display: swap; }
 
 /* Layout: one column on a phone, thumb-reach tabs at the bottom, the day's
-   dial as the opening panel. Dark is navy with orange; light turns it inside
-   out: an orange panel, navy ink, cream paper. */
+   dial as the opening panel. Navy with orange is the default look; cream
+   with navy and orange is the alternative. */
 :root {
   /* base colours as channels, so every tint is derived from them */
   --bg-rgb: 3 11 32;
@@ -67,32 +67,24 @@
   --e-io: cubic-bezier(.65, 0, .35, 1);
   color-scheme: dark;
 }
-/* light: orange and navy on cream */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg-rgb: 246 238 222; --bg2-rgb: 252 246 233; --ink-rgb: 11 27 74; --accent-rgb: 240 90 0; --cool-rgb: 20 48 126; --cool1-rgb: 20 48 126; --cool2-rgb: 47 95 208; --scrim-rgb: 11 27 74; --head-glow-rgb: 255 244 214;
-    --oranje: #f05a00; --oranje-2: #c9480a; --on-accent: #ffffff; --cobalt: #14307e; --sky: #2f5fd0; --ice: #14307e; --red: #c81e3a; --red-ink: #a3142c;
-    --surface: #fbf5e7; --surface-2: #fffaf0; --tip-bg: #0b1b4a; --tip-ink: #f6eede; --tip-accent: #ff9a4d; --knob: #ffffff; --grain: .22; --sleep-tint: rgb(47 95 208 / .13);
-    --bloom-a: rgb(240 90 0 / .13); --bloom-b: rgb(20 48 126 / .08);
-    --z0: #1b3a8f; --z1: #4b78e0; --z2: #d9a45c; --z3: #ff8f2e; --z4: #ea5200; --z5: #c2181b;
-    --stage-deep: #14307e; --stage-light: #4b78e0; --stage-rem: #9db9f2; --stage-wake: rgb(11 27 74 / .35);
-    --hero-bg: #ff6a00; --hero-pad: clamp(18px, 3vw, 44px); --hero-ink-rgb: 11 27 74; --hero-accent: #0b1b4a; --hero-accent-2: #0b1b4a; --hero-ice: #0b1b4a; --hero-sky: #0b1b4a; --hero-red: #7a0b1e; --hero-mid: #0b1b4a;
-    --hero-ember-rgb: 255 236 196; --hero-em-bg: #0b1b4a; --hero-em-ink: #fff3d9; --hero-head: #fff7e6;
-    --heat-a: #7d3f1c; --heat-b: #0b1b4a; --heat-c: #0b1b4a;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-    --bg-rgb: 246 238 222; --bg2-rgb: 252 246 233; --ink-rgb: 11 27 74; --accent-rgb: 240 90 0; --cool-rgb: 20 48 126; --cool1-rgb: 20 48 126; --cool2-rgb: 47 95 208; --scrim-rgb: 11 27 74; --head-glow-rgb: 255 244 214;
-    --oranje: #f05a00; --oranje-2: #c9480a; --on-accent: #ffffff; --cobalt: #14307e; --sky: #2f5fd0; --ice: #14307e; --red: #c81e3a; --red-ink: #a3142c;
-    --surface: #fbf5e7; --surface-2: #fffaf0; --tip-bg: #0b1b4a; --tip-ink: #f6eede; --tip-accent: #ff9a4d; --knob: #ffffff; --grain: .22; --sleep-tint: rgb(47 95 208 / .13);
-    --bloom-a: rgb(240 90 0 / .13); --bloom-b: rgb(20 48 126 / .08);
-    --z0: #1b3a8f; --z1: #4b78e0; --z2: #d9a45c; --z3: #ff8f2e; --z4: #ea5200; --z5: #c2181b;
-    --stage-deep: #14307e; --stage-light: #4b78e0; --stage-rem: #9db9f2; --stage-wake: rgb(11 27 74 / .35);
-    --hero-bg: #ff6a00; --hero-pad: clamp(18px, 3vw, 44px); --hero-ink-rgb: 11 27 74; --hero-accent: #0b1b4a; --hero-accent-2: #0b1b4a; --hero-ice: #0b1b4a; --hero-sky: #0b1b4a; --hero-red: #7a0b1e; --hero-mid: #0b1b4a;
-    --hero-ember-rgb: 255 236 196; --hero-em-bg: #0b1b4a; --hero-em-ink: #fff3d9; --hero-head: #fff7e6;
-    --heat-a: #7d3f1c; --heat-b: #0b1b4a; --heat-c: #0b1b4a;
-    color-scheme: light;
+/* Cream: the second look, chosen in the settings. Same layout, navy ink on
+   warm paper, orange kept for effort and actions. Applied only through
+   data-look, so the app stays navy unless the viewer picks cream. */
+:root[data-look="cream"] {
+  --bg-rgb: 245 238 224; --bg2-rgb: 250 245 235; --ink-rgb: 12 28 72; --accent-rgb: 232 88 0;
+  --cool-rgb: 28 58 140; --cool1-rgb: 28 58 140; --cool2-rgb: 56 98 204; --scrim-rgb: 12 28 72; --head-glow-rgb: 232 88 0;
+  --oranje: #e85800; --oranje-2: #b8460a; --on-accent: #ffffff;
+  --cobalt: #1c3a8c; --sky: #3862cc; --ice: #1c3a8c; --red: #c42039; --red-ink: #a3142c;
+  --surface: #fbf7ee; --surface-2: #fffcf5; --tip-bg: #0c1c48; --tip-ink: #f5eee0; --tip-accent: #ff9a4d; --knob: #ffffff; --grain: .18;
+  --sleep-tint: rgb(56 98 204 / .12);
+  --bloom-a: rgb(232 88 0 / .07); --bloom-b: rgb(28 58 140 / .06);
+  --z0: #1c3a8c; --z1: #4f7bdc; --z2: #d29a4e; --z3: #f08a2c; --z4: #e05200; --z5: #b8182c;
+  --stage-deep: #1c3a8c; --stage-light: #4f7bdc; --stage-rem: #9bb6ee; --stage-wake: rgb(12 28 72 / .3);
+  --hero-bg: transparent; --hero-pad: 0px; --hero-ink-rgb: 12 28 72;
+  --hero-accent: #e85800; --hero-accent-2: #b8460a; --hero-ice: #1c3a8c; --hero-sky: #3862cc; --hero-red: #c42039; --hero-mid: #0c1c48;
+  --hero-ember-rgb: 232 88 0; --hero-em-bg: transparent; --hero-em-ink: #c94d06; --hero-head: #0c1c48;
+  --heat-a: #f2b47a; --heat-b: #e86a10; --heat-c: #b8202f;
+  color-scheme: light;
 }
 /* tints derived from the channels; the opening panel re-derives them from its own ink */
 :root, .today-grid {
@@ -204,6 +196,7 @@ body.welcoming .nav { display: none; }
 @keyframes blink { 50% { opacity: .25; } }
 .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); transition: border-color .2s, background .2s; }
 .icon-btn:hover { border-color: var(--faint); background: rgb(var(--ink-rgb) / .06); }
+.icon-btn svg .half { fill: currentColor; stroke: none; }
 .icon-btn svg, .arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ───────── buttons ───────── */

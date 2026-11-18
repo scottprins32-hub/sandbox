@@ -1,1 +1,11 @@
-{ "name": "oranje", "private": true, "type": "module", "scripts": { "test": "node --test tests/*.test.js", "serve": "python3 -m http.server 4173" } }
+{
+  "name": "oranje",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "serve": "python3 -m http.server 4173",
+    "build": "node tools/build-site.mjs",
+    "deploy": "node tools/build-site.mjs && base44 functions deploy && base44 site deploy --yes --no-build"
+  }
+}

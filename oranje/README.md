@@ -34,24 +34,24 @@ Google only releases health data to an app you registered yourself, so there is 
 
 Then pick one way to host it. To share it with other people, use A.
 
-### A. Vercel: sign in once, stay signed in (recommended)
+### A. Base44: sign in once, stay signed in (recommended)
 
-The four small functions in `api/auth/` keep Google's refresh token in an encrypted, httpOnly cookie and hand the page one-hour access tokens. They never touch health data.
+Five small backend functions in `base44/functions/` keep Google's refresh token in an encrypted, httpOnly cookie and hand the page one-hour access tokens. They never touch health data. The site and the functions share one address, `https://<app>.base44.app`.
 
-1. Import this repository in Vercel with **Root Directory** `oranje` and framework preset **Other**.
-2. On the OAuth client add
-   - Authorised JavaScript origin: `https://YOUR-DOMAIN`
-   - Authorised redirect URI: `https://YOUR-DOMAIN/api/auth/callback`
-3. Set two environment variables (Settings → Environment Variables) and redeploy:
+1. Install the CLI and sign in: `npm install -g base44`, then `base44 login` (it shows a code to enter in your browser).
+2. In `oranje/`: `base44 link --create --name oranje`, then `npm run deploy`. That builds `dist/` and deploys the functions and the site, and prints the app URL.
+3. On the OAuth client add
+   - Authorised JavaScript origin: `https://<app>.base44.app`
+   - Authorised redirect URI: `https://<app>.base44.app/functions/authCallback`
+4. Give the functions their settings as Base44 secrets:
 
-   | Name | Value |
-   |---|---|
-   | `GOOGLE_CLIENT_ID` | the client ID |
-   | `GOOGLE_CLIENT_SECRET` | the client secret |
+   ```bash
+   base44 secrets set GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... APP_ORIGIN=https://<app>.base44.app
+   ```
 
-   Optional: `ORANJE_SECRET`, any long random string, to encrypt the sign-in cookie with its own key instead of one derived from the client secret.
+   `APP_ORIGIN` pins the address Google redirects back to. Optional: `ORANJE_SECRET`, any long random string, to encrypt the sign-in cookie with its own key instead of one derived from the client secret.
 
-4. Open the site and press **Connect Google account**.
+5. Open the site and press **Connect Google account**.
 
 ### Sharing it with friends or family
 
@@ -100,7 +100,7 @@ None of this is medical advice.
 cd oranje && npm test
 ```
 
-18 tests, no dependencies: the scoring maths against WHOOP's reference points, the climb's earnings and medals, the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
+22 tests, no dependencies: the scoring maths against WHOOP's reference points, the climb's earnings and medals, the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
 
 **Not yet verified against a live Google account.** The adapter is written from Google's published specification and proven against the mock, but no real Fitbit Air data has passed through it. If a data type misbehaves, the panel's **Data health** list names it and shows Google's error.
 
@@ -111,6 +111,7 @@ index.html, css/style.css      the page
 js/core/                       strain, recovery, sleep (pure functions, run in Node too)
 js/data/                       Google Health adapter, sign-in, demo generator, browser cache
 js/ui/                         dial, day line, charts, sections, motion
-api/auth/                      optional Vercel functions that keep you signed in
+base44/                        Base44 config, the sign-in functions, and their shared broker
+tools/                         site build for Base44, demo-only preview build
 fonts/                         Archivo and IBM Plex Mono (SIL Open Font License)
 ```

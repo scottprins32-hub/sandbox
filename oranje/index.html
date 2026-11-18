@@ -49,6 +49,9 @@
   </nav>
   <div class="bar-end">
     <button class="status" id="status" type="button" hidden><i class="status-dot"></i><span id="status-text"></span></button>
+    <button class="icon-btn" id="look-btn" type="button" aria-label="Switch to the cream look">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><path class="half" d="M12 4.5a7.5 7.5 0 0 1 0 15z"/></svg>
+    </button>
     <button class="icon-btn" id="open-panel" type="button" aria-label="Account and settings" aria-haspopup="dialog" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg>
     </button>
@@ -97,7 +100,7 @@
         <ol>
           <li>In <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud Console</a>, create a project, enable the <a href="https://console.developers.google.com/apis/library/health.googleapis.com" target="_blank" rel="noopener">Google Health API</a> and set up the consent screen as <b>External</b>.</li>
           <li>Create an <b>OAuth client ID</b> of type <b>Web application</b> with this authorised redirect URI: <code id="owner-redirect"></code></li>
-          <li>In Vercel, add <b>GOOGLE_CLIENT_ID</b> and <b>GOOGLE_CLIENT_SECRET</b> as environment variables, then redeploy.</li>
+          <li>Give the app its Google credentials as the Base44 secrets <b>GOOGLE_CLIENT_ID</b> and <b>GOOGLE_CLIENT_SECRET</b>.</li>
         </ol>
         <p>The README has every step.</p>
       </div>
@@ -316,6 +319,13 @@
     <section id="device-sec" hidden>
       <h3>Band</h3>
       <p id="device-line"></p>
+    </section>
+    <section>
+      <h3>Look</h3>
+      <div class="seg" role="group" aria-label="Look">
+        <button type="button" data-look-pick="navy" aria-pressed="true">Navy</button>
+        <button type="button" data-look-pick="cream" aria-pressed="false">Cream</button>
+      </div>
     </section>
     <section id="install-sec">
       <h3>On your phone</h3>

@@ -1,6 +1,6 @@
 // Signing in. Two ways, picked automatically:
 //
-//   broker  The site is deployed with its /api/auth functions (Vercel). Google
+//   broker  The site is deployed with its sign-in functions (Base44). Google
 //           sends a code to the server, which keeps the refresh token in an
 //           encrypted httpOnly cookie and hands the browser short-lived access
 //           tokens. Sign in once; it stays signed in.
@@ -73,7 +73,7 @@ export const auth = {
   // Work out which way of signing in this deployment supports.
   async init() {
     try {
-      const r = await fetch('api/auth/session', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+      const r = await fetch('/functions/authSession', { headers: { Accept: 'application/json' }, cache: 'no-store' });
       const j = r.ok && (r.headers.get('content-type') || '').includes('json') ? await r.json() : null;
       if (j?.broker && j.configured) { mode = 'broker'; brokerLinked = !!j.connected; who = { name: j.name || '', email: j.email || '' }; }
       else if (j?.broker && !window.ORANJE_CONFIG?.clientId) mode = 'unconfigured';   // hosted, but its Google credentials are not set yet
@@ -93,7 +93,7 @@ export const auth = {
   get missingScopes() { return cached?.missing || []; },
 
   async connect() {
-    if (mode === 'broker') { location.assign('api/auth/login'); return new Promise(() => {}); }
+    if (mode === 'broker') { location.assign('/functions/authLogin'); return new Promise(() => {}); }
     if (mode === 'unconfigured') throw new Error('unconfigured');
     if (!clientId()) throw new Error('Add an OAuth client ID first.');
     mode = 'popup';
@@ -105,7 +105,7 @@ export const auth = {
   async token({ force = false } = {}) {
     if (!force && fresh()) return cached.token;
     if (mode === 'broker') {
-      const r = await fetch('api/auth/token', { method: 'POST', headers: { Accept: 'application/json' }, cache: 'no-store' });
+      const r = await fetch('/functions/authToken', { method: 'POST', headers: { Accept: 'application/json' }, cache: 'no-store' });
       if (r.status === 401) { brokerLinked = false; throw new SignInNeeded(); }
       if (!r.ok) throw new Error('Could not refresh sign-in. Try again in a moment.');
       const j = await r.json();
@@ -120,7 +120,7 @@ export const auth = {
     cached = null; brokerLinked = false; who = { name: '', email: '' };
     try { sessionStorage.removeItem(KEY_TOKEN); } catch { /* fine */ }
     ls.set(KEY_LINKED, null);
-    if (mode === 'broker') { try { await fetch('api/auth/logout', { method: 'POST' }); } catch { /* offline */ } }
+    if (mode === 'broker') { try { await fetch('/functions/authLogout', { method: 'POST' }); } catch { /* offline */ } }
     else if (t && window.google?.accounts?.oauth2) window.google.accounts.oauth2.revoke(t, () => {});
   },
 };

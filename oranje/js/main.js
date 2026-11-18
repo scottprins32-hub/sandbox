@@ -265,7 +265,7 @@ let welcomeDial;
 function showWelcome() {
   show('welcome');
   $('#setup-origin').textContent = location.origin;
-  $('#owner-redirect').textContent = `${location.origin}/api/auth/callback`;
+  $('#owner-redirect').textContent = `${location.origin}/functions/authCallback`;
   if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'));
   welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 500 });
   roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 1300, delay: 500 });
@@ -361,9 +361,9 @@ $('#set-hrmax').addEventListener('change', (e) => {
   saveSettings(); compute(); renderAll({ animate: true });
 });
 $('#set-curve').addEventListener('change', (e) => { state.settings.curve = e.target.value; saveSettings(); compute(); renderAll({ animate: true }); });
-$$('.seg button').forEach((b) => b.addEventListener('click', () => {
+$$('.seg [data-range]').forEach((b) => b.addEventListener('click', () => {
   state.settings.range = Number(b.dataset.range); saveSettings();
-  $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   renderTrends(current(), state.ctx, state.settings.range, pick);
 }));
 document.addEventListener('keydown', (e) => {
@@ -412,6 +412,22 @@ document.addEventListener('visibilitychange', () => {
   if (Date.now() - (state.data?.syncedAt || 0) > 10 * 60000) sync();
 });
 
+// ───────── look: navy (default) or cream ─────────
+const currentLook = () => (document.documentElement.dataset.look === 'cream' ? 'cream' : 'navy');
+function setLook(look) {
+  const root = document.documentElement;
+  if (look === 'cream') root.dataset.look = 'cream'; else root.removeAttribute('data-look');
+  try { localStorage.setItem('oranje.look', look); } catch { /* storage off */ }
+  $('meta[name="theme-color"]')?.setAttribute('content', look === 'cream' ? '#F5EEE0' : '#04102B');
+  $('meta[name="color-scheme"]')?.setAttribute('content', look === 'cream' ? 'light' : 'dark');
+  $$('[data-look-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lookPick === look)));
+  const btn = $('#look-btn');
+  btn.setAttribute('aria-label', look === 'cream' ? 'Switch to the navy look' : 'Switch to the cream look');
+  btn.title = btn.getAttribute('aria-label');
+}
+$('#look-btn').addEventListener('click', () => setLook(currentLook() === 'cream' ? 'navy' : 'cream'));
+$$('[data-look-pick]').forEach((b) => b.addEventListener('click', () => setLook(b.dataset.lookPick)));
+
 // ───────── install as an app ─────────
 let installPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; renderPanel(); });
@@ -432,7 +448,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
 }
 
 (async function boot() {
-  $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
+  $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
+  setLook(currentLook());
   if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
   await auth.init();
   const q = new URLSearchParams(location.search);
