@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleWhoop, WHOOP_SCOPES, whoopCallback } from '../base44/shared/whoop-broker.js';
+import { defaultWearable, whoopContext } from '../js/data/whoop.js';
 import { fetchWhoopDays, summarizeWhoop } from '../base44/shared/whoop-data.js';
 
 const appOrigin = 'https://oranje.test';
@@ -125,4 +126,23 @@ test('WHOOP distinguishes unconfirmed revocation from a successful local disconn
   assert.equal(calls.length, 3);
   assert.deepEqual(await result.json(), { ok: true, revoked: false });
   assert.match(result.headers.get('Set-Cookie'), /^oranje_whoop_session=;.*Max-Age=0/);
+});
+
+test('the dashboard defaults to linked direct WHOOP and honours an explicit Fitbit choice', () => {
+  assert.equal(defaultWearable({ whoop: true, fitbit: true }), 'whoop');
+  assert.equal(defaultWearable({ whoop: true, fitbit: true, preference: 'google' }), 'google');
+  assert.equal(defaultWearable({ whoop: true, fitbit: false, preference: 'google' }), 'whoop');
+  assert.equal(defaultWearable({ whoop: false, fitbit: true, preference: 'whoop' }), 'google');
+  assert.equal(defaultWearable({ whoop: false, fitbit: false, preference: 'apple-health' }), null);
+});
+
+test('WHOOP cycles on the same date stay separate and unavailable scores stay unavailable', () => {
+  const ctx = whoopContext([
+    { date: '2026-11-18', strain: 9.4, recovery: 88, sleep: 92 },
+    { date: '2026-11-18', strain: 6.4, recovery: null, sleep: 79 },
+  ]);
+  assert.equal(ctx.days.length, 2);
+  assert.equal(ctx.days.at(-1).recovery, 88);
+  assert.equal(ctx.byDate['2026-11-18:2'].recovery, null);
+  assert.equal(ctx.byDate['2026-11-18:2'].sleep, 79);
 });

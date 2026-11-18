@@ -4,8 +4,8 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=6';
-import { $, h, roll } from './motion.js?v=6';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=8';
+import { $, h, roll } from './motion.js?v=8';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
@@ -232,12 +232,16 @@ const TYPE_OF = { rhr: 'daily-resting-heart-rate', hrv: 'daily-heart-rate-variab
 export function renderTrends(day, ctx, range, onPick) {
   const end = ctx.days[ctx.days.length - 1].date;
   const days = ctx.days.slice(-range);
-  trendChart($('#trend'), days, day.date, onPick);
+  trendChart($('#trend'), days, day.key ?? day.date, onPick);
   const done = days.filter((d) => !d.partial);
   const avg = (f) => mean(done.map(f));
-  const strain = avg((d) => d.strain), rec = avg((d) => d.recovery), sleep = avg((d) => d.sleepInfo?.asleep), rhr = avg((d) => d.rhr);
+  const whoop = ctx.source === 'whoop';
+  const strain = avg((d) => d.strain), rec = avg((d) => d.recovery);
+  const sleep = avg((d) => whoop ? d.sleepMinutes : d.sleepInfo?.asleep);
+  const rhr = avg((d) => whoop ? d.restingHeartRate : d.rhr);
   const over = done.filter((d) => d.target && isNum(d.strain) && d.strain > d.target.hi).length;
-  $('#trends-lede').innerHTML = done.length < 3 ? 'A few more days and patterns start to show here.'
+  $('#trends-lede').innerHTML = whoop ? 'Strain and recovery reported by WHOOP for these cycles.'
+    : done.length < 3 ? 'A few more days and patterns start to show here.'
     : `Over ${done.length} days to ${dayName(end)}: average strain <b>${one(strain)}</b> on <b>${isNum(rec) ? Math.round(rec) + '%' : '–'}</b> recovery. You pushed past your target on <b>${over}</b> of them.`;
   $('#averages').replaceChildren(
     h('div', {}, h('dt', { text: 'Average strain' }), h('dd', { text: one(strain) })),

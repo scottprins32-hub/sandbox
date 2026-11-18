@@ -7,15 +7,17 @@ import { fmtClock, fmtDur, fromKey, isNum, todayKey } from './core/util.js';
 import { auth } from './data/auth.js';
 import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
-import { store } from './data/store.js';
-import { createDial, createMeter } from './ui/dial.js?v=6';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=6';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=6';
-import { createRiver } from './ui/river.js?v=6';
-import { createRing } from './ui/ring.js?v=6';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=6';
+import { store } from './data/store.js?v=8';
+import { defaultWearable, disconnectWhoop, onWhoopDisconnect, requestWhoop, whoopContext, whoopDisconnectMessage, whoopError, whoopLogin } from './data/whoop.js?v=8';
+import { createDial, createMeter } from './ui/dial.js?v=8';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=8';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=8';
+import { createRiver } from './ui/river.js?v=8';
+import { createRing } from './ui/ring.js?v=8';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=8';
+import { clearWhoopDetails, renderWhoopDashboard } from './ui/whoop-dashboard.js?v=8';
 
-const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
+const state = { revision: 0, whoop: null, source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
 const person = () => (state.source === 'google' ? auth.who.email || state.data?.userId || '' : '');
 const saveSettings = () => store.saveSettings(state.settings, person());
@@ -31,15 +33,21 @@ const rings = {
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 // Preview builds (config.js: preview: true) run on demo data only and never offer sign-in.
 const PREVIEW = !!window.ORANJE_CONFIG?.preview;
+const keyOf = (day) => day.key ?? day.date;
+const emptyWhoop = () => state.source === 'whoop' && !state.ctx?.days.length;
 
 // ───────── views ─────────
 function show(view) {
   const welcome = $('#welcome');
   if (welcome) welcome.hidden = view !== 'welcome';
   $('#dash').hidden = view !== 'dash';
-  $('#status').hidden = $('#open-panel').hidden = $('#daynav').hidden = $('#tabs').hidden = view !== 'dash';
+  $('#status').hidden = $('#open-panel').hidden = view !== 'dash';
+  $('#daynav').hidden = $('#tabs').hidden = view !== 'dash' || emptyWhoop();
+  $('#wearable-bar').hidden = view !== 'dash' || PREVIEW;
+  $('#whoop-empty').hidden = view !== 'dash' || !emptyWhoop();
   document.body.classList.toggle('welcoming', view === 'welcome');
-  if (view === 'dash') showView(routeOf(), { quiet: true });
+  if (view === 'dash' && !emptyWhoop()) showView(routeOf(), { quiet: true });
+  else if (emptyWhoop()) for (const name of VIEWS) $(`#view-${name}`).hidden = true;
 }
 
 // ───────── tabs: today, strain, recovery, sleep, climb ─────────
@@ -64,9 +72,12 @@ function showView(name, { quiet = false } = {}) {
     heading?.focus({ preventScroll: true });
   }
   if (state.ctx) renderAll({ animate: false });
-  if (ALIAS[location.hash.slice(1)]) requestAnimationFrame(() => $(location.hash)?.scrollIntoView({ block: 'start' }));
+  if (ALIAS[location.hash.slice(1)]) {
+    const target = state.source === 'whoop' && location.hash === '#vitals' ? '#whoop-overview' : location.hash;
+    requestAnimationFrame(() => $(target)?.scrollIntoView({ block: 'start' }));
+  }
 }
-window.addEventListener('hashchange', () => { if (!$('#dash').hidden) showView(routeOf()); });
+window.addEventListener('hashchange', () => { if (!$('#dash').hidden && !emptyWhoop()) showView(routeOf()); });
 
 function compute() {
   setCurve(state.settings.curve);
@@ -75,7 +86,7 @@ function compute() {
   const last = state.ctx.days[state.ctx.days.length - 1]?.date;
   if (!state.date || !state.ctx.byDate[state.date]) state.date = last;
 }
-const current = () => state.ctx.byDate[state.date];
+const current = () => state.ctx?.byDate[state.date];
 
 // ───────── hero ─────────
 function verdictParts(d) {
@@ -96,8 +107,8 @@ function verdictParts(d) {
   return [[`${kind} on`], [`${r}% recovery.`, 1], [judge]];
 }
 
-function setVerdict(d) {
-  const el = $('#verdict'), parts = verdictParts(d);
+function setVerdict(parts) {
+  const el = $('#verdict');
   const text = parts.map((p) => p[0]).join(' ');
   if (el.dataset.text === text) return;
   el.dataset.text = text;
@@ -127,47 +138,49 @@ const narrow = window.matchMedia('(max-width: 720px)');
 function renderRibbon() {
   const days = state.ctx.days;
   let end = days.length - 1;
-  const sel = days.findIndex((d) => d.date === state.date);
+  const sel = days.findIndex((d) => keyOf(d) === state.date);
   const span = narrow.matches ? 7 : 14;
   if (sel < end - (span - 1)) end = Math.min(days.length - 1, sel + Math.floor(span / 2));
   const win = days.slice(Math.max(0, end - (span - 1)), end + 1);
-  const el = $('#ribbon'), key = span + win.map((d) => d.date).join();
+  const el = $('#ribbon'), key = span + win.map(keyOf).join();
   if (key !== ribbonKey) {
     ribbonKey = key;
     el.replaceChildren(...win.map((d) => {
       const date = fromKey(d.date);
-      const btn = h('button', { class: 'day', type: 'button', 'data-date': d.date, onclick: () => pick(d.date) },
+      const btn = h('button', { class: 'day', type: 'button', 'data-date': keyOf(d), onclick: () => pick(keyOf(d)) },
         h('span', { class: 'col' }, h('i')), h('span', { class: 'dot' }), h('span', { class: 'wd', text: WD[date.getDay()] }));
       return btn;
     }));
     for (let i = win.length; i < span; i++) el.prepend(h('span'));   // a short history sits at the right
   }
   for (const d of win) {
-    const btn = $(`[data-date="${d.date}"]`, el), date = fromKey(d.date);
-    btn.setAttribute('aria-pressed', String(d.date === state.date));
-    btn.setAttribute('aria-label', `${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: strain ${isNum(d.strain) ? d.strain.toFixed(1) : 'none'}, recovery ${isNum(d.recovery) ? d.recovery + '%' : 'none'}`);
+    const btn = $(`[data-date="${keyOf(d)}"]`, el), date = fromKey(d.date);
+    btn.setAttribute('aria-pressed', String(keyOf(d) === state.date));
+    btn.setAttribute('aria-label', `${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}${d.occurrence > 1 ? `, cycle ${d.occurrence}` : ''}: strain ${isNum(d.strain) ? d.strain.toFixed(1) : 'none'}, recovery ${isNum(d.recovery) ? d.recovery + '%' : 'none'}`);
     $('.dot', btn).className = `dot ${!isNum(d.recovery) ? '' : d.recovery >= 67 ? 'hi' : d.recovery >= 34 ? 'mid' : 'lo'}`;
     requestAnimationFrame(() => { $('.col i', btn).style.height = `${((d.strain || 0) / 21) * 100}%`; });
   }
 }
 
-function renderHero(animate, delay = 0) {
-  const d = current(), days = state.ctx.days;
+function renderDayNavigation(d, days) {
   const date = fromKey(d.date), isToday = d.date === todayKey();
   const dm = date.toLocaleDateString('en-GB', { day: 'numeric', month: narrow.matches ? 'short' : 'long' });
   $('#dayline').replaceChildren(h('b', { text: isToday ? 'Today' : date.toLocaleDateString('en-GB', { weekday: 'long' }) }),
     h('span', { class: isToday ? 'is-today' : '', text: isToday ? `${date.toLocaleDateString('en-GB', { weekday: 'short' })} ${dm}` : dm }));
   $('#dayline').title = isToday ? '' : 'Jump to today';
-  $('#day-prev').disabled = d.date === days[0].date;
-  $('#day-next').disabled = d.date === days[days.length - 1].date;
+  $('#day-prev').disabled = keyOf(d) === keyOf(days[0]);
+  $('#day-next').disabled = keyOf(d) === keyOf(days.at(-1));
   renderRibbon();
+}
 
+function renderHero(animate, delay = 0) {
+  const d = current(), days = state.ctx.days;
   dial.set(d.strain, d.target, { animate, delay });
   roll($('#strain-num'), d.strain, { format: (v) => v.toFixed(1), dur: animate ? 1300 : 0, delay });
   $('#strain-band').textContent = d.band ? d.band.name : 'No heart rate';
   $('#strain-target').textContent = d.target ? `Target ${d.target.lo.toFixed(1)}–${d.target.hi.toFixed(1)}` : '';
   $('#dial').setAttribute('aria-label', isNum(d.strain) ? `Day strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day');
-  setVerdict(d);
+  setVerdict(verdictParts(d));
 
   const rec = d.recovery, m = $('#m-recovery');
   m.dataset.band = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
@@ -192,16 +205,18 @@ function renderHero(animate, delay = 0) {
 }
 
 // the three scores of the day, each a ring that opens its own tab
+function setTrioScore(kind, value, text, band, aria, { animate, delay }) {
+  const el = $(`#ring-${kind}`), num = $('.ring-num', el);
+  el.dataset.band = band || '';
+  $('.ring-read', el).classList.toggle('nil', !isNum(value));
+  roll(num, value, { format: kind === 'strain' ? (v) => v.toFixed(1) : (v) => Math.round(v), dur: animate ? 1200 : 0, delay, key: `ring-${kind}` });
+  rings[kind].set(value, { animate, delay });
+  $('.ring-band', el).textContent = text;
+  el.setAttribute('aria-label', `${aria}. Open the ${kind} view`);
+}
+
 function renderTrio(d, rec, sl, nights, animate, delay) {
-  const set = (kind, value, text, band, aria, i) => {
-    const el = $(`#ring-${kind}`), num = $('.ring-num', el);
-    el.dataset.band = band || '';
-    $('.ring-read', el).classList.toggle('nil', !isNum(value));
-    roll(num, value, { format: kind === 'strain' ? (v) => v.toFixed(1) : (v) => Math.round(v), dur: animate ? 1200 : 0, delay: delay + i * 90, key: `ring-${kind}` });
-    rings[kind].set(value, { animate, delay: delay + i * 90 });
-    $('.ring-band', el).textContent = text;
-    el.setAttribute('aria-label', `${aria}. Open the ${kind} view`);
-  };
+  const set = (kind, value, text, band, aria, i) => setTrioScore(kind, value, text, band, aria, { animate, delay: delay + i * 90 });
   const recBand = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
   set('strain', d.strain, d.band ? d.band.name : 'No heart rate', '', isNum(d.strain) ? `Strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day', 0);
   set('recovery', rec, isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning ${nights}/3` : 'No reading', recBand, isNum(rec) ? `Recovery ${rec}%, ${recoveryBand(rec)}` : 'No recovery for this day', 1);
@@ -221,9 +236,39 @@ function renderGoal(d) {
   text.innerHTML = `Aim for <b>${d.target.lo}–${d.target.hi}</b> on ${d.recovery}% recovery. ${parts.line}`;
 }
 
+function renderWhoopRings(day, { animate, delay }) {
+  const scores = [
+    ['strain', day.strain, 'Day strain', ' out of 21'],
+    ['recovery', day.recovery, 'Recovery', '%'],
+    ['sleep', day.sleep, 'Sleep', '%'],
+  ];
+  scores.forEach(([kind, value, label, unit], i) => {
+    const available = isNum(value);
+    const band = kind === 'recovery' && available ? value >= 67 ? 'hi' : value >= 34 ? 'mid' : 'lo' : '';
+    setTrioScore(kind, value, available ? '' : 'Unavailable', band,
+      available ? `${label} ${kind === 'strain' ? value.toFixed(1) : Math.round(value)}${unit}, reported by WHOOP` : `${label} unavailable`,
+      { animate, delay: delay + i * 90 });
+  });
+}
+
+function renderRange() {
+  $$('.seg [data-range]').forEach((button) =>
+    button.setAttribute('aria-pressed', String(Number(button.dataset.range) === state.settings.range)));
+}
+
 function renderAll({ animate = true, delay = 0 } = {}) {
   if (!state.ctx?.days.length) return;
   const d = current();
+  renderDayNavigation(d, state.ctx.days);
+  renderRange();
+  if (state.source === 'whoop') {
+    setVerdict([['Daily scores from WHOOP']]);
+    renderWhoopRings(d, { animate, delay });
+    renderWhoopDashboard(d);
+    renderTrends(d, state.ctx, state.settings.range, pick);
+    renderStatus();
+    return;
+  }
   renderHero(animate, delay);
   renderClimb(d, state.game, pick);
   renderStrain(d);
@@ -236,11 +281,16 @@ function renderAll({ animate = true, delay = 0 } = {}) {
 }
 
 function pick(date) {
-  if (!state.ctx.byDate[date] || date === state.date) return;
+  if (!state.ctx?.byDate[date] || date === state.date) return;
   state.date = date;
   renderAll();
 }
-const step = (n) => { const i = state.ctx.days.findIndex((d) => d.date === state.date) + n; if (state.ctx.days[i]) pick(state.ctx.days[i].date); };
+const step = (n) => {
+  const days = state.ctx?.days;
+  if (!days) return;
+  const i = days.findIndex((d) => keyOf(d) === state.date) + n;
+  if (days[i]) pick(keyOf(days[i]));
+};
 
 // ───────── status, account, sync ─────────
 function renderStatus() {
@@ -250,26 +300,153 @@ function renderStatus() {
   else if (state.syncing) { st = 'syncing'; label = state.progress || 'Syncing'; }
   else if (state.signIn) { st = 'signin'; label = 'Sign in again'; }
   else if (state.error) { st = 'error'; label = 'Sync failed · retry'; }
+  else if (state.source === 'whoop' && state.whoop?.configured && !state.whoop.connected) label = 'Connect WHOOP';
   else label = state.data?.syncedAt ? `Synced ${fmtClock(state.data.syncedAt)}` : 'Not synced';
   el.dataset.state = st; text.textContent = label;
   el.setAttribute('aria-label', label);
-  el.title = state.error || (st === 'signin' ? 'Google needs you to sign in again before new data can load' : st === 'demo' ? 'These numbers are made up. Connect your account to see your own.' : 'Sync now');
+  el.title = state.error || (st === 'signin' ? 'Sign in again to load new data' : st === 'demo' ? 'These numbers are made up. Connect your account to see your own.' : 'Sync now');
 
   const src = $('#foot-source'), dev = state.data?.device;
-  src.textContent = state.source === 'demo' ? 'Showing demo data, generated in this browser. None of it is real.'
+  $('#foot-scores').textContent = state.source === 'whoop'
+    ? 'Strain, recovery and sleep scores supplied by WHOOP. This information is for personal insight.'
+    : 'Oranje estimates strain, recovery and sleep for Fitbit. This information is for personal insight.';
+  src.textContent = state.source === 'whoop' ? 'Source: WHOOP.' : state.source === 'demo' ? 'Showing demo data, generated in this browser. None of it is real.'
     : `Read from Google Health${state.data?.syncedAt ? `, last synced ${new Date(state.data.syncedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}${dev?.name ? `. ${dev.name}${isNum(dev.battery) ? `, battery ${dev.battery}%` : ''}` : ''}.`;
-  $('#foot-privacy').textContent = state.source === 'demo' ? 'Nothing is read from Google or sent anywhere on this page.' : 'Health data is read from Google Health and kept in this browser only.';
+  $('#foot-privacy').textContent = state.source === 'whoop' ? 'WHOOP measurements stay in this view only.' : state.source === 'demo' ? 'Nothing is read from Google or sent anywhere on this page.' : 'Health data is read from Google Health and kept in this browser only.';
+  $('#wearable-source').textContent = state.source === 'whoop' ? state.whoop?.connected ? 'Direct from WHOOP' : 'WHOOP connection' : state.source === 'google' ? 'Fitbit via Google Health' : 'Demo data';
+  $$('#wearable-bar [data-source-pick]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.sourcePick === state.source)));
+  if (state.source === 'whoop') renderWhoopState();
   renderPanel();
+}
+
+// Data stays scoped to the active provider. A completed request from a
+// previous view must never replace the current view or repopulate its scores.
+function activateSource(source) {
+  if (state.source === 'whoop' || source === 'whoop') {
+    clearWhoopDetails();
+    for (const kind of Object.keys(rings)) setTrioScore(kind, null, '', '', 'Score unavailable', { animate: false, delay: 0 });
+    for (const id of ['verdict', 'ribbon', 'dayline', 'trend', 'trends-lede', 'averages']) $(`#${id}`).replaceChildren();
+    $('#verdict').removeAttribute('aria-label');
+    delete $('#verdict').dataset.text;
+    ribbonKey = '';
+  }
+  state.revision++;
+  state.source = source;
+  state.ctx = state.data = state.date = state.game = null;
+  state.syncing = state.signIn = false;
+  state.error = null;
+  if (source) document.body.dataset.source = source;
+  else delete document.body.dataset.source;
+}
+
+function renderWhoopState() {
+  const loading = state.syncing;
+  const connected = state.whoop?.connected && !state.signIn;
+  const reconnect = state.whoop?.configured && !connected;
+  $('#whoop-state').textContent = state.error || (loading ? 'Loading your WHOOP scores…'
+    : state.whoop?.configured === false ? whoopError('not_configured')
+    : connected ? 'WHOOP returned no cycles in the last 30 days.'
+    : 'Connect WHOOP to see your strain, recovery and sleep scores.');
+  $('#whoop-connect').hidden = loading || !reconnect;
+  $('#whoop-retry').hidden = loading || reconnect || state.whoop?.configured === false;
+}
+
+async function syncWhoop({ checkSession = false } = {}) {
+  if (state.syncing || state.source !== 'whoop') return;
+  const revision = state.revision;
+  state.syncing = true;
+  state.error = null;
+  state.progress = 'Syncing WHOOP';
+  renderStatus();
+  try {
+    if (checkSession || !state.whoop) {
+      const session = await requestWhoop('session');
+      if (revision !== state.revision) return;
+      state.whoop = session;
+      state.signIn = false;
+      if (!session.connected && state.ctx) {
+        activateSource('whoop');
+        show('dash');
+        renderStatus();
+        return;
+      }
+    }
+    if (!state.whoop.connected) return;
+    const { days } = await requestWhoop('data');
+    if (revision !== state.revision) return;
+    const isFirst = !state.ctx?.days.length;
+    if (!days.length && !isFirst) activateSource('whoop');
+    state.ctx = whoopContext(days);
+    state.data = { syncedAt: Date.now() };
+    state.signIn = false;
+    if (!current()) state.date = state.ctx.days.length ? keyOf(state.ctx.days.at(-1)) : null;
+    if (isFirst && state.date) enter();
+    show('dash');
+    if (state.date) renderAll(); else renderStatus();
+  } catch (error) {
+    if (revision !== state.revision) return;
+    if (error.message === 'reauth') {
+      activateSource('whoop');
+      state.whoop = { configured: true, connected: false };
+      state.signIn = true;
+      state.error = whoopError('reauth');
+      show('dash');
+      renderStatus();
+    } else {
+      state.error = whoopError(error.message);
+    }
+  } finally {
+    if (revision === state.revision) {
+      state.syncing = false;
+      show('dash');
+      renderStatus();
+    }
+  }
+}
+
+function startWhoop({ checkSession = false, error = '' } = {}) {
+  activateSource('whoop');
+  state.settings = store.settings();
+  state.error = error;
+  show('dash');
+  renderStatus();
+  if (!error && (checkSession || state.whoop?.connected || !state.whoop)) syncWhoop({ checkSession });
+}
+
+function finishWhoopDisconnect(revoked) {
+  state.whoop = { configured: true, connected: false };
+  if (store.wearable === 'whoop') store.wearable = null;
+  if (state.source !== 'whoop') return;
+  startWhoop({ error: whoopDisconnectMessage(revoked) });
+}
+
+async function disconnectActiveWhoop() {
+  if (state.syncing) return;
+  const revision = state.revision;
+  state.syncing = true;
+  state.progress = 'Disconnecting';
+  renderStatus();
+  try {
+    finishWhoopDisconnect(await disconnectWhoop());
+  } catch (error) {
+    if (revision === state.revision) {
+      state.syncing = false;
+      state.error = whoopError(error.message);
+      renderStatus();
+    }
+  }
 }
 
 async function sync() {
   if (state.syncing || state.source !== 'google') return;
+  const revision = state.revision;
   state.syncing = true; state.error = null; state.progress = 'Syncing'; renderStatus();
   try {
     const data = await syncGoogle({
       getToken: (o) => auth.token(o), known: state.data,
-      onProgress: (done, total) => { state.progress = total ? `Syncing ${done}/${total}` : 'Syncing'; $('#status-text').textContent = state.progress; },
+      onProgress: (done, total) => { if (revision !== state.revision) return; state.progress = total ? `Syncing ${done}/${total}` : 'Syncing'; $('#status-text').textContent = state.progress; },
     });
+    if (revision !== state.revision) return;
     const firstData = !state.data || state.data.userId !== data.userId;
     state.data = { ...data, owner: auth.who.email || '' }; state.signIn = false;
     if (firstData) { state.settings = store.settings(person()); state.date = null; }
@@ -280,9 +457,10 @@ async function sync() {
     renderAll({ animate: true });
     announce(state.game, `google:${person()}`);
   } catch (e) {
+    if (revision !== state.revision) return;
     if (e.signIn || e.status === 401) state.signIn = true; else state.error = e.message || 'Sync failed';
     if (!state.data) { show('welcome'); welcomeError(e.signIn ? '' : state.error); }
-  } finally { state.syncing = false; renderStatus(); }
+  } finally { if (revision === state.revision) { state.syncing = false; renderStatus(); } }
 }
 
 function enter() {
@@ -291,19 +469,19 @@ function enter() {
 }
 
 function startGoogle() {
-  state.source = 'google'; store.demo = false;
+  activateSource('google'); store.demo = false;
   const cache = store.cache();
   // On a shared device, never show one person's cached days to another.
   const mine = cache && !cache.demo && (!auth.who.email || !cache.owner || cache.owner === auth.who.email);
   if (cache && !mine) store.clearCache();
   state.data = mine ? cache : null;
   state.settings = store.settings(person());
-  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); }
+  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); } else show('welcome');
   sync();
 }
 
 function startDemo(seed) {
-  state.source = 'demo'; store.demo = true;
+  activateSource('demo'); store.demo = true;
   state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
   compute(); show('dash'); enter(); renderAll({ delay: 350 });
   window.scrollTo(0, 0);
@@ -316,16 +494,23 @@ async function connect(btn) {
   if (auth.unconfigured) { $('#owner-setup').hidden = false; $('#owner-setup').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); return; }
   if (auth.needsSetup) { $('#setup').hidden = false; $('#client-id').focus(); return; }
   if (btn) btn.disabled = true;
-  try { await auth.connect(); startGoogle(); }
-  catch (e) { if (state.source === 'google' && state.data) { state.error = e.message; renderStatus(); } else welcomeError(e.message); }
+  const revision = state.revision;
+  try { await auth.connect(); if (revision === state.revision) { store.wearable = 'google'; startGoogle(); } }
+  catch (e) {
+    if (revision !== state.revision) return;
+    if (state.source === 'google' && state.data) { state.error = e.message; renderStatus(); } else welcomeError(e.message);
+  }
   finally { if (btn) btn.disabled = false; }
 }
 
 async function disconnect() {
+  const revision = state.revision;
   store.forget(person());
   await auth.disconnect();
+  if (revision !== state.revision) return;
+  if (store.wearable === 'google') store.wearable = null;
   store.demo = false; state.settings = store.settings();
-  state.source = null; state.data = null; state.ctx = null; state.date = null; state.signIn = false; state.error = null;
+  activateSource(null);
   closePanel(); showWelcome();
 }
 
@@ -345,13 +530,21 @@ function renderPanel() {
   if ($('#panel').hidden) return;
   const acct = $('#acct-line'), actions = $('#acct-actions');
   actions.replaceChildren();
-  if (state.source === 'demo' && PREVIEW) {
+  if (state.source === 'whoop') {
+    acct.textContent = state.whoop?.connected && !state.signIn ? 'Your scores and workouts come directly from WHOOP.' : 'Connect your WHOOP account to view your scores.';
+    if (state.whoop?.connected && !state.signIn) {
+      actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Sync now', disabled: state.syncing, onclick: () => syncWhoop() }),
+        h('button', { class: 'btn ghost small', type: 'button', text: 'Disconnect WHOOP', disabled: state.syncing, onclick: () => disconnectActiveWhoop() }));
+    } else if (state.whoop?.configured) {
+      actions.append(h('a', { class: 'btn primary small source-link', href: whoopLogin, text: 'Connect WHOOP' }));
+    }
+  } else if (state.source === 'demo' && PREVIEW) {
     acct.innerHTML = 'Everything here is <b>generated data</b>: a made-up month for one made-up wearer. None of it is yours or anyone\'s.';
     actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Generate a different month', onclick: () => { closePanel(); startDemo(1 + Math.floor(Math.random() * 1e6)); } }));
   } else if (state.source === 'demo') {
     acct.innerHTML = 'You are looking at <b>demo data</b>. Nothing is being read from Google.';
     actions.append(h('button', { class: 'btn primary small', type: 'button', text: 'Connect Google account', onclick: (e) => { closePanel(); showWelcome(); connect(e.target); } }),
-      h('button', { class: 'btn ghost small', type: 'button', text: 'Leave demo', onclick: () => { store.demo = false; state.source = null; closePanel(); showWelcome(); } }));
+      h('button', { class: 'btn ghost small', type: 'button', text: 'Leave demo', onclick: () => { store.demo = false; activateSource(null); closePanel(); showWelcome(); } }));
   } else {
     const w = auth.who;
     acct.replaceChildren(...(w.name || w.email ? [h('b', { text: `Signed in as ${w.name || w.email}` }), w.name && w.email ? ` (${w.email}). ` : '. '] : []),
@@ -362,14 +555,14 @@ function renderPanel() {
       state.signIn ? h('button', { class: 'btn primary small', type: 'button', text: 'Sign in again', onclick: (e) => connect(e.target) }) : h('button', { class: 'btn primary small', type: 'button', text: 'Sync now', onclick: () => sync() }),
       h('button', { class: 'btn ghost small', type: 'button', text: w.name ? `Not ${w.name}? Disconnect` : 'Disconnect and erase', onclick: disconnect }));
   }
-  if (!PREVIEW) actions.append(h('a', { class: 'btn ghost small', href: 'whoop.html', text: 'WHOOP scores', style: { textDecoration: 'none' } }));
   const dev = state.data?.device;
   $('#device-sec').hidden = !dev;
   if (dev) $('#device-line').innerHTML = `<b>${dev.name}</b>${isNum(dev.battery) ? ` · battery ${dev.battery}%` : dev.batteryStatus ? ` · battery ${dev.batteryStatus.toLowerCase()}` : ''}${dev.lastSync ? ` · last synced to your phone ${new Date(dev.lastSync).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}`;
 
   $('#set-hrmax').value = state.settings.hrMax || '';
-  $('#set-hrmax').placeholder = state.ctx ? `${state.ctx.hrMax.value} (auto)` : 'auto';
-  $('#hrmax-source').textContent = state.ctx ? `· now ${state.ctx.hrMax.value} bpm, ${state.ctx.hrMax.source}` : '';
+  const hrMax = state.ctx?.hrMax;
+  $('#set-hrmax').placeholder = hrMax ? `${hrMax.value} (auto)` : 'auto';
+  $('#hrmax-source').textContent = hrMax ? `· now ${hrMax.value} bpm, ${hrMax.source}` : '';
   $('#set-curve').value = state.settings.curve;
 
   renderInstall();
@@ -384,7 +577,9 @@ function renderPanel() {
   }));
 
   const issues = state.data?.issues || [];
-  $('#health').replaceChildren(...(state.source === 'demo'
+  $('#health').replaceChildren(...(state.source === 'whoop'
+    ? [h('li', { class: state.error ? 'bad' : '' }, h('i'), 'WHOOP', h('span', { text: state.error || (state.ctx ? `${state.ctx.days.length} cycles read` : 'Not synced yet') }))]
+    : state.source === 'demo'
     ? [h('li', { class: 'none' }, h('i'), 'Demo data', h('span', { text: 'not real' }))]
     : issues.length ? issues.map((i) => h('li', { class: i.ok ? (i.count ? '' : 'none') : 'bad' }, h('i'), i.label, h('span', { text: i.ok ? (i.count ? `${i.count.toLocaleString('en-GB')} read` : 'nothing recorded') : `error ${i.status || ''}` }),
       i.ok ? null : h('small', { text: i.status === 403 ? 'Permission was not granted for this. Disconnect, then connect again and tick every box Google shows.' : i.message })))
@@ -405,6 +600,32 @@ function closePanel() {
 }
 
 // ───────── wiring ─────────
+$$('[data-source-pick]').forEach((button) => button.addEventListener('click', () => {
+  const source = button.dataset.sourcePick;
+  if (source === state.source) return;
+  if (source === 'whoop') {
+    store.wearable = 'whoop';
+    startWhoop({ checkSession: true });
+  } else if (auth.linked) {
+    store.wearable = 'google';
+    startGoogle();
+  } else {
+    activateSource(null);
+    showWelcome();
+    $('#btn-connect')?.focus();
+  }
+}));
+$('#whoop-retry').addEventListener('click', () => syncWhoop({ checkSession: true }));
+onWhoopDisconnect(finishWhoopDisconnect);
+window.addEventListener('pagehide', () => {
+  if (state.source === 'whoop') {
+    activateSource('whoop');
+    show('dash');
+  }
+});
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && state.source === 'whoop') startWhoop({ checkSession: true });
+});
 $('#btn-connect')?.addEventListener('click', (e) => connect(e.currentTarget));
 $('#btn-demo')?.addEventListener('click', () => {
   startDemo();
@@ -418,13 +639,16 @@ $('#setup-form')?.addEventListener('submit', (e) => {
 });
 $('#day-prev').addEventListener('click', () => step(-1));
 $('#day-next').addEventListener('click', () => step(1));
-$('#dayline').addEventListener('click', () => { const last = state.ctx?.days[state.ctx.days.length - 1]; if (last) pick(last.date); });
+$('#dayline').addEventListener('click', () => { const last = state.ctx?.days[state.ctx.days.length - 1]; if (last) pick(keyOf(last)); });
 $('#open-panel').addEventListener('click', openPanel);
 $('#customise').addEventListener('click', openPanel);
 $('#close-panel').addEventListener('click', closePanel);
 $('#scrim').addEventListener('click', closePanel);
 $('#status').addEventListener('click', (e) => {
-  if (state.source === 'demo') openPanel();
+  if (state.source === 'whoop') {
+    if (state.whoop?.configured && (!state.whoop.connected || state.signIn)) location.assign(whoopLogin);
+    else syncWhoop({ checkSession: true });
+  } else if (state.source === 'demo') openPanel();
   else if (state.signIn) connect(e.currentTarget);
   else sync();
 });
@@ -435,9 +659,9 @@ $('#set-hrmax').addEventListener('change', (e) => {
 });
 $('#set-curve').addEventListener('change', (e) => { state.settings.curve = e.target.value; saveSettings(); compute(); renderAll({ animate: true }); });
 $$('.seg [data-range]').forEach((b) => b.addEventListener('click', () => {
-  state.settings.range = Number(b.dataset.range); saveSettings();
-  $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  renderTrends(current(), state.ctx, state.settings.range, pick);
+  state.settings.range = Number(b.dataset.range); if (state.source !== 'whoop') saveSettings();
+  renderRange();
+  if (current()) renderTrends(current(), state.ctx, state.settings.range, pick);
 }));
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { closePanel(); return; }
@@ -475,8 +699,9 @@ window.addEventListener('resize', () => {
   rz = setTimeout(() => { if (window.innerWidth !== lastW && state.ctx && !$('#dash').hidden) { lastW = window.innerWidth; renderAll({ animate: false }); } }, 180);
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'visible' || state.source !== 'google' || state.signIn) return;
-  if (Date.now() - (state.data?.syncedAt || 0) > 10 * 60000) sync();
+  if (document.visibilityState !== 'visible' || state.signIn || Date.now() - (state.data?.syncedAt || 0) <= 10 * 60000) return;
+  if (state.source === 'whoop' && state.whoop?.connected) syncWhoop();
+  else if (state.source === 'google') sync();
 });
 
 // ───────── look: navy (default) or cream ─────────
@@ -515,15 +740,25 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
 }
 
 (async function boot() {
-  $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
   setLook(currentLook());
   if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
-  await auth.init();
+  const [, whoopSession] = await Promise.all([auth.init(), requestWhoop('session').catch(() => null)]);
+  state.whoop = whoopSession;
   const q = new URLSearchParams(location.search);
-  const authError = q.get('auth_error');
-  if (q.has('auth_error') || q.has('connected')) history.replaceState(null, '', location.pathname + location.hash);
+  const authError = q.get('auth_error'), whoopSignInError = q.get('whoop_error');
+  const askedForWhoop = q.get('source') === 'whoop';
+  const googleCallback = q.has('connected') && auth.linked;
+  if (googleCallback) store.wearable = 'google';
+  if (askedForWhoop && !whoopSignInError) store.wearable = 'whoop';
+  for (const key of ['source', 'whoop_error', 'auth_error', 'connected']) q.delete(key);
+  history.replaceState(null, '', location.pathname + (q.size ? `?${q}` : '') + location.hash);
 
-  if (auth.linked && !authError) startGoogle();
+  const preference = store.wearable;
+  const source = defaultWearable({ whoop: whoopSession?.connected, fitbit: auth.linked, preference });
+  if (askedForWhoop || whoopSignInError || (!whoopSession && preference === 'whoop')) {
+    startWhoop({ error: whoopSignInError ? whoopError(whoopSignInError) : '' });
+  } else if (googleCallback || (!authError && source === 'google')) startGoogle();
+  else if (source === 'whoop' && !authError) startWhoop();
   else if (store.demo && !authError) startDemo();
   else {
     showWelcome();

@@ -30,10 +30,18 @@ export function tween(key, { from = 0, to = 1, dur = 800, delay = 0, easing = ea
 
 // A number that travels to its new value instead of snapping.
 export function roll(el, to, { dur = 900, delay = 0, format = (v) => Math.round(v), key } = {}) {
-  if (to == null || Number.isNaN(to)) { el.textContent = '–'; el._v = null; return; }
+  const animationKey = key ?? el;
+  if (to == null || Number.isNaN(to)) {
+    const active = live.get(animationKey);
+    if (active) cancelAnimationFrame(active.raf);
+    live.delete(animationKey);
+    el.textContent = '–';
+    el._v = null;
+    return;
+  }
   const from = typeof el._v === 'number' ? el._v : 0;
   el._v = to;
-  tween(key || el, { from, to, dur, delay, easing: ease.expo, update: (v) => { el.textContent = format(v); } });
+  tween(animationKey, { from, to, dur, delay, easing: ease.expo, update: (v) => { el.textContent = format(v); } });
 }
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

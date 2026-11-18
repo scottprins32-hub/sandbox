@@ -5,6 +5,7 @@
 
 const KEY_SETTINGS = 'oranje.settings';
 const KEY_CACHE = 'oranje.cache.v1';
+const KEY_SOURCE = 'oranje.wearable';
 const KEY_DEMO = 'oranje.demo';
 const KEY_SEEN = 'oranje.game.seen';
 
@@ -32,6 +33,8 @@ export const store = {
     const seen = read(KEY_SEEN);
     if (seen && who) { delete seen[`google:${who}`]; write(KEY_SEEN, seen); }
   },
+  get wearable() { return read(KEY_SOURCE); },
+  set wearable(source) { write(KEY_SOURCE, source); },
   get demo() { return read(KEY_DEMO) === true; },
   set demo(v) { write(KEY_DEMO, v ? true : null); },
 };

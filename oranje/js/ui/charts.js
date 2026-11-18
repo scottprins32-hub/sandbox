@@ -3,7 +3,7 @@
 
 import { STRAIN_MAX, strainFromLoad } from '../core/strain.js';
 import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js';
-import { h } from './motion.js?v=6';
+import { h } from './motion.js?v=8';
 
 const WD = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const mount = (el, height) => {
@@ -146,13 +146,16 @@ export function trendChart(el, days, selected, onPick) {
       svg.append(h('text', { x: cx, y: H - 22, 'text-anchor': 'middle', class: 'axis', text: WD[date.getDay()] }));
       svg.append(h('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'axis', text: date.getDate() }));
     }
-    const s = isNum(day.strain) ? day.strain : 0;
-    const hit = h('rect', { x: cx - slot / 2, y: PT, width: slot, height: H - PT - PB, class: 't-hit', tabindex: 0, role: 'button', 'aria-label': `${date.toDateString()}: strain ${isNum(day.strain) ? day.strain.toFixed(1) : 'none'}, recovery ${isNum(day.recovery) ? day.recovery + '%' : 'none'}` });
-    hit.addEventListener('click', () => onPick(day.date));
-    hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(day.date); } });
-    const bar = h('rect', { x: cx - bw / 2, y: Ys(s), width: bw, height: Math.max(0, Ys(0) - Ys(s)), rx: Math.min(3, bw / 2), class: `t-bar${day.date === selected ? ' sel' : ''}` });
-    bar.style.pointerEvents = 'none';
-    svg.append(hit, bar);
+    const dayKey = day.key ?? day.date;
+    const hit = h('rect', { x: cx - slot / 2, y: PT, width: slot, height: H - PT - PB, class: 't-hit', tabindex: 0, role: 'button', 'aria-label': `${date.toDateString()}${day.occurrence > 1 ? `, cycle ${day.occurrence}` : ''}: strain ${isNum(day.strain) ? day.strain.toFixed(1) : 'none'}, recovery ${isNum(day.recovery) ? day.recovery + '%' : 'none'}` });
+    hit.addEventListener('click', () => onPick(dayKey));
+    hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(dayKey); } });
+    svg.append(hit);
+    if (isNum(day.strain)) {
+      const bar = h('rect', { x: cx - bw / 2, y: Ys(day.strain), width: bw, height: Math.max(0, Ys(0) - Ys(day.strain)), rx: Math.min(3, bw / 2), class: `t-bar${dayKey === selected ? ' sel' : ''}` });
+      bar.style.pointerEvents = 'none';
+      svg.append(bar);
+    }
     if (isNum(day.recovery)) { d += `${pen ? 'L' : 'M'}${cx.toFixed(1)} ${Yr(day.recovery).toFixed(1)}`; pen = true; dots.push([cx, Yr(day.recovery)]); } else pen = false;
   });
   svg.append(h('path', { class: 't-rec', d }));
