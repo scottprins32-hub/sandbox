@@ -2,10 +2,10 @@
 // Network first for everything, so a new version is never hidden behind an
 // old copy; the cache is only the fallback. Sign-in and Google are never cached.
 
-const CACHE = 'oranje-shell-v6';
+const CACHE = 'oranje-shell-v7';
 const SHELL = [
-  './', 'index.html', 'whoop.html', 'css/whoop.css', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
-  'js/boot.js?v=6', 'js/main.js?v=6', 'js/whoop.js',
+  './', 'index.html', 'whoop.html', 'css/whoop.css?v=7', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
+  'js/boot.js?v=6', 'js/main.js?v=7', 'js/whoop.js?v=7',
   'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
   'js/ui/charts.js?v=6', 'js/ui/dial.js?v=6', 'js/ui/game.js?v=6', 'js/ui/motion.js?v=6', 'js/ui/river.js?v=6', 'js/ui/ring.js?v=6', 'js/ui/sections.js?v=6',

@@ -113,7 +113,7 @@ None of this is medical advice.
 cd oranje && npm test
 ```
 
-22 tests, no dependencies: the scoring maths against WHOOP's reference points, the climb's earnings and medals, the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
+The tests have no external dependencies and cover the scoring maths against WHOOP's reference points, the climb's earnings and medals, the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
 
 **Not yet verified against a live Google account.** The adapter is written from Google's published specification and proven against the mock, but no real Fitbit Air data has passed through it. If a data type misbehaves, the panel's **Data health** list names it and shows Google's error.
 
