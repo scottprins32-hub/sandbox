@@ -499,6 +499,7 @@ span.dial-target { font-size: max(11px, 2.2cqw); color: var(--ice); margin-top: 
 .p-lab { font: 500 11px var(--mono); fill: var(--faint); }
 .p-lab.got { fill: var(--paper); }
 .p-lab.next { fill: var(--oranje-2); }
+.p-lab.halo { paint-order: stroke; stroke: rgb(var(--bg-rgb) / .92); stroke-width: 4px; stroke-linejoin: round; }
 .p-flag { fill: var(--oranje); stroke: var(--paper); stroke-width: 1.3; stroke-linejoin: round; }
 .p-rider { fill: var(--bg); stroke: var(--oranje); stroke-width: 3; }
 .p-drop { stroke: var(--paper); stroke-dasharray: 2 3; opacity: .55; }

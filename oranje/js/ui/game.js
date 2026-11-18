@@ -3,7 +3,7 @@
 
 import { LEVELS, levelAt } from '../core/game.js';
 import { clamp, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=4';
+import { $, h, polar, reduced, roll } from './motion.js?v=5';
 
 const fmtAlt = (m) => `${m < 0 ? '−' : ''}${Math.abs(m) >= 100 ? Math.round(Math.abs(m)).toLocaleString('en-GB') : Math.abs(m).toFixed(m > -10 && m < 10 && m % 1 ? 1 : 0)}`;
 const dayLabel = (key) => fromKey(key).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -56,16 +56,32 @@ function profile(el, game, selected, onPick) {
   const maxGain = 31;
   svg.setAttribute('aria-label', `Climb profile over ${n} days, from ${fmtAlt(t[0].from)} to ${fmtAlt(top)} metres.`);
 
-  // landmark heights, top down; a label too close to the one above it is left out
+  const flagX = (l) => {
+    const i = t.findIndex((d) => d.date === game.reached[l.id]);
+    if (!game.reached[l.id] || i < 0) return null;
+    const frac = clamp((l.alt - t[i].from) / Math.max(0.01, t[i].to - t[i].from), 0, 1);
+    return X(i) + frac * (X(i + 1) - X(i));
+  };
+  // landmark heights, top down; a label too close to the one above it is left out.
+  // On a phone the labels sit inside the chart, so they are drawn last, over the
+  // climb, with a halo in the page colour so they stay readable on the slopes.
   let lastY = -Infinity;
+  const labels = [];
   for (const l of [...LEVELS].reverse()) {
     if (l.alt < lo || l.alt > hi) continue;
     const y = Y(l.alt), got = game.reached[l.id] || l.id === 'polder';
     svg.append(h('line', { x1: PL, x2: W - PR, y1: y, y2: y, class: `p-level${got ? ' got' : ''}` }));
-    if (y - lastY < 16) continue;
+    if (y - lastY < (narrow ? 20 : 16)) continue;
     lastY = y;
     const label = `${l.name} ${fmtAlt(l.alt)} m`;
-    if (narrow) svg.append(h('text', { x: PL + 4, y: y - 5, class: `p-lab${got ? ' got' : ''}`, text: label }));
+    if (narrow && l.id === 'nap') continue;   // the axis already says 0 m
+    if (narrow) {
+      // start after this level's flag when the flag would sit inside the text
+      const fx = flagX(l), wide = label.length * 6.7;
+      let x = PL + 4;
+      if (fx != null && fx > x - 12 && fx < x + wide + 4 && fx + 14 + wide < W - PR) x = fx + 14;
+      labels.push(h('text', { x, y: y - 5, class: `p-lab halo${got ? ' got' : ''}`, text: label }));
+    }
     else svg.append(h('text', { x: W - PR + 10, y: y + 4, class: `p-lab${got ? ' got' : ''}`, text: label }));
   }
   if (next && !showNext) {
@@ -104,10 +120,8 @@ function profile(el, game, selected, onPick) {
   for (const l of LEVELS) {
     const at = game.reached[l.id];
     if (!at) continue;
-    const i = t.findIndex((d) => d.date === at);
-    if (i < 0) continue;
-    const frac = clamp((l.alt - t[i].from) / Math.max(0.01, t[i].to - t[i].from), 0, 1);
-    const x = X(i) + frac * (X(i + 1) - X(i)), y = Y(l.alt);
+    const x = flagX(l), y = Y(l.alt);
+    if (x == null) continue;
     svg.append(h('path', { d: `M${x} ${y}V${y - 17}l9 3.5-9 3.5`, class: 'p-flag' }, h('title', { text: `${l.name} reached on ${dayLabel(at)}` })));
   }
   // the rider: where the selected day ended
@@ -116,6 +130,7 @@ function profile(el, game, selected, onPick) {
     const x = X(si + 1), y = Y(t[si].to);
     svg.append(h('line', { x1: x, x2: x, y1: y, y2: base, class: 'p-drop' }), h('circle', { cx: x, cy: y, r: 6, class: 'p-rider' }));
   }
+  svg.append(...labels);
   // axis: metres
   for (const a of [0, Math.round(hi / 100) * 100 >= 200 ? Math.round(hi / 200) * 100 : null].filter(isNum)) {
     if (a <= lo || a >= hi) continue;

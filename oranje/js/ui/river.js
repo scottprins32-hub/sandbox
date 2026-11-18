@@ -4,7 +4,7 @@
 
 import { ZONES, zoneOf, reserveShare } from '../core/strain.js';
 import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, isNum } from '../core/util.js';
-import { ease, h, reduced, tween } from './motion.js?v=4';
+import { ease, h, reduced, tween } from './motion.js?v=5';
 
 const STAGE_LABEL = { deep: 'Deep', light: 'Light', rem: 'REM', wake: 'Awake' };
 // rest → max, cool to hot
