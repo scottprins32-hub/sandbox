@@ -2,13 +2,13 @@
 // Network first for everything, so a new version is never hidden behind an
 // old copy; the cache is only the fallback. Sign-in and Google are never cached.
 
-const CACHE = 'oranje-shell-v7';
+const CACHE = 'oranje-shell-v8';
 const SHELL = [
-  './', 'index.html', 'whoop.html', 'css/whoop.css?v=7', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
-  'js/boot.js?v=6', 'js/main.js?v=7', 'js/whoop.js?v=7',
-  'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
-  'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
-  'js/ui/charts.js?v=6', 'js/ui/dial.js?v=6', 'js/ui/game.js?v=6', 'js/ui/motion.js?v=6', 'js/ui/river.js?v=6', 'js/ui/ring.js?v=6', 'js/ui/sections.js?v=6',
+  './', 'index.html', 'whoop.html', 'css/whoop.css?v=8', 'config.js', 'manifest.webmanifest', 'css/style.css?v=8',
+  'js/boot.js?v=8', 'js/main.js?v=8', 'js/whoop.js?v=8',
+  'js/core/game.js', 'js/core/scores.js', 'js/core/sources.js', 'js/core/strain.js', 'js/core/util.js',
+  'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js', 'js/data/whoop.js',
+  'js/ui/charts.js?v=8', 'js/ui/dial.js?v=8', 'js/ui/game.js?v=8', 'js/ui/motion.js?v=8', 'js/ui/river.js?v=8', 'js/ui/ring.js?v=8', 'js/ui/sections.js?v=8',
   'fonts/Archivo-100-900.woff2', 'fonts/BarlowSemiCondensed-600.woff2', 'fonts/IBMPlexMono-400.woff2', 'fonts/IBMPlexMono-500.woff2',
   'icons/icon.svg', 'icons/favicon.ico', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 ];

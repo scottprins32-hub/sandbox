@@ -3,7 +3,7 @@
 
 import { LEVELS, levelAt } from '../core/game.js';
 import { clamp, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=6';
+import { $, h, polar, reduced, roll } from './motion.js?v=8';
 
 const fmtAlt = (m) => `${m < 0 ? '−' : ''}${Math.abs(m) >= 100 ? Math.round(Math.abs(m)).toLocaleString('en-GB') : Math.abs(m).toFixed(m > -10 && m < 10 && m % 1 ? 1 : 0)}`;
 const dayLabel = (key) => fromKey(key).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });

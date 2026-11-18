@@ -83,3 +83,19 @@ test('another person’s cached days are never merged into a sync', async () => 
   assert.equal(data.userId, '111111256096816351');
   assert.ok(!data.days.some((d) => d.steps === 99999));
 });
+
+test('what the band measured leads; phone apps only fill a type the band has nothing for', async () => {
+  const { data, mock } = await run({ appOnly: ['daily-resting-heart-rate', 'steps'] });
+  const from = Object.fromEntries(data.issues.map((i) => [i.type, i.from]));
+  assert.equal(from['heart-rate'], 'band');
+  assert.equal(from['daily-heart-rate-variability'], 'band');
+  assert.equal(from['daily-resting-heart-rate'], 'other');
+  assert.equal(from.steps, 'other');
+  // the fallback still delivers the values
+  const want = Object.fromEntries(truth.days.map((d) => [d.date, d]));
+  for (const got of data.days) { assert.equal(got.rhr, want[got.date].rhr); assert.equal(got.steps, want[got.date].steps); }
+  // every type but sleep was asked for from the wearables family first
+  const first = {};
+  for (const r of mock.log) { const m = r.path.match(/dataTypes\/([a-z0-9-]+)\//); if (m && !(m[1] in first)) first[m[1]] = r.family; }
+  for (const [type, fam] of Object.entries(first)) assert.equal(fam, type === 'sleep' ? null : 'users/me/dataSourceFamilies/google-wearables', type);
+});

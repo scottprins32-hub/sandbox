@@ -1,5 +1,5 @@
-import { createRing } from './ui/ring.js?v=6';
-import { $, h } from './ui/motion.js?v=6';
+import { createRing } from './ui/ring.js?v=8';
+import { $, h } from './ui/motion.js?v=8';
 import { fmtDur } from './core/util.js';
 
 const status = $('#whoop-status');
@@ -145,6 +145,7 @@ disconnect.addEventListener('click', async () => {
 });
 
 function disconnected(revoked) {
+  try { localStorage.removeItem('oranje.whoop.owner'); } catch { /* storage off */ }
   showDisconnected(revoked ? 'WHOOP disconnected.' : 'WHOOP disconnected here. To remove any remaining access, open Connected Apps in WHOOP and remove Oranje.', true);
 }
 

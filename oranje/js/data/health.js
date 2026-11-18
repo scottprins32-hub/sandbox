@@ -12,10 +12,18 @@
 //     for display; plain list is the fallback
 // Every data type is fetched on its own and failures are recorded rather than
 // thrown, so one refused type never blanks the dashboard.
+//
+// Wearable first: each type is asked for from the `google-wearables` source
+// family (Fitbit trackers and Pixel Watch, nothing typed in or written by
+// phone apps). Only when the band has nothing for a type are all sources
+// used, so Apple Health, Health Connect and other apps fill gaps but never
+// override what the band measured. Sleep cannot be filtered that way, so
+// nights recorded by a wearable are preferred when choosing a day's sleep.
 
 import { addDays, dateKey, dayStartMs, fromKey, isNum, rangeKeys, todayKey } from '../core/util.js';
 
 const BASE = 'https://health.googleapis.com/v4';
+export const WEARABLES = 'users/me/dataSourceFamilies/google-wearables';
 const S = 'https://www.googleapis.com/auth/googlehealth.';
 export const SCOPES = [
   `${S}activity_and_fitness.readonly`,
@@ -67,14 +75,14 @@ export function createClient({ getToken, fetchImpl = (...a) => fetch(...a), minG
   }
 
   const plainList = new Set(); // types where reconcile was refused once
-  async function points(type, filter, pageSize) {
+  async function points(type, filter, pageSize, dataSourceFamily) {
     const field = camel(type);
     const out = [];
     const run = async (suffix) => {
       let pageToken;
       do {
-        const r = await call(`/users/me/dataTypes/${type}/dataPoints${suffix}`, { query: { filter, pageSize, pageToken } });
-        for (const p of r.dataPoints || []) if (p[field]) out.push(p[field]);
+        const r = await call(`/users/me/dataTypes/${type}/dataPoints${suffix}`, { query: { filter, pageSize, pageToken, dataSourceFamily } });
+        for (const p of r.dataPoints || []) if (p[field]) out.push(p.dataSource ? { ...p[field], dataSource: p.dataSource } : p[field]);
         pageToken = r.nextPageToken;
       } while (pageToken);
     };
@@ -86,13 +94,13 @@ export function createClient({ getToken, fetchImpl = (...a) => fetch(...a), minG
     return out;
   }
 
-  async function rollUp(type, startMs, endMs, windowSize) {
+  async function rollUp(type, startMs, endMs, windowSize, dataSourceFamily) {
     const out = [];
     let pageToken;
     do {
       const r = await call(`/users/me/dataTypes/${type}/dataPoints:rollUp`, {
         method: 'POST',
-        body: { range: { startTime: new Date(startMs).toISOString(), endTime: new Date(endMs).toISOString() }, windowSize, pageSize: 10000, pageToken },
+        body: { range: { startTime: new Date(startMs).toISOString(), endTime: new Date(endMs).toISOString() }, windowSize, pageSize: 10000, pageToken, dataSourceFamily },
       });
       out.push(...(r.rollupDataPoints || []));
       pageToken = r.nextPageToken;
@@ -100,13 +108,13 @@ export function createClient({ getToken, fetchImpl = (...a) => fetch(...a), minG
     return out;
   }
 
-  async function dailyRollUp(type, startKey, endKeyExclusive) {
+  async function dailyRollUp(type, startKey, endKeyExclusive, dataSourceFamily) {
     const out = [];
     let pageToken;
     do {
       const r = await call(`/users/me/dataTypes/${type}/dataPoints:dailyRollUp`, {
         method: 'POST',
-        body: { range: { start: { date: civilDate(startKey), time: midnight }, end: { date: civilDate(endKeyExclusive), time: midnight } }, windowSizeDays: 1, pageToken },
+        body: { range: { start: { date: civilDate(startKey), time: midnight }, end: { date: civilDate(endKeyExclusive), time: midnight } }, windowSizeDays: 1, pageToken, dataSourceFamily },
       });
       out.push(...(r.rollupDataPoints || []));
       pageToken = r.nextPageToken;
@@ -136,7 +144,18 @@ function mapSleep(s) {
     nap: !!meta.nap,
     processed: meta.processed !== false,
     endKey: civilKey(s.interval?.civilEndTime?.date) || dateKey(new Date(end)),
+    wearable: fromWearable(s.dataSource),
   };
+}
+
+// A reading a tracker made, as opposed to one typed in or written by a phone app.
+const WEARABLE_FORMS = new Set(['FITNESS_BAND', 'WATCH', 'RING', 'CHEST_STRAP']);
+export function fromWearable(src) {
+  if (!src) return null;
+  if (src.recordingMethod === 'MANUAL') return false;
+  if (src.device?.formFactor) return WEARABLE_FORMS.has(src.device.formFactor);
+  if (src.platform) return src.platform === 'FITBIT';
+  return null;
 }
 
 function mapExercise(x) {
@@ -198,16 +217,25 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
   const jobs = [];
   let done = 0;
   const job = (type, fn) => jobs.push(async () => {
-    try { const count = await fn(); issues.push({ type, label: LABELS[type], ok: true, count }); }
+    try { const r = await fn(); const count = typeof r === 'number' ? r : r.n; issues.push({ type, label: LABELS[type], ok: true, count, from: typeof r === 'number' ? null : r.from }); }
     catch (e) { issues.push({ type, label: LABELS[type], ok: false, status: e.status || 0, reason: e.reason || '', message: e.message || 'Request failed' }); if (e.status === 401) throw e; }
     onProgress(++done, jobs.length, LABELS[type]);
   });
+  // Band first; all sources only when the band has nothing for this type.
+  // A family the API refuses for a type (400) counts as nothing from the band.
+  const wearableFirst = async (fetchFrom) => {
+    let n = 0;
+    try { n = await fetchFrom(WEARABLES); } catch (e) { if (e.status !== 400) throw e; }
+    if (n) return { n, from: 'band' };
+    n = await fetchFrom(undefined);
+    return { n, from: n ? 'other' : null };
+  };
   const chunks = (size) => { const out = []; for (let i = 0; i < keys.length; i += size) out.push([keys[i], addDays(keys[Math.min(keys.length, i + size) - 1], 1)]); return out; };
 
-  job('heart-rate', async () => {
+  job('heart-rate', () => wearableFirst(async (family) => {
     let n = 0;
     for (const [a, b] of chunks(14)) {
-      for (const p of await api.rollUp('heart-rate', dayStartMs(a), Math.min(dayStartMs(b), now.getTime()), '60s')) {
+      for (const p of await api.rollUp('heart-rate', dayStartMs(a), Math.min(dayStartMs(b), now.getTime()), '60s', family)) {
         const bpm = p.heartRate?.beatsPerMinuteAvg;
         if (!isNum(bpm)) continue;
         const t = new Date(p.startTime), d = day[dateKey(t)];
@@ -215,18 +243,18 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
       }
     }
     return n;
-  });
+  }));
 
-  const daily = (type, each, size = 90) => job(type, async () => {
+  const daily = (type, each, size = 90) => job(type, () => wearableFirst(async (family) => {
     let n = 0;
     for (const [a, b] of chunks(size)) {
-      for (const p of await api.dailyRollUp(type, a, b)) {
+      for (const p of await api.dailyRollUp(type, a, b, family)) {
         const d = day[civilKey(p.civilStartTime?.date)];
         if (d && p[camel(type)]) { each(d, p[camel(type)]); n++; }
       }
     }
     return n;
-  });
+  }));
   daily('steps', (d, v) => { d.steps = num(v.countSum) ?? 0; });
   daily('distance', (d, v) => { d.distance = +((num(v.millimetersSum) ?? 0) / 1e6).toFixed(2); });
   daily('total-calories', (d, v) => { d.calories = Math.round(v.kcalSum ?? 0); }, 14);
@@ -235,12 +263,12 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
     d.azm = { fatBurn, cardio, peak, total: fatBurn + cardio + peak };
   });
 
-  const dated = (type, each) => job(type, async () => {
+  const dated = (type, each) => job(type, () => wearableFirst(async (family) => {
     const f = `${snake(type)}.date >= "${keys[0]}" AND ${snake(type)}.date < "${endExclusive}"`;
     let n = 0;
-    for (const v of await api.points(type, f)) { const d = day[civilKey(v.date)]; if (d) { each(d, v); n++; } }
+    for (const v of await api.points(type, f, undefined, family)) { const d = day[civilKey(v.date)]; if (d) { each(d, v); n++; } }
     return n;
-  });
+  }));
   dated('daily-resting-heart-rate', (d, v) => { d.rhr = num(v.beatsPerMinute); });
   dated('daily-heart-rate-variability', (d, v) => {
     const ms = v.averageHeartRateVariabilityMilliseconds ?? v.deepSleepRootMeanSquareOfSuccessiveDifferencesMilliseconds;
@@ -262,18 +290,21 @@ export async function syncGoogle({ getToken, days = 28, known = null, fetchImpl,
     for (const [k, list] of Object.entries(byDay)) {
       const d = day[k];
       if (!d) continue;
-      const main = list.find((s) => s.main) || [...list].filter((s) => !s.nap).sort((a, b) => b.asleepMin - a.asleepMin)[0] || list[0];
-      d.sleep = main; d.naps = list.filter((s) => s !== main);
+      // a night the band recorded beats one a phone app wrote for the same day
+      const pool = list.some((s) => s.wearable) ? list.filter((s) => s.wearable !== false) : list;
+      const main = pool.find((s) => s.main) || [...pool].filter((s) => !s.nap).sort((a, b) => b.asleepMin - a.asleepMin)[0] || pool[0];
+      d.sleep = main; d.naps = pool.filter((s) => s !== main && s.nap);
     }
-    return nights.length;
+    const band = nights.filter((s) => s.wearable).length;
+    return { n: nights.length, from: !nights.length ? null : band ? 'band' : nights.some((s) => s.wearable === false) ? 'other' : null };
   });
 
-  job('exercise', async () => {
+  job('exercise', () => wearableFirst(async (family) => {
     const f = `exercise.interval.civil_start_time >= "${keys[0]}" AND exercise.interval.civil_start_time < "${endExclusive}"`;
-    const sessions = (await api.points('exercise', f, 25)).map(mapExercise).filter(Boolean);
+    const sessions = (await api.points('exercise', f, 25, family)).map(mapExercise).filter(Boolean);
     for (const w of sessions) day[w.startKey]?.workouts.push(w);
     return sessions.length;
-  });
+  }));
 
   let profile = known?.profile || {};
   job('profile', async () => { const p = await api.call('/users/me/profile'); profile = { age: isNum(p.age) ? p.age : null }; return 1; });

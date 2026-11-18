@@ -4,8 +4,8 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=6';
-import { $, h, roll } from './motion.js?v=6';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=8';
+import { $, h, roll } from './motion.js?v=8';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
@@ -26,7 +26,7 @@ export function aimParts(day) {
   if (!day.partial) line = s > day.target.hi ? `You went <b>${one(s - day.target.hi)} past</b> the top of it.` : s < day.target.lo ? `You finished <b>${one(day.target.lo - s)} short</b> of it, an easier day than you had in you.` : 'You <b>finished inside it</b>.';
   else if (s > day.target.hi) line = `You are <b>${one(s - day.target.hi)} past</b> it already. Anything more today is borrowed from tomorrow.`;
   else if (s >= day.target.lo) line = 'You are <b>inside it</b> now. This is a good place to stop.';
-  else line = `You are at ${one(s)}, with <b>${one(day.target.lo - s)} to go</b>: about ${fmtDur(Math.max(1, Math.ceil((loadFromStrain(day.target.lo) - day.load) / minuteLoad(0.66))))} at tempo effort.`;
+  else line = `You are at ${one(s)}, with <b>${one(day.target.lo - s)} to go</b>: about ${fmtDur(Math.max(1, Math.ceil((loadFromStrain(day.target.lo) - (day.src?.strain === 'whoop' ? loadFromStrain(s) : day.load)) / minuteLoad(0.66))))} at tempo effort.`;
   return { scale, line };
 }
 
@@ -35,6 +35,8 @@ export function renderStrain(day) {
   const lede = $('#strain-lede');
   if (!isNum(day.strain)) {
     lede.textContent = 'No heart-rate data for this day, so there is no strain to work out. Was the band on your wrist?';
+  } else if (day.src?.strain === 'whoop') {
+    lede.innerHTML = `<b>${one(day.strain)}</b> of 21, ${day.band.name.toLowerCase()}, as scored by WHOOP${day.partial ? ' so far' : ''}.`;
   } else {
     const active = day.zoneMin.slice(1).reduce((a, b) => a + b, 0);
     lede.innerHTML = `<b>${one(day.strain)}</b> of 21, ${day.band.name.toLowerCase()}. Built from <b>${fmtDur(active)}</b> above ${Math.round(FLOOR * 100)}% of your heart-rate range${day.partial ? ' so far' : ''}.`;
@@ -110,7 +112,9 @@ export function renderRecovery(day, ctx) {
   } else {
     const lead = [...day.recoveryParts].sort((a, b) => Math.abs(b.z * b.w) - Math.abs(a.z * a.w))[0];
     const why = lead ? `${DEV[lead.key].name.toLowerCase()} ${lead.z >= 0 ? 'helping' : 'holding it back'} most` : '';
-    lede.innerHTML = `<b>${day.recovery}%</b>, ${recoveryBand(day.recovery).toLowerCase()}. ${why ? why[0].toUpperCase() + why.slice(1) + '.' : ''}`;
+    lede.innerHTML = day.src?.recovery === 'whoop'
+      ? `<b>${day.recovery}%</b>, ${recoveryBand(day.recovery).toLowerCase()}, as scored by WHOOP.`
+      : `<b>${day.recovery}%</b>, ${recoveryBand(day.recovery).toLowerCase()}. ${why ? why[0].toUpperCase() + why.slice(1) + '.' : ''}`;
     for (const p of day.recoveryParts) {
       const def = DEV[p.key], v = def.get(day), b = def.base(day.baseline);
       const width = clamp(Math.abs(p.z) / 3, 0.02, 1) * 50;
@@ -138,7 +142,9 @@ export function renderSleep(day, ctx) {
   for (let i = 6; i >= 0; i--) { const k = addDays(day.date, -i); week.push({ date: k, sleep: ctx.byDate[k]?.sleep || null, selected: k === day.date }); }
   consistency($('#consistency'), week);
   if (!s) {
-    lede.textContent = day.partial ? 'Last night has not synced yet. Open the Google Health app on your phone to push it through.' : 'No sleep was recorded for this night.';
+    const w = day.src?.sleep === 'whoop' ? day.whoop : null;
+    if (w) lede.innerHTML = `Sleep <b>${day.sleepPct}%</b>, as scored by WHOOP${isNum(w.sleepMinutes) ? `, with <b>${fmtDur(w.sleepMinutes)}</b> asleep` : ''}. The band recorded no night, so there are no stages here.`;
+    else lede.textContent = day.partial ? 'Last night has not synced yet. Open the Google Health app on your phone to push it through.' : 'No sleep was recorded for this night.';
     hyp.replaceChildren(h('p', { class: 'empty', text: 'Nothing recorded.' }));
     stages.replaceChildren(h('p', { class: 'empty', text: '–' })); need.replaceChildren(h('p', { class: 'empty', text: '–' }));
     return;

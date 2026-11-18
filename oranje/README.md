@@ -76,7 +76,7 @@ While the consent screen is in *Testing*, Google expires every grant after seven
 
 ## Connect WHOOP
 
-Choose **WHOOP scores** on the welcome page or in settings. This opens a separate view with WHOOP's own Strain, Recovery and Sleep scores, plus HRV, resting/average heart rate, sleep duration and workouts from the last 30 days. The WHOOP API provides averages rather than continuous heart-rate samples.
+Choose **WHOOP scores** on the welcome page or in settings to connect. Once WHOOP is connected, the dashboard uses WHOOP's own Strain, Recovery and Sleep scores for every day WHOOP scored (see *Which source leads* below). The WHOOP page itself also lists HRV, resting/average heart rate, sleep duration and workouts from the last 30 days. The WHOOP API provides averages rather than continuous heart-rate samples.
 
 Owner setup for the existing Base44 app:
 
@@ -86,6 +86,16 @@ Owner setup for the existing Base44 app:
 4. Open [Oranje's WHOOP view](https://oranje-962c1581.base44.app/whoop.html), select **Connect WHOOP** and grant the requested read access at WHOOP. You can use the WHOOP Sandbox tier for personal use.
 
 The Base44 WHOOP functions proxy the API because it does not allow cross-origin browser requests. They use a separate encrypted browser cookie for each WHOOP session and do not persist health records. **Disconnect** clears the browser session and requests revocation at WHOOP. If WHOOP cannot confirm revocation, remove Oranje from Connected Apps in WHOOP.
+
+## Which source leads
+
+What a wearable measured or scored comes first; phone apps and Oranje's own estimates fill gaps (`js/core/sources.js`, `js/data/health.js`).
+
+1. **Scores.** For days WHOOP scored, its own strain, recovery and sleep replace Oranje's estimates. Each score on Today is tagged *WHOOP* or *Oranje estimate*; the Strain, Recovery and Sleep views show Oranje's estimate beside WHOOP's number. The strain target follows WHOOP's recovery.
+2. **Fitbit data.** Every data type is first requested from Google's `google-wearables` source family: Fitbit trackers and Pixel Watch only, nothing typed in or written by apps. Only when the band has nothing for a type does Oranje read all sources (Apple Health, Health Connect, other apps). Sleep cannot be filtered that way, so a night a wearable recorded is preferred. *Data health* in settings shows for each type whether it came from the band or other apps.
+3. **Vitals.** Resting heart rate and HRV come from the Fitbit; WHOOP's readings fill days the band missed.
+
+A WHOOP connection belongs to the browser, not the Google account, so on a shared device WHOOP scores are only added to the days of the person who first used them there.
 
 ## How the scores work
 

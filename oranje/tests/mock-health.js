@@ -14,7 +14,9 @@ const offset = (ms) => `${-new Date(ms).getTimezoneOffset() * 60}s`;
 const session = (t0, t1) => ({ startTime: iso(t0), startUtcOffset: offset(t0), endTime: iso(t1), endUtcOffset: offset(t1), civilStartTime: { date: civil(keyOf(new Date(t0))) }, civilEndTime: { date: civil(keyOf(new Date(t1))) } });
 const STAGE = { wake: 'AWAKE', light: 'LIGHT', deep: 'DEEP', rem: 'REM' };
 
-export function createMockHealth(days, { deny = [], noReconcile = false, unauthorized = false, notLinked = false, age = 33 } = {}) {
+// `appOnly` lists types that only phone apps wrote: asked for from the
+// google-wearables source family they come back empty, as on the real API.
+export function createMockHealth(days, { deny = [], appOnly = [], noReconcile = false, unauthorized = false, notLinked = false, age = 33 } = {}) {
   const log = [];
   const json = (status, body) => ({ ok: status >= 200 && status < 300, status, headers: { get: () => 'application/json' }, json: async () => body });
   const error = (status, statusName, reason, message) => json(status, { error: { code: status, status: statusName, message, details: [{ reason }] } });
@@ -37,7 +39,8 @@ export function createMockHealth(days, { deny = [], noReconcile = false, unautho
 
   async function fetchImpl(url, init = {}) {
     const u = new URL(url), method = init.method || 'GET', body = init.body ? JSON.parse(init.body) : null;
-    log.push({ method, path: u.pathname, filter: u.searchParams.get('filter'), body });
+    const family = u.searchParams.get('dataSourceFamily') || body?.dataSourceFamily || null;
+    log.push({ method, path: u.pathname, filter: u.searchParams.get('filter'), body, family });
     if (!/^Bearer \S+/.test(init.headers?.Authorization || '')) return error(401, 'UNAUTHENTICATED', 'ACCESS_TOKEN_MISSING', 'No token');
     if (unauthorized) return error(401, 'UNAUTHENTICATED', 'ACCESS_TOKEN_EXPIRED', 'Token expired');
     if (notLinked) return error(400, 'FAILED_PRECONDITION', 'ACCOUNT_NOT_LINKED', 'Account not linked');
@@ -50,6 +53,8 @@ export function createMockHealth(days, { deny = [], noReconcile = false, unautho
     if (!m) return error(404, 'NOT_FOUND', 'NOT_FOUND', `No route ${u.pathname}`);
     const [, type, op] = m;
     if (deny.includes(type)) return error(403, 'PERMISSION_DENIED', 'MISSING_OAUTH_SCOPE', 'Request had insufficient authentication scopes.');
+    if (family && type === 'sleep') return error(400, 'INVALID_ARGUMENT', 'UNSUPPORTED_FILTER', 'sleep cannot be filtered by data source family');
+    if (family?.endsWith('/google-wearables') && appOnly.includes(type)) return json(200, op === ':rollUp' || op === ':dailyRollUp' ? { rollupDataPoints: [] } : { dataPoints: [] });
 
     if (op === ':rollUp') {
       if (method !== 'POST' || type !== 'heart-rate') return error(400, 'INVALID_ARGUMENT', 'UNSUPPORTED', 'rollUp');
