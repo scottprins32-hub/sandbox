@@ -3,7 +3,7 @@
 
 import { LEVELS, levelAt } from '../core/game.js';
 import { clamp, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=5';
+import { $, h, polar, reduced, roll } from './motion.js?v=6';
 
 const fmtAlt = (m) => `${m < 0 ? '−' : ''}${Math.abs(m) >= 100 ? Math.round(Math.abs(m)).toLocaleString('en-GB') : Math.abs(m).toFixed(m > -10 && m < 10 && m % 1 ? 1 : 0)}`;
 const dayLabel = (key) => fromKey(key).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -65,24 +65,27 @@ function profile(el, game, selected, onPick) {
   // landmark heights, top down; a label too close to the one above it is left out.
   // On a phone the labels sit inside the chart, so they are drawn last, over the
   // climb, with a halo in the page colour so they stay readable on the slopes.
-  let lastY = -Infinity;
+  let lastY = -Infinity, lastLine = -Infinity;
   const labels = [];
   for (const l of [...LEVELS].reverse()) {
     if (l.alt < lo || l.alt > hi) continue;
     const y = Y(l.alt), got = game.reached[l.id] || l.id === 'polder';
     svg.append(h('line', { x1: PL, x2: W - PR, y1: y, y2: y, class: `p-level${got ? ' got' : ''}` }));
-    if (y - lastY < (narrow ? 20 : 16)) continue;
-    lastY = y;
     const label = `${l.name} ${fmtAlt(l.alt)} m`;
-    if (narrow && l.id === 'nap') continue;   // the axis already says 0 m
-    if (narrow) {
-      // start after this level's flag when the flag would sit inside the text
-      const fx = flagX(l), wide = label.length * 6.7;
-      let x = PL + 4;
-      if (fx != null && fx > x - 12 && fx < x + wide + 4 && fx + 14 + wide < W - PR) x = fx + 14;
-      labels.push(h('text', { x, y: y - 5, class: `p-lab halo${got ? ' got' : ''}`, text: label }));
+    if (!narrow) {
+      if (y - lastY < 16) continue;
+      lastY = y;
+      svg.append(h('text', { x: W - PR + 10, y: y + 4, class: `p-lab${got ? ' got' : ''}`, text: label }));
+      continue;
     }
-    else svg.append(h('text', { x: W - PR + 10, y: y + 4, class: `p-lab${got ? ' got' : ''}`, text: label }));
+    if (l.alt <= 0) continue;   // the axis already marks 0 m
+    if (y - lastLine < 20) continue;   // too close to the line above
+    // when this level's flag would sit inside the text, lift the name above the flag
+    const fx = flagX(l), wide = label.length * 6.7, x = PL + 4;
+    const ty = y - (fx != null && fx > x - 12 && fx < x + wide + 4 ? 23 : 5);
+    if (ty - lastY < 15) continue;   // too close to the name above
+    lastY = ty; lastLine = y;
+    labels.push(h('text', { x, y: ty, class: `p-lab halo${got ? ' got' : ''}`, text: label }));
   }
   if (next && !showNext) {
     svg.append(h('text', { x: PL + 4, y: PT - 12, class: 'p-lab next', text: `↑ ${next.name} ${fmtAlt(next.alt)} m · ${Math.ceil(next.alt - top)} m to go` }));

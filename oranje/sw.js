@@ -2,13 +2,13 @@
 // Network first for everything, so a new version is never hidden behind an
 // old copy; the cache is only the fallback. Sign-in and Google are never cached.
 
-const CACHE = 'oranje-shell-v5';
+const CACHE = 'oranje-shell-v6';
 const SHELL = [
-  './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css?v=5',
-  'js/boot.js?v=5', 'js/main.js?v=5',
+  './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css?v=6',
+  'js/boot.js?v=6', 'js/main.js?v=6',
   'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
-  'js/ui/charts.js?v=5', 'js/ui/dial.js?v=5', 'js/ui/game.js?v=5', 'js/ui/motion.js?v=5', 'js/ui/river.js?v=5', 'js/ui/ring.js?v=5', 'js/ui/sections.js?v=5',
+  'js/ui/charts.js?v=6', 'js/ui/dial.js?v=6', 'js/ui/game.js?v=6', 'js/ui/motion.js?v=6', 'js/ui/river.js?v=6', 'js/ui/ring.js?v=6', 'js/ui/sections.js?v=6',
   'fonts/Archivo-100-900.woff2', 'fonts/BarlowSemiCondensed-600.woff2', 'fonts/IBMPlexMono-400.woff2', 'fonts/IBMPlexMono-500.woff2',
   'icons/icon.svg', 'icons/favicon.ico', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 ];

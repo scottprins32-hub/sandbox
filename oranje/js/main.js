@@ -8,12 +8,12 @@ import { auth } from './data/auth.js';
 import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
-import { createDial, createMeter } from './ui/dial.js?v=5';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=5';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=5';
-import { createRiver } from './ui/river.js?v=5';
-import { createRing } from './ui/ring.js?v=5';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=5';
+import { createDial, createMeter } from './ui/dial.js?v=6';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=6';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=6';
+import { createRiver } from './ui/river.js?v=6';
+import { createRing } from './ui/ring.js?v=6';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=6';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
