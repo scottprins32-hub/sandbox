@@ -5,7 +5,7 @@
 const CACHE = 'oranje-shell-v4';
 const SHELL = [
   './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css?v=4',
-  'js/boot.js', 'js/main.js?v=4',
+  'js/boot.js?v=4', 'js/main.js?v=4',
   'js/core/game.js', 'js/core/scores.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
   'js/ui/charts.js?v=4', 'js/ui/dial.js?v=4', 'js/ui/game.js?v=4', 'js/ui/motion.js?v=4', 'js/ui/river.js?v=4', 'js/ui/ring.js?v=4', 'js/ui/sections.js?v=4',
