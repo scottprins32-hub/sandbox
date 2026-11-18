@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'dist');
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'config.js', 'manifest.webmanifest', 'sw.js', 'css', 'js', 'fonts', 'icons']) {
+for (const f of ['index.html', 'privacy.html', 'terms.html', 'config.js', 'manifest.webmanifest', 'sw.js', 'css', 'js', 'fonts', 'icons', 'brand']) {
   cpSync(join(root, f), join(out, f), { recursive: true, force: true });
 }
 console.log(`site built in ${out}`);

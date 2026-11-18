@@ -14,7 +14,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Oranje">
 <meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Oranje">
+<meta property="og:title" content="Oranje">
+<meta property="og:description" content="Strain, recovery en slaap voor je Fitbit Air.">
+<meta property="og:url" content="https://oranje-962c1581.base44.app/">
+<meta property="og:image" content="https://oranje-962c1581.base44.app/brand/oranje-share-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
@@ -29,13 +39,11 @@
 
 <header class="bar">
   <a class="brand" href="#today" aria-label="Oranje, back to top">
-    <svg class="flag" viewBox="0 0 30 22" aria-hidden="true">
-      <path class="wimpel" d="M2 3h26l-5 2.2H2z"/>
-      <rect x="2" y="7.4" width="19" height="4.2" fill="#D21F33"/>
-      <rect x="2" y="11.6" width="19" height="4.2" fill="#FFFFFF"/>
-      <rect x="2" y="15.8" width="19" height="4.2" fill="#2A56B5"/>
-      <rect class="flag-edge" x="2" y="7.4" width="19" height="12.6"/>
-    </svg>
+    <svg class="brand-mark" viewBox="71 77 370 370" aria-hidden="true"><defs><linearGradient id="hdr-heat" gradientUnits="userSpaceOnUse" x1="152.8" y1="365.2" x2="374.1" y2="176.2"><stop offset="0" stop-color="#FFB36B"/><stop offset=".55" stop-color="#FF6A00"/><stop offset="1" stop-color="#F0461E"/></linearGradient></defs>
+<path d="M374.12 176.18A146 146 0 0 1 359.24 365.24" fill="none" class="bm-track" stroke-width="62" stroke-linecap="round"/>
+<path d="M152.76 365.24A146 146 0 1 1 374.12 176.18" fill="none" stroke="url(#hdr-heat)" stroke-width="62" stroke-linecap="round"/>
+<circle cx="374.12" cy="176.18" r="48.36" class="bm-gap"/>
+<circle cx="374.12" cy="176.18" r="38.44" class="bm-knob"/></svg>
     <span class="brand-name">Oranje</span>
   </a>
   <nav class="nav" aria-label="Sections">
@@ -298,6 +306,7 @@
       <div>
         <p id="foot-source"></p>
         <p id="foot-privacy">Health data is read from Google Health and kept in this browser only.</p>
+        <p class="foot-links"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
       </div>
     </footer>
   </div>

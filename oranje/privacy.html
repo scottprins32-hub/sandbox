@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy · Oranje</title>
+<meta name="description" content="Hoe Oranje omgaat met je Fitbit- en Google-gegevens.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#04102B">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/boot.js"></script>
+</head>
+<body>
+<main class="doc">
+  <a class="doc-back" href="./"><img src="icons/icon.svg" alt="" width="28" height="28"> Oranje</a>
+  <h1>Privacy</h1>
+  <p class="doc-meta">Bijgewerkt op 18 november 2026</p>
+
+  <p class="doc-lede">Oranje is een persoonlijke app die laat zien hoe je Fitbit Air je dag meet. Hij wordt gemaakt en beheerd door een privépersoon voor een kleine kring mensen. Er zit geen bedrijf achter, er zijn geen advertenties en er wordt niets verkocht.</p>
+
+  <h2>Kort gezegd</h2>
+  <ul>
+    <li>Je gezondheidsgegevens gaan van Google rechtstreeks naar je eigen browser en blijven daar.</li>
+    <li>Er is geen database. Niemand anders kan je gegevens zien, ook de beheerder niet.</li>
+    <li>Oranje kan alleen lezen. Hij kan niets veranderen in je Google- of Fitbit-account.</li>
+    <li>Je kunt de koppeling altijd verbreken en alles wissen.</li>
+  </ul>
+
+  <h2>Wat Oranje leest</h2>
+  <p>Alleen nadat je bij Google toestemming geeft, en alleen-lezen, via de Google Health API:</p>
+  <ul>
+    <li><b>Activiteit en fitness:</b> stappen, afstand, calorieën, zone-minuten, trainingen en cardio-fitness.</li>
+    <li><b>Gezondheidsmetingen:</b> hartslag, rusthartslag, hartslagvariabiliteit (HRV), zuurstof in het bloed, ademhaling en huidtemperatuur.</li>
+    <li><b>Slaap:</b> wanneer je sliep en de slaapfases.</li>
+    <li><b>Profiel en instellingen:</b> je leeftijd, je tijdzone en de status van je band, zoals de batterij.</li>
+    <li><b>Je naam en e-mailadres</b> van je Google-account, alleen om te laten zien wie er is ingelogd.</li>
+  </ul>
+
+  <h2>Waar je gegevens blijven</h2>
+  <p>Je browser haalt de gegevens zelf op bij Google en bewaart ze in de opslag van die browser, zodat de app snel opent. Strain, recovery, slaapscore en de klimgame worden in je browser berekend. Er wordt niets naar een server van Oranje gestuurd.</p>
+  <p>Om ingelogd te blijven bewaart Oranje de inlogsleutel die Google afgeeft (een zogenaamd refresh token) en je naam en e-mailadres versleuteld (AES-GCM) in een cookie in jouw browser. Scripts op de pagina kunnen die cookie niet lezen (httpOnly). De kleine inlogfuncties van Oranje gebruiken hem alleen om bij Google een toegangscode van een uur op te halen. Ze slaan niets op en zien geen gezondheidsgegevens.</p>
+
+  <h2>Hosting</h2>
+  <p>De site en de inlogfuncties draaien bij Base44. Zoals elke webserver kan Base44 technische gegevens verwerken, zoals je IP-adres en het tijdstip van een bezoek, volgens <a href="https://base44.com/about-us/legal/privacy-policy" rel="noopener" target="_blank">het privacybeleid van Base44</a>. Base44 voegt eigen scripts toe aan de pagina. Oranje staat het uitvoeren daarvan niet toe en gebruikt geen statistiek- of advertentiediensten.</p>
+
+  <h2>Delen</h2>
+  <p>Oranje deelt je gegevens met niemand. Ze worden niet verkocht, niet gebruikt voor advertenties en niet gebruikt om AI-modellen te trainen.</p>
+  <p lang="en">Oranje's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener" target="_blank">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+  <h2>Verwijderen</h2>
+  <ul>
+    <li>In de app: <b>Instellingen</b>, dan <b>Disconnect</b>. Dat wist de gegevens in je browser, verwijdert de inlogcookie en trekt de toegang bij Google in.</li>
+    <li>Bij Google: op <a href="https://myaccount.google.com/connections" rel="noopener" target="_blank">myaccount.google.com/connections</a> kun je Oranje de toegang ontnemen.</li>
+  </ul>
+
+  <h2>Geen medisch advies</h2>
+  <p>De scores in Oranje zijn eigen schattingen, gebaseerd op gepubliceerd sportonderzoek. Het zijn niet de scores van Fitbit, Google of WHOOP, en ze zijn geen medisch advies.</p>
+
+  <h2>Vragen</h2>
+  <p>Vragen over je gegevens kun je stellen aan de persoon die je de link naar Oranje heeft gestuurd; dat is de beheerder van deze app.</p>
+
+  <p class="doc-foot"><a href="./">Terug naar Oranje</a> · <a href="terms.html">Voorwaarden</a></p>
+</main>
+</body>
+</html>

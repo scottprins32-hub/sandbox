@@ -2,7 +2,7 @@
 // Network first for everything, so a new version is never hidden behind an
 // old copy; the cache is only the fallback. Sign-in and Google are never cached.
 
-const CACHE = 'oranje-shell-v1';
+const CACHE = 'oranje-shell-v2';
 const SHELL = [
   './', 'index.html', 'config.js', 'manifest.webmanifest', 'css/style.css',
   'js/boot.js', 'js/main.js',
@@ -10,7 +10,7 @@ const SHELL = [
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js',
   'js/ui/charts.js', 'js/ui/dial.js', 'js/ui/game.js', 'js/ui/motion.js', 'js/ui/river.js', 'js/ui/sections.js',
   'fonts/Archivo-100-900.woff2', 'fonts/IBMPlexMono-400.woff2', 'fonts/IBMPlexMono-500.woff2',
-  'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
+  'icons/icon.svg', 'icons/favicon.ico', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 ];
 
 self.addEventListener('install', (e) => {
