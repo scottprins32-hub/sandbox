@@ -40,7 +40,7 @@
 <div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <header class="bar">
-  <a class="brand" href="#today" aria-label="Oranje, back to top">
+  <a class="brand" href="#today" aria-label="Oranje, today">
     <svg class="brand-mark" viewBox="71 77 370 370" aria-hidden="true"><defs><linearGradient id="hdr-heat" gradientUnits="userSpaceOnUse" x1="152.8" y1="365.2" x2="374.1" y2="176.2"><stop offset="0" stop-color="#FFB36B"/><stop offset=".55" stop-color="#FF6A00"/><stop offset="1" stop-color="#F0461E"/></linearGradient></defs>
 <path d="M374.12 176.18A146 146 0 0 1 359.24 365.24" fill="none" class="bm-track" stroke-width="62" stroke-linecap="round"/>
 <path d="M152.76 365.24A146 146 0 1 1 374.12 176.18" fill="none" stroke="url(#hdr-heat)" stroke-width="62" stroke-linecap="round"/>
@@ -48,15 +48,11 @@
 <circle cx="374.12" cy="176.18" r="38.44" class="bm-knob"/></svg>
     <span class="brand-name">Oranje</span>
   </a>
-  <nav class="nav" aria-label="Sections">
-    <a href="#today">Today</a>
-    <a href="#climb">Climb</a>
-    <a href="#strain">Strain</a>
-    <a href="#recovery">Recovery</a>
-    <a href="#sleep">Sleep</a>
-    <a href="#vitals">Vitals</a>
-    <a href="#trends">Trends</a>
-  </nav>
+  <div class="daynav" id="daynav" hidden>
+    <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+    <button class="dayline" id="dayline" type="button" aria-live="polite" title="Jump to today"></button>
+    <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+  </div>
   <div class="bar-end">
     <button class="status" id="status" type="button" hidden><i class="status-dot"></i><span id="status-text"></span></button>
     <button class="icon-btn" id="look-btn" type="button" aria-label="Switch to the cream look">
@@ -67,6 +63,13 @@
     </button>
   </div>
 </header>
+<nav class="tabs" id="tabs" aria-label="Views" hidden>
+  <a href="#today" data-view="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.34 17.66A8 8 0 1 1 17.66 17.66"/><circle cx="17.66" cy="6.34" r="1.9" class="fill"/></svg><span>Today</span></a>
+  <a href="#strain" data-view="strain"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12.5h4l2.2-5.5 4.3 11 2.3-5.5H21"/></svg><span>Strain</span></a>
+  <a href="#recovery" data-view="recovery"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="16" height="10" rx="2.6"/><path d="M21.5 10.5v3"/><path d="M11.6 9.2 9.4 12.4h3.2l-2.2 3.2"/></svg><span>Recovery</span></a>
+  <a href="#sleep" data-view="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 1 1 9.4 4.5a6.4 6.4 0 0 0 10.1 10.1z"/></svg><span>Sleep</span></a>
+  <a href="#climb" data-view="climb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 20 9 10.2l3.6 5.1 2.6-3.3L21.5 20z"/><path d="M9 10.2V3.8l4.4 1.6L9 7"/></svg><span>Climb</span></a>
+</nav>
 
 <main id="main">
 
@@ -126,44 +129,24 @@
     </div>
   </section>
 
-  <!-- ───────────── Dashboard ───────────── -->
+  <!-- ───────────── Dashboard: five views ───────────── -->
   <div id="dash" hidden>
 
-    <section class="today" id="today" aria-labelledby="verdict">
-      <div class="today-grid">
-        <div class="dial" id="dial" role="img">
-          <div class="dial-read">
-            <span class="eyebrow">Day strain</span>
-            <strong class="dial-num" id="strain-num">–</strong>
-            <span class="dial-band" id="strain-band"></span>
-            <span class="dial-target" id="strain-target"></span>
-          </div>
+    <section class="view" id="view-today" data-view="today" aria-labelledby="verdict">
+      <div class="today-top">
+        <h1 class="verdict" id="verdict"></h1>
+        <div class="ribbon" id="ribbon" role="group" aria-label="Recent days: strain bar and recovery dot for each day"></div>
+      </div>
+      <div class="cards">
+        <div class="card trio span-7" id="trio">
+          <a class="ring" id="ring-strain" href="#strain" data-kind="strain"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong></span></span><span class="ring-label">Strain</span><span class="ring-band"></span></a>
+          <a class="ring" id="ring-recovery" href="#recovery" data-kind="recovery"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Recovery</span><span class="ring-band"></span></a>
+          <a class="ring" id="ring-sleep" href="#sleep" data-kind="sleep"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Sleep</span><span class="ring-band"></span></a>
         </div>
-
-        <div class="brief">
-          <div class="daynav">
-            <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
-            <p class="dayline" id="dayline" aria-live="polite"></p>
-            <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
-          </div>
-          <div class="ribbon" id="ribbon" role="group" aria-label="Last two weeks: strain bar and recovery dot for each day"></div>
-
-          <h1 class="verdict" id="verdict"></h1>
-
-          <div class="meters">
-            <article class="meter" id="m-recovery">
-              <header><h2>Recovery</h2><span class="meter-band" id="recovery-band"></span></header>
-              <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
-              <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
-              <dl class="facts" id="recovery-facts"></dl>
-            </article>
-            <article class="meter sleep" id="m-sleep">
-              <header><h2>Sleep</h2><span class="meter-band" id="sleep-band"></span></header>
-              <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
-              <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
-              <dl class="facts" id="sleep-facts"></dl>
-            </article>
-          </div>
+        <div class="card goal span-5" id="goal">
+          <h3>Today's target</h3>
+          <div id="goal-scale"></div>
+          <p class="goal-text" id="goal-text"></p>
           <a class="climb-chip" id="climb-chip" href="#climb">
             <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 9.5 8l3.5 5 2.5-3L22 20z"/></svg>
             <span class="cc-alt"><b id="cc-alt">–</b> m</span>
@@ -171,59 +154,55 @@
             <span class="cc-streak" id="cc-streak"></span>
           </a>
         </div>
-      </div>
-
-      <figure class="river-wrap">
-        <figcaption>
-          <span class="cap-title">The day, beat by beat</span>
-          <span class="legend"><i class="lg-hr"></i>Heart rate <i class="lg-build"></i>Strain building <i class="lg-sleep"></i>Asleep</span>
-        </figcaption>
-        <div class="river" id="river" tabindex="0"></div>
-      </figure>
-    </section>
-
-    <section class="sec" id="climb" aria-labelledby="h-climb">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-climb">Climb</h2>
-        <p id="climb-lede"></p>
-      </header>
-      <figure class="block" data-reveal>
-        <h3>From the polder, one day at a time</h3>
-        <div class="profile" id="profile"></div>
-        <figcaption class="note" id="profile-note"></figcaption>
-      </figure>
-      <div class="climb-grid">
-        <div class="block" data-reveal>
-          <div class="earn-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
-          <ul class="earn" id="earn"></ul>
-        </div>
-        <div class="block" data-reveal>
-          <h3>Streaks</h3>
-          <div class="streaks" id="streaks"></div>
-        </div>
-      </div>
-      <div class="block medals" data-reveal>
-        <h3>Medals <span id="badge-count"></span></h3>
-        <div class="badges" id="badges"></div>
+        <figure class="card span-12 river-card">
+          <figcaption>
+            <h3>The day, beat by beat</h3>
+            <span class="legend"><i class="lg-hr"></i>Heart rate <i class="lg-build"></i>Strain building <i class="lg-sleep"></i>Asleep</span>
+          </figcaption>
+          <div class="river" id="river" tabindex="0"></div>
+        </figure>
+        <section class="card plain span-12" id="vitals" aria-labelledby="h-vitals">
+          <div class="card-head"><h3 id="h-vitals">Vitals</h3><button class="link small" id="customise" type="button">Choose what shows</button></div>
+          <div class="tiles" id="tiles"></div>
+        </section>
+        <section class="card span-12" id="trends" aria-labelledby="h-trends">
+          <div class="card-head">
+            <h3 id="h-trends">Strain against recovery</h3>
+            <div class="seg" role="group" aria-label="Range">
+              <button type="button" data-range="14" aria-pressed="true">2 weeks</button>
+              <button type="button" data-range="28" aria-pressed="false">4 weeks</button>
+            </div>
+          </div>
+          <p class="card-lede" id="trends-lede"></p>
+          <div class="trend" id="trend"></div>
+          <dl class="averages" id="averages"></dl>
+        </section>
       </div>
     </section>
 
-    <section class="sec" id="strain" aria-labelledby="h-strain">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-strain">Strain</h2>
-        <p id="strain-lede"></p>
-      </header>
-      <div class="strain-grid">
-        <div class="block" data-reveal>
+    <section class="view" id="view-strain" data-view="strain" aria-labelledby="h-strain" hidden>
+      <header class="view-head"><h2 id="h-strain">Strain</h2><p id="strain-lede"></p></header>
+      <div class="cards">
+        <div class="card dial-card span-5">
+          <div class="dial" id="dial" role="img">
+            <div class="dial-read">
+              <span class="eyebrow">Day strain</span>
+              <strong class="dial-num" id="strain-num">–</strong>
+              <span class="dial-band" id="strain-band"></span>
+              <span class="dial-target" id="strain-target"></span>
+            </div>
+          </div>
+        </div>
+        <div class="card span-7">
           <h3>Time in each zone</h3>
           <div class="zones" id="zones"></div>
           <p class="note" id="zones-note"></p>
         </div>
-        <div class="block" data-reveal>
+        <div class="card span-6">
           <h3>Sessions</h3>
           <ol class="sessions" id="sessions"></ol>
         </div>
-        <figure class="block curve" data-reveal>
+        <figure class="card curve span-6">
           <h3>Why the last points are the hardest</h3>
           <div id="curve"></div>
           <figcaption id="curve-note"></figcaption>
@@ -231,72 +210,75 @@
       </div>
     </section>
 
-    <section class="sec" id="recovery" aria-labelledby="h-recovery">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-recovery">Recovery</h2>
-        <p id="recovery-lede"></p>
-      </header>
-      <div class="recovery-grid">
-        <div class="block" data-reveal>
-          <h3>This morning against your own normal</h3>
-          <div class="devs" id="devs"></div>
-          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
-        </div>
-        <div class="block aim" data-reveal>
+    <section class="view" id="view-recovery" data-view="recovery" aria-labelledby="h-recovery" hidden>
+      <header class="view-head"><h2 id="h-recovery">Recovery</h2><p id="recovery-lede"></p></header>
+      <div class="cards">
+        <article class="card meter score-card span-4" id="m-recovery">
+          <header><h3>This morning</h3><span class="meter-band" id="recovery-band"></span></header>
+          <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="recovery-facts"></dl>
+        </article>
+        <div class="card aim span-8">
           <h3>What today can take</h3>
           <div id="aim"></div>
+        </div>
+        <div class="card span-12">
+          <h3>Against your own normal</h3>
+          <div class="devs" id="devs"></div>
+          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
         </div>
       </div>
     </section>
 
-    <section class="sec" id="sleep" aria-labelledby="h-sleep">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-sleep">Sleep</h2>
-        <p id="sleep-lede"></p>
-      </header>
-      <div class="block" data-reveal>
-        <h3>Last night, stage by stage</h3>
-        <div class="hypno" id="hypno"></div>
-      </div>
-      <div class="sleep-grid">
-        <div class="block" data-reveal>
+    <section class="view" id="view-sleep" data-view="sleep" aria-labelledby="h-sleep" hidden>
+      <header class="view-head"><h2 id="h-sleep">Sleep</h2><p id="sleep-lede"></p></header>
+      <div class="cards">
+        <article class="card meter sleep score-card span-4" id="m-sleep">
+          <header><h3>Last night</h3><span class="meter-band" id="sleep-band"></span></header>
+          <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="sleep-facts"></dl>
+        </article>
+        <div class="card span-8">
+          <h3>Stage by stage</h3>
+          <div class="hypno" id="hypno"></div>
+        </div>
+        <div class="card span-4">
           <h3>Where the night went</h3>
           <div class="stages" id="stages"></div>
         </div>
-        <div class="block" data-reveal>
+        <div class="card span-4">
           <h3>Had against needed</h3>
           <div id="need"></div>
         </div>
-        <div class="block" data-reveal>
-          <h3>Bed and wake times, last 7 nights</h3>
+        <div class="card span-4">
+          <h3>Bed and wake times</h3>
           <div id="consistency"></div>
         </div>
       </div>
     </section>
 
-    <section class="sec" id="vitals" aria-labelledby="h-vitals">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-vitals">Vitals</h2>
-        <p>Each measurement with its last two weeks. <button class="link" id="customise" type="button">Choose what shows here</button></p>
-      </header>
-      <div class="tiles" id="tiles"></div>
-    </section>
-
-    <section class="sec" id="trends" aria-labelledby="h-trends">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-trends">Trends</h2>
-        <p id="trends-lede"></p>
-      </header>
-      <div class="block" data-reveal>
-        <div class="trend-head">
-          <h3>Strain taken on against recovery woken up with</h3>
-          <div class="seg" role="group" aria-label="Range">
-            <button type="button" data-range="14" aria-pressed="true">2 weeks</button>
-            <button type="button" data-range="28" aria-pressed="false">4 weeks</button>
-          </div>
+    <section class="view" id="view-climb" data-view="climb" aria-labelledby="h-climb" hidden>
+      <header class="view-head"><h2 id="h-climb">Climb</h2><p id="climb-lede"></p></header>
+      <div class="cards">
+        <figure class="card span-12" data-reveal>
+          <h3>From the polder, one day at a time</h3>
+          <div class="profile" id="profile"></div>
+          <figcaption class="note" id="profile-note"></figcaption>
+        </figure>
+        <div class="card span-7">
+          <div class="card-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
+          <ul class="earn" id="earn"></ul>
         </div>
-        <div class="trend" id="trend"></div>
-        <dl class="averages" id="averages"></dl>
+        <div class="card span-5">
+          <h3>Streaks</h3>
+          <div class="streaks" id="streaks"></div>
+        </div>
+        <div class="card medals span-12">
+          <h3>Medals <span id="badge-count"></span></h3>
+          <div class="badges" id="badges"></div>
+        </div>
       </div>
     </section>
 

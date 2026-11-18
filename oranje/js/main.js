@@ -12,7 +12,8 @@ import { createDial, createMeter } from './ui/dial.js';
 import { announce, renderChip, renderClimb } from './ui/game.js';
 import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js';
 import { createRiver } from './ui/river.js';
-import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js';
+import { createRing } from './ui/ring.js';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
@@ -22,6 +23,11 @@ const dial = createDial($('#dial'));
 const recMeter = createMeter($('#recovery-ticks'));
 const sleepMeter = createMeter($('#sleep-ticks'));
 const river = createRiver($('#river'));
+const rings = {
+  strain: createRing($('#ring-strain .ring-face'), { max: 21 }),
+  recovery: createRing($('#ring-recovery .ring-face')),
+  sleep: createRing($('#ring-sleep .ring-face')),
+};
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 // Preview builds (config.js: preview: true) run on demo data only and never offer sign-in.
 const PREVIEW = !!window.ORANJE_CONFIG?.preview;
@@ -31,9 +37,29 @@ function show(view) {
   const welcome = $('#welcome');
   if (welcome) welcome.hidden = view !== 'welcome';
   $('#dash').hidden = view !== 'dash';
-  $('#status').hidden = $('#open-panel').hidden = view !== 'dash';
+  $('#status').hidden = $('#open-panel').hidden = $('#daynav').hidden = $('#tabs').hidden = view !== 'dash';
   document.body.classList.toggle('welcoming', view === 'welcome');
+  if (view === 'dash') showView(routeOf(), { quiet: true });
 }
+
+// ───────── tabs: today, strain, recovery, sleep, climb ─────────
+const VIEWS = ['today', 'strain', 'recovery', 'sleep', 'climb'];
+const ALIAS = { vitals: 'today', trends: 'today' };
+const routeOf = () => { const k = location.hash.slice(1); return VIEWS.includes(k) ? k : ALIAS[k] || 'today'; };
+let shown = null;
+function showView(name, { quiet = false } = {}) {
+  const changed = name !== shown;
+  shown = name;
+  for (const v of VIEWS) $(`#view-${v}`).hidden = v !== name;
+  $$('#tabs a').forEach((a) => { if (a.dataset.view === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  if (!changed || quiet) return;
+  const el = $(`#view-${name}`);
+  el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (state.ctx) renderAll({ animate: false });
+  if (ALIAS[location.hash.slice(1)]) requestAnimationFrame(() => $(location.hash)?.scrollIntoView({ block: 'start' }));
+}
+window.addEventListener('hashchange', () => { if (!$('#dash').hidden) showView(routeOf()); });
 
 function compute() {
   setCurve(state.settings.curve);
@@ -90,7 +116,7 @@ function trend(v, base, goodUp, unit) {
 }
 
 let ribbonKey = '';
-const narrow = window.matchMedia('(max-width: 860px)');
+const narrow = window.matchMedia('(max-width: 720px)');
 function renderRibbon() {
   const days = state.ctx.days;
   let end = days.length - 1;
@@ -121,7 +147,10 @@ function renderRibbon() {
 function renderHero(animate, delay = 0) {
   const d = current(), days = state.ctx.days;
   const date = fromKey(d.date), isToday = d.date === todayKey();
-  $('#dayline').replaceChildren(h('b', { text: date.toLocaleDateString('en-GB', { weekday: 'long' }) }), ` ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}${isToday ? ' · today' : ''}`);
+  const dm = date.toLocaleDateString('en-GB', { day: 'numeric', month: narrow.matches ? 'short' : 'long' });
+  $('#dayline').replaceChildren(h('b', { text: isToday ? 'Today' : date.toLocaleDateString('en-GB', { weekday: 'long' }) }),
+    h('span', { class: isToday ? 'is-today' : '', text: isToday ? `${date.toLocaleDateString('en-GB', { weekday: 'short' })} ${dm}` : dm }));
+  $('#dayline').title = isToday ? '' : 'Jump to today';
   $('#day-prev').disabled = d.date === days[0].date;
   $('#day-next').disabled = d.date === days[days.length - 1].date;
   renderRibbon();
@@ -151,6 +180,38 @@ function renderHero(animate, delay = 0) {
 
   river.set(d, { animate });
   renderChip(state.game);
+  renderTrio(d, rec, sl, nights, animate, delay);
+  renderGoal(d);
+}
+
+// the three scores of the day, each a ring that opens its own tab
+function renderTrio(d, rec, sl, nights, animate, delay) {
+  const set = (kind, value, text, band, aria, i) => {
+    const el = $(`#ring-${kind}`), num = $('.ring-num', el);
+    el.dataset.band = band || '';
+    $('.ring-read', el).classList.toggle('nil', !isNum(value));
+    roll(num, value, { format: kind === 'strain' ? (v) => v.toFixed(1) : (v) => Math.round(v), dur: animate ? 1200 : 0, delay: delay + i * 90, key: `ring-${kind}` });
+    rings[kind].set(value, { animate, delay: delay + i * 90 });
+    $('.ring-band', el).textContent = text;
+    el.setAttribute('aria-label', `${aria}. Open the ${kind} view`);
+  };
+  const recBand = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
+  set('strain', d.strain, d.band ? d.band.name : 'No heart rate', '', isNum(d.strain) ? `Strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day', 0);
+  set('recovery', rec, isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning ${nights}/3` : 'No reading', recBand, isNum(rec) ? `Recovery ${rec}%, ${recoveryBand(rec)}` : 'No recovery for this day', 1);
+  set('sleep', sl?.score, !sl ? (d.partial ? 'Not synced' : 'Not recorded') : sl.score >= 85 ? 'Well rested' : sl.score >= 70 ? 'Enough' : 'Short',
+    '', sl ? `Sleep ${sl.score}%, ${fmtDur(sl.asleep)} asleep` : 'No sleep recorded', 2);
+}
+
+function renderGoal(d) {
+  const scale = $('#goal-scale'), text = $('#goal-text');
+  if (!d.target) {
+    scale.replaceChildren();
+    text.textContent = 'A strain target appears once recovery is known: a few nights of wear and it shows up here.';
+    return;
+  }
+  const parts = aimParts(d);
+  scale.replaceChildren(parts.scale);
+  text.innerHTML = `Aim for <b>${d.target.lo}–${d.target.hi}</b> on ${d.recovery}% recovery. ${parts.line}`;
 }
 
 function renderAll({ animate = true, delay = 0 } = {}) {
@@ -346,6 +407,7 @@ $('#setup-form')?.addEventListener('submit', (e) => {
 });
 $('#day-prev').addEventListener('click', () => step(-1));
 $('#day-next').addEventListener('click', () => step(1));
+$('#dayline').addEventListener('click', () => { const last = state.ctx?.days[state.ctx.days.length - 1]; if (last) pick(last.date); });
 $('#open-panel').addEventListener('click', openPanel);
 $('#customise').addEventListener('click', openPanel);
 $('#close-panel').addEventListener('click', closePanel);
@@ -381,11 +443,11 @@ $('#panel').addEventListener('keydown', (e) => {
   else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
 });
 
-// swipe the opening panel sideways to move a day (touch only)
+// swipe sideways anywhere on a view to move a day (touch only), except on charts you scrub
 {
-  const pane = $('.today-grid');
+  const pane = $('#dash');
   let x0 = 0, y0 = 0, tracking = false;
-  pane.addEventListener('touchstart', (e) => { if (e.touches.length !== 1) return; tracking = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  pane.addEventListener('touchstart', (e) => { if (e.touches.length !== 1 || e.target.closest('.river, .t-spark, .profile, .trend, .hypno, .seg')) return; tracking = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
   pane.addEventListener('touchend', (e) => {
     if (!tracking) return; tracking = false;
     const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
@@ -395,12 +457,6 @@ $('#panel').addEventListener('keydown', (e) => {
 }
 narrow.addEventListener('change', () => { if (state.ctx && !$('#dash').hidden) renderAll({ animate: false }); });
 
-// section in view → nav highlight
-const links = Object.fromEntries($$('.nav a').map((a) => [a.getAttribute('href').slice(1), a]));
-const spy = new IntersectionObserver((entries) => {
-  for (const en of entries) if (en.isIntersecting) { Object.values(links).forEach((a) => a.classList.remove('on')); links[en.target.id]?.classList.add('on'); }
-}, { rootMargin: '-45% 0px -50% 0px' });
-$$('#dash > section').forEach((s) => spy.observe(s));
 
 let lastW = window.innerWidth, rz = 0;
 window.addEventListener('resize', () => {

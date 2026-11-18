@@ -6,7 +6,7 @@
 import { chromium } from 'playwright';
 const BASE = process.argv[2] || 'http://localhost:4173/';
 const WIDTHS = [320, 360, 375, 390, 430, 600, 768, 820, 900, 1000, 1024, 1100, 1280, 1366, 1440, 1680, 1920];
-const PAGES = [['', true], ['privacy.html', false], ['terms.html', false]];
+const PAGES = [['', true], ['#strain', true], ['#recovery', true], ['#sleep', true], ['#climb', true], ['privacy.html', false], ['terms.html', false]];
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   let problems = 0;
@@ -40,7 +40,7 @@ const PAGES = [['', true], ['privacy.html', false], ['terms.html', false]];
           if (r.right > parent.right + 1 && el.matches('h2, h1')) out.push(`${el.tagName} "${el.textContent.trim().slice(0, 18)}" wider than its box by ${Math.round(r.right - parent.right)}px`);
         }
         // text whose rendered width exceeds its box (inline content overflowing)
-        for (const el of document.querySelectorAll('.sec-head h2, .doc h1, .welcome-title span')) {
+        for (const el of document.querySelectorAll('.view-head h2, .verdict, .ring-num, .doc h1, .welcome-title span')) {
           if (!el.offsetParent) continue;
           const range = document.createRange(); range.selectNodeContents(el);
           const tr = range.getBoundingClientRect(), br = el.getBoundingClientRect();

@@ -125,7 +125,7 @@ function profile(el, game, selected, onPick) {
 
 // ───────── the section ─────────
 export function renderClimb(day, game, onPick) {
-  const sec = $('#climb');
+  const sec = $('#view-climb');
   if (!sec) return;
   const L = game.level, today = game.byDate[day.date];
   const reachedList = Object.entries(game.reached).sort((a, b) => (a[1] < b[1] ? -1 : 1));
@@ -211,8 +211,12 @@ export function announce(game, scope, { delay = 1600 } = {}) {
   let k = 0;
   if (now.level > seen.level) toast({ art: summitArt(), title: `Summit: ${game.level.level.name}`, text: `${fmtAlt(game.level.level.alt)} m, ${game.level.level.note}.` }, delay + 900 * k++);
   const fresh = earned.filter((b) => !seen.badges.includes(b.id));
-  fresh.slice(0, 2).forEach((b) => toast({ art: medal(b, 52), title: `Medal: ${b.name}`, text: b.desc }, delay + 900 * k++));
-  if (fresh.length > 2) toast({ art: summitArt(), title: `And ${fresh.length - 2} more medals`, text: 'See them all in the climb.' }, delay + 900 * k++);
+  // one medal gets its own note; several share one, so the screen stays readable
+  if (fresh.length === 1) toast({ art: medal(fresh[0], 52), title: `Medal: ${fresh[0].name}`, text: fresh[0].desc }, delay + 900 * k++);
+  else if (fresh.length > 1) {
+    const names = fresh.map((b) => b.name);
+    toast({ art: medal(fresh[0], 52), title: `${fresh.length} new medals`, text: `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}. See them in the climb.` }, delay + 900 * k++);
+  }
 }
 
 export const altitude = fmtAlt;
