@@ -1,8 +1,11 @@
 // Renders the brand SVGs to PNG at exact pixel sizes with Chromium.
 // The share image embeds Archivo for its tagline via @font-face.
-const { chromium } = require('playwright');
-const { readFileSync } = require('node:fs');
-const path = require('node:path');
+import { chromium } from 'playwright';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const B = path.join(__dirname, '../../brand/');
 const I = path.join(__dirname, '../../icons/');
 const FONT = 'file://' + path.join(__dirname, '../../fonts/Archivo-100-900.woff2');
@@ -32,7 +35,7 @@ const jobs = [
 ];
 
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   for (const [src, out, w, h0, transparent] of jobs) {
     let svg = readFileSync(src, 'utf8');
     const vb = svg.match(/viewBox="([^"]+)"/)[1].split(/\s+/).map(Number);

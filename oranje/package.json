@@ -6,6 +6,7 @@
     "test": "node --test tests/*.test.js",
     "serve": "python3 -m http.server 4173",
     "build": "node tools/build-site.mjs",
-    "deploy": "node tools/build-site.mjs && base44 functions deploy && base44 site deploy --yes --no-build"
+    "deploy": "node tools/build-site.mjs && base44 functions deploy && base44 site deploy --yes --no-build",
+    "check:layout": "node tools/check-layout.mjs http://localhost:4173/"
   }
 }
