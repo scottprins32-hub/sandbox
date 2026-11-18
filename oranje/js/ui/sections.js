@@ -4,14 +4,31 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=3';
-import { $, h, roll } from './motion.js?v=3';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=4';
+import { $, h, roll } from './motion.js?v=4';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
 const signed = (v, digits = 0) => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(digits)}`;
 const dayName = (key) => fromKey(key).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const later = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
+
+// The target band on a 0–21 rail, and one line on where the day stands against it.
+export function aimParts(day) {
+  const pct = (s) => `${(s / 21) * 100}%`;
+  const scale = h('div', { class: 'aim-scale', role: 'img', 'aria-label': `Target strain ${day.target.lo} to ${day.target.hi}; current ${one(day.strain)}` },
+    ...[0, 7, 14, 21].map((s) => h('span', { class: 'lab', style: { left: pct(s) }, text: s })),
+    h('div', { class: 'rail' }),
+    h('div', { class: 'band', style: { left: pct(day.target.lo), width: pct(day.target.hi - day.target.lo) } }),
+    isNum(day.strain) ? h('div', { class: 'pin', style: { left: pct(day.strain) } }) : null);
+  const s = day.strain ?? 0;
+  let line;
+  if (!day.partial) line = s > day.target.hi ? `You went <b>${one(s - day.target.hi)} past</b> the top of it.` : s < day.target.lo ? `You finished <b>${one(day.target.lo - s)} short</b> of it, an easier day than you had in you.` : 'You <b>finished inside it</b>.';
+  else if (s > day.target.hi) line = `You are <b>${one(s - day.target.hi)} past</b> it already. Anything more today is borrowed from tomorrow.`;
+  else if (s >= day.target.lo) line = 'You are <b>inside it</b> now. This is a good place to stop.';
+  else line = `You are at ${one(s)}, with <b>${one(day.target.lo - s)} to go</b>: about ${fmtDur(Math.max(1, Math.ceil((loadFromStrain(day.target.lo) - day.load) / minuteLoad(0.66))))} at tempo effort.`;
+  return { scale, line };
+}
 
 // ───────── Strain ─────────
 export function renderStrain(day) {
@@ -109,18 +126,7 @@ export function renderRecovery(day, ctx) {
 
   aim.replaceChildren();
   if (!day.target) { aim.append(h('p', { class: 'empty', text: 'A strain target appears once recovery is known.' })); return; }
-  const pct = (s) => `${(s / 21) * 100}%`;
-  const scale = h('div', { class: 'aim-scale', role: 'img', 'aria-label': `Target strain ${day.target.lo} to ${day.target.hi}; current ${one(day.strain)}` },
-    ...[0, 7, 14, 21].map((s) => h('span', { class: 'lab', style: { left: pct(s) }, text: s })),
-    h('div', { class: 'rail' }),
-    h('div', { class: 'band', style: { left: pct(day.target.lo), width: pct(day.target.hi - day.target.lo) } }),
-    isNum(day.strain) ? h('div', { class: 'pin', style: { left: pct(day.strain) } }) : null);
-  const s = day.strain ?? 0;
-  let line;
-  if (!day.partial) line = s > day.target.hi ? `You went <b>${one(s - day.target.hi)} past</b> the top of it.` : s < day.target.lo ? `You finished <b>${one(day.target.lo - s)} short</b> of it, an easier day than you had in you.` : 'You <b>finished inside it</b>.';
-  else if (s > day.target.hi) line = `You are <b>${one(s - day.target.hi)} past</b> it already. Anything more today is borrowed from tomorrow.`;
-  else if (s >= day.target.lo) line = 'You are <b>inside it</b> now. This is a good place to stop.';
-  else line = `You are at ${one(s)}, with <b>${one(day.target.lo - s)} to go</b>: about ${fmtDur(Math.max(1, Math.ceil((loadFromStrain(day.target.lo) - day.load) / minuteLoad(0.66))))} at tempo effort.`;
+  const { scale, line } = aimParts(day);
   aim.append(scale, h('p', { html: `On ${day.recovery}% recovery, a strain of <b>${day.target.lo}–${day.target.hi}</b> ${day.partial ? 'is' : 'was'} the range that trains without digging a hole.` }), h('p', { html: line }));
 }
 

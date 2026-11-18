@@ -4,7 +4,7 @@
 
 import { ZONES, zoneOf, reserveShare } from '../core/strain.js';
 import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, isNum } from '../core/util.js';
-import { cancelTween, ease, h, reduced, tween } from './motion.js?v=3';
+import { ease, h, reduced, tween } from './motion.js?v=4';
 
 const STAGE_LABEL = { deep: 'Deep', light: 'Light', rem: 'REM', wake: 'Awake' };
 // rest → max, cool to hot
@@ -171,16 +171,14 @@ export function createRiver(root) {
 
   function render(animate) {
     if (!model || !root.clientWidth) return;
-    cancelTween(clipRect);
     measure();
     const s = scaleFor(model);
     paintFurniture(model, s);
     const from = shape;
     if (!animate || reduced() || !from) {
-      cancelTween(line);
       paintShape(model, s, model.hr, model.cumulative);
       if (animate && first && !reduced()) {
-        tween(clipRect, { from: 0, to: W, dur: 740, delay: 100, easing: ease.inOut, update: (w) => clipRect.setAttribute('width', w), done: () => clipRect.setAttribute('width', 99999) });
+        tween(clipRect, { from: 0, to: W, dur: 1700, delay: 250, easing: ease.inOut, update: (w) => clipRect.setAttribute('width', w), done: () => clipRect.setAttribute('width', 99999) });
       } else clipRect.setAttribute('width', 99999);
       first = false;
       return;

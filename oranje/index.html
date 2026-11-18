@@ -10,7 +10,7 @@
 <meta name="google-site-verification" content="hrZpIo-20oDDmPcBV2-lM6oGdSVddSEgC8zCuI3LjJc">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; connect-src 'self' https://health.googleapis.com https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com; img-src 'self' data: https://*.googleusercontent.com; font-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#0A1324">
+<meta name="theme-color" content="#04102B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,15 +31,52 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/BarlowSemiCondensed-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=3">
-<script src="js/boot.js"></script>
+<link rel="stylesheet" href="css/style.css?v=4">
+<script src="js/boot.js?v=4"></script>
 <script src="config.js"></script>
 </head>
-<body class="welcoming">
+<body class="booting">
 <a class="skip" href="#main">Skip to content</a>
 
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<!-- Tabler Icons v3.34.1 (https://github.com/tabler/tabler-icons)
+MIT License
+
+Copyright (c) 2020-2024 Paweł Kuna
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+  <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l3 8l4 -16l3 8h4"/></symbol>
+  <symbol id="icon-mountain" viewBox="0 0 24 24"><path d="M3 20h18l-6.921 -14.612a2.3 2.3 0 0 0 -4.158 0l-6.921 14.612z"/><path d="M7.5 11l2 2.5l2.5 -2.5l2 3l2.5 -2"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
+  <symbol id="icon-battery-charging" viewBox="0 0 24 24"><path d="M16 7h1a2 2 0 0 1 2 2v.5a.5 .5 0 0 0 .5 .5a.5 .5 0 0 1 .5 .5v3a.5 .5 0 0 1 -.5 .5a.5 .5 0 0 0 -.5 .5v.5a2 2 0 0 1 -2 2h-2"/><path d="M8 7h-2a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h1"/><path d="M12 8l-2 4h3l-2 4"/></symbol>
+</svg>
+
 <header class="bar">
-  <a class="brand" href="#main" aria-label="Oranje, back to top">
+  <a class="brand" href="#today" aria-label="Oranje, today">
     <svg class="brand-mark" viewBox="71 77 370 370" aria-hidden="true"><defs><linearGradient id="hdr-heat" gradientUnits="userSpaceOnUse" x1="152.8" y1="365.2" x2="374.1" y2="176.2"><stop offset="0" stop-color="#FFB36B"/><stop offset=".55" stop-color="#FF6A00"/><stop offset="1" stop-color="#F0461E"/></linearGradient></defs>
 <path d="M374.12 176.18A146 146 0 0 1 359.24 365.24" fill="none" class="bm-track" stroke-width="62" stroke-linecap="round"/>
 <path d="M152.76 365.24A146 146 0 1 1 374.12 176.18" fill="none" stroke="url(#hdr-heat)" stroke-width="62" stroke-linecap="round"/>
@@ -47,22 +84,28 @@
 <circle cx="374.12" cy="176.18" r="38.44" class="bm-knob"/></svg>
     <span class="brand-name">Oranje</span>
   </a>
-  <nav class="nav" aria-label="Sections">
-    <a href="#today" aria-current="location">Today</a>
-    <a href="#strain">Details</a>
-    <a href="#climb">Climb</a>
-    <a href="#trends">Trends</a>
-  </nav>
+  <div class="daynav" id="daynav" hidden>
+    <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg class="ui-icon chevron-prev" aria-hidden="true"><use href="#icon-chevron-right"/></svg></button>
+    <button class="dayline" id="dayline" type="button" aria-live="polite" title="Jump to today"></button>
+    <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></button>
+  </div>
   <div class="bar-end">
-    <button class="status" id="status" type="button" hidden><i class="status-dot"></i><span id="status-text"></span></button>
+    <button class="status" id="status" type="button" hidden><i class="status-dot"></i><span id="status-text"></span><span class="status-short" aria-hidden="true">Demo</span></button>
     <button class="icon-btn" id="look-btn" type="button" aria-label="Switch to the cream look">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><path class="half" d="M12 4.5a7.5 7.5 0 0 1 0 15z"/></svg>
+      <svg class="ui-icon theme-sun" aria-hidden="true"><use href="#icon-sun"/></svg><svg class="ui-icon theme-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
     </button>
     <button class="icon-btn" id="open-panel" type="button" aria-label="Account and settings" aria-haspopup="dialog" hidden>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg>
+      <svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"/></svg>
     </button>
   </div>
 </header>
+<nav class="tabs" id="tabs" aria-label="Views" hidden>
+  <a href="#today" data-view="today"><svg class="ui-icon" aria-hidden="true"><use href="#icon-home"/></svg><span>Today</span></a>
+  <a href="#strain" data-view="strain"><svg class="ui-icon" aria-hidden="true"><use href="#icon-activity"/></svg><span>Strain</span></a>
+  <a href="#recovery" data-view="recovery"><svg class="ui-icon" aria-hidden="true"><use href="#icon-battery-charging"/></svg><span>Recovery</span></a>
+  <a href="#sleep" data-view="sleep"><svg class="ui-icon" aria-hidden="true"><use href="#icon-moon"/></svg><span>Sleep</span></a>
+  <a href="#climb" data-view="climb"><svg class="ui-icon" aria-hidden="true"><use href="#icon-mountain"/></svg><span>Climb</span></a>
+</nav>
 
 <main id="main">
 
@@ -70,8 +113,8 @@
   <section class="welcome" id="welcome" hidden>
     <div class="welcome-copy">
       <p class="eyebrow">For Fitbit Air</p>
-      <h1 class="welcome-title">Every beat,<br> in <em>Oranje.</em></h1>
-      <p class="welcome-lede">See your strain, recovery and sleep in one daily view. Connect the Google account that syncs with your Fitbit Air.</p>
+      <h1 class="welcome-title"><span>Every beat,</span> <span>in <em>oranje</em>.</span></h1>
+      <p class="welcome-lede">Day strain, recovery and sleep, worked out from your own heart rate. Sign in once with the Google account your Fitbit Air syncs to, and the rest draws itself.</p>
       <div class="welcome-cta">
         <button class="btn primary" id="btn-connect" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.900h5.400a4.600 4.600 0 0 1-2 3v2.500h3.200c1.900-1.700 3-4.300 3-7.400z"/><path fill="#fff" opacity=".85" d="M12 22c2.700 0 5-.9 6.600-2.400l-3.200-2.500c-.9.600-2 1-3.400 1-2.600 0-4.800-1.800-5.600-4.100H3.100v2.600A10 10 0 0 0 12 22z"/><path fill="#fff" opacity=".7" d="M6.400 14a6 6 0 0 1 0-4V7.400H3.100a10 10 0 0 0 0 9.200z"/><path fill="#fff" opacity=".95" d="M12 5.900c1.500 0 2.800.500 3.800 1.500l2.900-2.900A10 10 0 0 0 3.100 7.400L6.400 10c.8-2.300 3-4.100 5.600-4.100z"/></svg>
@@ -111,34 +154,76 @@
         <p>The README has every step.</p>
       </div>
 
-      <p class="welcome-privacy">Read-only access. Your health data stays in your browser. <a href="privacy.html">Privacy</a></p>
+      <ul class="welcome-facts">
+        <li><b>Strain 0–21</b> from every minute of heart rate, on a published model.</li>
+        <li><b>Nothing leaves your browser.</b> No server reads or stores your health data.</li>
+        <li><b>Read-only.</b> Oranje can never change what is in Google Health.</li>
+      </ul>
     </div>
-    <figure class="welcome-art" aria-label="Example day strain of 14.6 out of 21">
-      <figcaption>Demo reading</figcaption>
-      <div class="dial" id="welcome-dial" aria-hidden="true">
-        <div class="dial-read"><span class="eyebrow">Day strain</span><strong class="dial-num" id="welcome-num">14.6</strong><span class="dial-band">out of 21</span></div>
-      </div>
-    </figure>
+    <div class="welcome-art" aria-hidden="true">
+      <div class="dial dial-art" id="welcome-dial"><div class="dial-read"><span class="eyebrow">Day strain</span><strong class="dial-num" id="welcome-num">0.0</strong></div></div>
+    </div>
   </section>
 
-  <!-- ───────────── Dashboard ───────────── -->
+  <!-- ───────────── Dashboard: five views ───────────── -->
   <div id="dash" hidden>
 
-    <section class="today" id="today" aria-labelledby="dayline">
-      <div class="day-tools">
-        <div class="daynav">
-          <h1 class="dayline" id="dayline" tabindex="-1" aria-live="polite"></h1>
-          <div class="day-arrows">
-            <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
-            <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
-          </div>
-        </div>
-        <button class="history-toggle" id="history-toggle" type="button" aria-expanded="false" aria-controls="ribbon">History</button>
-        <div class="ribbon" id="ribbon" role="group" aria-label="Recent days with strain and recovery scores" hidden></div>
+    <section class="view" id="view-today" data-view="today" aria-labelledby="verdict">
+      <div class="today-top">
+        <h1 class="verdict" id="verdict"></h1>
+        <div class="ribbon" id="ribbon" role="group" aria-label="Recent days: strain bar and recovery dot for each day"></div>
       </div>
+      <div class="cards">
+        <div class="card trio span-7" id="trio">
+          <a class="ring" id="ring-strain" href="#strain" data-kind="strain"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong></span></span><span class="ring-label">Strain<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          <a class="ring" id="ring-recovery" href="#recovery" data-kind="recovery"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Recovery<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          <a class="ring" id="ring-sleep" href="#sleep" data-kind="sleep"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Sleep<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+        </div>
+        <div class="card goal span-5" id="goal">
+          <h3>Today's target</h3>
+          <div id="goal-scale"></div>
+          <p class="goal-text" id="goal-text"></p>
+          <a class="climb-chip" id="climb-chip" href="#climb">
+            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 9.5 8l3.5 5 2.5-3L22 20z"/></svg>
+            <span class="cc-alt"><b id="cc-alt">–</b> m</span>
+            <span class="cc-mid"><span class="cc-level" id="cc-level"></span><span class="cc-track"><i id="cc-fill"></i></span><span class="cc-next" id="cc-next"></span></span>
+            <span class="cc-streak" id="cc-streak"></span>
+          </a>
+        </div>
+        <figure class="card span-12 river-card">
+          <figcaption>
+            <h3>The day, beat by beat</h3>
+            <span class="legend">
+              <span><i class="lg-hr" aria-hidden="true"></i>Heart rate</span>
+              <span><i class="lg-build" aria-hidden="true"></i>Strain building</span>
+              <span><i class="lg-sleep" aria-hidden="true"></i>Asleep</span>
+            </span>
+          </figcaption>
+          <div class="river" id="river" tabindex="0"></div>
+        </figure>
+        <section class="card plain span-12" id="vitals" aria-labelledby="h-vitals">
+          <div class="card-head"><h3 id="h-vitals">Vitals</h3><button class="link small" id="customise" type="button">Choose what shows</button></div>
+          <div class="tiles" id="tiles"></div>
+        </section>
+        <section class="card span-12" id="trends" aria-labelledby="h-trends">
+          <div class="card-head">
+            <h3 id="h-trends">Strain against recovery</h3>
+            <div class="seg" role="group" aria-label="Range">
+              <button type="button" data-range="14" aria-pressed="true">2 weeks</button>
+              <button type="button" data-range="28" aria-pressed="false">4 weeks</button>
+            </div>
+          </div>
+          <p class="card-lede" id="trends-lede"></p>
+          <div class="trend" id="trend"></div>
+          <dl class="averages" id="averages"></dl>
+        </section>
+      </div>
+    </section>
 
-      <div class="today-grid">
-        <div class="strain-card">
+    <section class="view" id="view-strain" data-view="strain" aria-labelledby="h-strain" hidden>
+      <header class="view-head"><h2 id="h-strain">Strain</h2><p id="strain-lede"></p></header>
+      <div class="cards">
+        <div class="card dial-card span-5">
           <div class="dial" id="dial" role="img">
             <div class="dial-read">
               <span class="eyebrow">Day strain</span>
@@ -147,71 +232,17 @@
               <span class="dial-target" id="strain-target"></span>
             </div>
           </div>
-          <a class="score-link" href="#strain">View strain <span aria-hidden="true">↗</span></a>
         </div>
-
-        <div class="brief">
-          <p class="verdict" id="verdict"></p>
-          <div class="meters">
-            <article class="meter" id="m-recovery">
-              <header><h2><a class="score-link" href="#recovery">Recovery <span aria-hidden="true">↗</span></a></h2></header>
-              <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
-              <span class="meter-band" id="recovery-band"></span>
-              <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
-              <dl class="facts" id="recovery-facts"></dl>
-            </article>
-            <article class="meter sleep" id="m-sleep">
-              <header><h2><a class="score-link" href="#sleep">Sleep <span aria-hidden="true">↗</span></a></h2></header>
-              <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
-              <span class="meter-band" id="sleep-band"></span>
-              <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
-              <dl class="facts" id="sleep-facts"></dl>
-            </article>
-          </div>
-          <a class="climb-chip" id="climb-chip" href="#climb">
-            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 9.5 8l3.5 5 2.5-3L22 20z"/></svg>
-            <span class="cc-alt"><b id="cc-alt">–</b> m</span>
-            <span class="cc-mid"><span class="cc-level" id="cc-level"></span><span class="cc-track"><i id="cc-fill"></i></span><span class="cc-next" id="cc-next"></span></span>
-            <span class="cc-streak" id="cc-streak"></span>
-          </a>
-        </div>
-      </div>
-
-      <figure class="river-wrap">
-        <figcaption>
-          <h2 class="cap-title">Heart rate through the day</h2>
-          <span class="legend">
-            <span><i class="lg-hr" aria-hidden="true"></i>Heart rate</span>
-            <span><i class="lg-build" aria-hidden="true"></i>Strain building</span>
-            <span><i class="lg-sleep" aria-hidden="true"></i>Asleep</span>
-          </span>
-        </figcaption>
-        <div class="river" id="river" tabindex="0"></div>
-      </figure>
-    </section>
-
-    <section class="sec" id="strain" aria-labelledby="h-strain" data-nav="strain">
-      <nav class="detail-nav" aria-label="Health details">
-        <a href="#strain">Strain</a>
-        <a href="#recovery">Recovery</a>
-        <a href="#sleep">Sleep</a>
-        <a href="#vitals">Vitals</a>
-      </nav>
-      <header class="sec-head" data-reveal>
-        <h2 id="h-strain">Strain</h2>
-        <p id="strain-lede"></p>
-      </header>
-      <div class="strain-grid">
-        <div class="block" data-reveal>
+        <div class="card span-7">
           <h3>Time in each zone</h3>
           <div class="zones" id="zones"></div>
           <p class="note" id="zones-note"></p>
         </div>
-        <div class="block" data-reveal>
+        <div class="card span-6">
           <h3>Sessions</h3>
           <ol class="sessions" id="sessions"></ol>
         </div>
-        <figure class="block curve" data-reveal>
+        <figure class="card curve span-6">
           <h3>Why the last points are the hardest</h3>
           <div id="curve"></div>
           <figcaption id="curve-note"></figcaption>
@@ -219,98 +250,75 @@
       </div>
     </section>
 
-    <section class="sec" id="recovery" aria-labelledby="h-recovery" data-nav="strain">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-recovery">Recovery</h2>
-        <p id="recovery-lede"></p>
-      </header>
-      <div class="recovery-grid">
-        <div class="block" data-reveal>
-          <h3>This morning against your own normal</h3>
-          <div class="devs" id="devs"></div>
-          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
-        </div>
-        <div class="block aim" data-reveal>
+    <section class="view" id="view-recovery" data-view="recovery" aria-labelledby="h-recovery" hidden>
+      <header class="view-head"><h2 id="h-recovery">Recovery</h2><p id="recovery-lede"></p></header>
+      <div class="cards">
+        <article class="card meter score-card span-4" id="m-recovery">
+          <header><h3>This morning</h3><span class="meter-band" id="recovery-band"></span></header>
+          <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="recovery-facts"></dl>
+        </article>
+        <div class="card aim span-8">
           <h3>What today can take</h3>
           <div id="aim"></div>
+        </div>
+        <div class="card span-12">
+          <h3>Against your own normal</h3>
+          <div class="devs" id="devs"></div>
+          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
         </div>
       </div>
     </section>
 
-    <section class="sec" id="sleep" aria-labelledby="h-sleep" data-nav="strain">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-sleep">Sleep</h2>
-        <p id="sleep-lede"></p>
-      </header>
-      <div class="block" data-reveal>
-        <h3>Last night, stage by stage</h3>
-        <div class="hypno" id="hypno"></div>
-      </div>
-      <div class="sleep-grid">
-        <div class="block" data-reveal>
+    <section class="view" id="view-sleep" data-view="sleep" aria-labelledby="h-sleep" hidden>
+      <header class="view-head"><h2 id="h-sleep">Sleep</h2><p id="sleep-lede"></p></header>
+      <div class="cards">
+        <article class="card meter sleep score-card span-4" id="m-sleep">
+          <header><h3>Last night</h3><span class="meter-band" id="sleep-band"></span></header>
+          <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="sleep-facts"></dl>
+        </article>
+        <div class="card span-8">
+          <h3>Stage by stage</h3>
+          <div class="hypno" id="hypno"></div>
+        </div>
+        <div class="card span-4">
           <h3>Where the night went</h3>
           <div class="stages" id="stages"></div>
         </div>
-        <div class="block" data-reveal>
+        <div class="card span-4">
           <h3>Had against needed</h3>
           <div id="need"></div>
         </div>
-        <div class="block" data-reveal>
-          <h3>Bed and wake times, last 7 nights</h3>
+        <div class="card span-4">
+          <h3>Bed and wake times</h3>
           <div id="consistency"></div>
         </div>
       </div>
     </section>
 
-    <section class="sec" id="vitals" aria-labelledby="h-vitals" data-nav="strain">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-vitals">Vitals</h2>
-        <p>Each measurement with its last two weeks. <button class="link" id="customise" type="button">Choose what shows here</button></p>
-      </header>
-      <div class="tiles" id="tiles"></div>
-    </section>
-
-    <section class="sec" id="climb" aria-labelledby="h-climb">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-climb">Climb</h2>
-        <p id="climb-lede"></p>
-      </header>
-      <figure class="block" data-reveal>
-        <h3>From the polder, one day at a time</h3>
-        <div class="profile" id="profile"></div>
-        <figcaption class="note" id="profile-note"></figcaption>
-      </figure>
-      <div class="climb-grid">
-        <div class="block" data-reveal>
-          <div class="earn-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
+    <section class="view" id="view-climb" data-view="climb" aria-labelledby="h-climb" hidden>
+      <header class="view-head"><h2 id="h-climb">Climb</h2><p id="climb-lede"></p></header>
+      <div class="cards">
+        <figure class="card span-12" data-reveal>
+          <h3>From the polder, one day at a time</h3>
+          <div class="profile" id="profile"></div>
+          <figcaption class="note" id="profile-note"></figcaption>
+        </figure>
+        <div class="card span-7">
+          <div class="card-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
           <ul class="earn" id="earn"></ul>
         </div>
-        <div class="block" data-reveal>
+        <div class="card span-5">
           <h3>Streaks</h3>
           <div class="streaks" id="streaks"></div>
         </div>
-      </div>
-      <div class="block medals" data-reveal>
-        <h3>Medals <span id="badge-count"></span></h3>
-        <div class="badges" id="badges"></div>
-      </div>
-    </section>
-
-    <section class="sec" id="trends" aria-labelledby="h-trends">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-trends">Trends</h2>
-        <p id="trends-lede"></p>
-      </header>
-      <div class="block" data-reveal>
-        <div class="trend-head">
-          <h3>Strain taken on against recovery woken up with</h3>
-          <div class="seg" role="group" aria-label="Range">
-            <button type="button" data-range="14" aria-pressed="true">2 weeks</button>
-            <button type="button" data-range="28" aria-pressed="false">4 weeks</button>
-          </div>
+        <div class="card medals span-12">
+          <h3>Medals <span id="badge-count"></span></h3>
+          <div class="badges" id="badges"></div>
         </div>
-        <div class="trend" id="trend"></div>
-        <dl class="averages" id="averages"></dl>
       </div>
     </section>
 
@@ -333,7 +341,7 @@
 <aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
   <header>
     <h2 id="panel-title">Account and settings</h2>
-    <button class="icon-btn" id="close-panel" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <button class="icon-btn" id="close-panel" type="button" aria-label="Close"><svg class="ui-icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
   </header>
   <div class="panel-body">
     <section>
@@ -383,6 +391,6 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
-<script type="module" src="js/main.js?v=3"></script>
+<script type="module" src="js/main.js?v=4"></script>
 </body>
 </html>

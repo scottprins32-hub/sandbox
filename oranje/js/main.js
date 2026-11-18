@@ -8,20 +8,26 @@ import { auth } from './data/auth.js';
 import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
-import { createDial, createMeter } from './ui/dial.js?v=3';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=3';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=3';
-import { createRiver } from './ui/river.js?v=3';
-import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=3';
+import { createDial, createMeter } from './ui/dial.js?v=4';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=4';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=4';
+import { createRiver } from './ui/river.js?v=4';
+import { createRing } from './ui/ring.js?v=4';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=4';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
 const person = () => (state.source === 'google' ? auth.who.email || state.data?.userId || '' : '');
 const saveSettings = () => store.saveSettings(state.settings, person());
-const dial = createDial($('#dial'), 'strain-heat');
+const dial = createDial($('#dial'));
 const recMeter = createMeter($('#recovery-ticks'));
 const sleepMeter = createMeter($('#sleep-ticks'));
 const river = createRiver($('#river'));
+const rings = {
+  strain: createRing($('#ring-strain .ring-face'), { max: 21 }),
+  recovery: createRing($('#ring-recovery .ring-face')),
+  sleep: createRing($('#ring-sleep .ring-face')),
+};
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 // Preview builds (config.js: preview: true) run on demo data only and never offer sign-in.
 const PREVIEW = !!window.ORANJE_CONFIG?.preview;
@@ -31,9 +37,36 @@ function show(view) {
   const welcome = $('#welcome');
   if (welcome) welcome.hidden = view !== 'welcome';
   $('#dash').hidden = view !== 'dash';
-  $('#status').hidden = $('#open-panel').hidden = view !== 'dash';
+  $('#status').hidden = $('#open-panel').hidden = $('#daynav').hidden = $('#tabs').hidden = view !== 'dash';
   document.body.classList.toggle('welcoming', view === 'welcome');
+  if (view === 'dash') showView(routeOf(), { quiet: true });
 }
+
+// ───────── tabs: today, strain, recovery, sleep, climb ─────────
+const VIEWS = ['today', 'strain', 'recovery', 'sleep', 'climb'];
+const ALIAS = { vitals: 'today', trends: 'today' };
+const routeOf = () => { const k = location.hash.slice(1); return VIEWS.includes(k) ? k : ALIAS[k] || 'today'; };
+let shown = null;
+function showView(name, { quiet = false } = {}) {
+  const changed = name !== shown;
+  const focusWasInView = shown && $(`#view-${shown}`).contains(document.activeElement);
+  shown = name;
+  for (const v of VIEWS) $(`#view-${v}`).hidden = v !== name;
+  $$('#tabs a').forEach((a) => { if (a.dataset.view === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  if (!changed || quiet) return;
+  const el = $(`#view-${name}`);
+  el.classList.remove('swap');
+  if (!reduced()) requestAnimationFrame(() => { if (shown === name) el.classList.add('swap'); });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (focusWasInView) {
+    const heading = $('h1, h2', el);
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+  }
+  if (state.ctx) renderAll({ animate: false });
+  if (ALIAS[location.hash.slice(1)]) requestAnimationFrame(() => $(location.hash)?.scrollIntoView({ block: 'start' }));
+}
+window.addEventListener('hashchange', () => { if (!$('#dash').hidden) showView(routeOf()); });
 
 function compute() {
   setCurve(state.settings.curve);
@@ -68,12 +101,15 @@ function setVerdict(d) {
   const text = parts.map((p) => p[0]).join(' ');
   if (el.dataset.text === text) return;
   el.dataset.text = text;
-  const kids = parts.flatMap(([phrase, emphasis], index) => [
-    ...(index ? [' '] : []),
-    emphasis ? h('em', { text: phrase }) : phrase,
-  ]);
-  el.replaceChildren(...kids);
-  if (!reduced()) el.animate([{ opacity: .62 }, { opacity: 1 }], { duration: 360, easing: 'ease-out' });
+  el.setAttribute('aria-label', text);
+  let i = 0;
+  const kids = [];
+  for (const [phrase, strong] of parts) {
+    const words = phrase.split(' ').map((w) => h('span', { class: 'w', style: `--i:${i++}`, 'aria-hidden': 'true', text: w }));
+    const spaced = words.flatMap((w, k) => (k ? [' ', w] : [w]));
+    kids.push(strong ? h('em', {}, spaced) : spaced, ' ');
+  }
+  el.replaceChildren(...kids.flat());
 }
 
 function trend(v, base, goodUp, unit) {
@@ -87,7 +123,7 @@ function trend(v, base, goodUp, unit) {
 }
 
 let ribbonKey = '';
-const narrow = window.matchMedia('(max-width: 860px)');
+const narrow = window.matchMedia('(max-width: 720px)');
 function renderRibbon() {
   const days = state.ctx.days;
   let end = days.length - 1;
@@ -118,40 +154,71 @@ function renderRibbon() {
 function renderHero(animate, delay = 0) {
   const d = current(), days = state.ctx.days;
   const date = fromKey(d.date), isToday = d.date === todayKey();
-  $('#dayline').replaceChildren(
-    isToday ? 'Today' : date.toLocaleDateString('en-GB', { weekday: 'long' }),
-    h('span', { text: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) }),
-  );
+  const dm = date.toLocaleDateString('en-GB', { day: 'numeric', month: narrow.matches ? 'short' : 'long' });
+  $('#dayline').replaceChildren(h('b', { text: isToday ? 'Today' : date.toLocaleDateString('en-GB', { weekday: 'long' }) }),
+    h('span', { class: isToday ? 'is-today' : '', text: isToday ? `${date.toLocaleDateString('en-GB', { weekday: 'short' })} ${dm}` : dm }));
+  $('#dayline').title = isToday ? '' : 'Jump to today';
   $('#day-prev').disabled = d.date === days[0].date;
   $('#day-next').disabled = d.date === days[days.length - 1].date;
   renderRibbon();
 
   dial.set(d.strain, d.target, { animate, delay });
-  roll($('#strain-num'), d.strain, { format: (v) => v.toFixed(1), dur: animate ? 650 : 0, delay });
+  roll($('#strain-num'), d.strain, { format: (v) => v.toFixed(1), dur: animate ? 1300 : 0, delay });
   $('#strain-band').textContent = d.band ? d.band.name : 'No heart rate';
   $('#strain-target').textContent = d.target ? `Target ${d.target.lo.toFixed(1)}–${d.target.hi.toFixed(1)}` : '';
-  const strainLabel = isNum(d.strain) ? `Day strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day';
-  $('#dial').setAttribute('aria-label', [strainLabel, $('#strain-target').textContent].filter(Boolean).join('. '));
+  $('#dial').setAttribute('aria-label', isNum(d.strain) ? `Day strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day');
   setVerdict(d);
 
   const rec = d.recovery, m = $('#m-recovery');
   m.dataset.band = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
-  roll($('#recovery-num'), rec, { dur: animate ? 530 : 0, delay: delay + 55 });
+  roll($('#recovery-num'), rec, { dur: animate ? 1100 : 0, delay: delay + 120 });
   $('#recovery-num').parentElement.classList.toggle('nil', !isNum(rec));
-  recMeter.set(rec, { animate, delay: delay + 55 });
+  recMeter.set(rec, { animate, delay: delay + 120 });
   const nights = days.filter((x) => x.date < d.date && (isNum(x.hrv) || isNum(x.rhr))).length;
   $('#recovery-band').textContent = isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning · ${nights}/3 nights` : 'No reading';
   $('#recovery-facts').replaceChildren(h('dt', { text: 'HRV' }), trend(d.hrv, d.baseline.hrv, true, 'ms'), h('dt', { text: 'Resting HR' }), trend(d.rhr, d.baseline.rhr, false, 'bpm'));
 
   const sl = d.sleepInfo;
-  roll($('#sleep-num'), sl?.score, { dur: animate ? 530 : 0, delay: delay + 95 });
+  roll($('#sleep-num'), sl?.score, { dur: animate ? 1100 : 0, delay: delay + 220 });
   $('#sleep-num').parentElement.classList.toggle('nil', !sl);
-  sleepMeter.set(sl?.score, { animate, delay: delay + 95 });
+  sleepMeter.set(sl?.score, { animate, delay: delay + 220 });
   $('#sleep-band').textContent = !sl ? (d.partial ? 'Not synced yet' : 'Not recorded') : sl.score >= 85 ? 'Well rested' : sl.score >= 70 ? 'Enough' : 'Short';
   $('#sleep-facts').replaceChildren(h('dt', { text: 'Asleep' }), h('dd', { text: sl ? fmtDur(sl.asleep) : '–' }), h('dt', { text: 'Needed' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
 
   river.set(d, { animate });
   renderChip(state.game);
+  renderTrio(d, rec, sl, nights, animate, delay);
+  renderGoal(d);
+}
+
+// the three scores of the day, each a ring that opens its own tab
+function renderTrio(d, rec, sl, nights, animate, delay) {
+  const set = (kind, value, text, band, aria, i) => {
+    const el = $(`#ring-${kind}`), num = $('.ring-num', el);
+    el.dataset.band = band || '';
+    $('.ring-read', el).classList.toggle('nil', !isNum(value));
+    roll(num, value, { format: kind === 'strain' ? (v) => v.toFixed(1) : (v) => Math.round(v), dur: animate ? 1200 : 0, delay: delay + i * 90, key: `ring-${kind}` });
+    rings[kind].set(value, { animate, delay: delay + i * 90 });
+    $('.ring-band', el).textContent = text;
+    el.setAttribute('aria-label', `${aria}. Open the ${kind} view`);
+  };
+  const recBand = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
+  set('strain', d.strain, d.band ? d.band.name : 'No heart rate', '', isNum(d.strain) ? `Strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day', 0);
+  set('recovery', rec, isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning ${nights}/3` : 'No reading', recBand, isNum(rec) ? `Recovery ${rec}%, ${recoveryBand(rec)}` : 'No recovery for this day', 1);
+  set('sleep', sl?.score, !sl ? (d.partial ? 'Not synced' : 'Not recorded') : sl.score >= 85 ? 'Well rested' : sl.score >= 70 ? 'Enough' : 'Short',
+    '', sl ? `Sleep ${sl.score}%, ${fmtDur(sl.asleep)} asleep` : 'No sleep recorded', 2);
+}
+
+function renderGoal(d) {
+  const scale = $('#goal-scale'), text = $('#goal-text');
+  if (!d.target) {
+    scale.replaceChildren();
+    text.textContent = 'A strain target appears once recovery is known: a few nights of wear and it shows up here.';
+    return;
+  }
+  const parts = aimParts(d);
+  scale.replaceChildren(parts.scale);
+  text.innerHTML = `Aim for <b>${d.target.lo}–${d.target.hi}</b> on ${d.recovery}% recovery. ${parts.line}`;
 }
 
 function renderAll({ animate = true, delay = 0 } = {}) {
@@ -185,6 +252,7 @@ function renderStatus() {
   else if (state.error) { st = 'error'; label = 'Sync failed · retry'; }
   else label = state.data?.syncedAt ? `Synced ${fmtClock(state.data.syncedAt)}` : 'Not synced';
   el.dataset.state = st; text.textContent = label;
+  el.setAttribute('aria-label', label);
   el.title = state.error || (st === 'signin' ? 'Google needs you to sign in again before new data can load' : st === 'demo' ? 'These numbers are made up. Connect your account to see your own.' : 'Sync now');
 
   const src = $('#foot-source'), dev = state.data?.device;
@@ -219,7 +287,7 @@ async function sync() {
 
 function enter() {
   $('#dash').classList.add('enter');
-  setTimeout(() => $('#dash').classList.remove('enter'), 760);
+  setTimeout(() => $('#dash').classList.remove('enter'), 2200);
 }
 
 function startGoogle() {
@@ -230,16 +298,15 @@ function startGoogle() {
   if (cache && !mine) store.clearCache();
   state.data = mine ? cache : null;
   state.settings = store.settings(person());
-  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 75 }); }
+  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); }
   sync();
 }
 
 function startDemo(seed) {
   state.source = 'demo'; store.demo = true;
   state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
-  compute(); show('dash'); enter(); renderAll({ delay: 75 });
+  compute(); show('dash'); enter(); renderAll({ delay: 350 });
   window.scrollTo(0, 0);
-  announce(state.game, 'demo');
 }
 
 function welcomeError(msg) { const el = $('#welcome-error'); el.textContent = msg || ''; el.hidden = !msg; }
@@ -267,9 +334,9 @@ function showWelcome() {
   show('welcome');
   $('#setup-origin').textContent = location.origin;
   $('#owner-redirect').textContent = `${location.origin}/functions/authCallback`;
-  if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'), 'welcome-heat');
-  welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 80 });
-  roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 650, delay: 80 });
+  if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'));
+  welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 500 });
+  roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 1300, delay: 500 });
 }
 
 // ───────── panel ─────────
@@ -350,6 +417,7 @@ $('#setup-form')?.addEventListener('submit', (e) => {
 });
 $('#day-prev').addEventListener('click', () => step(-1));
 $('#day-next').addEventListener('click', () => step(1));
+$('#dayline').addEventListener('click', () => { const last = state.ctx?.days[state.ctx.days.length - 1]; if (last) pick(last.date); });
 $('#open-panel').addEventListener('click', openPanel);
 $('#customise').addEventListener('click', openPanel);
 $('#close-panel').addEventListener('click', closePanel);
@@ -385,11 +453,11 @@ $('#panel').addEventListener('keydown', (e) => {
   else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
 });
 
-// swipe the opening panel sideways to move a day (touch only)
+// swipe sideways anywhere on a view to move a day (touch only), except on charts you scrub
 {
-  const pane = $('.today-grid');
+  const pane = $('#dash');
   let x0 = 0, y0 = 0, tracking = false;
-  pane.addEventListener('touchstart', (e) => { if (e.touches.length !== 1) return; tracking = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  pane.addEventListener('touchstart', (e) => { if (e.touches.length !== 1 || e.target.closest('.river, .t-spark, .profile, .trend, .hypno, .seg')) return; tracking = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
   pane.addEventListener('touchend', (e) => {
     if (!tracking) return; tracking = false;
     const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
@@ -399,24 +467,6 @@ $('#panel').addEventListener('keydown', (e) => {
 }
 narrow.addEventListener('change', () => { if (state.ctx && !$('#dash').hidden) renderAll({ animate: false }); });
 
-// section in view → nav highlight
-const navLinks = $$('.nav a');
-const spy = new IntersectionObserver((entries) => {
-  const section = entries.findLast((entry) => entry.isIntersecting)?.target;
-  if (!section) return;
-  const href = `#${section.dataset.nav || section.id}`;
-  navLinks.forEach((link) => {
-    if (link.hash === href) link.setAttribute('aria-current', 'location');
-    else link.removeAttribute('aria-current');
-  });
-}, { rootMargin: '-33% 0px -65% 0px' });
-$$('#dash > section').forEach((section) => spy.observe(section));
-
-$('#history-toggle').addEventListener('click', (event) => {
-  const ribbon = $('#ribbon');
-  ribbon.hidden = !ribbon.hidden;
-  event.currentTarget.setAttribute('aria-expanded', String(!ribbon.hidden));
-});
 
 let lastW = window.innerWidth, rz = 0;
 window.addEventListener('resize', () => {
@@ -434,7 +484,7 @@ function setLook(look) {
   const root = document.documentElement;
   if (look === 'cream') root.dataset.look = 'cream'; else root.removeAttribute('data-look');
   try { localStorage.setItem('oranje.look', look); } catch { /* storage off */ }
-  $('meta[name="theme-color"]')?.setAttribute('content', look === 'cream' ? '#F5EEE0' : '#0A1324');
+  $('meta[name="theme-color"]')?.setAttribute('content', look === 'cream' ? '#F5EEE0' : '#04102B');
   $('meta[name="color-scheme"]')?.setAttribute('content', look === 'cream' ? 'light' : 'dark');
   $$('[data-look-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lookPick === look)));
   const btn = $('#look-btn');
@@ -466,7 +516,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
 (async function boot() {
   $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
   setLook(currentLook());
-  if (PREVIEW) { startDemo(); return; }
+  if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
   await auth.init();
   const q = new URLSearchParams(location.search);
   const authError = q.get('auth_error');
@@ -478,4 +528,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
     showWelcome();
     if (authError) welcomeError(authError === 'access_denied' ? 'Google sign-in was cancelled. Nothing was connected.' : authError === 'not_configured' ? 'This deployment is missing its Google credentials. See the README.' : `Google sign-in did not finish (${authError}). Try again.`);
   }
+  document.body.classList.remove('booting');
+  document.body.classList.add('ready');
+  try { sessionStorage.setItem('oranje.seen', '1'); } catch { /* fine */ }
+  setTimeout(() => document.body.classList.add('settled'), 1200);
 })();
