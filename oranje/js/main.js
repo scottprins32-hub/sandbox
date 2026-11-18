@@ -405,7 +405,10 @@ function closePanel() {
 
 // ───────── wiring ─────────
 $('#btn-connect')?.addEventListener('click', (e) => connect(e.currentTarget));
-$('#btn-demo')?.addEventListener('click', () => startDemo());
+$('#btn-demo')?.addEventListener('click', () => {
+  startDemo();
+  $('#dayline').focus({ preventScroll: true });
+});
 $('#setup-form')?.addEventListener('submit', (e) => {
   e.preventDefault();
   const id = $('#client-id').value.trim();
