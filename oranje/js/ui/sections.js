@@ -4,8 +4,8 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js';
-import { $, h, roll } from './motion.js';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=4';
+import { $, h, roll } from './motion.js?v=4';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');

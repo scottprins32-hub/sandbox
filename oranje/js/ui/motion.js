@@ -12,9 +12,15 @@ export const ease = {
 
 const live = new Map(); // one running tween per key, so a new target interrupts cleanly
 
+export function cancelTween(key) {
+  const active = live.get(key);
+  if (!active) return;
+  cancelAnimationFrame(active.raf);
+  live.delete(key);
+}
+
 export function tween(key, { from = 0, to = 1, dur = 800, delay = 0, easing = ease.out, update, done }) {
-  const prev = live.get(key);
-  if (prev) cancelAnimationFrame(prev.raf);
+  cancelTween(key);
   if (reduced() || dur <= 0) { update(to, 1); if (done) done(); live.delete(key); return; }
   const rec = { raf: 0 };
   const t0 = performance.now() + delay;
@@ -30,10 +36,16 @@ export function tween(key, { from = 0, to = 1, dur = 800, delay = 0, easing = ea
 
 // A number that travels to its new value instead of snapping.
 export function roll(el, to, { dur = 900, delay = 0, format = (v) => Math.round(v), key } = {}) {
-  if (to == null || Number.isNaN(to)) { el.textContent = '–'; el._v = null; return; }
-  const from = typeof el._v === 'number' ? el._v : 0;
-  el._v = to;
-  tween(key || el, { from, to, dur, delay, easing: ease.expo, update: (v) => { el.textContent = format(v); } });
+  if (to == null || Number.isNaN(to)) {
+    cancelTween(key || el);
+    el.textContent = '–';
+    el._v = null;
+    return;
+  }
+  tween(key || el, {
+    from: el._v ?? 0, to, dur, delay, easing: ease.out,
+    update: (v) => { el._v = v; el.textContent = format(v); },
+  });
 }
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -60,8 +72,7 @@ export function h(tag, attrs = {}, ...kids) {
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-// Reveal blocks once as they scroll into view. Content is visible without JS:
-// the hidden state is only applied after this script has run.
+// Enter once on scroll. Content stays readable before the observer runs.
 export function watchReveals(root = document) {
   const items = $$('[data-reveal]', root).filter((el) => !el._seen);
   if (reduced() || !('IntersectionObserver' in window)) { items.forEach((el) => el.classList.add('in')); return; }
@@ -73,7 +84,7 @@ export function watchReveals(root = document) {
       io.unobserve(e.target);
     }
   }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
-  items.forEach((el) => { el._seen = true; el.classList.add('pre'); io.observe(el); });
+  items.forEach((el) => { el._seen = true; io.observe(el); });
 }
 
 export const polar = (cx, cy, r, deg) => {
