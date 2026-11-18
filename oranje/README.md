@@ -74,6 +74,19 @@ Without a server Google issues one-hour tokens only. When one lapses the page ke
 
 While the consent screen is in *Testing*, Google expires every grant after seven days, so you would have to reconnect weekly. To stop that, open **Audience** and press **Publish app**. You do not need to submit it for verification for personal use; Google will show an "unverified app" warning once when you sign in, and you click through it. (Google's documentation implies this lifts the weekly expiry for these scopes but does not say so in as many words.)
 
+## Connect WHOOP
+
+Choose **WHOOP scores** on the welcome page or in settings. This opens a separate view with WHOOP's own Strain, Recovery and Sleep scores, plus HRV, resting/average heart rate, sleep duration and workouts from the last 30 days. The WHOOP API provides averages rather than continuous heart-rate samples.
+
+Owner setup for the existing Base44 app:
+
+1. In the [WHOOP Developer Dashboard](https://developer-dashboard.whoop.com/), create an app named Oranje. Select `read:cycles`, `read:recovery`, `read:sleep` and `read:workout`. Oranje requests `offline` during sign-in to renew the access token.
+2. Register exactly `https://oranje-962c1581.base44.app/functions/whoopCallback` as an OAuth redirect URI.
+3. Add `WHOOP_CLIENT_ID` and `WHOOP_CLIENT_SECRET` in the Oranje app's Base44 secrets. Put the secret in Base44 directly, never in the repository, frontend or chat.
+4. Open [Oranje's WHOOP view](https://oranje-962c1581.base44.app/whoop.html), select **Connect WHOOP** and grant the requested read access at WHOOP. You can use the WHOOP Sandbox tier for personal use.
+
+The Base44 WHOOP functions proxy the API because it does not allow cross-origin browser requests. They use a separate encrypted browser cookie for each WHOOP session and do not persist health records. **Disconnect** clears the browser session and requests revocation at WHOOP. If WHOOP cannot confirm revocation, remove Oranje from Connected Apps in WHOOP.
+
 ## How the scores work
 
 **Strain** (`js/core/strain.js`). WHOOP does not publish its formula; this is a transparent estimate, not WHOOP's number.
