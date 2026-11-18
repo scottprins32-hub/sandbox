@@ -15,7 +15,7 @@ A personal dashboard for a **Fitbit Air**: day strain, recovery, sleep and vital
 cd oranje && python3 -m http.server 4173   # open http://localhost:4173
 ```
 
-Choose **Look around with demo data**. The demo month is generated in the browser and labelled as such.
+Choose **Try the demo**. The demo month is generated in the browser and labelled as such.
 
 ## Where the data comes from
 

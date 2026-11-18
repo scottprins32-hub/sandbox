@@ -10,7 +10,7 @@
 <meta name="google-site-verification" content="hrZpIo-20oDDmPcBV2-lM6oGdSVddSEgC8zCuI3LjJc">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; connect-src 'self' https://health.googleapis.com https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com; img-src 'self' data: https://*.googleusercontent.com; font-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#04102B">
+<meta name="theme-color" content="#0A1324">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,17 +30,16 @@
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css">
+<link rel="preload" href="fonts/BarlowSemiCondensed-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css?v=3">
 <script src="js/boot.js"></script>
 <script src="config.js"></script>
 </head>
-<body class="booting">
+<body class="welcoming">
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-
 <header class="bar">
-  <a class="brand" href="#today" aria-label="Oranje, back to top">
+  <a class="brand" href="#main" aria-label="Oranje, back to top">
     <svg class="brand-mark" viewBox="71 77 370 370" aria-hidden="true"><defs><linearGradient id="hdr-heat" gradientUnits="userSpaceOnUse" x1="152.8" y1="365.2" x2="374.1" y2="176.2"><stop offset="0" stop-color="#FFB36B"/><stop offset=".55" stop-color="#FF6A00"/><stop offset="1" stop-color="#F0461E"/></linearGradient></defs>
 <path d="M374.12 176.18A146 146 0 0 1 359.24 365.24" fill="none" class="bm-track" stroke-width="62" stroke-linecap="round"/>
 <path d="M152.76 365.24A146 146 0 1 1 374.12 176.18" fill="none" stroke="url(#hdr-heat)" stroke-width="62" stroke-linecap="round"/>
@@ -49,12 +48,9 @@
     <span class="brand-name">Oranje</span>
   </a>
   <nav class="nav" aria-label="Sections">
-    <a href="#today">Today</a>
+    <a href="#today" aria-current="location">Today</a>
+    <a href="#strain">Details</a>
     <a href="#climb">Climb</a>
-    <a href="#strain">Strain</a>
-    <a href="#recovery">Recovery</a>
-    <a href="#sleep">Sleep</a>
-    <a href="#vitals">Vitals</a>
     <a href="#trends">Trends</a>
   </nav>
   <div class="bar-end">
@@ -74,14 +70,14 @@
   <section class="welcome" id="welcome" hidden>
     <div class="welcome-copy">
       <p class="eyebrow">For Fitbit Air</p>
-      <h1 class="welcome-title"><span>Every beat,</span> <span>in <em>oranje</em>.</span></h1>
-      <p class="welcome-lede">Day strain, recovery and sleep, worked out from your own heart rate. Sign in once with the Google account your Fitbit Air syncs to, and the rest draws itself.</p>
+      <h1 class="welcome-title">Every beat,<br> in <em>Oranje.</em></h1>
+      <p class="welcome-lede">See your strain, recovery and sleep in one daily view. Connect the Google account that syncs with your Fitbit Air.</p>
       <div class="welcome-cta">
         <button class="btn primary" id="btn-connect" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.900h5.400a4.600 4.600 0 0 1-2 3v2.500h3.200c1.900-1.700 3-4.300 3-7.400z"/><path fill="#fff" opacity=".85" d="M12 22c2.700 0 5-.9 6.600-2.400l-3.200-2.500c-.9.600-2 1-3.400 1-2.600 0-4.800-1.800-5.600-4.100H3.100v2.600A10 10 0 0 0 12 22z"/><path fill="#fff" opacity=".7" d="M6.400 14a6 6 0 0 1 0-4V7.400H3.100a10 10 0 0 0 0 9.200z"/><path fill="#fff" opacity=".95" d="M12 5.900c1.500 0 2.800.500 3.800 1.500l2.900-2.900A10 10 0 0 0 3.100 7.400L6.400 10c.8-2.300 3-4.100 5.600-4.100z"/></svg>
           Connect Google account
         </button>
-        <button class="btn ghost" id="btn-demo" type="button">Look around with demo data</button>
+        <button class="btn ghost" id="btn-demo" type="button">Try the demo</button>
       </div>
       <p class="welcome-error" id="welcome-error" role="alert" hidden></p>
 
@@ -115,51 +111,59 @@
         <p>The README has every step.</p>
       </div>
 
-      <ul class="welcome-facts">
-        <li><b>Strain 0–21</b> from every minute of heart rate, on a published model.</li>
-        <li><b>Nothing leaves your browser.</b> No server reads or stores your health data.</li>
-        <li><b>Read-only.</b> Oranje can never change what is in Google Health.</li>
-      </ul>
+      <p class="welcome-privacy">Read-only access. Your health data stays in your browser. <a href="privacy.html">Privacy</a></p>
     </div>
-    <div class="welcome-art" aria-hidden="true">
-      <div class="dial dial-art" id="welcome-dial"><div class="dial-read"><span class="eyebrow">Day strain</span><strong class="dial-num" id="welcome-num">0.0</strong></div></div>
-    </div>
+    <figure class="welcome-art" aria-label="Example day strain of 14.6 out of 21">
+      <figcaption>Demo reading</figcaption>
+      <div class="dial" id="welcome-dial" aria-hidden="true">
+        <div class="dial-read"><span class="eyebrow">Day strain</span><strong class="dial-num" id="welcome-num">14.6</strong><span class="dial-band">out of 21</span></div>
+      </div>
+    </figure>
   </section>
 
   <!-- ───────────── Dashboard ───────────── -->
   <div id="dash" hidden>
 
-    <section class="today" id="today" aria-labelledby="verdict">
-      <div class="today-grid">
-        <div class="dial" id="dial" role="img">
-          <div class="dial-read">
-            <span class="eyebrow">Day strain</span>
-            <strong class="dial-num" id="strain-num">–</strong>
-            <span class="dial-band" id="strain-band"></span>
-            <span class="dial-target" id="strain-target"></span>
+    <section class="today" id="today" aria-labelledby="dayline">
+      <div class="day-tools">
+        <div class="daynav">
+          <h1 class="dayline" id="dayline" tabindex="-1" aria-live="polite"></h1>
+          <div class="day-arrows">
+            <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+            <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
           </div>
+        </div>
+        <button class="history-toggle" id="history-toggle" type="button" aria-expanded="false" aria-controls="ribbon">History</button>
+        <div class="ribbon" id="ribbon" role="group" aria-label="Recent days with strain and recovery scores" hidden></div>
+      </div>
+
+      <div class="today-grid">
+        <div class="strain-card">
+          <div class="dial" id="dial" role="img">
+            <div class="dial-read">
+              <span class="eyebrow">Day strain</span>
+              <strong class="dial-num" id="strain-num">–</strong>
+              <span class="dial-band" id="strain-band"></span>
+              <span class="dial-target" id="strain-target"></span>
+            </div>
+          </div>
+          <a class="score-link" href="#strain">View strain <span aria-hidden="true">↗</span></a>
         </div>
 
         <div class="brief">
-          <div class="daynav">
-            <button class="arrow" id="day-prev" type="button" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
-            <p class="dayline" id="dayline" aria-live="polite"></p>
-            <button class="arrow" id="day-next" type="button" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
-          </div>
-          <div class="ribbon" id="ribbon" role="group" aria-label="Last two weeks: strain bar and recovery dot for each day"></div>
-
-          <h1 class="verdict" id="verdict"></h1>
-
+          <p class="verdict" id="verdict"></p>
           <div class="meters">
             <article class="meter" id="m-recovery">
-              <header><h2>Recovery</h2><span class="meter-band" id="recovery-band"></span></header>
+              <header><h2><a class="score-link" href="#recovery">Recovery <span aria-hidden="true">↗</span></a></h2></header>
               <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
+              <span class="meter-band" id="recovery-band"></span>
               <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
               <dl class="facts" id="recovery-facts"></dl>
             </article>
             <article class="meter sleep" id="m-sleep">
-              <header><h2>Sleep</h2><span class="meter-band" id="sleep-band"></span></header>
+              <header><h2><a class="score-link" href="#sleep">Sleep <span aria-hidden="true">↗</span></a></h2></header>
               <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
+              <span class="meter-band" id="sleep-band"></span>
               <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
               <dl class="facts" id="sleep-facts"></dl>
             </article>
@@ -175,11 +179,95 @@
 
       <figure class="river-wrap">
         <figcaption>
-          <span class="cap-title">The day, beat by beat</span>
-          <span class="legend"><i class="lg-hr"></i>Heart rate <i class="lg-build"></i>Strain building <i class="lg-sleep"></i>Asleep</span>
+          <h2 class="cap-title">Heart rate through the day</h2>
+          <span class="legend">
+            <span><i class="lg-hr" aria-hidden="true"></i>Heart rate</span>
+            <span><i class="lg-build" aria-hidden="true"></i>Strain building</span>
+            <span><i class="lg-sleep" aria-hidden="true"></i>Asleep</span>
+          </span>
         </figcaption>
         <div class="river" id="river" tabindex="0"></div>
       </figure>
+    </section>
+
+    <section class="sec" id="strain" aria-labelledby="h-strain" data-nav="strain">
+      <nav class="detail-nav" aria-label="Health details">
+        <a href="#strain">Strain</a>
+        <a href="#recovery">Recovery</a>
+        <a href="#sleep">Sleep</a>
+        <a href="#vitals">Vitals</a>
+      </nav>
+      <header class="sec-head" data-reveal>
+        <h2 id="h-strain">Strain</h2>
+        <p id="strain-lede"></p>
+      </header>
+      <div class="strain-grid">
+        <div class="block" data-reveal>
+          <h3>Time in each zone</h3>
+          <div class="zones" id="zones"></div>
+          <p class="note" id="zones-note"></p>
+        </div>
+        <div class="block" data-reveal>
+          <h3>Sessions</h3>
+          <ol class="sessions" id="sessions"></ol>
+        </div>
+        <figure class="block curve" data-reveal>
+          <h3>Why the last points are the hardest</h3>
+          <div id="curve"></div>
+          <figcaption id="curve-note"></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="recovery" aria-labelledby="h-recovery" data-nav="strain">
+      <header class="sec-head" data-reveal>
+        <h2 id="h-recovery">Recovery</h2>
+        <p id="recovery-lede"></p>
+      </header>
+      <div class="recovery-grid">
+        <div class="block" data-reveal>
+          <h3>This morning against your own normal</h3>
+          <div class="devs" id="devs"></div>
+          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
+        </div>
+        <div class="block aim" data-reveal>
+          <h3>What today can take</h3>
+          <div id="aim"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="sleep" aria-labelledby="h-sleep" data-nav="strain">
+      <header class="sec-head" data-reveal>
+        <h2 id="h-sleep">Sleep</h2>
+        <p id="sleep-lede"></p>
+      </header>
+      <div class="block" data-reveal>
+        <h3>Last night, stage by stage</h3>
+        <div class="hypno" id="hypno"></div>
+      </div>
+      <div class="sleep-grid">
+        <div class="block" data-reveal>
+          <h3>Where the night went</h3>
+          <div class="stages" id="stages"></div>
+        </div>
+        <div class="block" data-reveal>
+          <h3>Had against needed</h3>
+          <div id="need"></div>
+        </div>
+        <div class="block" data-reveal>
+          <h3>Bed and wake times, last 7 nights</h3>
+          <div id="consistency"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="vitals" aria-labelledby="h-vitals" data-nav="strain">
+      <header class="sec-head" data-reveal>
+        <h2 id="h-vitals">Vitals</h2>
+        <p>Each measurement with its last two weeks. <button class="link" id="customise" type="button">Choose what shows here</button></p>
+      </header>
+      <div class="tiles" id="tiles"></div>
     </section>
 
     <section class="sec" id="climb" aria-labelledby="h-climb">
@@ -206,80 +294,6 @@
         <h3>Medals <span id="badge-count"></span></h3>
         <div class="badges" id="badges"></div>
       </div>
-    </section>
-
-    <section class="sec" id="strain" aria-labelledby="h-strain">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-strain">Strain</h2>
-        <p id="strain-lede"></p>
-      </header>
-      <div class="strain-grid">
-        <div class="block" data-reveal>
-          <h3>Time in each zone</h3>
-          <div class="zones" id="zones"></div>
-          <p class="note" id="zones-note"></p>
-        </div>
-        <div class="block" data-reveal>
-          <h3>Sessions</h3>
-          <ol class="sessions" id="sessions"></ol>
-        </div>
-        <figure class="block curve" data-reveal>
-          <h3>Why the last points are the hardest</h3>
-          <div id="curve"></div>
-          <figcaption id="curve-note"></figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="sec" id="recovery" aria-labelledby="h-recovery">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-recovery">Recovery</h2>
-        <p id="recovery-lede"></p>
-      </header>
-      <div class="recovery-grid">
-        <div class="block" data-reveal>
-          <h3>This morning against your own normal</h3>
-          <div class="devs" id="devs"></div>
-          <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
-        </div>
-        <div class="block aim" data-reveal>
-          <h3>What today can take</h3>
-          <div id="aim"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec" id="sleep" aria-labelledby="h-sleep">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-sleep">Sleep</h2>
-        <p id="sleep-lede"></p>
-      </header>
-      <div class="block" data-reveal>
-        <h3>Last night, stage by stage</h3>
-        <div class="hypno" id="hypno"></div>
-      </div>
-      <div class="sleep-grid">
-        <div class="block" data-reveal>
-          <h3>Where the night went</h3>
-          <div class="stages" id="stages"></div>
-        </div>
-        <div class="block" data-reveal>
-          <h3>Had against needed</h3>
-          <div id="need"></div>
-        </div>
-        <div class="block" data-reveal>
-          <h3>Bed and wake times, last 7 nights</h3>
-          <div id="consistency"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec" id="vitals" aria-labelledby="h-vitals">
-      <header class="sec-head" data-reveal>
-        <h2 id="h-vitals">Vitals</h2>
-        <p>Each measurement with its last two weeks. <button class="link" id="customise" type="button">Choose what shows here</button></p>
-      </header>
-      <div class="tiles" id="tiles"></div>
     </section>
 
     <section class="sec" id="trends" aria-labelledby="h-trends">
@@ -369,6 +383,6 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js?v=3"></script>
 </body>
 </html>

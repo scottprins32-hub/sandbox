@@ -8,17 +8,17 @@ import { auth } from './data/auth.js';
 import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
-import { createDial, createMeter } from './ui/dial.js';
-import { announce, renderChip, renderClimb } from './ui/game.js';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js';
-import { createRiver } from './ui/river.js';
-import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js';
+import { createDial, createMeter } from './ui/dial.js?v=3';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=3';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=3';
+import { createRiver } from './ui/river.js?v=3';
+import { VITAL_DEFS, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=3';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
 const person = () => (state.source === 'google' ? auth.who.email || state.data?.userId || '' : '');
 const saveSettings = () => store.saveSettings(state.settings, person());
-const dial = createDial($('#dial'));
+const dial = createDial($('#dial'), 'strain-heat');
 const recMeter = createMeter($('#recovery-ticks'));
 const sleepMeter = createMeter($('#sleep-ticks'));
 const river = createRiver($('#river'));
@@ -68,15 +68,12 @@ function setVerdict(d) {
   const text = parts.map((p) => p[0]).join(' ');
   if (el.dataset.text === text) return;
   el.dataset.text = text;
-  el.setAttribute('aria-label', text);
-  let i = 0;
-  const kids = [];
-  for (const [phrase, strong] of parts) {
-    const words = phrase.split(' ').map((w) => h('span', { class: 'w', style: `--i:${i++}`, 'aria-hidden': 'true', text: w }));
-    const spaced = words.flatMap((w, k) => (k ? [' ', w] : [w]));
-    kids.push(strong ? h('em', {}, spaced) : spaced, ' ');
-  }
-  el.replaceChildren(...kids.flat());
+  const kids = parts.flatMap(([phrase, emphasis], index) => [
+    ...(index ? [' '] : []),
+    emphasis ? h('em', { text: phrase }) : phrase,
+  ]);
+  el.replaceChildren(...kids);
+  if (!reduced()) el.animate([{ opacity: .62 }, { opacity: 1 }], { duration: 360, easing: 'ease-out' });
 }
 
 function trend(v, base, goodUp, unit) {
@@ -121,31 +118,35 @@ function renderRibbon() {
 function renderHero(animate, delay = 0) {
   const d = current(), days = state.ctx.days;
   const date = fromKey(d.date), isToday = d.date === todayKey();
-  $('#dayline').replaceChildren(h('b', { text: date.toLocaleDateString('en-GB', { weekday: 'long' }) }), ` ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}${isToday ? ' · today' : ''}`);
+  $('#dayline').replaceChildren(
+    isToday ? 'Today' : date.toLocaleDateString('en-GB', { weekday: 'long' }),
+    h('span', { text: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) }),
+  );
   $('#day-prev').disabled = d.date === days[0].date;
   $('#day-next').disabled = d.date === days[days.length - 1].date;
   renderRibbon();
 
   dial.set(d.strain, d.target, { animate, delay });
-  roll($('#strain-num'), d.strain, { format: (v) => v.toFixed(1), dur: animate ? 1300 : 0, delay });
+  roll($('#strain-num'), d.strain, { format: (v) => v.toFixed(1), dur: animate ? 650 : 0, delay });
   $('#strain-band').textContent = d.band ? d.band.name : 'No heart rate';
   $('#strain-target').textContent = d.target ? `Target ${d.target.lo.toFixed(1)}–${d.target.hi.toFixed(1)}` : '';
-  $('#dial').setAttribute('aria-label', isNum(d.strain) ? `Day strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day');
+  const strainLabel = isNum(d.strain) ? `Day strain ${d.strain.toFixed(1)} of 21, ${d.band.name}` : 'No strain for this day';
+  $('#dial').setAttribute('aria-label', [strainLabel, $('#strain-target').textContent].filter(Boolean).join('. '));
   setVerdict(d);
 
   const rec = d.recovery, m = $('#m-recovery');
   m.dataset.band = !isNum(rec) ? '' : rec >= 67 ? 'hi' : rec >= 34 ? 'mid' : 'lo';
-  roll($('#recovery-num'), rec, { dur: animate ? 1100 : 0, delay: delay + 120 });
+  roll($('#recovery-num'), rec, { dur: animate ? 530 : 0, delay: delay + 55 });
   $('#recovery-num').parentElement.classList.toggle('nil', !isNum(rec));
-  recMeter.set(rec, { animate, delay: delay + 120 });
+  recMeter.set(rec, { animate, delay: delay + 55 });
   const nights = days.filter((x) => x.date < d.date && (isNum(x.hrv) || isNum(x.rhr))).length;
   $('#recovery-band').textContent = isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning · ${nights}/3 nights` : 'No reading';
   $('#recovery-facts').replaceChildren(h('dt', { text: 'HRV' }), trend(d.hrv, d.baseline.hrv, true, 'ms'), h('dt', { text: 'Resting HR' }), trend(d.rhr, d.baseline.rhr, false, 'bpm'));
 
   const sl = d.sleepInfo;
-  roll($('#sleep-num'), sl?.score, { dur: animate ? 1100 : 0, delay: delay + 220 });
+  roll($('#sleep-num'), sl?.score, { dur: animate ? 530 : 0, delay: delay + 95 });
   $('#sleep-num').parentElement.classList.toggle('nil', !sl);
-  sleepMeter.set(sl?.score, { animate, delay: delay + 220 });
+  sleepMeter.set(sl?.score, { animate, delay: delay + 95 });
   $('#sleep-band').textContent = !sl ? (d.partial ? 'Not synced yet' : 'Not recorded') : sl.score >= 85 ? 'Well rested' : sl.score >= 70 ? 'Enough' : 'Short';
   $('#sleep-facts').replaceChildren(h('dt', { text: 'Asleep' }), h('dd', { text: sl ? fmtDur(sl.asleep) : '–' }), h('dt', { text: 'Needed' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
 
@@ -218,7 +219,7 @@ async function sync() {
 
 function enter() {
   $('#dash').classList.add('enter');
-  setTimeout(() => $('#dash').classList.remove('enter'), 2200);
+  setTimeout(() => $('#dash').classList.remove('enter'), 760);
 }
 
 function startGoogle() {
@@ -229,14 +230,14 @@ function startGoogle() {
   if (cache && !mine) store.clearCache();
   state.data = mine ? cache : null;
   state.settings = store.settings(person());
-  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); }
+  if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 75 }); }
   sync();
 }
 
 function startDemo(seed) {
   state.source = 'demo'; store.demo = true;
   state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
-  compute(); show('dash'); enter(); renderAll({ delay: 350 });
+  compute(); show('dash'); enter(); renderAll({ delay: 75 });
   window.scrollTo(0, 0);
   announce(state.game, 'demo');
 }
@@ -266,9 +267,9 @@ function showWelcome() {
   show('welcome');
   $('#setup-origin').textContent = location.origin;
   $('#owner-redirect').textContent = `${location.origin}/functions/authCallback`;
-  if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'));
-  welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 500 });
-  roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 1300, delay: 500 });
+  if (!welcomeDial) welcomeDial = createDial($('#welcome-dial'), 'welcome-heat');
+  welcomeDial.set(14.6, { lo: 12.8, hi: 15.2 }, { delay: 80 });
+  roll($('#welcome-num'), 14.6, { format: (v) => v.toFixed(1), dur: 650, delay: 80 });
 }
 
 // ───────── panel ─────────
@@ -337,7 +338,10 @@ function closePanel() {
 
 // ───────── wiring ─────────
 $('#btn-connect')?.addEventListener('click', (e) => connect(e.currentTarget));
-$('#btn-demo')?.addEventListener('click', () => startDemo());
+$('#btn-demo')?.addEventListener('click', () => {
+  startDemo();
+  $('#dayline').focus({ preventScroll: true });
+});
 $('#setup-form')?.addEventListener('submit', (e) => {
   e.preventDefault();
   const id = $('#client-id').value.trim();
@@ -396,11 +400,23 @@ $('#panel').addEventListener('keydown', (e) => {
 narrow.addEventListener('change', () => { if (state.ctx && !$('#dash').hidden) renderAll({ animate: false }); });
 
 // section in view → nav highlight
-const links = Object.fromEntries($$('.nav a').map((a) => [a.getAttribute('href').slice(1), a]));
+const navLinks = $$('.nav a');
 const spy = new IntersectionObserver((entries) => {
-  for (const en of entries) if (en.isIntersecting) { Object.values(links).forEach((a) => a.classList.remove('on')); links[en.target.id]?.classList.add('on'); }
-}, { rootMargin: '-45% 0px -50% 0px' });
-$$('#dash > section').forEach((s) => spy.observe(s));
+  const section = entries.findLast((entry) => entry.isIntersecting)?.target;
+  if (!section) return;
+  const href = `#${section.dataset.nav || section.id}`;
+  navLinks.forEach((link) => {
+    if (link.hash === href) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+  });
+}, { rootMargin: '-33% 0px -65% 0px' });
+$$('#dash > section').forEach((section) => spy.observe(section));
+
+$('#history-toggle').addEventListener('click', (event) => {
+  const ribbon = $('#ribbon');
+  ribbon.hidden = !ribbon.hidden;
+  event.currentTarget.setAttribute('aria-expanded', String(!ribbon.hidden));
+});
 
 let lastW = window.innerWidth, rz = 0;
 window.addEventListener('resize', () => {
@@ -418,7 +434,7 @@ function setLook(look) {
   const root = document.documentElement;
   if (look === 'cream') root.dataset.look = 'cream'; else root.removeAttribute('data-look');
   try { localStorage.setItem('oranje.look', look); } catch { /* storage off */ }
-  $('meta[name="theme-color"]')?.setAttribute('content', look === 'cream' ? '#F5EEE0' : '#04102B');
+  $('meta[name="theme-color"]')?.setAttribute('content', look === 'cream' ? '#F5EEE0' : '#0A1324');
   $('meta[name="color-scheme"]')?.setAttribute('content', look === 'cream' ? 'light' : 'dark');
   $$('[data-look-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lookPick === look)));
   const btn = $('#look-btn');
@@ -450,7 +466,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
 (async function boot() {
   $$('.seg [data-range]').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.range) === state.settings.range)));
   setLook(currentLook());
-  if (PREVIEW) { startDemo(); document.body.classList.remove('booting'); document.body.classList.add('ready'); setTimeout(() => document.body.classList.add('settled'), 1200); return; }
+  if (PREVIEW) { startDemo(); return; }
   await auth.init();
   const q = new URLSearchParams(location.search);
   const authError = q.get('auth_error');
@@ -462,8 +478,4 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !PREVIEW) 
     showWelcome();
     if (authError) welcomeError(authError === 'access_denied' ? 'Google sign-in was cancelled. Nothing was connected.' : authError === 'not_configured' ? 'This deployment is missing its Google credentials. See the README.' : `Google sign-in did not finish (${authError}). Try again.`);
   }
-  document.body.classList.remove('booting');
-  document.body.classList.add('ready');
-  try { sessionStorage.setItem('oranje.seen', '1'); } catch { /* fine */ }
-  setTimeout(() => document.body.classList.add('settled'), 1200);
 })();
