@@ -2,9 +2,10 @@
 // The share image embeds Archivo for its tagline via @font-face.
 const { chromium } = require('playwright');
 const { readFileSync } = require('node:fs');
-const B = '/home/user/sandbox/oranje/brand/';
-const I = '/home/user/sandbox/oranje/icons/';
-const FONT = 'file:///home/user/sandbox/oranje/fonts/Archivo-100-900.woff2';
+const path = require('node:path');
+const B = path.join(__dirname, '../../brand/');
+const I = path.join(__dirname, '../../icons/');
+const FONT = 'file://' + path.join(__dirname, '../../fonts/Archivo-100-900.woff2');
 
 const jobs = [
   // [svg, out, width, height, transparent]

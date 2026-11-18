@@ -6,7 +6,8 @@ from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 
-font = TTFont('/home/user/sandbox/oranje/fonts/Archivo-100-900.woff2')
+import os
+font = TTFont(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'fonts', 'Archivo-100-900.woff2'))
 inst = instantiateVariableFont(font, {'wght': 800, 'wdth': 125})
 gs = inst.getGlyphSet()
 cmap = inst.getBestCmap()

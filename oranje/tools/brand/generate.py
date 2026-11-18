@@ -4,8 +4,9 @@ import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mark as M
 
-OUT = '/home/user/sandbox/oranje/brand'
-ICONS = '/home/user/sandbox/oranje/icons'
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, '..', '..', 'brand')
+ICONS = os.path.join(HERE, '..', '..', 'icons')
 os.makedirs(OUT, exist_ok=True)
 WM = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordmark.json')))
 
