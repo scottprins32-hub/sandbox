@@ -6,7 +6,7 @@ import { ZONES, zoneOf, reserveShare } from '../core/strain.js';
 import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, fromKey, isNum } from '../core/util.js';
 import { date, num, strings } from '../i18n.js';
 import { stageName, zoneName } from '../terms.js';
-import { ease, h, reduced, tween } from './motion.js?v=13';
+import { ease, h, reduced, tween } from './motion.js?v=14';
 
 const t = strings({
   en: {

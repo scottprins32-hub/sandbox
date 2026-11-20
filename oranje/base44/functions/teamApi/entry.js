@@ -4,7 +4,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk';
 import { env } from '../../shared/env.js';
 import { handleTeam, unavailable } from '../../shared/team.js';
 
-export default async function team(req) {
+export default async function teamApi(req) {
   let db;
   try {
     // Service role: TeamMember and TeamDay deny the browser everything (RLS).

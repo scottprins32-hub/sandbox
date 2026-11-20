@@ -11,16 +11,16 @@ import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
 import { demoMembers, ledger, team as teamApi, withMine } from './data/team.js';
-import { createDial, createMeter } from './ui/dial.js?v=13';
-import { announce, renderChip, renderGame } from './ui/game.js?v=13';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=13';
-import { createRiver } from './ui/river.js?v=13';
-import { initHelp } from './ui/help.js?v=13';
+import { createDial, createMeter } from './ui/dial.js?v=14';
+import { announce, renderChip, renderGame } from './ui/game.js?v=14';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=14';
+import { createRiver } from './ui/river.js?v=14';
+import { initHelp } from './ui/help.js?v=14';
 import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js';
 import { pageText } from './i18n-page.js';
 import { bandName, recoveryName, sleepName, term } from './terms.js';
-import { createRing } from './ui/ring.js?v=13';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=13';
+import { createRing } from './ui/ring.js?v=14';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=14';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null, team: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.

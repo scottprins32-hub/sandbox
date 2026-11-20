@@ -5,7 +5,7 @@ import { STRAIN_MAX, strainFromLoad } from '../core/strain.js';
 import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js';
 import { date as fmtDate, num, strings } from '../i18n.js';
 import { stageName } from '../terms.js';
-import { h } from './motion.js?v=13';
+import { h } from './motion.js?v=14';
 
 const t = strings({
   en: {

@@ -1,7 +1,7 @@
 // A small score ring for the Today view: a 270° arc open at the bottom,
 // filled to the value with a knob at its tip.
 
-import { arcPath, ease, h, polar, tween } from './motion.js?v=13';
+import { arcPath, ease, h, polar, tween } from './motion.js?v=14';
 
 const A0 = -135, SWEEP = 270, CX = 60, CY = 62, R = 48;
 

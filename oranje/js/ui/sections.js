@@ -5,8 +5,8 @@ import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strai
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
 import { date, num, signedNum, strings } from '../i18n.js';
 import { bandName, recoveryName, stageName, term, zoneName } from '../terms.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=13';
-import { $, h, roll } from './motion.js?v=13';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=14';
+import { $, h, roll } from './motion.js?v=14';
 
 const t = strings({
   en: {

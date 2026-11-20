@@ -1,4 +1,4 @@
-// The team, from the browser: talks to this site's /functions/team, keeps the
+// The team, from the browser: talks to this site's /functions/teamApi, keeps the
 // XP ledger, and makes a pretend team for the demo.
 //
 // Nothing is shared until the person chooses "Join". After that, the day
@@ -10,7 +10,7 @@ import { shareDay } from '../core/team.js';
 import { makeDemo } from './demo.js';
 
 async function call(action, body) {
-  const res = await fetch(`/functions/team?action=${action}`, {
+  const res = await fetch(`/functions/teamApi?action=${action}`, {
     method: action === 'state' ? 'GET' : 'POST', cache: 'no-store',
     headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}) },
     body: body ? JSON.stringify(body) : undefined,
