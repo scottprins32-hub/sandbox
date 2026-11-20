@@ -39,10 +39,13 @@ export function rangeKeys(endKey, n) {
   return out;
 }
 
+// Hours and minutes: "7h 36m" in English, "7u 36m" in Dutch (set by js/i18n.js).
+let units = { h: 'h', m: 'm' };
+export const setDurationUnits = (u) => { units = u; };
 export const fmtDur = (min) => {
   if (!isNum(min)) return '–';
   const m = Math.round(min);
-  return m >= 60 ? `${Math.floor(m / 60)}h ${pad(m % 60)}m` : `${m}m`;
+  return m >= 60 ? `${Math.floor(m / 60)}${units.h} ${pad(m % 60)}${units.m}` : `${m}${units.m}`;
 };
 export const fmtClock = (ms) => {
   const d = new Date(ms);

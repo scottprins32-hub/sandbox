@@ -5,7 +5,7 @@
 const CACHE = 'oranje-shell-v10';
 const SHELL = [
   './', 'index.html', 'whoop.html', 'css/whoop.css?v=10', 'config.js', 'manifest.webmanifest', 'css/style.css?v=10',
-  'js/boot.js?v=10', 'js/main.js?v=10', 'js/whoop.js?v=10',
+  'js/boot.js?v=10', 'js/main.js?v=10', 'js/i18n.js', 'js/i18n-page.js', 'js/legal.js', 'js/terms.js', 'js/whoop.js?v=10',
   'js/core/game.js', 'js/core/scores.js', 'js/core/sources.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js', 'js/data/whoop.js',
   'js/ui/charts.js?v=10', 'js/ui/dial.js?v=10', 'js/ui/game.js?v=10', 'js/ui/help.js?v=10', 'js/ui/motion.js?v=10', 'js/ui/river.js?v=10', 'js/ui/ring.js?v=10', 'js/ui/sections.js?v=10',

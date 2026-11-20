@@ -3,11 +3,31 @@
 // strain it added up to drawn over the top. Changing day reshapes the line.
 
 import { ZONES, zoneOf, reserveShare } from '../core/strain.js';
-import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, isNum } from '../core/util.js';
+import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, fromKey, isNum } from '../core/util.js';
+import { date, num, strings } from '../i18n.js';
+import { stageName, zoneName } from '../terms.js';
 import { ease, h, reduced, tween } from './motion.js?v=10';
 
-const STAGE_LABEL = { deep: 'Deep', light: 'Light', rem: 'REM', wake: 'Awake' };
-// rest → max, cool to hot
+const t = strings({
+  en: {
+    rest: 'Rest {bpm}',
+    asleepFor: 'Asleep {dur}', asleep: 'Asleep',
+    now: 'Now',
+    stageSleep: ({ s }) => `${stageName(s)} sleep`,
+    strainAt: 'Strain {v}',
+    aria: ({ day, peak }) => `Heart rate through ${day}${peak ? `, peaking at ${peak}` : ''} beats per minute. Use the arrow keys to read values.`,
+  },
+  nl: {
+    rest: 'Rust {bpm}',
+    asleepFor: 'Slaap {dur}', asleep: 'Slaap',
+    now: 'Nu',
+    stageSleep: ({ s }) => ({ deep: 'Diepe slaap', light: 'Lichte slaap', rem: 'REM-slaap', wake: 'Wakker' })[s] || stageName(s),
+    strainAt: 'Strain {v}',
+    aria: ({ nice, peak }) => `Hartslag op ${nice}${peak ? `, met een piek van ${peak}` : ''}, in slagen per minuut. Lees de waarden af met de pijltjestoetsen.`,
+  },
+});
+// session names come from the data source, so they are escaped before going into the tooltip's markup
+const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);   // theme tokens, rest → max
 let uid = 0;
 
@@ -114,11 +134,11 @@ export function createRiver(root) {
       if (bpm <= s.lo || bpm >= s.hi) continue;
       const y = Y(bpm, s);
       gGrid.append(h('line', { x1: PL, x2: W - PR, y1: y, y2: y, class: 'zone' }));
-      gGrid.append(h('text', { x: W - PR + 8, y: y + 4, class: 'axis zone-label', text: narrow ? Math.round(bpm) : `${z.name} ${Math.round(bpm)}` }));
+      gGrid.append(h('text', { x: W - PR + 8, y: y + 4, class: 'axis zone-label', text: narrow ? Math.round(bpm) : `${zoneName(z)} ${Math.round(bpm)}` }));
     }
     const yr = Y(day.rhrUsed, s);
     gGrid.append(h('line', { x1: PL, x2: W - PR, y1: yr, y2: yr, class: 'zone rest' }));
-    gGrid.append(h('text', { x: W - PR + 8, y: yr + 4, class: 'axis zone-label', text: narrow ? Math.round(day.rhrUsed) : `Rest ${Math.round(day.rhrUsed)}` }));
+    gGrid.append(h('text', { x: W - PR + 8, y: yr + 4, class: 'axis zone-label', text: narrow ? Math.round(day.rhrUsed) : t('rest', { bpm: Math.round(day.rhrUsed) }) }));
 
     // sleep: the night that ended this morning, and tonight if it has begun
     const nights = [day.sleep, day.nextSleep].filter(Boolean);
@@ -131,7 +151,7 @@ export function createRiver(root) {
         if (sb <= sa) continue;
         gMarks.append(h('rect', { x: X(sa), y: base - 5, width: Math.max(0.5, X(sb) - X(sa)), height: 5, class: `stage ${st.s}` }));
       }
-      if (X(b) - X(a) > 90) gTop.append(h('text', { x: X(a) + 10, y: PT + 18, class: 'mark-label sleep', text: sl === day.sleep ? `Asleep ${fmtDur(sl.asleepMin)}` : 'Asleep' }));
+      if (X(b) - X(a) > 90) gTop.append(h('text', { x: X(a) + 10, y: PT + 18, class: 'mark-label sleep', text: sl === day.sleep ? t('asleepFor', { dur: fmtDur(sl.asleepMin) }) : t('asleep') }));
     }
     // sessions
     let lastEnd = -1e9;
@@ -140,7 +160,7 @@ export function createRiver(root) {
       const xa = X(a), xb = X(b);
       gBack.append(h('rect', { x: xa, y: PT, width: Math.max(1, xb - xa), height: base - PT, class: 'work-block' }));
       gTop.append(h('path', { d: `M${xa} ${PT + 5}V${PT - 1}H${xb}V${PT + 5}`, class: 'work-bracket' }));
-      const label = narrow ? (isNum(w.strain) ? w.strain.toFixed(1) : '') : `${w.name}${isNum(w.strain) ? ' ' + w.strain.toFixed(1) : ''}`;
+      const label = narrow ? (isNum(w.strain) ? num(w.strain, 1) : '') : `${w.name}${isNum(w.strain) ? ' ' + num(w.strain, 1) : ''}`;
       const need = label.length * 6.6 + 10;
       const lx = Math.max(xa, lastEnd + 8);
       if (lx + need < W - PR + 40) { gTop.append(h('text', { x: lx, y: PT - 8, class: 'mark-label work', text: label })); lastEnd = lx + need; }
@@ -151,7 +171,7 @@ export function createRiver(root) {
       if (lastMin > 0) {
         const x = X(lastMin + 1);
         gTop.append(h('line', { x1: x, x2: x, y1: PT, y2: base, class: 'now' }));
-        gTop.append(h('text', { x: x + 6, y: PT + 12, class: 'mark-label nowlab', text: 'Now' }));
+        gTop.append(h('text', { x: x + 6, y: PT + 12, class: 'mark-label nowlab', text: t('now') }));
       }
     }
     // strain end label
@@ -219,8 +239,8 @@ export function createRiver(root) {
     const stage = sl && sl.stages.find((st) => ms >= st.t0 && ms < st.t1);
     const work = model.workouts.find((w) => ms >= w.t0 && ms < w.t1);
     tip.innerHTML = `<b>${fmtMinuteOfDay(m)}</b><span class="tip-bpm">${model.hr[m]} <small>bpm</small></span>`
-      + `<span>${stage ? STAGE_LABEL[stage.s] + ' sleep' : work ? work.name : zone.name}</span>`
-      + `<span class="tip-strain">Strain ${isNum(model.cumulative[m]) ? model.cumulative[m].toFixed(1) : '–'}</span>`;
+      + `<span>${stage ? t('stageSleep', { s: stage.s }) : work ? esc(work.name) : zoneName(zone)}</span>`
+      + `<span class="tip-strain">${t('strainAt', { v: isNum(model.cumulative[m]) ? num(model.cumulative[m], 1) : '–' })}</span>`;
     const tw = tip.offsetWidth || 150;
     tip.style.transform = `translate(${clamp(x - tw / 2, 4, W - tw - 4)}px, ${Math.max(0, y - 74)}px)`;
     root.classList.add('reading');
@@ -244,8 +264,7 @@ export function createRiver(root) {
   return {
     set(day, { animate = true } = {}) {
       model = day; hide();
-      const peak = day.peakHr ? `, peaking at ${day.peakHr}` : '';
-      svg.setAttribute('aria-label', `Heart rate through ${day.date}${peak} beats per minute. Use the arrow keys to read values.`);
+      svg.setAttribute('aria-label', t('aria', { day: day.date, nice: date(fromKey(day.date), { weekday: 'long', day: 'numeric', month: 'long' }), peak: day.peakHr || '' }));
       render(animate);
     },
   };

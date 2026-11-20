@@ -915,6 +915,15 @@ body.welcoming .tabs { display: none; }
   .ring-band { font-size: 11px; }
 }
 
+/* ───────── language switch: shows the other language ───────── */
+.lang-btn {
+  height: 40px; min-width: 40px; padding: 0 10px; flex: none; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: var(--control-radius); color: var(--paper); background: var(--control-fill);
+  font: 600 12px/1 var(--mono); letter-spacing: .06em; transition: border-color .2s, background .2s;
+}
+.lang-btn:hover { border-color: var(--faint); }
+@media (max-width: 720px) { .bar-end .lang-btn { height: 36px; min-width: 36px; padding: 0 8px; } }
+
 /* ───────── "?" explanations ───────── */
 .help-btn {
   position: relative; display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;

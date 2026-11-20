@@ -3,9 +3,35 @@
 
 import { STRAIN_MAX, strainFromLoad } from '../core/strain.js';
 import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js';
+import { date as fmtDate, num, strings } from '../i18n.js';
+import { stageName } from '../terms.js';
 import { h } from './motion.js?v=10';
 
-const WD = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const t = strings({
+  en: {
+    wd: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+    hypAria: 'Sleep stages from {from} to {to}',
+    curveAria: "Strain rises quickly at first and flattens. Today's load of {load} gives strain {strain}.",
+    curveAxis: 'Heart-rate load →',
+    noNights: 'No nights recorded this week.',
+    nightsAria: 'Bed and wake times for the last seven nights',
+    bedToWake: '{from} to {to}',
+    trendAria: 'Day strain and recovery for the last {n} days',
+    dayAria: ({ d, s, r }) => `${d.toDateString()}: strain ${s ?? 'none'}, recovery ${r ?? 'none'}`,
+  },
+  nl: {
+    wd: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
+    hypAria: 'Slaapfases van {from} tot {to}',
+    curveAria: 'Strain stijgt eerst snel en vlakt dan af. De belasting van vandaag, {load}, geeft een strain van {strain}.',
+    curveAxis: 'Hartslagbelasting →',
+    noNights: 'Deze week geen nachten vastgelegd.',
+    nightsAria: 'Bedtijd en opstaan in de laatste zeven nachten',
+    bedToWake: '{from} tot {to}',
+    trendAria: 'Strain en herstel per dag, de laatste {n} dagen',
+    dayAria: ({ d, s, r }) => `${fmtDate(d, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}: strain ${s ?? 'geen'}, herstel ${r ?? 'geen'}`,
+  },
+});
+const weekday = (d) => t('wd')[d.getDay()];
 const mount = (el, height) => {
   const W = Math.max(120, el.clientWidth);
   const svg = h('svg', { viewBox: `0 0 ${W} ${height}`, width: W, height, role: 'img' });
@@ -44,18 +70,18 @@ export function sparkline(el, values, { baseline = null, labels = [], onRead } =
   el.onpointermove = read; el.onpointerdown = read; el.onpointerleave = reset; el.onpointercancel = reset;
 }
 
-const STAGE_ROWS = [['wake', 'Awake', 'var(--stage-wake)'], ['rem', 'REM', 'var(--stage-rem)'], ['light', 'Light', 'var(--stage-light)'], ['deep', 'Deep', 'var(--stage-deep)']];
-export const STAGE_COLORS = Object.fromEntries(STAGE_ROWS.map(([k, , c]) => [k, c]));
+const STAGE_ROWS = [['wake', 'var(--stage-wake)'], ['rem', 'var(--stage-rem)'], ['light', 'var(--stage-light)'], ['deep', 'var(--stage-deep)']];
+export const STAGE_COLORS = Object.fromEntries(STAGE_ROWS);
 
 export function hypnogram(el, sleep) {
   const H = 210, { svg, W } = mount(el, H);
   const PL = W < 520 ? 46 : 62, PR = 6, PT = 8, PB = 26, rowH = (H - PT - PB) / 4;
   const X = (ms) => PL + ((ms - sleep.start) / (sleep.end - sleep.start)) * (W - PL - PR);
-  svg.setAttribute('aria-label', `Sleep stages from ${fmtClock(sleep.start)} to ${fmtClock(sleep.end)}`);
-  STAGE_ROWS.forEach(([, name], r) => {
+  svg.setAttribute('aria-label', t('hypAria', { from: fmtClock(sleep.start), to: fmtClock(sleep.end) }));
+  STAGE_ROWS.forEach(([k], r) => {
     const y = PT + r * rowH;
     svg.append(h('line', { x1: PL, x2: W - PR, y1: y + rowH, y2: y + rowH, class: 'h-row' }));
-    svg.append(h('text', { x: 0, y: y + rowH / 2 + 4, class: 'h-name', text: name }));
+    svg.append(h('text', { x: 0, y: y + rowH / 2 + 4, class: 'h-name', text: stageName(k) }));
   });
   let prev = null;
   for (const st of sleep.stages) {
@@ -63,7 +89,7 @@ export function hypnogram(el, sleep) {
     if (r < 0) continue;
     const x = X(st.t0), w = Math.max(1, X(st.t1) - x), y = PT + r * rowH + 5;
     if (prev) svg.append(h('line', { x1: x, x2: x, y1: Math.min(prev.y, y) + (rowH - 10) / 2, y2: Math.max(prev.y, y) + (rowH - 10) / 2, class: 'h-link' }));
-    svg.append(h('rect', { x, y, width: w, height: rowH - 10, style: { fill: STAGE_ROWS[r][2] }, class: 'h-seg' }, h('title', { text: `${STAGE_ROWS[r][1]} ${fmtClock(st.t0)}–${fmtClock(st.t1)} (${fmtDur((st.t1 - st.t0) / 60000)})` })));
+    svg.append(h('rect', { x, y, width: w, height: rowH - 10, style: { fill: STAGE_ROWS[r][1] }, class: 'h-seg' }, h('title', { text: `${stageName(st.s)} ${fmtClock(st.t0)}–${fmtClock(st.t1)} (${fmtDur((st.t1 - st.t0) / 60000)})` })));
     prev = { y };
   }
   const first = new Date(sleep.start); first.setMinutes(0, 0, 0); first.setHours(first.getHours() + 1);
@@ -81,7 +107,7 @@ export function strainCurve(el, load, strain) {
   const PL = 26, PR = 10, PT = 12, PB = 24, maxL = 560;
   const X = (l) => PL + (Math.min(l, maxL) / maxL) * (W - PL - PR);
   const Y = (s) => PT + (1 - s / STRAIN_MAX) * (H - PT - PB);
-  svg.setAttribute('aria-label', `Strain rises quickly at first and flattens. Today's load of ${Math.round(load)} gives strain ${strain.toFixed(1)}.`);
+  svg.setAttribute('aria-label', t('curveAria', { load: Math.round(load), strain: num(strain, 1) }));
   svg.append(h('defs', {}, h('linearGradient', { id: 'curve-fill', x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, style: { stopColor: 'var(--oranje)' }, 'stop-opacity': 0.3 }), h('stop', { offset: 1, style: { stopColor: 'var(--oranje)' }, 'stop-opacity': 0 }))));
   for (const s of [10, 14, 18, 21]) {
     svg.append(h('line', { x1: PL, x2: W - PR, y1: Y(s), y2: Y(s), class: 'c-band' }));
@@ -95,7 +121,7 @@ export function strainCurve(el, load, strain) {
   svg.append(h('line', { x1: x, x2: x, y1: y, y2: Y(0), class: 'c-guide' }));
   svg.append(h('line', { x1: PL, x2: x, y1: y, y2: y, class: 'c-guide' }));
   svg.append(h('circle', { class: 'c-dot', r: 6, cx: x, cy: y }));
-  svg.append(h('text', { x: PL, y: H - 6, class: 'axis', text: 'Heart-rate load →' }));
+  svg.append(h('text', { x: PL, y: H - 6, class: 'axis', text: t('curveAxis') }));
 }
 
 // Bed-to-wake bars for the last week, on a shared evening-to-morning clock.
@@ -104,11 +130,11 @@ export function consistency(el, nights) {
   const PL = 44, PT = 6, PB = 22;
   const rel = (ms) => { const d = new Date(ms); let m = d.getHours() * 60 + d.getMinutes(); if (m < 14 * 60) m += 1440; return m; }; // minutes since noon-ish, so evening < morning
   const all = nights.filter((n) => n.sleep);
-  if (!all.length) { el.replaceChildren(h('p', { class: 'empty', text: 'No nights recorded this week.' })); return; }
+  if (!all.length) { el.replaceChildren(h('p', { class: 'empty', text: t('noNights') })); return; }
   const lo = Math.floor(Math.min(...all.map((n) => rel(n.sleep.start))) / 60) * 60 - 30;
   const hi = Math.ceil(Math.max(...all.map((n) => rel(n.sleep.end))) / 60) * 60 + 30;
   const Y = (m) => PT + ((m - lo) / (hi - lo)) * (H - PT - PB);
-  svg.setAttribute('aria-label', 'Bed and wake times for the last seven nights');
+  svg.setAttribute('aria-label', t('nightsAria'));
   for (let m = Math.ceil(lo / 120) * 120; m <= hi; m += 120) {
     svg.append(h('line', { x1: PL, x2: W, y1: Y(m), y2: Y(m), class: 'k-grid' }));
     svg.append(h('text', { x: 0, y: Y(m) + 4, class: 'axis', text: `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:00` }));
@@ -116,10 +142,10 @@ export function consistency(el, nights) {
   const slot = (W - PL) / nights.length, bw = Math.min(22, slot * 0.46);
   nights.forEach((n, i) => {
     const cx = PL + slot * (i + 0.5);
-    svg.append(h('text', { x: cx, y: H - 5, 'text-anchor': 'middle', class: 'axis', text: WD[fromKey(n.date).getDay()] }));
+    svg.append(h('text', { x: cx, y: H - 5, 'text-anchor': 'middle', class: 'axis', text: weekday(fromKey(n.date)) }));
     if (!n.sleep) return;
     const y0 = Y(rel(n.sleep.start)), y1 = Y(rel(n.sleep.end));
-    svg.append(h('rect', { x: cx - bw / 2, y: y0, width: bw, height: Math.max(2, y1 - y0), rx: 3, class: n.selected ? 'k-bar sel' : 'k-bar' }, h('title', { text: `${fmtClock(n.sleep.start)} to ${fmtClock(n.sleep.end)}` })));
+    svg.append(h('rect', { x: cx - bw / 2, y: y0, width: bw, height: Math.max(2, y1 - y0), rx: 3, class: n.selected ? 'k-bar sel' : 'k-bar' }, h('title', { text: t('bedToWake', { from: fmtClock(n.sleep.start), to: fmtClock(n.sleep.end) }) })));
   });
 }
 
@@ -130,7 +156,7 @@ export function trendChart(el, days, selected, onPick) {
   const slot = (W - PL - PR) / days.length, bw = Math.max(4, Math.min(34, slot * 0.56));
   const Ys = (s) => PT + (1 - s / STRAIN_MAX) * (H - PT - PB);
   const Yr = (r) => PT + (1 - r / 100) * (H - PT - PB);
-  svg.setAttribute('aria-label', `Day strain and recovery for the last ${days.length} days`);
+  svg.setAttribute('aria-label', t('trendAria', { n: days.length }));
   for (const s of [0, 7, 14, 21]) {
     svg.append(h('line', { x1: PL, x2: W - PR, y1: Ys(s), y2: Ys(s), class: 't-grid' }));
     svg.append(h('text', { x: PL - 8, y: Ys(s) + 4, 'text-anchor': 'end', class: 'axis', text: s }));
@@ -143,11 +169,11 @@ export function trendChart(el, days, selected, onPick) {
     const date = fromKey(day.date);
     const showLabel = days.length <= 14 || date.getDay() === 1;
     if (showLabel) {
-      svg.append(h('text', { x: cx, y: H - 22, 'text-anchor': 'middle', class: 'axis', text: WD[date.getDay()] }));
+      svg.append(h('text', { x: cx, y: H - 22, 'text-anchor': 'middle', class: 'axis', text: weekday(date) }));
       svg.append(h('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'axis', text: date.getDate() }));
     }
     const s = isNum(day.strain) ? day.strain : 0;
-    const hit = h('rect', { x: cx - slot / 2, y: PT, width: slot, height: H - PT - PB, class: 't-hit', tabindex: 0, role: 'button', 'aria-label': `${date.toDateString()}: strain ${isNum(day.strain) ? day.strain.toFixed(1) : 'none'}, recovery ${isNum(day.recovery) ? day.recovery + '%' : 'none'}` });
+    const hit = h('rect', { x: cx - slot / 2, y: PT, width: slot, height: H - PT - PB, class: 't-hit', tabindex: 0, role: 'button', 'aria-label': t('dayAria', { d: date, s: isNum(day.strain) ? num(day.strain, 1) : null, r: isNum(day.recovery) ? day.recovery + '%' : null }) });
     hit.addEventListener('click', () => onPick(day.date));
     hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(day.date); } });
     const bar = h('rect', { x: cx - bw / 2, y: Ys(s), width: bw, height: Math.max(0, Ys(0) - Ys(s)), rx: Math.min(3, bw / 2), class: `t-bar${day.date === selected ? ' sel' : ''}` });

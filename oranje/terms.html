@@ -12,35 +12,42 @@
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css?v=10">
 <script src="js/boot.js?v=10"></script>
+<script type="module" src="js/legal.js?v=10"></script>
 </head>
-<body>
+<body data-page="terms">
 <main class="doc">
-  <a class="doc-back" href="./"><img src="icons/icon.svg" alt="" width="28" height="28"> Oranje</a>
-  <h1>Voorwaarden</h1>
-  <p class="doc-meta">Bijgewerkt op 18 november 2026</p>
+  <div class="trend-head doc-top">
+    <a class="doc-back" href="./"><img src="icons/icon.svg" alt="" width="28" height="28"> Oranje</a>
+    <div class="seg doc-lang" role="group" aria-label="Taal" data-i18n-attr="aria-label:lang" hidden>
+      <button type="button" lang="nl" data-lang-pick="nl" aria-pressed="true">Nederlands</button>
+      <button type="button" lang="en" data-lang-pick="en" aria-pressed="false">English</button>
+    </div>
+  </div>
+  <h1 data-i18n="h1">Voorwaarden</h1>
+  <p class="doc-meta" data-i18n="meta">Bijgewerkt op 18 november 2026</p>
 
-  <p class="doc-lede">Oranje is een gratis, persoonlijk project voor een kleine kring mensen. Door de app te gebruiken ga je akkoord met deze punten.</p>
+  <p class="doc-lede" data-i18n="lede">Oranje is een gratis, persoonlijk project voor een kleine kring mensen. Door de app te gebruiken ga je akkoord met deze punten.</p>
 
-  <h2>Gebruik</h2>
+  <h2 data-i18n="hUse">Gebruik</h2>
   <ul>
-    <li>Je logt in met je eigen Google- of WHOOP-account en ziet alleen je eigen gegevens.</li>
-    <li>Gebruik Oranje alleen voor jezelf, niet om gegevens van anderen te bekijken.</li>
-    <li>De beheerder kan de app aanpassen, toegang beperken of de app stoppen, ook zonder aankondiging.</li>
+    <li data-i18n="use1">Je logt in met je eigen Google- of WHOOP-account en ziet alleen je eigen gegevens.</li>
+    <li data-i18n="use2">Gebruik Oranje alleen voor jezelf, niet om gegevens van anderen te bekijken.</li>
+    <li data-i18n="use3">De beheerder kan de app aanpassen, toegang beperken of de app stoppen, ook zonder aankondiging.</li>
   </ul>
 
-  <h2>Geen medisch advies</h2>
-  <p>Voor Fitbit berekent Oranje eigen scores en streefwaarden. De WHOOP-weergave toont scores die WHOOP aanlevert. Ze zijn bedoeld als inzicht en motivatie, niet als diagnose of behandeladvies. Twijfel je over je gezondheid, raadpleeg dan een arts.</p>
+  <h2 data-i18n="hMedical">Geen medisch advies</h2>
+  <p data-i18n="medical">Voor Fitbit berekent Oranje eigen scores en streefwaarden. De WHOOP-weergave toont scores die WHOOP aanlevert. Ze zijn bedoeld als inzicht en motivatie, niet als diagnose of behandeladvies. Twijfel je over je gezondheid, raadpleeg dan een arts.</p>
 
-  <h2>Geen garantie</h2>
-  <p>Oranje wordt aangeboden zoals hij is. De beheerder doet zijn best, maar garandeert niet dat de app altijd werkt, dat de gegevens volledig zijn of dat de berekeningen kloppen. Voor zover de wet dat toestaat, is de beheerder niet aansprakelijk voor schade door het gebruik van Oranje.</p>
+  <h2 data-i18n="hWarranty">Geen garantie</h2>
+  <p data-i18n="warranty">Oranje wordt aangeboden zoals hij is. De beheerder doet zijn best, maar garandeert niet dat de app altijd werkt, dat de gegevens volledig zijn of dat de berekeningen kloppen. Voor zover de wet dat toestaat, is de beheerder niet aansprakelijk voor schade door het gebruik van Oranje.</p>
 
-  <h2>Merken</h2>
-  <p>Fitbit en Google zijn merken van Google LLC. WHOOP is een merk van WHOOP, Inc. Oranje is niet verbonden aan, gesponsord door of goedgekeurd door deze bedrijven.</p>
+  <h2 data-i18n="hMarks">Merken</h2>
+  <p data-i18n="marks">Fitbit en Google zijn merken van Google LLC. WHOOP is een merk van WHOOP, Inc. Oranje is niet verbonden aan, gesponsord door of goedgekeurd door deze bedrijven.</p>
 
-  <h2>Privacy</h2>
-  <p>Hoe Oranje met je gegevens omgaat, lees je in de <a href="privacy.html">privacyverklaring</a>.</p>
+  <h2 data-i18n="hPrivacy">Privacy</h2>
+  <p data-i18n-html="privacy">Hoe Oranje met je gegevens omgaat, lees je in de <a href="privacy.html">privacyverklaring</a>.</p>
 
-  <p class="doc-foot"><a href="./">Terug naar Oranje</a> · <a href="privacy.html">Privacy</a></p>
+  <p class="doc-foot" data-i18n-html="foot"><a href="./">Terug naar Oranje</a> · <a href="privacy.html">Privacy</a></p>
 </main>
 </body>
 </html>
