@@ -1,5 +1,5 @@
-import { createRing } from './ui/ring.js?v=8';
-import { $, h } from './ui/motion.js?v=8';
+import { createRing } from './ui/ring.js?v=9';
+import { $, h } from './ui/motion.js?v=9';
 import { fmtDur } from './core/util.js';
 
 const status = $('#whoop-status');

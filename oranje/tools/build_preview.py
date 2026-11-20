@@ -13,7 +13,7 @@ body=h[h.index('<body'):h.index('</body>')]; body=body[body.index('>')+1:]
 a=body.index('  <!-- ───────────── Welcome'); b=body.index('  <!-- ───────────── Dashboard')
 body=body[:a]+body[b:]
 body=body.replace('<noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>\n','')
-page='<title>Oranje Demo</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="css/style.css?v=8">\n<script src="js/boot.js?v=8"></script>\n<script src="config.js"></script>\n'+body
+page='<title>Oranje Demo</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="css/style.css?v=9">\n<script src="js/boot.js?v=9"></script>\n<script src="config.js"></script>\n'+body
 open(OUT+'/oranje-demo.html','w').write(page)
 open(site+'/index.html','w').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0}</style></head><body>'+page+'</body></html>')
 print('built', len(page))

@@ -4,8 +4,8 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=8';
-import { $, h, roll } from './motion.js?v=8';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=9';
+import { $, h, roll } from './motion.js?v=9';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
@@ -195,7 +195,7 @@ export function renderVitals(day, ctx, hidden, issues) {
   const have = [...wrap.children].map((c) => c.dataset.k).join();
   if (have !== keys.join()) {
     wrap.replaceChildren(...keys.map((k) => h('article', { class: 'tile', 'data-k': k },
-      h('h3', { text: VITAL_DEFS[k].name }), h('p', { class: 't-num' }, h('span', { class: 'v' }), h('small', { text: VITAL_DEFS[k].unit })),
+      h('h3', { text: VITAL_DEFS[k].name, 'data-help': `vital-${k}` }), h('p', { class: 't-num' }, h('span', { class: 'v' }), h('small', { text: VITAL_DEFS[k].unit })),
       h('p', { class: 't-delta' }), h('div', { class: 't-spark' }))));
     if (!keys.length) wrap.append(h('article', { class: 'tile' }, h('p', { class: 'empty', text: 'Every vital is switched off. Choose what shows here to bring some back.' })));
   }

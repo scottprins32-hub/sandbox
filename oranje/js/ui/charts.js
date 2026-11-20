@@ -3,7 +3,7 @@
 
 import { STRAIN_MAX, strainFromLoad } from '../core/strain.js';
 import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js';
-import { h } from './motion.js?v=8';
+import { h } from './motion.js?v=9';
 
 const WD = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const mount = (el, height) => {

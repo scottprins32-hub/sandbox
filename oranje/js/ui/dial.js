@@ -2,7 +2,7 @@
 // Ticks light up to the current value; an outer bracket marks today's target.
 
 import { STRAIN_MAX } from '../core/strain.js';
-import { arcPath, ease, h, polar, tween } from './motion.js?v=8';
+import { arcPath, ease, h, polar, tween } from './motion.js?v=9';
 
 const C = 300, A0 = -135, SWEEP = 270, N = 210;
 const MID = 12;   // where the colour ramp turns from its first leg to its second

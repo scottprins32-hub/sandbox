@@ -31,8 +31,8 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/BarlowSemiCondensed-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=8">
-<script src="js/boot.js?v=8"></script>
+<link rel="stylesheet" href="css/style.css?v=9">
+<script src="js/boot.js?v=9"></script>
 <script src="config.js"></script>
 </head>
 <body class="booting">
@@ -176,12 +176,18 @@ SOFTWARE.
       </div>
       <div class="cards">
         <div class="card trio span-7" id="trio">
-          <a class="ring" id="ring-strain" href="#strain" data-kind="strain"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong></span></span><span class="ring-label">Strain<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
-          <a class="ring" id="ring-recovery" href="#recovery" data-kind="recovery"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Recovery<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
-          <a class="ring" id="ring-sleep" href="#sleep" data-kind="sleep"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Sleep<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          <div class="ring-cell" data-help="strain">
+            <a class="ring" id="ring-strain" href="#strain" data-kind="strain"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong></span></span><span class="ring-label">Strain<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
+          <div class="ring-cell" data-help="recovery">
+            <a class="ring" id="ring-recovery" href="#recovery" data-kind="recovery"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Recovery<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
+          <div class="ring-cell" data-help="sleep">
+            <a class="ring" id="ring-sleep" href="#sleep" data-kind="sleep"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label">Sleep<svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
         </div>
         <div class="card goal span-5" id="goal">
-          <h3>Today's target</h3>
+          <h3 data-help="target">Today's target</h3>
           <div id="goal-scale"></div>
           <p class="goal-text" id="goal-text"></p>
           <a class="climb-chip" id="climb-chip" href="#climb">
@@ -193,7 +199,7 @@ SOFTWARE.
         </div>
         <figure class="card span-12 river-card">
           <figcaption>
-            <h3>The day, beat by beat</h3>
+            <h3 data-help="day">The day, beat by beat</h3>
             <span class="legend">
               <span><i class="lg-hr" aria-hidden="true"></i>Heart rate</span>
               <span><i class="lg-build" aria-hidden="true"></i>Strain building</span>
@@ -203,12 +209,12 @@ SOFTWARE.
           <div class="river" id="river" tabindex="0"></div>
         </figure>
         <section class="card plain span-12" id="vitals" aria-labelledby="h-vitals">
-          <div class="card-head"><h3 id="h-vitals">Vitals</h3><button class="link small" id="customise" type="button">Choose what shows</button></div>
+          <div class="card-head"><h3 id="h-vitals" data-help="vitals">Vitals</h3><button class="link small" id="customise" type="button">Choose what shows</button></div>
           <div class="tiles" id="tiles"></div>
         </section>
         <section class="card span-12" id="trends" aria-labelledby="h-trends">
           <div class="card-head">
-            <h3 id="h-trends">Strain against recovery</h3>
+            <h3 id="h-trends" data-help="trends">Strain against recovery</h3>
             <div class="seg" role="group" aria-label="Range">
               <button type="button" data-range="14" aria-pressed="true">2 weeks</button>
               <button type="button" data-range="28" aria-pressed="false">4 weeks</button>
@@ -222,7 +228,7 @@ SOFTWARE.
     </section>
 
     <section class="view" id="view-strain" data-view="strain" aria-labelledby="h-strain" hidden>
-      <header class="view-head"><h2 id="h-strain">Strain</h2><p id="strain-lede"></p></header>
+      <header class="view-head"><h2 id="h-strain" data-help="strain">Strain</h2><p id="strain-lede"></p></header>
       <div class="cards">
         <div class="card dial-card span-5">
           <div class="dial" id="dial" role="img">
@@ -235,16 +241,16 @@ SOFTWARE.
           </div>
         </div>
         <div class="card span-7">
-          <h3>Time in each zone</h3>
+          <h3 data-help="zones">Time in each zone</h3>
           <div class="zones" id="zones"></div>
           <p class="note" id="zones-note"></p>
         </div>
         <div class="card span-6">
-          <h3>Sessions</h3>
+          <h3 data-help="sessions">Sessions</h3>
           <ol class="sessions" id="sessions"></ol>
         </div>
         <figure class="card curve span-6">
-          <h3>Why the last points are the hardest</h3>
+          <h3 data-help="curve">Why the last points are the hardest</h3>
           <div id="curve"></div>
           <figcaption id="curve-note"></figcaption>
         </figure>
@@ -252,7 +258,7 @@ SOFTWARE.
     </section>
 
     <section class="view" id="view-recovery" data-view="recovery" aria-labelledby="h-recovery" hidden>
-      <header class="view-head"><h2 id="h-recovery">Recovery</h2><p id="recovery-lede"></p></header>
+      <header class="view-head"><h2 id="h-recovery" data-help="recovery">Recovery</h2><p id="recovery-lede"></p></header>
       <div class="cards">
         <article class="card meter score-card span-4" id="m-recovery">
           <header><h3>This morning</h3><span class="meter-band" id="recovery-band"></span></header>
@@ -261,11 +267,11 @@ SOFTWARE.
           <dl class="facts" id="recovery-facts"></dl>
         </article>
         <div class="card aim span-8">
-          <h3>What today can take</h3>
+          <h3 data-help="aim">What today can take</h3>
           <div id="aim"></div>
         </div>
         <div class="card span-12">
-          <h3>Against your own normal</h3>
+          <h3 data-help="normal">Against your own normal</h3>
           <div class="devs" id="devs"></div>
           <p class="note">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
         </div>
@@ -273,7 +279,7 @@ SOFTWARE.
     </section>
 
     <section class="view" id="view-sleep" data-view="sleep" aria-labelledby="h-sleep" hidden>
-      <header class="view-head"><h2 id="h-sleep">Sleep</h2><p id="sleep-lede"></p></header>
+      <header class="view-head"><h2 id="h-sleep" data-help="sleep">Sleep</h2><p id="sleep-lede"></p></header>
       <div class="cards">
         <article class="card meter sleep score-card span-4" id="m-sleep">
           <header><h3>Last night</h3><span class="meter-band" id="sleep-band"></span></header>
@@ -282,42 +288,42 @@ SOFTWARE.
           <dl class="facts" id="sleep-facts"></dl>
         </article>
         <div class="card span-8">
-          <h3>Stage by stage</h3>
+          <h3 data-help="stages">Stage by stage</h3>
           <div class="hypno" id="hypno"></div>
         </div>
         <div class="card span-4">
-          <h3>Where the night went</h3>
+          <h3 data-help="nightsplit">Where the night went</h3>
           <div class="stages" id="stages"></div>
         </div>
         <div class="card span-4">
-          <h3>Had against needed</h3>
+          <h3 data-help="need">Had against needed</h3>
           <div id="need"></div>
         </div>
         <div class="card span-4">
-          <h3>Bed and wake times</h3>
+          <h3 data-help="bedtimes">Bed and wake times</h3>
           <div id="consistency"></div>
         </div>
       </div>
     </section>
 
     <section class="view" id="view-climb" data-view="climb" aria-labelledby="h-climb" hidden>
-      <header class="view-head"><h2 id="h-climb">Climb</h2><p id="climb-lede"></p></header>
+      <header class="view-head"><h2 id="h-climb" data-help="climb">Climb</h2><p id="climb-lede"></p></header>
       <div class="cards">
         <figure class="card span-12" data-reveal>
-          <h3>From the polder, one day at a time</h3>
+          <h3 data-help="profile">From the polder, one day at a time</h3>
           <div class="profile" id="profile"></div>
           <figcaption class="note" id="profile-note"></figcaption>
         </figure>
         <div class="card span-7">
-          <div class="card-head"><h3 id="earn-title">Today so far</h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
+          <div class="card-head"><h3 data-help="earn"><span id="earn-title">Today so far</span></h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
           <ul class="earn" id="earn"></ul>
         </div>
         <div class="card span-5">
-          <h3>Streaks</h3>
+          <h3 data-help="streaks">Streaks</h3>
           <div class="streaks" id="streaks"></div>
         </div>
         <div class="card medals span-12">
-          <h3>Medals <span id="badge-count"></span></h3>
+          <h3 data-help="medals">Medals <span id="badge-count"></span></h3>
           <div class="badges" id="badges"></div>
         </div>
       </div>
@@ -392,6 +398,6 @@ SOFTWARE.
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
-<script type="module" src="js/main.js?v=8"></script>
+<script type="module" src="js/main.js?v=9"></script>
 </body>
 </html>
