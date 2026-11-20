@@ -1,0 +1,25 @@
+// One record per member per day: the scores that member chose to share with
+// the team. Written only by the `team` backend function (service role); the
+// browser can never read or write it. Metric fields are optional: a value the
+// server could not validate is left out (or set to null on update).
+{
+  "name": "TeamDay",
+  "type": "object",
+  "properties": {
+    "email": { "type": "string", "description": "Member's Google email, lower case. Internal key, never returned to browsers." },
+    "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD" },
+    "key": { "type": "string", "description": "email|date, one record per member per day." },
+    "points": { "type": "integer", "minimum": 0, "maximum": 10 },
+    "strain": { "type": "number", "minimum": 0, "maximum": 21 },
+    "recovery": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "sleep": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "rhr": { "type": "number", "minimum": 25, "maximum": 150 },
+    "hrv": { "type": "number", "minimum": 1, "maximum": 400 },
+    "sleepMin": { "type": "integer", "minimum": 0, "maximum": 1440 },
+    "azm": { "type": "integer", "minimum": 0, "maximum": 1440 },
+    "steps": { "type": "integer", "minimum": 0, "maximum": 200000 },
+    "inTarget": { "type": "boolean" }
+  },
+  "required": ["email", "date"],
+  "rls": { "create": false, "read": false, "update": false, "delete": false }
+}

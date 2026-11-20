@@ -6,7 +6,8 @@ A personal dashboard for a **Fitbit Air**: day strain, recovery, sleep and vital
 - **Recovery** and **sleep** scores, computed in the open from your own baselines.
 - **The day, beat by beat**: 24 hours of heart rate with sleep, sessions and the strain it built.
 - Ten vitals with their last fortnight; pick which ones show.
-- **The climb**, a small game: good days earn metres of altitude, from the Zuidplaspolder (−6.76 m) past the Vaalserberg to the Alpe d'Huez, with three streaks and eight medals.
+- **Day points and levels**: every day earns up to 10 points for healthy habits; points build a week score and XP for your level, with three streaks and eight medals.
+- **Team**: everyone on the link who chooses to join competes in weekly standings, a weekly challenge and leaderboards, like WHOOP teams.
 - Your health data is read by your browser straight from Google and cached there. No server of this app sees it.
 
 ## Try it
@@ -117,7 +118,9 @@ That curve reproduces the figures WHOOP has published: an hour's walk ≈ 6.5, a
 
 **Target strain** follows WHOOP's published colour guidance: `6 + 0.12 × recovery`, ± 1.2.
 
-**The climb** (`js/core/game.js`) rewards balance, not pain. Each day earns metres: 12 for a strain inside your target (5 if within 1.5 of it), 8 for sleep at 85 %+ (4 at 70 %+), 4 for 22+ zone minutes (150 a week), 2 for wearing the band to bed, and up to 5 more for a run of on-target days. Going far past your target earns nothing for training. Medals cover distance, rides, steps, early mornings, sleep runs, on-target runs, a rest day after a hard one, and one all-out day.
+**Day points** (`js/core/game.js`) reward balance, not pain. Each day earns up to 10: 4 for a strain inside your target (2 if within 1.5 of it), 3 for sleep at 85 %+ (1 at 70 %+), 2 for 22+ zone minutes (150 a week), 1 for wearing the band to bed. Going far past your target earns nothing for training. All points ever earned are XP; levels run from Starter (0) to Legend (3,300). XP is kept in the browser per person, so it keeps growing after old days leave the synced window.
+
+**Team** (`js/core/team.js`, `base44/shared/team.js`). Joining is opt-in. Members share one summary per day (points, strain, recovery, sleep score, resting heart rate, HRV, sleep time, zone minutes, steps, on-target) through `/functions/team`, which knows the caller from the sealed sign-in cookie and stores the rows in two Base44 entities (`TeamMember`, `TeamDay`) that browsers cannot read directly. The last 120 days are kept; *Leave and erase* deletes them. The Team tab shows weekly standings on day points (Monday to Sunday), a weekly challenge that rotates through sleep, on-target days, zone minutes, recovery and steps, and 7-day leaderboards. Deploying it needs `base44 entities push` as well as functions and site. Medals cover distance, rides, steps, early mornings, sleep runs, on-target runs, a rest day after a hard one, and one all-out day.
 
 None of this is medical advice.
 
@@ -127,7 +130,7 @@ None of this is medical advice.
 cd oranje && npm test
 ```
 
-The tests have no external dependencies and cover the scoring maths against WHOOP's reference points, the climb's earnings and medals, the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
+The tests have no external dependencies and cover the scoring maths against WHOOP's reference points, day points, levels, medals and the team rules, the team function (identity, validation, no e-mail in responses), the sign-in functions (state check, encrypted cookie, cross-site refusal), and the Google Health adapter run end to end against `tests/mock-health.js`, a stand-in server that speaks the wire format from the API's discovery document.
 
 **Not yet verified against a live Google account.** The adapter is written from Google's published specification and proven against the mock, but no real Fitbit Air data has passed through it. If a data type misbehaves, the panel's **Data health** list names it and shows Google's error.
 

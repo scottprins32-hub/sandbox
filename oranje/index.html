@@ -31,8 +31,8 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/BarlowSemiCondensed-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=11">
-<script src="js/boot.js?v=11"></script>
+<link rel="stylesheet" href="css/style.css?v=12">
+<script src="js/boot.js?v=12"></script>
 <script src="config.js"></script>
 </head>
 <body class="booting">
@@ -67,6 +67,7 @@ SOFTWARE.
   <symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
   <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l3 8l4 -16l3 8h4"/></symbol>
   <symbol id="icon-mountain" viewBox="0 0 24 24"><path d="M3 20h18l-6.921 -14.612a2.3 2.3 0 0 0 -4.158 0l-6.921 14.612z"/><path d="M7.5 11l2 2.5l2.5 -2.5l2 3l2.5 -2"/></symbol>
+  <symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1 -10 0z"/><path d="M5 9a2 2 0 0 1 0 -4h2"/><path d="M19 9a2 2 0 0 0 0 -4h-2"/></symbol>
   <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
   <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></symbol>
   <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
@@ -105,7 +106,7 @@ SOFTWARE.
   <a href="#strain" data-view="strain"><svg class="ui-icon" aria-hidden="true"><use href="#icon-activity"/></svg><span data-i18n="tabStrain">Strain</span></a>
   <a href="#recovery" data-view="recovery"><svg class="ui-icon" aria-hidden="true"><use href="#icon-battery-charging"/></svg><span data-i18n="tabRecovery">Recovery</span></a>
   <a href="#sleep" data-view="sleep"><svg class="ui-icon" aria-hidden="true"><use href="#icon-moon"/></svg><span data-i18n="tabSleep">Sleep</span></a>
-  <a href="#climb" data-view="climb"><svg class="ui-icon" aria-hidden="true"><use href="#icon-mountain"/></svg><span data-i18n="tabClimb">Climb</span></a>
+  <a href="#team" data-view="team"><svg class="ui-icon" aria-hidden="true"><use href="#icon-trophy"/></svg><span data-i18n="tabTeam">Team</span></a>
 </nav>
 
 <main id="main">
@@ -191,9 +192,9 @@ SOFTWARE.
           <h3 data-help="target"><span data-i18n="hTarget">Today's target</span></h3>
           <div id="goal-scale"></div>
           <p class="goal-text" id="goal-text"></p>
-          <a class="climb-chip" id="climb-chip" href="#climb">
-            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20 9.5 8l3.5 5 2.5-3L22 20z"/></svg>
-            <span class="cc-alt"><b id="cc-alt">–</b> m</span>
+          <a class="climb-chip" id="climb-chip" href="#team">
+            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trophy"/></svg>
+            <span class="cc-alt"><small data-i18n="lvShort">Lv</small> <b id="cc-alt">–</b></span>
             <span class="cc-mid"><span class="cc-level" id="cc-level"></span><span class="cc-track"><i id="cc-fill"></i></span><span class="cc-next" id="cc-next"></span></span>
             <span class="cc-streak" id="cc-streak"></span>
           </a>
@@ -307,23 +308,46 @@ SOFTWARE.
       </div>
     </section>
 
-    <section class="view" id="view-climb" data-view="climb" aria-labelledby="h-climb" hidden>
-      <header class="view-head"><h2 id="h-climb" data-help="climb"><span data-i18n="vClimb">Climb</span></h2><p id="climb-lede"></p></header>
+    <section class="view" id="view-team" data-view="team" aria-labelledby="h-team" hidden>
+      <header class="view-head"><h2 id="h-team" data-help="team"><span data-i18n="vTeam">Team</span></h2><p id="team-lede"></p></header>
       <div class="cards">
-        <figure class="card span-12" data-reveal>
-          <h3 data-help="profile"><span data-i18n="hProfile">From the polder, one day at a time</span></h3>
-          <div class="profile" id="profile"></div>
-          <figcaption class="note" id="profile-note"></figcaption>
-        </figure>
+        <div class="card span-5 level-card">
+          <h3 data-help="level"><span data-i18n="hLevel">Your level</span></h3>
+          <div class="lv-top"><b class="lv-n" id="lv-n">1</b><div><p class="lv-name" id="lv-name"></p><p class="lv-xp" id="lv-xp"></p></div></div>
+          <div class="lv-track" aria-hidden="true"><i id="lv-fill"></i></div>
+          <p class="lv-next" id="lv-next"></p>
+          <div class="week-head"><span data-i18n="thisWeek">This week</span><span class="week-pts"><b id="week-pts">0</b> <small id="week-max"></small></span></div>
+          <div class="week-days" id="week-days"></div>
+        </div>
         <div class="card span-7">
-          <div class="card-head"><h3 data-help="earn"><span id="earn-title">Today so far</span></h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b> m</p></div>
+          <div class="card-head"><h3 data-help="points"><span id="earn-title">Today so far</span></h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b><span id="earn-unit"> pts so far</span></p></div>
           <ul class="earn" id="earn"></ul>
+        </div>
+        <section class="card span-12 team-card" id="team-card" aria-labelledby="h-board">
+          <div class="card-head"><h3 id="h-board" data-help="weekboard"><span data-i18n="hBoard">This week's standings</span></h3><p class="team-meta" id="board-meta"></p></div>
+          <p class="team-status" id="team-status" hidden></p>
+          <div class="team-join" id="team-join" hidden></div>
+          <ol class="board" id="board" hidden></ol>
+          <p class="note" id="board-last"></p>
+          <div class="panel-actions"><button class="btn ghost small" id="team-leave" type="button" hidden>Leave and erase</button></div>
+        </section>
+        <div class="card span-5" id="challenge-card" hidden>
+          <h3 data-help="challenge"><span data-i18n="hChallenge">Challenge of the week</span></h3>
+          <p class="ch-title" id="ch-title"></p>
+          <p class="ch-text" id="ch-text"></p>
+          <ol class="board" id="ch-board"></ol>
+        </div>
+        <div class="card span-7" id="boards-card" hidden>
+          <h3 data-help="boards"><span data-i18n="hBoards">Leaderboards</span></h3>
+          <div class="chips" id="board-pick" role="group" data-i18n-attr="aria-label:hBoards"></div>
+          <p class="card-lede" id="boards-lede"></p>
+          <ol class="board" id="lb"></ol>
         </div>
         <div class="card span-5">
           <h3 data-help="streaks"><span data-i18n="hStreaks">Streaks</span></h3>
           <div class="streaks" id="streaks"></div>
         </div>
-        <div class="card medals span-12">
+        <div class="card medals span-7">
           <h3 data-help="medals"><span data-i18n="hMedals">Medals</span> <span id="badge-count"></span></h3>
           <div class="badges" id="badges"></div>
         </div>
@@ -406,6 +430,6 @@ SOFTWARE.
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
-<script type="module" src="js/main.js?v=11"></script>
+<script type="module" src="js/main.js?v=12"></script>
 </body>
 </html>

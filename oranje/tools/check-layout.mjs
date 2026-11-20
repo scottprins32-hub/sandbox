@@ -7,7 +7,7 @@
 import { chromium } from 'playwright';
 const BASE = process.argv[2] || 'http://localhost:4173/';
 const WIDTHS = [320, 360, 375, 390, 430, 600, 768, 820, 900, 1000, 1024, 1100, 1280, 1366, 1440, 1680, 1920];
-const PAGES = [['', false], ['', true], ['#strain', true], ['#recovery', true], ['#sleep', true], ['#climb', true], ['privacy.html', false], ['terms.html', false]];
+const PAGES = [['', false], ['', true], ['#strain', true], ['#recovery', true], ['#sleep', true], ['#team', true], ['privacy.html', false], ['terms.html', false]];
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   let problems = 0;

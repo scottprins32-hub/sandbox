@@ -1,0 +1,14 @@
+// One record per person who joined the team. Written only by the `team`
+// backend function (service role); the browser can never read or write it.
+// `email` is the internal key and is never sent to browsers.
+{
+  "name": "TeamMember",
+  "type": "object",
+  "properties": {
+    "email": { "type": "string", "description": "Google account email, lower case. Internal key, never returned to browsers." },
+    "name": { "type": "string", "minLength": 1, "maxLength": 24, "description": "Display name chosen when joining." },
+    "joined": { "type": "string", "format": "date", "description": "Day of joining, YYYY-MM-DD (UTC)." }
+  },
+  "required": ["email", "name"],
+  "rls": { "create": false, "read": false, "update": false, "delete": false }
+}

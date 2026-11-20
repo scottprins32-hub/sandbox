@@ -1,33 +1,26 @@
-// The climb: a small game on top of the scores. Each day earns metres of
-// altitude for doing the things that actually help (training inside your
-// target, sleeping well, moving enough), so it rewards balance, not pain.
-// You start in the Zuidplaspolder, the lowest point of the Netherlands, and
-// climb past Dutch landmarks towards the Alpe d'Huez, "the Dutch mountain".
-// Pure functions: no DOM, runs in Node.
-// Words shown to people are getters that ask js/i18n.js at the moment they are
-// read, so a game computed once follows the language when it changes.
+// The game: day points, a level that grows with them, streaks and medals.
+// Each day earns up to 10 points for the things that actually help: training
+// inside your strain target, sleeping well, moving enough and wearing the band
+// at night. Going all out earns nothing extra, so it rewards balance, not pain.
+// Points add up to a week score (for the team standings) and to XP, which
+// raises your level. Pure functions: no DOM, runs in Node.
+// Words shown to people are getters that ask js/i18n.js when they are read,
+// so a game computed once follows the language when it changes.
 
-import { fromKey, isNum } from './util.js';
+import { addDays, fromKey, isNum } from './util.js';
 import { date, num, strings } from '../i18n.js';
 
 const t = strings({
   en: {
-    lvPolder: 'Zuidplaspolder', lvNap: 'Sea level', lvDune: 'Catrijper Nok', lvCauberg: 'Cauberg',
-    lvVaals: 'Vaalserberg', lvBotrange: 'Signal de Botrange', lvAlpe: "Alpe d'Huez",
-    ntPolder: 'the lowest point of the Netherlands', ntNap: 'NAP, the Dutch zero', ntDune: 'the highest dune in the Netherlands',
-    ntCauberg: 'the Amstel Gold Race climb', ntVaals: 'the top of the European Netherlands', ntBotrange: 'the top of Belgium',
-    ntAlpe: 'the Dutch mountain',
-
     trainIn: 'Train inside your target', trainedIn: 'Trained inside your target', closeTo: 'Close to your target',
     needsRecovery: 'needs a recovery score first', inRange: '{s} in {lo}–{hi}', offRange: '{s}, target {lo}–{hi}', range: 'target {lo}–{hi}',
     sleptWell: 'Slept well', sleptOk: 'Slept enough', sleepGoal: 'Sleep 85% or more',
     sleepPct: 'sleep {p}%', sleepPctMore: 'sleep {p}%, 85% earns {m}', noSleep: 'no sleep recorded',
     moved: '{n}+ zone minutes', azm: '{n} zone minutes', noAzm: 'no zone minutes',
     overnight: 'Wore the band to bed', measured: 'recovery measured', noNight: 'no night recorded',
-    streakBonus: 'Streak bonus, day {n}', streakDetail: '+1 m for each day in a row, up to {max}',
-
     stTarget: 'Inside target', stSleep: 'Slept 85%+', stMoved: '{n}+ zone min',
-
+    lv1: 'Starter', lv2: 'Walker', lv3: 'Cyclist', lv4: 'Runner', lv5: 'Skater', lv6: 'Road racer',
+    lv7: 'Marathoner', lv8: 'Eleven-cities skater', lv9: 'Champion', lv10: 'Legend',
     dElfsteden: '200 km covered within four weeks, the length of the Frisian eleven-cities tour.',
     dFietsland: '20 rides recorded. Commutes count.',
     dVierdaagse: 'Four days in a row of 12,000 steps or more.',
@@ -41,21 +34,15 @@ const t = strings({
     bNeedsHard: 'needs a 14+ day first', bBestDay: 'best day {n} / 18',
   },
   nl: {
-    lvNap: 'Zeeniveau',
-    ntPolder: 'het laagste punt van Nederland', ntNap: 'NAP, het Nederlandse nulpunt', ntDune: 'de hoogste duin van Nederland',
-    ntCauberg: 'de klim van de Amstel Gold Race', ntVaals: 'het hoogste punt van Europees Nederland', ntBotrange: 'het hoogste punt van België',
-    ntAlpe: 'de Hollandse berg',
-
     trainIn: 'Train binnen je doel', trainedIn: 'Binnen je doel getraind', closeTo: 'Dicht bij je doel',
     needsRecovery: 'eerst een herstelscore nodig', inRange: '{s} binnen {lo}–{hi}', offRange: '{s}, doel {lo}–{hi}', range: 'doel {lo}–{hi}',
     sleptWell: 'Goed geslapen', sleptOk: 'Genoeg geslapen', sleepGoal: 'Slaap 85% of meer',
     sleepPct: 'slaap {p}%', sleepPctMore: 'slaap {p}%, 85% levert {m} op', noSleep: 'geen slaap gemeten',
     moved: '{n}+ zoneminuten', azm: '{n} zoneminuten', noAzm: 'geen zoneminuten',
     overnight: 'Met de band naar bed', measured: 'herstel gemeten', noNight: 'geen nacht gemeten',
-    streakBonus: 'Reeksbonus, dag {n}', streakDetail: '+1 m voor elke dag op rij, tot {max}',
-
     stTarget: 'Binnen doel', stSleep: 'Slaap 85%+', stMoved: '{n}+ zonemin',
-
+    lv1: 'Starter', lv2: 'Wandelaar', lv3: 'Fietser', lv4: 'Hardloper', lv5: 'Schaatser', lv6: 'Wielrenner',
+    lv7: 'Marathonloper', lv8: 'Elfstedenrijder', lv9: 'Kampioen', lv10: 'Legende',
     dElfsteden: '200 km binnen vier weken, de lengte van de Friese Elfstedentocht.',
     dFietsland: '20 fietsritten vastgelegd. Woon-werkritjes tellen mee.',
     dVierdaagse: 'Vier dagen op rij 12.000 stappen of meer.',
@@ -70,65 +57,56 @@ const t = strings({
   },
 });
 
-const cap = (s) => s[0].toUpperCase() + s.slice(1);
-const level = (id, alt) => ({ id, alt, get name() { return t(`lv${cap(id)}`); }, get note() { return t(`nt${cap(id)}`); } });
-
-export const LEVELS = [
-  level('polder', -6.76),
-  level('nap', 0),
-  level('dune', 55.4),
-  level('cauberg', 134),
-  level('vaals', 322),
-  level('botrange', 694),
-  level('alpe', 1850),
-];
-
-// What a day can earn, in metres.
-export const EARN = { target: 12, close: 5, sleptWell: 8, sleptOk: 4, moved: 4, overnight: 2, streakMax: 5 };
-const MOVED_AZM = 22;          // 150 zone minutes a week, the WHO and Fitbit weekly goal, per day
+// What a day can earn, in points. 10 is a perfect day.
+export const POINTS = { target: 4, close: 2, sleptWell: 3, sleptOk: 1, moved: 2, overnight: 1 };
+export const DAY_MAX = POINTS.target + POINTS.sleptWell + POINTS.moved + POINTS.overnight;
+export const MOVED_AZM = 22;   // 150 zone minutes a week, the WHO and Fitbit weekly goal, per day
 const CLOSE = 1.5;             // strain within this of the target range still earns something
+
+// Levels by XP (all points ever earned). A steady week earns about 50.
+const LEVEL_XP = [0, 50, 150, 300, 500, 800, 1200, 1700, 2400, 3300];
+export const LEVELS = LEVEL_XP.map((xp, i) => ({ n: i + 1, xp, get name() { return t(`lv${i + 1}`); } }));
+export function levelOf(xp) {
+  let i = 0;
+  for (let k = 0; k < LEVELS.length; k++) if (xp >= LEVELS[k].xp) i = k;
+  const next = LEVELS[i + 1] || null;
+  return { n: LEVELS[i].n, xp: LEVELS[i].xp, get name() { return LEVELS[i].name; }, next, toGo: next ? next.xp - xp : 0, progress: next ? (xp - LEVELS[i].xp) / (next.xp - LEVELS[i].xp) : 1 };
+}
 
 // a target bound as it was always shown: 11 stays 11, 13.4 becomes 13,4 in Dutch
 const tnum = (v) => (isNum(v) ? num(v, Number.isInteger(v) ? 0 : 1) : '');
-const inTarget = (d) => !!d.target && isNum(d.strain) && d.strain >= d.target.lo && d.strain <= d.target.hi;
+export const inTarget = (d) => !!d.target && isNum(d.strain) && d.strain >= d.target.lo && d.strain <= d.target.hi;
 const nearTarget = (d) => !!d.target && isNum(d.strain) && !inTarget(d) && d.strain >= d.target.lo - CLOSE && d.strain <= d.target.hi + CLOSE;
 
-export function levelAt(alt) {
-  let i = 0;
-  for (let k = 0; k < LEVELS.length; k++) if (alt >= LEVELS[k].alt) i = k;
-  const next = LEVELS[i + 1] || null;
-  const span = next ? next.alt - LEVELS[i].alt : 1;
-  return { index: i, level: LEVELS[i], next, toGo: next ? next.alt - alt : 0, progress: next ? Math.min(1, (alt - LEVELS[i].alt) / span) : 1 };
-}
-
-// One day's earnings. `streak` is the on-target streak including this day.
-// On today, which is still running, a part not yet earned is "open".
-// `label` and `detail` are read in the current language: each is a [key, vars] pair
-// whose vars are a function, so numbers are formatted when shown.
-export function dayEarnings(d, streak) {
+// One day's points. On today, which is still running, a part not yet earned is "open".
+// `label` and `detail` are read in the current language.
+export function dayPoints(d) {
   const open = !!d.partial;
   const parts = [];
   const say = ([key, vars]) => t(key, vars?.());
-  const add = (key, label, metres, got, detail) => parts.push({ key, get label() { return say(label); }, metres: got ? metres : 0, max: metres, got, open: open && !got && key !== 'sleep' && key !== 'overnight', get detail() { return say(detail); } });
+  const add = (key, label, points, got, detail) => parts.push({ key, get label() { return say(label); }, points: got ? points : 0, max: points, got, open: open && !got && key !== 'sleep' && key !== 'overnight', get detail() { return say(detail); } });
   const range = () => ({ s: isNum(d.strain) ? num(d.strain, 1) : '', lo: tnum(d.target.lo), hi: tnum(d.target.hi) });
 
-  if (!d.target) add('target', ['trainIn'], EARN.target, false, ['needsRecovery']);
-  else if (inTarget(d)) add('target', ['trainedIn'], EARN.target, true, ['inRange', range]);
-  else if (nearTarget(d) && !(open && d.strain < d.target.lo)) add('target', ['closeTo'], EARN.close, true, ['offRange', range]);
-  else add('target', ['trainIn'], EARN.target, false, isNum(d.strain) ? ['offRange', range] : ['range', range]);
+  if (!d.target) add('target', ['trainIn'], POINTS.target, false, ['needsRecovery']);
+  else if (inTarget(d)) add('target', ['trainedIn'], POINTS.target, true, ['inRange', range]);
+  else if (nearTarget(d) && !(open && d.strain < d.target.lo)) add('target', ['closeTo'], POINTS.close, true, ['offRange', range]);
+  else add('target', ['trainIn'], POINTS.target, false, isNum(d.strain) ? ['offRange', range] : ['range', range]);
 
   const sp = d.sleepPct;
-  if (isNum(sp) && sp >= 85) add('sleep', ['sleptWell'], EARN.sleptWell, true, ['sleepPct', () => ({ p: num(sp) })]);
-  else if (isNum(sp) && sp >= 70) add('sleep', ['sleptOk'], EARN.sleptOk, true, ['sleepPctMore', () => ({ p: num(sp), m: EARN.sleptWell })]);
-  else add('sleep', ['sleepGoal'], EARN.sleptWell, false, isNum(sp) ? ['sleepPct', () => ({ p: num(sp) })] : ['noSleep']);
+  if (isNum(sp) && sp >= 85) add('sleep', ['sleptWell'], POINTS.sleptWell, true, ['sleepPct', () => ({ p: num(sp) })]);
+  else if (isNum(sp) && sp >= 70) add('sleep', ['sleptOk'], POINTS.sleptOk, true, ['sleepPctMore', () => ({ p: num(sp), m: POINTS.sleptWell })]);
+  else add('sleep', ['sleepGoal'], POINTS.sleptWell, false, isNum(sp) ? ['sleepPct', () => ({ p: num(sp) })] : ['noSleep']);
 
   const azm = d.azm?.total;
-  add('moved', ['moved', () => ({ n: MOVED_AZM })], EARN.moved, isNum(azm) && azm >= MOVED_AZM, isNum(azm) ? ['azm', () => ({ n: num(azm) })] : ['noAzm']);
-  add('overnight', ['overnight'], EARN.overnight, !!d.sleep, d.sleep ? ['measured'] : ['noNight']);
+  add('moved', ['moved', () => ({ n: MOVED_AZM })], POINTS.moved, isNum(azm) && azm >= MOVED_AZM, isNum(azm) ? ['azm', () => ({ n: num(azm) })] : ['noAzm']);
+  add('overnight', ['overnight'], POINTS.overnight, !!(d.sleep || d.whoop?.sleepMinutes), d.sleep || d.whoop?.sleepMinutes ? ['measured'] : ['noNight']);
+  return { points: parts.reduce((a, p) => a + p.points, 0), parts };
+}
 
-  const bonus = inTarget(d) ? Math.min(EARN.streakMax, Math.max(0, streak - 1)) : 0;
-  if (bonus) parts.push({ key: 'streak', get label() { return t('streakBonus', { n: streak }); }, metres: bonus, max: EARN.streakMax, got: true, open: false, get detail() { return t('streakDetail', { max: EARN.streakMax }); } });
-  return { metres: parts.reduce((a, p) => a + p.metres, 0), parts };
+// Monday of the week a date key falls in, as a date key.
+export function weekStart(key) {
+  const wd = (fromKey(key).getDay() + 6) % 7;   // Monday 0 … Sunday 6
+  return addDays(key, -wd);
 }
 
 // A run of days meeting `test`. Today counts when it already meets it; if it
@@ -226,18 +204,19 @@ export const BADGES = [
 ];
 
 // Everything the game shows, from the computed days (oldest first).
-export function playGame(days) {
-  let alt = LEVELS[0].alt, streak = 0;
-  const timeline = [];
-  const reached = {};   // level id → date first reached
-  for (const d of days) {
-    if (inTarget(d)) streak++; else if (!d.partial) streak = 0;
-    const e = dayEarnings(d, inTarget(d) ? streak : 0);
-    const from = alt;
-    alt += e.metres;
-    for (const l of LEVELS) if (!reached[l.id] && alt >= l.alt && l.id !== 'polder') reached[l.id] = d.date;
-    timeline.push({ date: d.date, from, to: alt, metres: e.metres, parts: e.parts, partial: !!d.partial });
-  }
+// `ledger` holds points of settled days from earlier visits ({ date: points }),
+// so XP keeps growing after old days drop out of the synced window. The
+// returned ledger includes this run's settled days; the caller stores it.
+export function playGame(days, ledger = {}) {
+  const timeline = days.map((d) => { const p = dayPoints(d); return { date: d.date, points: p.points, parts: p.parts, partial: !!d.partial }; });
+  const next = { ...ledger };
+  for (const e of timeline) if (!e.partial) next[e.date] = e.points;
+  const today = timeline.find((e) => e.partial);
+  const xp = Object.values(next).reduce((a, v) => a + (isNum(v) ? v : 0), 0) + (today && !(today.date in next) ? today.points : 0);
+  const last = days[days.length - 1]?.date;
+  const week = last ? weekStart(last) : null;
+  const weekDays = week ? timeline.filter((e) => e.date >= week) : [];
+  const prevWeek = week ? addDays(week, -7) : null;
   const streaks = {
     target: { get label() { return t('stTarget'); }, ...streakOf(days, inTarget) },
     sleep: { get label() { return t('stSleep'); }, ...streakOf(days, (d) => isNum(d.sleepPct) && d.sleepPct >= 85) },
@@ -247,7 +226,12 @@ export function playGame(days) {
     const r = b.check(days);
     return { id: b.id, name: b.name, glyph: b.glyph, get desc() { return b.desc; }, earned: !!r.at, at: r.at, progress: Math.max(0, Math.min(1, r.at ? 1 : r.progress)), get label() { return r.label; } };
   });
-  return { alt, level: levelAt(alt), timeline, byDate: Object.fromEntries(timeline.map((t) => [t.date, t])), reached, streaks, badges };
+  return {
+    xp, level: levelOf(xp), timeline, byDate: Object.fromEntries(timeline.map((e) => [e.date, e])), ledger: next,
+    week: { start: week, points: weekDays.reduce((a, e) => a + e.points, 0), days: weekDays, max: 7 * DAY_MAX },
+    lastWeek: prevWeek ? timeline.filter((e) => e.date >= prevWeek && e.date < week).reduce((a, e) => a + e.points, 0) : 0,
+    streaks, badges,
+  };
 }
 
 export const weekdayShort = (key) => date(fromKey(key), { weekday: 'short' });

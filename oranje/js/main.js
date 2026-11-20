@@ -10,18 +10,19 @@ import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
-import { createDial, createMeter } from './ui/dial.js?v=11';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=11';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=11';
-import { createRiver } from './ui/river.js?v=11';
-import { initHelp } from './ui/help.js?v=11';
+import { demoMembers, ledger, team as teamApi, withMine } from './data/team.js';
+import { createDial, createMeter } from './ui/dial.js?v=12';
+import { announce, renderChip, renderGame } from './ui/game.js?v=12';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=12';
+import { createRiver } from './ui/river.js?v=12';
+import { initHelp } from './ui/help.js?v=12';
 import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js';
 import { pageText } from './i18n-page.js';
 import { bandName, recoveryName, sleepName, term } from './terms.js';
-import { createRing } from './ui/ring.js?v=11';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=11';
+import { createRing } from './ui/ring.js?v=12';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=12';
 
-const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null };
+const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null, team: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
 const person = () => (state.source === 'google' ? auth.who.email || state.data?.userId || '' : '');
 const saveSettings = () => store.saveSettings(state.settings, person());
@@ -96,7 +97,7 @@ const tx = strings({
     'daily-resting-heart-rate': 'Resting heart rate', 'daily-heart-rate-variability': 'Heart-rate variability', 'daily-oxygen-saturation': 'Blood oxygen',
     'daily-respiratory-rate': 'Breathing rate', 'daily-sleep-temperature-derivations': 'Skin temperature', 'daily-vo2-max': 'Cardio fitness',
     sleep: 'Sleep', exercise: 'Exercise sessions', profile: 'Profile', devices: 'Band status', whoopLine: 'WHOOP scores',
-    switchTo: 'Nederlands', switchShort: 'NL',
+    switchTo: 'Nederlands', switchShort: 'NL', you: 'You',
   },
   nl: {
     title: 'Oranje · strain, herstel en slaap voor Fitbit Air',
@@ -157,7 +158,7 @@ const tx = strings({
     'daily-resting-heart-rate': 'Rusthartslag', 'daily-heart-rate-variability': 'Hartslagvariabiliteit', 'daily-oxygen-saturation': 'Zuurstof in je bloed',
     'daily-respiratory-rate': 'Ademhaling', 'daily-sleep-temperature-derivations': 'Huidtemperatuur', 'daily-vo2-max': 'Conditie (VO₂ max)',
     sleep: 'Slaap', exercise: 'Trainingen', profile: 'Profiel', devices: 'Status van de band', whoopLine: 'WHOOP-scores',
-    switchTo: 'English', switchShort: 'EN',
+    switchTo: 'English', switchShort: 'EN', you: 'Jij',
   },
 });
 // Known English messages from the data and sign-in modules, shown in the reader's language.
@@ -183,8 +184,8 @@ function show(view) {
 }
 
 // ───────── tabs: today, strain, recovery, sleep, climb ─────────
-const VIEWS = ['today', 'strain', 'recovery', 'sleep', 'climb'];
-const ALIAS = { vitals: 'today', trends: 'today' };
+const VIEWS = ['today', 'strain', 'recovery', 'sleep', 'team'];
+const ALIAS = { vitals: 'today', trends: 'today', climb: 'team' };
 const routeOf = () => { const k = location.hash.slice(1); return VIEWS.includes(k) ? k : ALIAS[k] || 'today'; };
 let shown = null;
 function showView(name, { quiet = false } = {}) {
@@ -213,7 +214,11 @@ function compute() {
   const whoop = state.source === 'google' && state.whoop?.days?.length ? whoopByDate(state.whoop.days) : null;
   state.ctx = computeAll(withWhoopVitals(state.data.days, whoop), state.data.profile, state.settings);
   applyOfficial(state.ctx.days, whoop);
-  state.game = playGame(state.ctx.days);
+  const scope = state.source === 'google' ? `google:${person()}` : 'demo';
+  state.game = playGame(state.ctx.days, ledger.read(scope));
+  if (state.source === 'google') ledger.write(scope, state.game.ledger);
+  if (state.source === 'demo') state.team = { mode: 'demo', members: demoMembers(state.ctx.days, state.game, 'Demo') };
+  else if (state.team?.mode === 'joined' && state.team.server) state.team.members = withMine(state.team.server, state.ctx.days, state.game);
   const last = state.ctx.days[state.ctx.days.length - 1]?.date;
   if (!state.date || !state.ctx.byDate[state.date]) state.date = last;
 }
@@ -330,7 +335,7 @@ function renderHero(animate, delay = 0) {
   $('#sleep-facts').replaceChildren(h('dt', { text: tx('asleep'), 'data-help': 'asleep' }), h('dd', { text: isNum(asleep) ? fmtDur(asleep) : '–' }), h('dt', { text: tx('needed'), 'data-help': 'need' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
 
   river.set(d, { animate });
-  renderChip(state.game);
+  renderChip(state.game, state.team);
   renderTrio(d, rec, sl, nights, animate, delay);
   renderGoal(d);
 }
@@ -397,7 +402,8 @@ function renderAll({ animate = true, delay = 0 } = {}) {
   if (!state.ctx?.days.length) return;
   const d = current();
   renderHero(animate, delay);
-  renderClimb(d, state.game, pick);
+  renderGame(d, state.game, state.team, { pick, join: joinTeam, leave: leaveTeam });
+  renderChip(state.game, state.team);
   renderStrain(d);
   renderRecovery(d, state.ctx);
   renderSleep(d, state.ctx);
@@ -454,6 +460,7 @@ async function sync() {
     show('dash');
     renderAll({ animate: true });
     announce(state.game, `google:${person()}`);
+    refreshTeam({ upload: true });
   } catch (e) {
     if (e.signIn || e.status === 401) state.signIn = true; else state.error = e.message || 'Sync failed';
     if (!state.data) { show('welcome'); welcomeError(e.signIn ? '' : errText(state.error)); }
@@ -463,6 +470,34 @@ async function sync() {
 function enter() {
   $('#dash').classList.add('enter');
   setTimeout(() => $('#dash').classList.remove('enter'), 2200);
+}
+
+// ───────── team ─────────
+function teamFrom(s) {
+  if (!s.signedIn) return { mode: 'signedOut', members: [] };
+  if (!s.joined) return { mode: 'join', members: [], count: s.count || 0, name: (auth.who.name || '').split(' ')[0] };
+  return { mode: 'joined', me: s.me, server: s.members, members: state.ctx ? withMine(s.members, state.ctx.days, state.game) : s.members };
+}
+const rerenderTeam = () => { if (state.ctx && !$('#dash').hidden) renderAll({ animate: false }); };
+async function refreshTeam({ upload = false } = {}) {
+  if (PREVIEW || state.source !== 'google') return;
+  if (auth.mode !== 'broker') { state.team = { mode: 'signedOut', members: [] }; rerenderTeam(); return; }
+  try {
+    let s = await teamApi.state();
+    if (s.joined && upload && state.ctx) { state.team = { ...teamFrom(s), busy: true }; rerenderTeam(); await teamApi.sync(state.ctx.days, state.game); s = await teamApi.state(); }
+    state.team = teamFrom(s);
+  } catch { state.team = { mode: 'error', members: [] }; }
+  rerenderTeam();
+}
+async function joinTeam(name) {
+  state.team = { ...(state.team || {}), busy: true, name }; rerenderTeam();
+  try { await teamApi.join(name); await refreshTeam({ upload: true }); }
+  catch { state.team = { mode: 'error', members: [] }; rerenderTeam(); }
+}
+async function leaveTeam() {
+  state.team = { ...(state.team || {}), busy: true }; rerenderTeam();
+  try { await teamApi.leave(); } catch { /* the state below shows what is left */ }
+  await refreshTeam();
 }
 
 let whoopLoading = null;
@@ -487,8 +522,10 @@ function startGoogle() {
   if (cache && !mine) store.clearCache();
   state.data = mine ? cache : null;
   state.settings = store.settings(person());
+  state.team = { mode: 'loading', members: [] };
   if (state.data) { compute(); show('dash'); enter(); renderAll({ delay: 350 }); }
   refreshWhoop();
+  refreshTeam();
   sync();
 }
 
@@ -496,6 +533,7 @@ function startDemo(seed) {
   state.source = 'demo'; store.demo = true;
   state.data = makeDemo(seed ? { seed } : {}); state.date = null; state.signIn = false; state.error = null;
   compute(); show('dash'); enter(); renderAll({ delay: 350 });
+  announce(state.game, 'demo');
   window.scrollTo(0, 0);
 }
 
@@ -513,7 +551,7 @@ async function connect(btn) {
 
 async function disconnect() {
   store.forget(person());
-  forgetWhoopOwner(); state.whoop = null;
+  forgetWhoopOwner(); state.whoop = null; state.team = null;
   await auth.disconnect();
   store.demo = false; state.settings = store.settings();
   state.source = null; state.data = null; state.ctx = null; state.date = null; state.signIn = false; state.error = null;

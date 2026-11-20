@@ -1,5 +1,5 @@
-import { createRing } from './ui/ring.js?v=11';
-import { $, h } from './ui/motion.js?v=11';
+import { createRing } from './ui/ring.js?v=12';
+import { $, h } from './ui/motion.js?v=12';
 import { fmtDur } from './core/util.js';
 import { applyPage, date, getLang, num, onLang, setLang, strings } from './i18n.js';
 

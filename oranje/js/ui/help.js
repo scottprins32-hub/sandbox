@@ -4,7 +4,7 @@
 // tab bar, where the thumb is.
 
 import { getLang, strings } from '../i18n.js';
-import { h } from './motion.js?v=11';
+import { h } from './motion.js?v=12';
 
 const ui = strings({
   en: { close: 'Close', label: 'Explain: {title}', tip: 'What does this mean?' },
@@ -34,7 +34,7 @@ export const HELP_TEXT = {
   target: ['Today\'s target', [
     'The strain that trains you without digging a hole, based on this morning\'s recovery.',
     'The better you recovered, the higher the range: below about 10 when run down, around 13–15 when recovered, more on great mornings. The box is the range; the orange line is where you are now.',
-    'Finishing inside it earns the most metres in the climb.',
+    'Finishing inside it earns the most day points.',
   ]],
   day: ['Heart rate through the day', [
     'Your heart rate minute by minute, from midnight to midnight.',
@@ -77,14 +77,20 @@ export const HELP_TEXT = {
   nightsplit: ['Where the night went', ['Time spent in each sleep stage. As a rough guide, deep and REM together make up about 40% of a good night.']],
   need: ['Had against needed', ['How long you slept compared with what last night called for: a base of 7 h 36 m, more after a hard day, and part of any sleep you still owed.']],
   bedtimes: ['Bed and wake times', ['When you fell asleep and woke up over the last week. Steady times help your sleep score; a night far from your usual timing lowers it.']],
-  climb: ['The climb', [
-    'A small game. Good days earn metres, climbing from the Zuidplaspolder, the lowest point of the Netherlands, towards the Alpe d\'Huez.',
-    'You earn by training inside your strain target, sleeping well, moving enough and wearing the band at night. Landmarks on the way unlock as you pass them.',
-  ]],
-  profile: ['From the polder', ['Each slope is one day: the more metres it earned, the steeper and brighter. Flags mark the landmarks you reached. Tap a day to see how it scored.']],
-  earn: ['Today so far', ['What this day earned in the climb, and what is still open. Inside your target: 12 m (close to it: 5 m). Slept 85%+: 8 m (70%+: 4 m). 22+ zone minutes: 4 m. Band worn at night: 2 m. Days in a row inside your target add a bonus of up to 5 m.']],
   streaks: ['Streaks', ['How many days in a row you hit each habit, with your best run. The dots are the last two weeks.']],
   medals: ['Medals', ['Eight Dutch-themed challenges, from four days of 12,000 steps (Vierdaagse) to a strain of 18 or more (Oranjeboven). The ring around each medal fills as you get closer.']],
+  team: ['Team', [
+    'Your game and the team. Every day earns up to 10 points for healthy habits; points add up to a week score and to XP, which raises your level.',
+    'If you join, you compete with everyone on this Oranje link in the weekly standings, a weekly challenge and the leaderboards. You can leave and erase your shared data any time.',
+  ]],
+  level: ['Your level', [
+    'XP is every point you have ever earned. Levels go from Starter to Legend; a steady week earns about 50 XP.',
+    'This week shows your points per day, Monday to Sunday, out of 70.',
+  ]],
+  points: ['Day points', ['How the chosen day scored, out of 10. Inside your strain target: 4 (close to it: 2). Sleep 85%+: 3 (70%+: 1). 22+ zone minutes: 2. Band worn at night: 1. Going all out earns nothing extra: it rewards balance.']],
+  weekboard: ['Weekly standings', ['Everyone in the team, ranked on day points from Monday to Sunday. The week with the most points wins; past wins are counted under each name.']],
+  challenge: ['Challenge of the week', ['A different theme every week, the same for everyone: best sleep, most days on target, most zone minutes, best recovery or most steps. It starts again every Monday.']],
+  boards: ['Leaderboards', ['Team averages over the last 7 days, like WHOOP teams: recovery, strain, sleep, HRV, resting heart rate and sleep time. For resting heart rate, lower ranks higher.']],
   },
   nl: {
   strain: ['Strain', [
@@ -108,7 +114,7 @@ export const HELP_TEXT = {
   target: ['Doel van vandaag', [
     'De strain waarmee je traint zonder jezelf te slopen, gebaseerd op je herstel van vanochtend.',
     'Hoe beter je hersteld bent, hoe hoger het doel: onder ongeveer 10 als je uitgeput bent, rond 13–15 als je hersteld bent, en hoger op hele goede ochtenden. Het vakje is het doel; het oranje streepje is waar je nu staat.',
-    'Eindig je binnen het doel, dan levert dat de meeste meters op in de klim.',
+    'Eindig je binnen het doel, dan levert dat de meeste dagpunten op.',
   ]],
   day: ['De dag, slag voor slag', [
     'Je hartslag minuut voor minuut, van middernacht tot middernacht.',
@@ -151,14 +157,20 @@ export const HELP_TEXT = {
   nightsplit: ['Waar de nacht heen ging', ['De tijd in elke slaapfase. Als vuistregel zijn diepe slaap en REM-slaap samen ongeveer 40% van een goede nacht.']],
   need: ['Geslapen tegenover nodig', ['Hoe lang je sliep vergeleken met wat afgelopen nacht nodig was: een basis van 7 u 36 m, meer na een zware dag, plus een deel van de slaap die je nog tekortkwam.']],
   bedtimes: ['Bed- en wektijden', ['Wanneer je in slaap viel en wakker werd, de afgelopen week. Vaste tijden helpen je slaapscore; een nacht ver van je gewone tijden haalt hem omlaag.']],
-  climb: ['De klim', [
-    'Een klein spel. Goede dagen leveren meters op, en zo klim je van de Zuidplaspolder, het laagste punt van Nederland, richting de Alpe d\'Huez.',
-    'Je verdient meters door binnen je strain-doel te trainen, goed te slapen, genoeg te bewegen en de band \'s nachts te dragen. Onderweg kom je bekende toppen tegen.',
-  ]],
-  profile: ['Vanuit de polder', ['Elke helling is één dag: hoe meer meters die dag opleverde, hoe steiler en feller. Vlaggetjes markeren de toppen die je hebt gehaald. Tik op een dag om te zien wat die opleverde.']],
-  earn: ['Wat deze dag oplevert', ['Wat deze dag in de klim oplevert, en wat nog open staat. Binnen je doel: 12 m (er dichtbij: 5 m). 85%+ geslapen: 8 m (70%+: 4 m). 22+ zoneminuten: 4 m. Band \'s nachts gedragen: 2 m. Meerdere dagen achter elkaar binnen je doel geven een bonus van maximaal 5 m.']],
   streaks: ['Reeksen', ['Hoeveel dagen op rij je elke gewoonte haalde, met je beste reeks. De bolletjes zijn de laatste twee weken.']],
   medals: ['Medailles', ['Acht Hollandse uitdagingen, van vier dagen op rij 12.000 stappen (Vierdaagse) tot een strain van 18 of meer (Oranjeboven). De ring om elke medaille loopt vol naarmate je dichterbij komt.']],
+  team: ['Team', [
+    'Je spel en het team. Elke dag levert tot 10 punten op voor gezonde gewoontes; punten tellen op tot een weekscore en tot XP, waarmee je level stijgt.',
+    'Doe je mee, dan speel je tegen iedereen op deze Oranje-link in het weekklassement, een uitdaging per week en de ranglijsten. Je kunt altijd stoppen en je gedeelde gegevens wissen.',
+  ]],
+  level: ['Jouw level', [
+    'XP is elk punt dat je ooit hebt verdiend. De levels gaan van Starter tot Legende; een vaste week levert ongeveer 50 XP op.',
+    'Deze week toont je punten per dag, van maandag tot zondag, van de 70.',
+  ]],
+  points: ['Dagpunten', ['Hoe de gekozen dag scoorde, van de 10. Binnen je strain-doel: 4 (er dichtbij: 2). Slaap 85%+: 3 (70%+: 1). 22+ zoneminuten: 2. Band \'s nachts gedragen: 1. Alles geven levert niets extra op: het beloont balans.']],
+  weekboard: ['Weekklassement', ['Iedereen in het team, gerangschikt op dagpunten van maandag tot zondag. Wie de meeste punten heeft, wint de week; gewonnen weken staan onder elke naam.']],
+  challenge: ['Uitdaging van de week', ['Elke week een ander thema, voor iedereen hetzelfde: beste slaap, meeste dagen binnen je doel, meeste zoneminuten, beste herstel of meeste stappen. Elke maandag begint hij opnieuw.']],
+  boards: ['Ranglijsten', ['Gemiddelden van het team over de laatste 7 dagen, zoals bij WHOOP-teams: herstel, strain, slaap, HRV, rusthartslag en slaapduur. Bij rusthartslag staat lager hoger.']],
   },
 };
 const entry = (key) => HELP_TEXT[getLang()]?.[key] || HELP_TEXT.en[key];

@@ -83,6 +83,22 @@ export function whoFrom(idToken, clientId) {
   } catch { return null; }
 }
 
+// Who is signed in, for features that need a stable identity (the team).
+// Only our own sealed cookies count: Google must be configured, the refresh
+// token cookie must be present and oranje_who must open to a non-empty email.
+// Nothing else the browser sends about itself is trusted.
+export async function signedIn(req, env) {
+  try {
+    if (!configured(env)) return null;
+    const c = cookies(req);
+    if (!c[RT] || !c[WHO]) return null;
+    const who = JSON.parse((await open(env, c[WHO])) || 'null');
+    const email = typeof who?.email === 'string' ? who.email.trim().toLowerCase() : '';
+    if (!email) return null;
+    return { name: typeof who.name === 'string' ? who.name : '', email };
+  } catch { return null; }
+}
+
 async function googleToken(env, params, fetchImpl) {
   const r = await fetchImpl('https://oauth2.googleapis.com/token', {
     method: 'POST',
