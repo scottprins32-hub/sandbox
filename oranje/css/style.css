@@ -915,6 +915,9 @@ body.welcoming .tabs { display: none; }
   .ring-band { font-size: 11px; }
 }
 
+.doc-top { align-items: center; margin-bottom: 36px; }
+.doc-top .doc-back { margin-bottom: 0; }
+
 /* ───────── language switch: shows the other language ───────── */
 .lang-btn {
   height: 40px; min-width: 40px; padding: 0 10px; flex: none; display: grid; place-items: center;
