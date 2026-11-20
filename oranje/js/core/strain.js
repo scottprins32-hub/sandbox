@@ -89,13 +89,14 @@ export function sessionStrain(hr, dayStart, t0, t1, rhr, hrMax) {
   return analyseDay(hr, rhr, hrMax, a, b);
 }
 
-// What to aim for today, given how recovered you woke up. WHOOP publishes
-// only the colour guidance (run down → light, steady → moderate, recovered →
-// high); this line passes through those band edges: 33 % → 10, 67 % → 14.
+// The least strain worth doing today, given how recovered you woke up. WHOOP
+// publishes only the colour guidance (run down → light, steady → moderate,
+// recovered → high); this line passes through its band edges: 33 % → about 9,
+// 67 % → about 13. It is a minimum: going further is allowed, it just earns
+// nothing extra. `hi` is the top of the scale, so drawings show "from here up".
 export function targetFor(recovery) {
   if (!isNum(recovery)) return null;
-  const mid = 6 + 0.12 * recovery;
-  return { lo: +(mid - 1.2).toFixed(1), hi: +Math.min(STRAIN_MAX, mid + 1.2).toFixed(1) };
+  return { lo: +(4.8 + 0.12 * recovery).toFixed(1), hi: STRAIN_MAX };
 }
 
 // Tanaka et al. 2001. Used only until real maxima are seen in the data.

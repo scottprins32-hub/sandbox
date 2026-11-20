@@ -11,16 +11,16 @@ import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
 import { demoMembers, ledger, team as teamApi, withMine } from './data/team.js';
-import { createDial, createMeter } from './ui/dial.js?v=14';
-import { announce, renderChip, renderGame } from './ui/game.js?v=14';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=14';
-import { createRiver } from './ui/river.js?v=14';
-import { initHelp } from './ui/help.js?v=14';
+import { createDial, createMeter } from './ui/dial.js?v=15';
+import { announce, renderChip, renderGame } from './ui/game.js?v=15';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=15';
+import { createRiver } from './ui/river.js?v=15';
+import { initHelp } from './ui/help.js?v=15';
 import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js';
 import { pageText } from './i18n-page.js';
 import { bandName, recoveryName, sleepName, term } from './terms.js';
-import { createRing } from './ui/ring.js?v=14';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=14';
+import { createRing } from './ui/ring.js?v=15';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=15';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null, team: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
@@ -44,16 +44,16 @@ const tx = strings({
     noData: 'No data for this day.', bandOn: 'Was the band on?',
     strainSoFar: 'so far. Recovery is still learning your normal.', firstSync: 'Waiting for the first sync.',
     leadHi: 'Recovered and ready.', leadMid: 'Steady today.', leadLo: 'Run down today.',
-    pastTarget: 'Past target.', easeOff: 'Time to ease off.', onTarget: 'Right on target', atValue: 'at {v}.',
+    pastTarget: 'Past target.', easeOff: 'Time to ease off.', onTarget: 'Target reached', atValue: 'at {v}.',
     toGo: '{v} to go', toTarget: 'to today’s target.', noHr: 'No heart rate recorded.',
     kindLight: 'A light day', kindModerate: 'A moderate day', kindHigh: 'A hard day', kindAll: 'An all-out day',
-    wellJudged: 'Well judged.', roomToSpare: 'Room to spare.', kindOn: '{kind} on', recPct: '{r}% recovery.',
+    wellJudged: 'Target reached.', roomToSpare: 'Below target.', kindOn: '{kind} on', recPct: '{r}% recovery.',
     today: 'Today', jumpToday: 'Jump to today', none: 'none',
     ribbonDay: '{date}: strain {s}, recovery {r}',
     learning: 'Learning · {n}/3 nights', learningShort: 'Learning {n}/3', noReading: 'No reading',
     noHeartRate: 'No heart rate', notSyncedYet: 'Not synced yet', notRecorded: 'Not recorded', notSynced: 'Not synced',
     hrv: 'HRV', restingHr: 'Resting HR', asleep: 'Asleep', needed: 'Needed',
-    dialLabel: 'Day strain {s} of 21, {band}', noStrain: 'No strain for this day', target: 'Target {lo}–{hi}',
+    dialLabel: 'Day strain {s} of 21, {band}', noStrain: 'No strain for this day', target: 'Target {lo}+',
     openView: '{aria}. Open the {view} view',
     ariaStrain: 'Strain {s} of 21, {band}', ariaRecovery: 'Recovery {r}%, {band}', noRecovery: 'No recovery for this day',
     ariaSleep: 'Sleep {s}%', ariaAsleep: ', {d} asleep', noSleep: 'No sleep recorded', fromSource: ' (from {source})',
@@ -64,7 +64,7 @@ const tx = strings({
     noteSleep: 'Sleep score from <b>WHOOP</b>. ', noteSleepEst: "Oranje's own estimate: {v}%. Stages below are from the Fitbit.",
     noteSleepNone: 'The Fitbit recorded no night, so Oranje has no estimate of its own.',
     goalNone: 'A strain target appears once recovery is known: a few nights of wear and it shows up here.',
-    goalAim: 'Aim for <b>{lo}–{hi}</b> on {r}% recovery. ',
+    goalAim: 'Aim for at least <b>{lo}</b> on {r}% recovery. ',
     stDemo: 'Demo data', stSyncing: 'Syncing', stSyncingN: 'Syncing {done}/{total}', stSignIn: 'Sign in again', stError: 'Sync failed · retry',
     stSynced: 'Synced {t}', stNotSynced: 'Not synced',
     tipSignIn: 'Google needs you to sign in again before new data can load', tipDemo: 'These numbers are made up. Connect your account to see your own.', tipSync: 'Sync now',
@@ -105,16 +105,16 @@ const tx = strings({
     noData: 'Geen gegevens voor deze dag.', bandOn: 'Droeg je de band?',
     strainSoFar: 'tot nu toe. Je herstel leert nog wat normaal is voor jou.', firstSync: 'Wachten op de eerste synchronisatie.',
     leadHi: 'Hersteld en klaar.', leadMid: 'Stabiel vandaag.', leadLo: 'Uitgeput vandaag.',
-    pastTarget: 'Voorbij je doel.', easeOff: 'Tijd om gas terug te nemen.', onTarget: 'Precies op doel', atValue: 'op {v}.',
+    pastTarget: 'Voorbij je doel.', easeOff: 'Tijd om gas terug te nemen.', onTarget: 'Doel gehaald', atValue: 'op {v}.',
     toGo: 'Nog {v}', toTarget: 'tot je doel van vandaag.', noHr: 'Geen hartslag gemeten.',
     kindLight: 'Een lichte dag', kindModerate: 'Een gemiddelde dag', kindHigh: 'Een zware dag', kindAll: 'Een dag alles gegeven',
-    wellJudged: 'Goed gedoseerd.', roomToSpare: 'Er zat nog meer in.', kindOn: '{kind} bij', recPct: '{r}% herstel.',
+    wellJudged: 'Doel gehaald.', roomToSpare: 'Onder je doel.', kindOn: '{kind} bij', recPct: '{r}% herstel.',
     today: 'Vandaag', jumpToday: 'Naar vandaag', none: 'geen',
     ribbonDay: '{date}: strain {s}, herstel {r}',
     learning: 'Aan het leren · {n}/3 nachten', learningShort: 'Leren {n}/3', noReading: 'Geen meting',
     noHeartRate: 'Geen hartslag', notSyncedYet: 'Nog niet gesynchroniseerd', notRecorded: 'Niet gemeten', notSynced: 'Nog niet binnen',
     hrv: 'HRV', restingHr: 'Rusthartslag', asleep: 'Geslapen', needed: 'Nodig',
-    dialLabel: 'Dagstrain {s} van 21, {band}', noStrain: 'Geen strain voor deze dag', target: 'Doel {lo}–{hi}',
+    dialLabel: 'Dagstrain {s} van 21, {band}', noStrain: 'Geen strain voor deze dag', target: 'Doel {lo}+',
     openView: '{aria}. Open {view}',
     ariaStrain: 'Strain {s} van 21, {band}', ariaRecovery: 'Herstel {r}%, {band}', noRecovery: 'Geen herstel voor deze dag',
     ariaSleep: 'Slaap {s}%', ariaAsleep: ', {d} geslapen', noSleep: 'Geen slaap gemeten', fromSource: ' (van {source})',
@@ -125,7 +125,7 @@ const tx = strings({
     noteSleep: 'Slaapscore van <b>WHOOP</b>. ', noteSleepEst: 'De eigen schatting van Oranje: {v}%. De fases hieronder komen van de Fitbit.',
     noteSleepNone: 'De Fitbit heeft geen nacht gemeten, dus Oranje heeft geen eigen schatting.',
     goalNone: 'Een strain-doel verschijnt zodra je herstel bekend is: na een paar nachten dragen staat het hier.',
-    goalAim: 'Mik op <b>{lo}–{hi}</b> bij {r}% herstel. ',
+    goalAim: 'Mik op minstens <b>{lo}</b> bij {r}% herstel. ',
     stDemo: 'Demogegevens', stSyncing: 'Synchroniseren', stSyncingN: 'Synchroniseren {done}/{total}', stSignIn: 'Log opnieuw in', stError: 'Synchroniseren mislukt · opnieuw',
     stSynced: 'Bijgewerkt {t}', stNotSynced: 'Nog niet bijgewerkt',
     tipSignIn: 'Google wil dat je opnieuw inlogt voordat er nieuwe gegevens kunnen komen', tipDemo: 'Deze getallen zijn verzonnen. Koppel je account om je eigen te zien.', tipSync: 'Nu bijwerken',
@@ -234,14 +234,13 @@ function verdictParts(d) {
     if (!isNum(r)) return isNum(s) ? [['Strain'], [num(s, 1), 1], [tx('strainSoFar')]] : [[tx('firstSync')]];
     const lead = tx(r >= 67 ? 'leadHi' : r >= 34 ? 'leadMid' : 'leadLo');
     if (!isNum(s)) return [[lead]];
-    if (s > t.hi) return [[lead], [tx('pastTarget'), 1], [tx('easeOff')]];
     if (s >= t.lo) return [[lead], [tx('onTarget'), 1], [tx('atValue', { v: num(s, 1) })]];
     return [[lead], [tx('toGo', { v: num(t.lo - s, 1) }), 1], [tx('toTarget')]];
   }
   if (!isNum(s)) return [[tx('noHr')]];
   const kind = tx({ Light: 'kindLight', Moderate: 'kindModerate', High: 'kindHigh', 'All out': 'kindAll' }[d.band.name]);
   if (!isNum(r)) return [[`${kind}.`]];
-  const judge = tx(s > t.hi ? 'pastTarget' : s >= t.lo ? 'wellJudged' : 'roomToSpare');
+  const judge = tx(s >= t.lo ? 'wellJudged' : 'roomToSpare');
   return [[tx('kindOn', { kind })], [tx('recPct', { r }), 1], [judge]];
 }
 
@@ -314,7 +313,7 @@ function renderHero(animate, delay = 0) {
   dial.set(d.strain, d.target, { animate, delay });
   roll($('#strain-num'), d.strain, { format: (v) => num(v, 1), dur: animate ? 1300 : 0, delay });
   $('#strain-band').textContent = d.band ? bandName(d.band) : tx('noHeartRate');
-  $('#strain-target').textContent = d.target ? tx('target', { lo: num(d.target.lo, 1), hi: num(d.target.hi, 1) }) : '';
+  $('#strain-target').textContent = d.target ? tx('target', { lo: num(d.target.lo, 1) }) : '';
   $('#dial').setAttribute('aria-label', isNum(d.strain) ? tx('dialLabel', { s: num(d.strain, 1), band: bandName(d.band) }) : tx('noStrain'));
   setVerdict(d);
 
@@ -395,7 +394,7 @@ function renderGoal(d) {
   }
   const parts = aimParts(d);
   scale.replaceChildren(parts.scale);
-  text.innerHTML = tx('goalAim', { lo: num(d.target.lo, d.target.lo % 1 ? 1 : 0), hi: num(d.target.hi, d.target.hi % 1 ? 1 : 0), r: d.recovery }) + parts.line;
+  text.innerHTML = tx('goalAim', { lo: num(d.target.lo, d.target.lo % 1 ? 1 : 0), r: d.recovery }) + parts.line;
 }
 
 function renderAll({ animate = true, delay = 0 } = {}) {

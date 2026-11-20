@@ -7,12 +7,12 @@ import { makeDemo } from '../js/data/demo.js';
 
 const day = (o = {}) => ({ date: '2026-11-10', strain: 12, target: { lo: 11, hi: 13.4 }, sleepPct: 90, azm: { total: 30 }, sleep: { end: 0 }, partial: false, distance: 0, steps: 0, workouts: [], ...o });
 
-test('a balanced day earns all ten points, overdoing it does not', () => {
+test('the strain target is a minimum: reaching it earns the points, going further changes nothing', () => {
   assert.equal(DAY_MAX, 10);
   assert.equal(dayPoints(day()).points, 10);
-  const hard = dayPoints(day({ strain: 18 }));
-  assert.equal(hard.parts.find((p) => p.key === 'target').points, 0, 'going far past the target earns nothing for training');
-  assert.equal(dayPoints(day({ strain: 14.5 })).parts.find((p) => p.key === 'target').points, POINTS.close);
+  assert.equal(dayPoints(day({ strain: 18 })).parts.find((p) => p.key === 'target').points, POINTS.target, 'well above the minimum still counts');
+  assert.equal(dayPoints(day({ strain: 10 })).parts.find((p) => p.key === 'target').points, POINTS.close, 'within 1.5 below it earns something');
+  assert.equal(dayPoints(day({ strain: 9 })).parts.find((p) => p.key === 'target').points, 0);
   assert.equal(dayPoints(day({ sleepPct: 75 })).parts.find((p) => p.key === 'sleep').points, POINTS.sleptOk);
   assert.equal(dayPoints(day({ azm: { total: 10 }, sleep: null, sleepPct: null })).points, POINTS.target);
 });

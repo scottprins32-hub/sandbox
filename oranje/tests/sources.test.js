@@ -22,7 +22,7 @@ test('WHOOP scores lead; Oranje estimates stay alongside and fill days WHOOP mis
   assert.deepEqual(d.src, { strain: 'whoop', recovery: 'whoop', sleep: 'whoop' });
   assert.deepEqual(d.est, est);
   assert.equal(d.band.name, 'Light');
-  assert.deepEqual(d.target, { lo: 10.1, hi: 12.5 });   // the target follows WHOOP's recovery
+  assert.deepEqual(d.target, { lo: 10.1, hi: 21 });   // the target follows WHOOP's recovery
   const p = ctx.byDate[prev];
   assert.equal(p.strain, other.strain); assert.equal(p.recovery, other.recovery);
   assert.equal(p.src.strain, 'oranje');

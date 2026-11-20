@@ -4,7 +4,7 @@
 // tab bar, where the thumb is.
 
 import { getLang, strings } from '../i18n.js';
-import { h } from './motion.js?v=14';
+import { h } from './motion.js?v=15';
 
 const ui = strings({
   en: { close: 'Close', label: 'Explain: {title}', tip: 'What does this mean?' },
@@ -32,9 +32,9 @@ export const HELP_TEXT = {
     'With WHOOP connected you see WHOOP\'s own sleep score.',
   ]],
   target: ['Today\'s target', [
-    'The strain that trains you without digging a hole, based on this morning\'s recovery.',
-    'The better you recovered, the higher the range: below about 10 when run down, around 13–15 when recovered, more on great mornings. The box is the range; the orange line is where you are now.',
-    'Finishing inside it earns the most day points.',
+    'The least strain worth doing today, based on this morning\'s recovery.',
+    'The better you recovered, the higher it is: around 8–9 when run down, around 13 when recovered, more on great mornings. The bar from the target up is the zone to reach; the orange line is where you are now.',
+    'Reaching it earns 4 day points (close to it: 2). Going further is fine, it just earns nothing extra.',
   ]],
   day: ['Heart rate through the day', [
     'Your heart rate minute by minute, from midnight to midnight.',
@@ -87,9 +87,9 @@ export const HELP_TEXT = {
     'XP is every point you have ever earned. Levels go from Starter to Legend; a steady week earns about 50 XP.',
     'This week shows your points per day, Monday to Sunday, out of 70.',
   ]],
-  points: ['Day points', ['How the chosen day scored, out of 10. Inside your strain target: 4 (close to it: 2). Sleep 85%+: 3 (70%+: 1). 22+ zone minutes: 2. Band worn at night: 1. Going all out earns nothing extra: it rewards balance.']],
+  points: ['Day points', ['How the chosen day scored, out of 10. Reaching your strain target: 4 (close to it: 2). Sleep 85%+: 3 (70%+: 1). 22+ zone minutes: 2. Band worn at night: 1. Going far beyond it earns nothing extra.']],
   weekboard: ['Weekly standings', ['Everyone in the team, ranked on day points from Monday to Sunday. The week with the most points wins; past wins are counted under each name.']],
-  challenge: ['Challenge of the week', ['A different theme every week, the same for everyone: best sleep, most days on target, most zone minutes, best recovery or most steps. It starts again every Monday.']],
+  challenge: ['Challenge of the week', ['A different theme every week, the same for everyone: best sleep, most days reaching your target, most zone minutes, best recovery or most steps. It starts again every Monday.']],
   boards: ['Leaderboards', ['Team averages over the last 7 days, like WHOOP teams: recovery, strain, sleep, HRV, resting heart rate and sleep time. For resting heart rate, lower ranks higher.']],
   },
   nl: {
@@ -112,9 +112,9 @@ export const HELP_TEXT = {
     'Is WHOOP gekoppeld, dan zie je de slaapscore van WHOOP zelf.',
   ]],
   target: ['Doel van vandaag', [
-    'De strain waarmee je traint zonder jezelf te slopen, gebaseerd op je herstel van vanochtend.',
-    'Hoe beter je hersteld bent, hoe hoger het doel: onder ongeveer 10 als je uitgeput bent, rond 13–15 als je hersteld bent, en hoger op hele goede ochtenden. Het vakje is het doel; het oranje streepje is waar je nu staat.',
-    'Eindig je binnen het doel, dan levert dat de meeste dagpunten op.',
+    'De minste strain die vandaag de moeite waard is, gebaseerd op je herstel van vanochtend.',
+    'Hoe beter je hersteld bent, hoe hoger het doel: rond 8–9 als je uitgeput bent, rond 13 als je hersteld bent, en hoger op hele goede ochtenden. De balk vanaf het doel is waar je naartoe werkt; het oranje streepje is waar je nu staat.',
+    'Haal je het, dan levert dat 4 dagpunten op (er dichtbij: 2). Verder gaan mag, het levert alleen niets extra op.',
   ]],
   day: ['De dag, slag voor slag', [
     'Je hartslag minuut voor minuut, van middernacht tot middernacht.',
@@ -167,9 +167,9 @@ export const HELP_TEXT = {
     'XP is elk punt dat je ooit hebt verdiend. De levels gaan van Starter tot Legende; een vaste week levert ongeveer 50 XP op.',
     'Deze week toont je punten per dag, van maandag tot zondag, van de 70.',
   ]],
-  points: ['Dagpunten', ['Hoe de gekozen dag scoorde, van de 10. Binnen je strain-doel: 4 (er dichtbij: 2). Slaap 85%+: 3 (70%+: 1). 22+ zoneminuten: 2. Band \'s nachts gedragen: 1. Alles geven levert niets extra op: het beloont balans.']],
+  points: ['Dagpunten', ['Hoe de gekozen dag scoorde, van de 10. Je strain-doel gehaald: 4 (er dichtbij: 2). Slaap 85%+: 3 (70%+: 1). 22+ zoneminuten: 2. Band \'s nachts gedragen: 1. Er ver overheen gaan levert niets extra op.']],
   weekboard: ['Weekklassement', ['Iedereen in het team, gerangschikt op dagpunten van maandag tot zondag. Wie de meeste punten heeft, wint de week; gewonnen weken staan onder elke naam.']],
-  challenge: ['Uitdaging van de week', ['Elke week een ander thema, voor iedereen hetzelfde: beste slaap, meeste dagen binnen je doel, meeste zoneminuten, beste herstel of meeste stappen. Elke maandag begint hij opnieuw.']],
+  challenge: ['Uitdaging van de week', ['Elke week een ander thema, voor iedereen hetzelfde: beste slaap, meeste dagen je doel gehaald, meeste zoneminuten, beste herstel of meeste stappen. Elke maandag begint hij opnieuw.']],
   boards: ['Ranglijsten', ['Gemiddelden van het team over de laatste 7 dagen, zoals bij WHOOP-teams: herstel, strain, slaap, HRV, rusthartslag en slaapduur. Bij rusthartslag staat lager hoger.']],
   },
 };

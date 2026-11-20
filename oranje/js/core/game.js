@@ -1,7 +1,7 @@
 // The game: day points, a level that grows with them, streaks and medals.
 // Each day earns up to 10 points for the things that actually help: training
-// inside your strain target, sleeping well, moving enough and wearing the band
-// at night. Going all out earns nothing extra, so it rewards balance, not pain.
+// your strain target (a minimum), sleeping well, moving enough and wearing the
+// band at night. Going far beyond it earns nothing extra.
 // Points add up to a week score (for the team standings) and to XP, which
 // raises your level. Pure functions: no DOM, runs in Node.
 // Words shown to people are getters that ask js/i18n.js when they are read,
@@ -12,13 +12,13 @@ import { date, num, strings } from '../i18n.js';
 
 const t = strings({
   en: {
-    trainIn: 'Train inside your target', trainedIn: 'Trained inside your target', closeTo: 'Close to your target',
-    needsRecovery: 'needs a recovery score first', inRange: '{s} in {lo}–{hi}', offRange: '{s}, target {lo}–{hi}', range: 'target {lo}–{hi}',
+    trainIn: 'Reach your strain target', trainedIn: 'Reached your strain target', closeTo: 'Close to your target',
+    needsRecovery: 'needs a recovery score first', inRange: '{s}, target {lo}+', offRange: '{s}, target {lo}+', range: 'target {lo}+',
     sleptWell: 'Slept well', sleptOk: 'Slept enough', sleepGoal: 'Sleep 85% or more',
     sleepPct: 'sleep {p}%', sleepPctMore: 'sleep {p}%, 85% earns {m}', noSleep: 'no sleep recorded',
     moved: '{n}+ zone minutes', azm: '{n} zone minutes', noAzm: 'no zone minutes',
     overnight: 'Wore the band to bed', measured: 'recovery measured', noNight: 'no night recorded',
-    stTarget: 'Inside target', stSleep: 'Slept 85%+', stMoved: '{n}+ zone min',
+    stTarget: 'Target reached', stSleep: 'Slept 85%+', stMoved: '{n}+ zone min',
     lv1: 'Starter', lv2: 'Walker', lv3: 'Cyclist', lv4: 'Runner', lv5: 'Skater', lv6: 'Road racer',
     lv7: 'Marathoner', lv8: 'Eleven-cities skater', lv9: 'Champion', lv10: 'Legend',
     dElfsteden: '200 km covered within four weeks, the length of the Frisian eleven-cities tour.',
@@ -26,7 +26,7 @@ const t = strings({
     dVierdaagse: 'Four days in a row of 12,000 steps or more.',
     dVroegevogel: 'Up before 07:00 on five mornings in one week.',
     dNachtrust: 'Seven nights in a row with seven hours of sleep or more.',
-    dDeltawerken: 'Inside your strain target five days running. Built to last.',
+    dDeltawerken: 'Reached your strain target five days running. Built to last.',
     dRustdag: 'Took it easy, strain under 9, the day after a strain of 14 or more.',
     dOranjeboven: 'One all-out day: a strain of 18 or more. Then rest.',
     bKm: '{n} / 200 km', bRides: '{n} / 20 rides', bRunDays: 'best run {n} / {of} days', bWeek: 'best week {n} / 5 mornings',
@@ -34,13 +34,13 @@ const t = strings({
     bNeedsHard: 'needs a 14+ day first', bBestDay: 'best day {n} / 18',
   },
   nl: {
-    trainIn: 'Train binnen je doel', trainedIn: 'Binnen je doel getraind', closeTo: 'Dicht bij je doel',
-    needsRecovery: 'eerst een herstelscore nodig', inRange: '{s} binnen {lo}–{hi}', offRange: '{s}, doel {lo}–{hi}', range: 'doel {lo}–{hi}',
+    trainIn: 'Haal je strain-doel', trainedIn: 'Strain-doel gehaald', closeTo: 'Dicht bij je doel',
+    needsRecovery: 'eerst een herstelscore nodig', inRange: '{s}, doel {lo}+', offRange: '{s}, doel {lo}+', range: 'doel {lo}+',
     sleptWell: 'Goed geslapen', sleptOk: 'Genoeg geslapen', sleepGoal: 'Slaap 85% of meer',
     sleepPct: 'slaap {p}%', sleepPctMore: 'slaap {p}%, 85% levert {m} op', noSleep: 'geen slaap gemeten',
     moved: '{n}+ zoneminuten', azm: '{n} zoneminuten', noAzm: 'geen zoneminuten',
     overnight: 'Met de band naar bed', measured: 'herstel gemeten', noNight: 'geen nacht gemeten',
-    stTarget: 'Binnen doel', stSleep: 'Slaap 85%+', stMoved: '{n}+ zonemin',
+    stTarget: 'Doel gehaald', stSleep: 'Slaap 85%+', stMoved: '{n}+ zonemin',
     lv1: 'Starter', lv2: 'Wandelaar', lv3: 'Fietser', lv4: 'Hardloper', lv5: 'Schaatser', lv6: 'Wielrenner',
     lv7: 'Marathonloper', lv8: 'Elfstedenrijder', lv9: 'Kampioen', lv10: 'Legende',
     dElfsteden: '200 km binnen vier weken, de lengte van de Friese Elfstedentocht.',
@@ -48,7 +48,7 @@ const t = strings({
     dVierdaagse: 'Vier dagen op rij 12.000 stappen of meer.',
     dVroegevogel: 'In één week vijf ochtenden voor 07:00 op.',
     dNachtrust: 'Zeven nachten op rij zeven uur slaap of meer.',
-    dDeltawerken: 'Vijf dagen achter elkaar binnen je Strain-doel. Gebouwd om te blijven.',
+    dDeltawerken: 'Vijf dagen achter elkaar je strain-doel gehaald. Gebouwd om te blijven.',
     dRustdag: 'Rustig aan gedaan, Strain onder 9, de dag na een Strain van 14 of meer.',
     dOranjeboven: 'Eén dag alles geven: een Strain van 18 of meer. Daarna rust.',
     bKm: '{n} / 200 km', bRides: '{n} / 20 ritten', bRunDays: 'beste reeks {n} / {of} dagen', bWeek: 'beste week {n} / 5 ochtenden',
@@ -61,7 +61,7 @@ const t = strings({
 export const POINTS = { target: 4, close: 2, sleptWell: 3, sleptOk: 1, moved: 2, overnight: 1 };
 export const DAY_MAX = POINTS.target + POINTS.sleptWell + POINTS.moved + POINTS.overnight;
 export const MOVED_AZM = 22;   // 150 zone minutes a week, the WHO and Fitbit weekly goal, per day
-const CLOSE = 1.5;             // strain within this of the target range still earns something
+const CLOSE = 1.5;             // strain within this below the target still earns something
 
 // Levels by XP (all points ever earned). A steady week earns about 50.
 const LEVEL_XP = [0, 50, 150, 300, 500, 800, 1200, 1700, 2400, 3300];
@@ -75,8 +75,8 @@ export function levelOf(xp) {
 
 // a target bound as it was always shown: 11 stays 11, 13.4 becomes 13,4 in Dutch
 const tnum = (v) => (isNum(v) ? num(v, Number.isInteger(v) ? 0 : 1) : '');
-export const inTarget = (d) => !!d.target && isNum(d.strain) && d.strain >= d.target.lo && d.strain <= d.target.hi;
-const nearTarget = (d) => !!d.target && isNum(d.strain) && !inTarget(d) && d.strain >= d.target.lo - CLOSE && d.strain <= d.target.hi + CLOSE;
+export const inTarget = (d) => !!d.target && isNum(d.strain) && d.strain >= d.target.lo;
+const nearTarget = (d) => !!d.target && isNum(d.strain) && !inTarget(d) && d.strain >= d.target.lo - CLOSE;
 
 // One day's points. On today, which is still running, a part not yet earned is "open".
 // `label` and `detail` are read in the current language.
@@ -85,7 +85,7 @@ export function dayPoints(d) {
   const parts = [];
   const say = ([key, vars]) => t(key, vars?.());
   const add = (key, label, points, got, detail) => parts.push({ key, get label() { return say(label); }, points: got ? points : 0, max: points, got, open: open && !got && key !== 'sleep' && key !== 'overnight', get detail() { return say(detail); } });
-  const range = () => ({ s: isNum(d.strain) ? num(d.strain, 1) : '', lo: tnum(d.target.lo), hi: tnum(d.target.hi) });
+  const range = () => ({ s: isNum(d.strain) ? num(d.strain, 1) : '', lo: tnum(d.target.lo) });
 
   if (!d.target) add('target', ['trainIn'], POINTS.target, false, ['needsRecovery']);
   else if (inTarget(d)) add('target', ['trainedIn'], POINTS.target, true, ['inRange', range]);

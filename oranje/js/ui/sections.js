@@ -5,17 +5,17 @@ import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strai
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
 import { date, num, signedNum, strings } from '../i18n.js';
 import { bandName, recoveryName, stageName, term, zoneName } from '../terms.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=14';
-import { $, h, roll } from './motion.js?v=14';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=15';
+import { $, h, roll } from './motion.js?v=15';
 
 const t = strings({
   en: {
-    aimAria: 'Target strain {lo} to {hi}; current {cur}',
+    aimAria: 'Strain target at least {lo}; current {cur}',
     aimDoneOver: 'You went <b>{v} past</b> the top of it.',
     aimDoneUnder: 'You finished <b>{v} short</b> of it, an easier day than you had in you.',
-    aimDoneIn: 'You <b>finished inside it</b>.',
+    aimDoneIn: 'You <b>reached it</b>.',
     aimNowOver: 'You are <b>{v} past</b> it already. Anything more today is borrowed from tomorrow.',
-    aimNowIn: 'You are <b>inside it</b> now. This is a good place to stop.',
+    aimNowIn: 'You have <b>reached it</b>. More is fine, it just earns nothing extra.',
     aimNowUnder: 'You are at {s}, with <b>{v} to go</b>: about {dur} at tempo effort.',
 
     noHr: 'No heart-rate data for this day, so there is no strain to work out. Was the band on your wrist?',
@@ -47,7 +47,7 @@ const t = strings({
     needMet: 'of need met',
     skinNote: 'Skin temperature ran {v} °C from your baseline last night. It is not part of the score, but a jump like that often comes with illness.',
     noTarget: 'A strain target appears once recovery is known.',
-    targetLine: ({ r, lo, hi, partial }) => `On ${r}% recovery, a strain of <b>${lo}–${hi}</b> ${partial ? 'is' : 'was'} the range that trains without digging a hole.`,
+    targetLine: ({ r, lo, partial }) => `On ${r}% recovery, a strain of at least <b>${lo}</b> ${partial ? 'is' : 'was'} worth doing today.`,
 
     sleepWhoop: ({ pct, dur }) => `Sleep <b>${pct}%</b>, as scored by WHOOP${dur ? `, with <b>${dur}</b> asleep` : ''}. The band recorded no night, so there are no stages here.`,
     sleepUnsynced: 'Last night has not synced yet. Open the Google Health app on your phone to push it through.',
@@ -76,16 +76,16 @@ const t = strings({
     vsFull: 'vs a full day', vsUsual: 'vs your usual',
 
     trendsFew: 'A few more days and patterns start to show here.',
-    trendsLede: 'Over {n} days to {end}: average strain <b>{s}</b> on <b>{r}</b> recovery. You pushed past your target on <b>{over}</b> of them.',
+    trendsLede: 'Over {n} days to {end}: average strain <b>{s}</b> on <b>{r}</b> recovery. You reached your target on <b>{over}</b> of them.',
     avgStrain: 'Average strain', avgRecovery: 'Average recovery', avgSleep: 'Average sleep', avgRhr: 'Resting heart rate',
   },
   nl: {
-    aimAria: 'Strain-doel {lo} tot {hi}; nu {cur}',
+    aimAria: 'Strain-doel minstens {lo}; nu {cur}',
     aimDoneOver: 'Je eindigde <b>{v} boven</b> je doel.',
     aimDoneUnder: 'Je bleef <b>{v} onder</b> je doel: een rustigere dag dan erin zat.',
-    aimDoneIn: 'Je <b>eindigde binnen je doel</b>.',
+    aimDoneIn: 'Je hebt je doel <b>gehaald</b>.',
     aimNowOver: 'Je zit er al <b>{v} boven</b>. Wat je vandaag nog doet, leen je van morgen.',
-    aimNowIn: 'Je zit nu <b>binnen je doel</b>. Een mooi moment om te stoppen.',
+    aimNowIn: 'Je hebt je doel <b>gehaald</b>. Meer mag, het levert alleen niets extra op.',
     aimNowUnder: 'Je staat op {s}, nog <b>{v} te gaan</b>: zo’n {dur} op tempo.',
 
     noHr: 'Geen hartslag voor deze dag, dus er valt geen strain te berekenen. Zat de band wel om je pols?',
@@ -117,7 +117,7 @@ const t = strings({
     needMet: 'van je behoefte',
     skinNote: 'Je huidtemperatuur week afgelopen nacht {v} °C af van je normaal. Het telt niet mee in de score, maar zo’n sprong gaat vaak samen met ziekte.',
     noTarget: 'Een strain-doel verschijnt zodra je herstel bekend is.',
-    targetLine: ({ r, lo, hi, partial }) => `Bij ${r}% herstel ${partial ? 'is' : 'was'} een strain van <b>${lo}–${hi}</b> het bereik waarmee je traint zonder jezelf te slopen.`,
+    targetLine: ({ r, lo, partial }) => `Bij ${r}% herstel ${partial ? 'is' : 'was'} een strain van minstens <b>${lo}</b> de moeite waard.`,
 
     sleepWhoop: ({ pct, dur }) => `Slaap <b>${pct}%</b> volgens WHOOP${dur ? `, met <b>${dur}</b> geslapen` : ''}. De band heeft geen nacht vastgelegd, dus hier staan geen slaapfases.`,
     sleepUnsynced: 'Afgelopen nacht is nog niet gesynchroniseerd. Open de Google Health-app op je telefoon om hem door te sturen.',
@@ -146,7 +146,7 @@ const t = strings({
     vsFull: 't.o.v. een hele dag', vsUsual: 't.o.v. je normaal',
 
     trendsFew: 'Nog een paar dagen en hier verschijnen patronen.',
-    trendsLede: 'In {n} dagen tot {end}: gemiddeld <b>{s}</b> strain bij <b>{r}</b> herstel. Op <b>{over}</b> daarvan ging je over je doel heen.',
+    trendsLede: 'In {n} dagen tot {end}: gemiddeld <b>{s}</b> strain bij <b>{r}</b> herstel. Op <b>{over}</b> daarvan haalde je je doel.',
     avgStrain: 'Gemiddelde strain', avgRecovery: 'Gemiddeld herstel', avgSleep: 'Gemiddelde slaap', avgRhr: 'Rusthartslag',
   },
 });
@@ -161,15 +161,14 @@ const later = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
 // The target band on a 0–21 rail, and one line on where the day stands against it.
 export function aimParts(day) {
   const pct = (s) => `${(s / 21) * 100}%`;
-  const scale = h('div', { class: 'aim-scale', role: 'img', 'aria-label': t('aimAria', { lo: dec(day.target.lo), hi: dec(day.target.hi), cur: one(day.strain) }) },
+  const scale = h('div', { class: 'aim-scale', role: 'img', 'aria-label': t('aimAria', { lo: dec(day.target.lo), cur: one(day.strain) }) },
     ...[0, 7, 14, 21].map((s) => h('span', { class: 'lab', style: { left: pct(s) }, text: s })),
     h('div', { class: 'rail' }),
     h('div', { class: 'band', style: { left: pct(day.target.lo), width: pct(day.target.hi - day.target.lo) } }),
     isNum(day.strain) ? h('div', { class: 'pin', style: { left: pct(day.strain) } }) : null);
   const s = day.strain ?? 0;
   let line;
-  if (!day.partial) line = s > day.target.hi ? t('aimDoneOver', { v: one(s - day.target.hi) }) : s < day.target.lo ? t('aimDoneUnder', { v: one(day.target.lo - s) }) : t('aimDoneIn');
-  else if (s > day.target.hi) line = t('aimNowOver', { v: one(s - day.target.hi) });
+  if (!day.partial) line = s < day.target.lo ? t('aimDoneUnder', { v: one(day.target.lo - s) }) : t('aimDoneIn');
   else if (s >= day.target.lo) line = t('aimNowIn');
   else line = t('aimNowUnder', { s: one(s), v: one(day.target.lo - s), dur: fmtDur(Math.max(1, Math.ceil((loadFromStrain(day.target.lo) - (day.src?.strain === 'whoop' ? loadFromStrain(s) : day.load)) / minuteLoad(0.66)))) });
   return { scale, line };
@@ -278,7 +277,7 @@ export function renderRecovery(day, ctx) {
   aim.replaceChildren();
   if (!day.target) { aim.append(h('p', { class: 'empty', text: t('noTarget') })); return; }
   const { scale, line } = aimParts(day);
-  aim.append(scale, h('p', { html: t('targetLine', { r: day.recovery, lo: dec(day.target.lo), hi: dec(day.target.hi), partial: day.partial }) }), h('p', { html: line }));
+  aim.append(scale, h('p', { html: t('targetLine', { r: day.recovery, lo: dec(day.target.lo), partial: day.partial }) }), h('p', { html: line }));
 }
 
 // ───────── Sleep ─────────
@@ -394,7 +393,7 @@ export function renderTrends(day, ctx, range, onPick) {
   const done = days.filter((d) => !d.partial);
   const avg = (f) => mean(done.map(f));
   const strain = avg((d) => d.strain), rec = avg((d) => d.recovery), sleep = avg((d) => d.sleepInfo?.asleep), rhr = avg((d) => d.rhr);
-  const over = done.filter((d) => d.target && isNum(d.strain) && d.strain > d.target.hi).length;
+  const over = done.filter((d) => d.target && isNum(d.strain) && d.strain >= d.target.lo).length;
   $('#trends-lede').innerHTML = done.length < 3 ? t('trendsFew')
     : t('trendsLede', { n: done.length, end: dayName(end), s: one(strain), r: isNum(rec) ? Math.round(rec) + '%' : '–', over });
   $('#averages').replaceChildren(

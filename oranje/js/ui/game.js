@@ -5,7 +5,7 @@
 import { DAY_MAX } from '../core/game.js';
 import { BOARDS, challengeBoard, leaderboard, pastWinners, weekBoard, winCounts } from '../core/team.js';
 import { addDays, fmtDur, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=14';
+import { $, h, polar, reduced, roll } from './motion.js?v=15';
 import { date as fmtDate, num, strings } from '../i18n.js';
 
 const t = strings({
@@ -20,7 +20,7 @@ const t = strings({
     open: '+{p} open', soFar: ' pts so far', thatDay: ' pts that day',
     best: 'best {n}', days: ({ n }) => (n === 1 ? 'day' : 'days'), dotsAria: 'Last {n} days: {hits} hits',
     countOf: '{n} of {of}', earnedOn: 'Earned {day}', dismiss: 'Dismiss',
-    welcome: 'Level {n}: {name}', welcomeText: '{n} of {of} medals earned. Every day earns up to 10 points: train inside your target, sleep well, keep moving.',
+    welcome: 'Level {n}: {name}', welcomeText: '{n} of {of} medals earned. Every day earns up to 10 points: reach your strain target, sleep well, keep moving.',
     levelUp: 'Level up: {name}', levelUpText: 'Level {n} with {xp} XP.',
     medal: 'Medal: {name}', newMedals: '{n} new medals', newMedalsText: '{list} and {last}. See them in the team tab.',
     you: 'you', points: '{p} pts', wins: ({ n }) => `${n} ${n === 1 ? 'week' : 'weeks'} won`,
@@ -37,7 +37,7 @@ const t = strings({
     alone: 'You are the only member so far. Send the link to someone and ask them to join.',
     challenge: { sleep: 'Sleep week', target: 'On-target week', azm: 'Zone-minute week', recovery: 'Recovery week', steps: 'Step week' },
     challengeText: {
-      sleep: 'Highest average sleep score this week.', target: 'Most days inside your strain target this week.', azm: 'Most zone minutes this week.',
+      sleep: 'Highest average sleep score this week.', target: 'Most days reaching your strain target this week.', azm: 'Most zone minutes this week.',
       recovery: 'Highest average recovery this week.', steps: 'Most steps this week.',
     },
     unit: { '%': '%', days: ' days', min: ' min', steps: ' steps' },
@@ -56,7 +56,7 @@ const t = strings({
     open: '+{p} open', soFar: ' pt tot nu toe', thatDay: ' pt die dag',
     best: 'beste {n}', days: ({ n }) => (n === 1 ? 'dag' : 'dagen'), dotsAria: 'Laatste {n} dagen: {hits} keer gehaald',
     countOf: '{n} van {of}', earnedOn: 'Behaald op {day}', dismiss: 'Sluiten',
-    welcome: 'Level {n}: {name}', welcomeText: '{n} van {of} medailles behaald. Elke dag levert tot 10 punten op: train binnen je doel, slaap goed, blijf bewegen.',
+    welcome: 'Level {n}: {name}', welcomeText: '{n} van {of} medailles behaald. Elke dag levert tot 10 punten op: haal je strain-doel, slaap goed, blijf bewegen.',
     levelUp: 'Level omhoog: {name}', levelUpText: 'Level {n} met {xp} XP.',
     medal: 'Medaille: {name}', newMedals: '{n} nieuwe medailles', newMedalsText: '{list} en {last}. Bekijk ze in het tabblad Team.',
     you: 'jij', points: '{p} pt', wins: ({ n }) => `${n} ${n === 1 ? 'week' : 'weken'} gewonnen`,
@@ -73,7 +73,7 @@ const t = strings({
     alone: 'Je bent nog de enige. Stuur de link naar iemand en vraag of die meedoet.',
     challenge: { sleep: 'Slaapweek', target: 'Doelweek', azm: 'Zoneminutenweek', recovery: 'Herstelweek', steps: 'Stappenweek' },
     challengeText: {
-      sleep: 'Hoogste gemiddelde slaapscore deze week.', target: 'De meeste dagen binnen je strain-doel deze week.', azm: 'De meeste zoneminuten deze week.',
+      sleep: 'Hoogste gemiddelde slaapscore deze week.', target: 'De meeste dagen je strain-doel gehaald deze week.', azm: 'De meeste zoneminuten deze week.',
       recovery: 'Hoogste gemiddelde herstel deze week.', steps: 'De meeste stappen deze week.',
     },
     unit: { '%': '%', days: ' dagen', min: ' min', steps: ' stappen' },

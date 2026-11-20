@@ -35,7 +35,7 @@ test('a gap in wear does not break the day, and bands follow WHOOP', () => {
   assert.equal(a.worn, 1080);
   assert.ok(a.strain > 9);
   assert.deepEqual([9.9, 10, 13.9, 14, 17.9, 18, 21].map((s) => bandOf(s).name), ['Light', 'Moderate', 'Moderate', 'High', 'High', 'All out', 'All out']);
-  assert.deepEqual(targetFor(33), { lo: 8.8, hi: 11.2 });
+  assert.deepEqual(targetFor(33), { lo: 8.8, hi: 21 }, 'a minimum: anything from 8.8 up counts');
   assert.equal(targetFor(null), null);
 });
 
