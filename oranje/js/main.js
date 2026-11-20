@@ -10,13 +10,13 @@ import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
-import { createDial, createMeter } from './ui/dial.js?v=9';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=9';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=9';
-import { createRiver } from './ui/river.js?v=9';
-import { initHelp } from './ui/help.js?v=9';
-import { createRing } from './ui/ring.js?v=9';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=9';
+import { createDial, createMeter } from './ui/dial.js?v=10';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=10';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=10';
+import { createRiver } from './ui/river.js?v=10';
+import { initHelp } from './ui/help.js?v=10';
+import { createRing } from './ui/ring.js?v=10';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=10';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
@@ -181,14 +181,14 @@ function renderHero(animate, delay = 0) {
   recMeter.set(rec, { animate, delay: delay + 120 });
   const nights = days.filter((x) => x.date < d.date && (isNum(x.hrv) || isNum(x.rhr))).length;
   $('#recovery-band').textContent = isNum(rec) ? recoveryBand(rec) : nights < 3 ? `Learning · ${nights}/3 nights` : 'No reading';
-  $('#recovery-facts').replaceChildren(h('dt', { text: 'HRV' }), trend(d.hrv, d.baseline.hrv, true, 'ms'), h('dt', { text: 'Resting HR' }), trend(d.rhr, d.baseline.rhr, false, 'bpm'));
+  $('#recovery-facts').replaceChildren(h('dt', { text: 'HRV', 'data-help': 'vital-hrv' }), trend(d.hrv, d.baseline.hrv, true, 'ms'), h('dt', { text: 'Resting HR', 'data-help': 'vital-rhr' }), trend(d.rhr, d.baseline.rhr, false, 'bpm'));
 
   const sl = d.sleepInfo, sp = d.sleepPct, asleep = sl?.asleep ?? d.whoop?.sleepMinutes;
   roll($('#sleep-num'), sp, { dur: animate ? 1100 : 0, delay: delay + 220 });
   $('#sleep-num').parentElement.classList.toggle('nil', !isNum(sp));
   sleepMeter.set(sp, { animate, delay: delay + 220 });
   $('#sleep-band').textContent = !isNum(sp) ? (d.partial ? 'Not synced yet' : 'Not recorded') : sp >= 85 ? 'Well rested' : sp >= 70 ? 'Enough' : 'Short';
-  $('#sleep-facts').replaceChildren(h('dt', { text: 'Asleep' }), h('dd', { text: isNum(asleep) ? fmtDur(asleep) : '–' }), h('dt', { text: 'Needed' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
+  $('#sleep-facts').replaceChildren(h('dt', { text: 'Asleep', 'data-help': 'asleep' }), h('dd', { text: isNum(asleep) ? fmtDur(asleep) : '–' }), h('dt', { text: 'Needed', 'data-help': 'need' }), h('dd', { text: sl ? fmtDur(sl.need) : '–' }));
 
   river.set(d, { animate });
   renderChip(state.game);

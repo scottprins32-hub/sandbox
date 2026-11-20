@@ -2,13 +2,13 @@
 // Network first for everything, so a new version is never hidden behind an
 // old copy; the cache is only the fallback. Sign-in and Google are never cached.
 
-const CACHE = 'oranje-shell-v9';
+const CACHE = 'oranje-shell-v10';
 const SHELL = [
-  './', 'index.html', 'whoop.html', 'css/whoop.css?v=9', 'config.js', 'manifest.webmanifest', 'css/style.css?v=9',
-  'js/boot.js?v=9', 'js/main.js?v=9', 'js/whoop.js?v=9',
+  './', 'index.html', 'whoop.html', 'css/whoop.css?v=10', 'config.js', 'manifest.webmanifest', 'css/style.css?v=10',
+  'js/boot.js?v=10', 'js/main.js?v=10', 'js/whoop.js?v=10',
   'js/core/game.js', 'js/core/scores.js', 'js/core/sources.js', 'js/core/strain.js', 'js/core/util.js',
   'js/data/auth.js', 'js/data/demo.js', 'js/data/health.js', 'js/data/store.js', 'js/data/whoop.js',
-  'js/ui/charts.js?v=9', 'js/ui/dial.js?v=9', 'js/ui/game.js?v=9', 'js/ui/help.js?v=9', 'js/ui/motion.js?v=9', 'js/ui/river.js?v=9', 'js/ui/ring.js?v=9', 'js/ui/sections.js?v=9',
+  'js/ui/charts.js?v=10', 'js/ui/dial.js?v=10', 'js/ui/game.js?v=10', 'js/ui/help.js?v=10', 'js/ui/motion.js?v=10', 'js/ui/river.js?v=10', 'js/ui/ring.js?v=10', 'js/ui/sections.js?v=10',
   'fonts/Archivo-100-900.woff2', 'fonts/BarlowSemiCondensed-600.woff2', 'fonts/IBMPlexMono-400.woff2', 'fonts/IBMPlexMono-500.woff2',
   'icons/icon.svg', 'icons/favicon.ico', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 ];

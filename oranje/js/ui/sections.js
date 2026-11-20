@@ -4,8 +4,8 @@
 import { recoveryBand } from '../core/scores.js';
 import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
 import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=9';
-import { $, h, roll } from './motion.js?v=9';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=10';
+import { $, h, roll } from './motion.js?v=10';
 
 const ZONE_COLOR = [0, 1, 2, 3, 4, 5].map((z) => `var(--z${z})`);
 const one = (v) => (isNum(v) ? v.toFixed(1) : '–');
@@ -94,6 +94,7 @@ export function renderStrain(day) {
 }
 
 // ───────── Recovery ─────────
+const DEV_HELP = { hrv: 'vital-hrv', rhr: 'vital-rhr', sleep: 'sleep', br: 'vital-br' };
 const DEV = {
   hrv: { name: 'Heart-rate variability', unit: 'ms', get: (d) => d.hrv, base: (b) => b.hrv },
   rhr: { name: 'Resting heart rate', unit: 'bpm', get: (d) => d.rhr, base: (b) => b.rhr },
@@ -120,7 +121,7 @@ export function renderRecovery(day, ctx) {
       const width = clamp(Math.abs(p.z) / 3, 0.02, 1) * 50;
       const bar = h('div', { class: `dev-bar${p.z < 0 ? ' neg' : ''}` });
       devs.append(h('div', { class: 'dev-row' },
-        h('div', { class: 'name' }, def.name, h('small', { text: `${Math.round(p.w * 100)}% of the score` })),
+        h('div', { class: 'name' }, h('span', { text: def.name, 'data-help': DEV_HELP[p.key] }), h('small', { text: `${Math.round(p.w * 100)}% of the score` })),
         h('div', { class: 'axis-track', role: 'img', 'aria-label': `${def.name}: ${p.z >= 0 ? 'better' : 'worse'} than usual` }, bar),
         h('div', { class: 'val' }, `${isNum(v) ? (p.key === 'br' ? v.toFixed(1) : Math.round(v)) : '–'}`, h('small', { text: b ? `usual ${p.key === 'br' ? b.mean.toFixed(1) : Math.round(b.mean)} ${def.unit}` : p.key === 'sleep' ? 'of need met' : def.unit }))));
       later(() => { bar.style.width = `${width}%`; if (p.z < 0) bar.style.left = `${50 - width}%`; });
@@ -168,10 +169,10 @@ export function renderSleep(day, ctx) {
     h('p', { class: 'big' }, fmtDur(s.asleep), h('small', { text: `of ${fmtDur(s.need)}` })),
     h('div', { class: 'need-track' }, fill, h('div', { class: 'mark', style: { left: `${(s.need / scaleMax) * 100}%` } })),
     h('dl', { class: 'kv' },
-      h('dt', { text: 'Time in bed' }), h('dd', { text: fmtDur(s.inBed) }),
-      h('dt', { text: 'Asleep while in bed' }), h('dd', { text: isNum(s.efficiency) ? `${Math.round(s.efficiency * 100)}%` : '–' }),
-      h('dt', { text: 'Deep and REM' }), h('dd', { text: isNum(s.restorative) ? `${Math.round(s.restorative * 100)}% of sleep` : '–' }),
-      h('dt', { text: s.debt > 5 ? 'Still owed' : 'Owed' }), h('dd', { text: s.debt > 5 ? fmtDur(s.debt) : 'nothing' })));
+      h('dt', { text: 'Time in bed', 'data-help': 'inbed' }), h('dd', { text: fmtDur(s.inBed) }),
+      h('dt', { text: 'Asleep while in bed', 'data-help': 'efficiency' }), h('dd', { text: isNum(s.efficiency) ? `${Math.round(s.efficiency * 100)}%` : '–' }),
+      h('dt', { text: 'Deep and REM', 'data-help': 'restorative' }), h('dd', { text: isNum(s.restorative) ? `${Math.round(s.restorative * 100)}% of sleep` : '–' }),
+      h('dt', { text: s.debt > 5 ? 'Still owed' : 'Owed', 'data-help': 'owed' }), h('dd', { text: s.debt > 5 ? fmtDur(s.debt) : 'nothing' })));
   later(() => { fill.style.width = `${(s.asleep / scaleMax) * 100}%`; });
 }
 
@@ -246,8 +247,8 @@ export function renderTrends(day, ctx, range, onPick) {
   $('#trends-lede').innerHTML = done.length < 3 ? 'A few more days and patterns start to show here.'
     : `Over ${done.length} days to ${dayName(end)}: average strain <b>${one(strain)}</b> on <b>${isNum(rec) ? Math.round(rec) + '%' : '–'}</b> recovery. You pushed past your target on <b>${over}</b> of them.`;
   $('#averages').replaceChildren(
-    h('div', {}, h('dt', { text: 'Average strain' }), h('dd', { text: one(strain) })),
-    h('div', {}, h('dt', { text: 'Average recovery' }), h('dd', {}, isNum(rec) ? Math.round(rec) : '–', h('small', { text: '%' }))),
-    h('div', {}, h('dt', { text: 'Average sleep' }), h('dd', { text: isNum(sleep) ? fmtDur(sleep) : '–' })),
-    h('div', {}, h('dt', { text: 'Resting heart rate' }), h('dd', {}, isNum(rhr) ? Math.round(rhr) : '–', h('small', { text: 'bpm' }))));
+    h('div', {}, h('dt', { text: 'Average strain', 'data-help': 'strain' }), h('dd', { text: one(strain) })),
+    h('div', {}, h('dt', { text: 'Average recovery', 'data-help': 'recovery' }), h('dd', {}, isNum(rec) ? Math.round(rec) : '–', h('small', { text: '%' }))),
+    h('div', {}, h('dt', { text: 'Average sleep', 'data-help': 'avgsleep' }), h('dd', { text: isNum(sleep) ? fmtDur(sleep) : '–' })),
+    h('div', {}, h('dt', { text: 'Resting heart rate', 'data-help': 'vital-rhr' }), h('dd', {}, isNum(rhr) ? Math.round(rhr) : '–', h('small', { text: 'bpm' }))));
 }
