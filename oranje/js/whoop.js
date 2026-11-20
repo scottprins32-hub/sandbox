@@ -1,5 +1,5 @@
-import { createRing } from './ui/ring.js?v=12';
-import { $, h } from './ui/motion.js?v=12';
+import { createRing } from './ui/ring.js?v=13';
+import { $, h } from './ui/motion.js?v=13';
 import { fmtDur } from './core/util.js';
 import { applyPage, date, getLang, num, onLang, setLang, strings } from './i18n.js';
 
@@ -64,7 +64,7 @@ const errorText = (key) => t(KNOWN.includes(key) ? key : 'unknown');
 
 function request(action) {
   const run = async () => {
-    const response = await fetch(`/functions/whoop?action=${action}`, {
+    const response = await fetch(`/functions/whoopApi?action=${action}`, {
       method: action === 'session' ? 'GET' : 'POST',
       headers: { Accept: 'application/json' },
       cache: 'no-store',

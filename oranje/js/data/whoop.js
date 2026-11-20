@@ -1,4 +1,4 @@
-// WHOOP scores for the dashboard, through this site's /functions/whoop.
+// WHOOP scores for the dashboard, through this site's /functions/whoopApi.
 // The WHOOP page (whoop.html) connects the account; this only reads.
 //
 // A WHOOP connection lives in this browser, not in a Google account. So the
@@ -10,7 +10,7 @@ const read = () => { try { return localStorage.getItem(OWNER) || ''; } catch { r
 const write = (v) => { try { if (v) localStorage.setItem(OWNER, v); else localStorage.removeItem(OWNER); } catch { /* storage off */ } };
 
 async function call(action) {
-  const res = await fetch(`/functions/whoop?action=${action}`, {
+  const res = await fetch(`/functions/whoopApi?action=${action}`, {
     method: action === 'session' ? 'GET' : 'POST', headers: { Accept: 'application/json' }, cache: 'no-store',
   });
   const body = await res.json().catch(() => ({}));

@@ -15,7 +15,7 @@ const workout = { id: 'workout', sport_name: 'cycling', start: '2026-11-17T12:00
 const token = (expires_in = 3600) => Response.json({ access_token: 'fake-access-value', refresh_token: 'fake-refresh-value', expires_in });
 const cookieOf = (response, name) => response.headers.getSetCookie().find((value) => value.startsWith(`${name}=`))?.split(';')[0];
 const req = (action, method = 'GET', cookie = '', origin = appOrigin) =>
-  new Request(`${appOrigin}/functions/whoop?action=${action}`, { method, headers: { Origin: origin, Cookie: cookie } });
+  new Request(`${appOrigin}/functions/whoopApi?action=${action}`, { method, headers: { Origin: origin, Cookie: cookie } });
 
 async function login(expiresIn) {
   const response = await handleWhoop(req('login'), env);
@@ -26,7 +26,7 @@ async function login(expiresIn) {
   const cookie = cookieOf(response, 'oranje_whoop_state');
   const result = await whoopCallback(new Request(callback, { headers: { Cookie: cookie } }), env, (_, init) => {
     assert.equal(init.body.get('grant_type'), 'authorization_code');
-    assert.equal(init.body.get('redirect_uri'), `${appOrigin}/functions/whoopCallback`);
+    assert.equal(init.body.get('redirect_uri'), `${appOrigin}/functions/whoopReturn`);
     return token(expiresIn);
   });
   return { response, target, result, jar: cookieOf(result, 'oranje_whoop_session') };
@@ -72,7 +72,7 @@ test('WHOOP login requests only required scopes and seals its own session cookie
 });
 
 test('WHOOP rejects wrong state, cross-origin, tampered cookie and unconfigured requests', async () => {
-  const callback = await whoopCallback(new Request(`${appOrigin}/functions/whoopCallback?state=wrong&code=abc`,
+  const callback = await whoopCallback(new Request(`${appOrigin}/functions/whoopReturn?state=wrong&code=abc`,
     { headers: { Cookie: 'oranje_whoop_state=expected' } }), env, () => assert.fail('must not contact WHOOP'));
   assert.match(callback.headers.get('Location'), /error=state_mismatch/);
   assert.equal((await handleWhoop(req('data', 'POST', '', 'https://other.test'), env)).status, 403);

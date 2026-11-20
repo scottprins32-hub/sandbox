@@ -82,9 +82,9 @@ Choose **WHOOP scores** on the welcome page or in settings to connect. Once WHOO
 Owner setup for the existing Base44 app:
 
 1. In the [WHOOP Developer Dashboard](https://developer-dashboard.whoop.com/), create an app named Oranje. Select `read:cycles`, `read:recovery`, `read:sleep` and `read:workout`. Oranje requests `offline` during sign-in to renew the access token.
-2. Register exactly `https://oranje-962c1581.base44.app/functions/whoopCallback` as an OAuth redirect URI.
+2. Register exactly `https://health-oranje.base44.app/functions/whoopReturn` as an OAuth redirect URI.
 3. Add `WHOOP_CLIENT_ID` and `WHOOP_CLIENT_SECRET` in the Oranje app's Base44 secrets. Put the secret in Base44 directly, never in the repository, frontend or chat.
-4. Open [Oranje's WHOOP view](https://oranje-962c1581.base44.app/whoop.html), select **Connect WHOOP** and grant the requested read access at WHOOP. You can use the WHOOP Sandbox tier for personal use.
+4. Open [Oranje's WHOOP view](https://health-oranje.base44.app/whoop.html), select **Connect WHOOP** and grant the requested read access at WHOOP. You can use the WHOOP Sandbox tier for personal use.
 
 The Base44 WHOOP functions proxy the API because it does not allow cross-origin browser requests. They use a separate encrypted browser cookie for each WHOOP session and do not persist health records. **Disconnect** clears the browser session and requests revocation at WHOOP. If WHOOP cannot confirm revocation, remove Oranje from Connected Apps in WHOOP.
 

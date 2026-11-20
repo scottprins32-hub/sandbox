@@ -5,7 +5,7 @@
 import { DAY_MAX } from '../core/game.js';
 import { BOARDS, challengeBoard, leaderboard, pastWinners, weekBoard, winCounts } from '../core/team.js';
 import { addDays, fmtDur, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=12';
+import { $, h, polar, reduced, roll } from './motion.js?v=13';
 import { date as fmtDate, num, strings } from '../i18n.js';
 
 const t = strings({

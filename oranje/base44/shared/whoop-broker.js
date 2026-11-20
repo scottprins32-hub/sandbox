@@ -24,7 +24,7 @@ function reply(status, data, { location, cookies = [] } = {}) {
   return new Response(data ? JSON.stringify(data) : null, { status, headers });
 }
 
-const callbackUrl = (env) => `${env.appOrigin}/functions/whoopCallback`;
+const callbackUrl = (env) => `${env.appOrigin}/functions/whoopReturn`;
 const dashboard = (env) => `${env.appOrigin}/whoop.html`;
 const dropState = () => cookie(STATE, '', 0, 'Lax');
 const dropSession = () => cookie(SESSION, '', 0);
