@@ -3,7 +3,7 @@
 // (see i18n.js) fills every element marked data-i18n / data-i18n-html, the
 // title and the description, and the switch at the top changes it.
 
-import { applyPage, getLang, onLang, setLang, strings } from './i18n.js';
+import { applyPage, getLang, onLang, setLang, strings } from './i18n.js?v=16';
 
 const updated = { nl: 'Bijgewerkt op 20 november 2026', en: 'Updated 20 November 2026' };
 const foot = {

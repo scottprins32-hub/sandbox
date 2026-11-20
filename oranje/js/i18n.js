@@ -10,7 +10,7 @@
 // The language is stored per browser. Without a choice, a browser set to
 // Dutch gets Dutch and everyone else gets English.
 
-import { setDurationUnits } from './core/util.js';
+import { setDurationUnits } from './core/util.js?v=16';
 
 const KEY = 'oranje.lang';
 export const LANGS = ['en', 'nl'];

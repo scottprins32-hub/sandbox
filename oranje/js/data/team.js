@@ -4,10 +4,10 @@
 // Nothing is shared until the person chooses "Join". After that, the day
 // summaries from core/team.js shareDay() are sent after each sync.
 
-import { computeAll } from '../core/scores.js';
-import { playGame } from '../core/game.js';
-import { shareDay } from '../core/team.js';
-import { makeDemo } from './demo.js';
+import { computeAll } from '../core/scores.js?v=16';
+import { playGame } from '../core/game.js?v=16';
+import { shareDay } from '../core/team.js?v=16';
+import { makeDemo } from './demo.js?v=16';
 
 async function call(action, body) {
   const res = await fetch(`/functions/teamApi?action=${action}`, {

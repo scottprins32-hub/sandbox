@@ -1,26 +1,26 @@
 // Oranje: boot, state, and the top of the page.
 
-import { computeAll } from './core/scores.js';
-import { playGame } from './core/game.js';
-import { applyOfficial, whoopByDate, withWhoopVitals } from './core/sources.js';
-import { setCurve } from './core/strain.js';
-import { fmtClock, fmtDur, fromKey, isNum, todayKey } from './core/util.js';
-import { auth } from './data/auth.js';
-import { makeDemo } from './data/demo.js';
-import { syncGoogle } from './data/health.js';
-import { store } from './data/store.js';
-import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
-import { demoMembers, ledger, team as teamApi, withMine } from './data/team.js';
-import { createDial, createMeter } from './ui/dial.js?v=15';
-import { announce, renderChip, renderGame } from './ui/game.js?v=15';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=15';
-import { createRiver } from './ui/river.js?v=15';
-import { initHelp } from './ui/help.js?v=15';
-import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js';
-import { pageText } from './i18n-page.js';
-import { bandName, recoveryName, sleepName, term } from './terms.js';
-import { createRing } from './ui/ring.js?v=15';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=15';
+import { computeAll } from './core/scores.js?v=16';
+import { playGame } from './core/game.js?v=16';
+import { applyOfficial, whoopByDate, withWhoopVitals } from './core/sources.js?v=16';
+import { setCurve } from './core/strain.js?v=16';
+import { fmtClock, fmtDur, fromKey, isNum, todayKey } from './core/util.js?v=16';
+import { auth } from './data/auth.js?v=16';
+import { makeDemo } from './data/demo.js?v=16';
+import { syncGoogle } from './data/health.js?v=16';
+import { store } from './data/store.js?v=16';
+import { forgetWhoopOwner, loadWhoop } from './data/whoop.js?v=16';
+import { demoMembers, ledger, team as teamApi, withMine } from './data/team.js?v=16';
+import { createDial, createMeter } from './ui/dial.js?v=16';
+import { announce, renderChip, renderGame } from './ui/game.js?v=16';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=16';
+import { createRiver } from './ui/river.js?v=16';
+import { initHelp } from './ui/help.js?v=16';
+import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js?v=16';
+import { pageText } from './i18n-page.js?v=16';
+import { bandName, recoveryName, sleepName, term } from './terms.js?v=16';
+import { createRing } from './ui/ring.js?v=16';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=16';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null, team: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.

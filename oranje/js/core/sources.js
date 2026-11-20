@@ -8,8 +8,8 @@
 // before anything else), WHOOP's readings fill the gaps, and data that phone
 // apps wrote to Google Health is used only when no wearable has a value.
 
-import { bandOf, targetFor } from './strain.js';
-import { isNum } from './util.js';
+import { bandOf, targetFor } from './strain.js?v=16';
+import { isNum } from './util.js?v=16';
 
 // WHOOP lists cycles newest first; when one date has two cycles, keep the newest.
 export function whoopByDate(days = []) {

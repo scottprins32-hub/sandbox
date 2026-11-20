@@ -2,8 +2,8 @@
 // Google Health does not expose Fitbit's own Readiness or Sleep Score through
 // the API, so these are computed here, in the open, from the raw measurements.
 
-import { analyseDay, bandOf, estimateHrMax, sessionStrain, targetFor } from './strain.js';
-import { clamp, dayStartMs, isNum, mean, percentile, sd } from './util.js';
+import { analyseDay, bandOf, estimateHrMax, sessionStrain, targetFor } from './strain.js?v=16';
+import { clamp, dayStartMs, isNum, mean, percentile, sd } from './util.js?v=16';
 
 const BASE_SLEEP_NEED_MIN = 7.6 * 60;
 

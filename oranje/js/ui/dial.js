@@ -1,8 +1,8 @@
 // The strain dial: 211 ticks across 270°, one per tenth of a strain point.
 // Ticks light up to the current value; an outer bracket marks today's target.
 
-import { STRAIN_MAX } from '../core/strain.js';
-import { arcPath, ease, h, polar, tween } from './motion.js?v=15';
+import { STRAIN_MAX } from '../core/strain.js?v=16';
+import { arcPath, ease, h, polar, tween } from './motion.js?v=16';
 
 const C = 300, A0 = -135, SWEEP = 270, N = 210;
 const MID = 12;   // where the colour ramp turns from its first leg to its second

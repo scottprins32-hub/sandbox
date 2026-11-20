@@ -3,7 +3,7 @@
 // is synthetic and the UI labels it as such. Output has exactly the same
 // shape as the Google Health adapter (js/data/health.js) produces.
 
-import { addDays, clamp, dateKey, dayStartMs, fromKey } from '../core/util.js';
+import { addDays, clamp, dateKey, dayStartMs, fromKey } from '../core/util.js?v=16';
 
 function mulberry32(a) {
   return () => {

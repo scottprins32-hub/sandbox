@@ -11,7 +11,7 @@
 // Either way the browser talks to Google Health itself; health data never
 // passes through a server of ours.
 
-import { SCOPES } from './health.js';
+import { SCOPES } from './health.js?v=16';
 
 const KEY_CLIENT = 'oranje.clientId';
 const KEY_LINKED = 'oranje.linked';

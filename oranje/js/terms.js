@@ -2,8 +2,8 @@
 // js/core keeps English ids (Light, Recovered, Tempo …); these turn them into
 // the reader's language at the moment they are shown.
 
-import { strings } from './i18n.js';
-import { isNum } from './core/util.js';
+import { strings } from './i18n.js?v=16';
+import { isNum } from './core/util.js?v=16';
 
 export const term = strings({
   en: {

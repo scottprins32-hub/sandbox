@@ -5,8 +5,8 @@
 // A shared day: { date, points, strain, recovery, sleep, rhr, hrv, sleepMin, azm, steps, inTarget }
 // A member:     { id, name, me, days: [shared day…] } (oldest first)
 
-import { addDays, fromKey, isNum, mean } from './util.js';
-import { inTarget, weekStart } from './game.js';
+import { addDays, fromKey, isNum, mean } from './util.js?v=16';
+import { inTarget, weekStart } from './game.js?v=16';
 
 // One of your own computed days, as it is shared with the team.
 export function shareDay(d, points) {

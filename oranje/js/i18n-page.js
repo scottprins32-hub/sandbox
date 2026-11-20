@@ -2,7 +2,7 @@
 // applyPage() from i18n.js fills them in. English matches the HTML itself.
 // Generated once from the page, then edited by hand.
 
-import { strings } from './i18n.js';
+import { strings } from './i18n.js?v=16';
 
 export const pageText = strings({
   en: {

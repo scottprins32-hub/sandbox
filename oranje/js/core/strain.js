@@ -20,7 +20,7 @@
 // It is an estimate in WHOOP's spirit, not WHOOP's number. It sees the heart
 // only, so heavy lifting reads lower than it would on a WHOOP.
 
-import { clamp, isNum } from './util.js';
+import { clamp, isNum } from './util.js?v=16';
 
 export const STRAIN_MAX = 21;
 export const FLOOR = 0.3;   // share of HR reserve below which a minute adds no load

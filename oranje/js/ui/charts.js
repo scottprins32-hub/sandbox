@@ -1,11 +1,11 @@
 // Small SVG charts. Each one draws into its container at the container's real
 // pixel width, so type stays crisp and nothing is stretched.
 
-import { STRAIN_MAX, strainFromLoad } from '../core/strain.js';
-import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js';
-import { date as fmtDate, num, strings } from '../i18n.js';
-import { stageName } from '../terms.js';
-import { h } from './motion.js?v=15';
+import { STRAIN_MAX, strainFromLoad } from '../core/strain.js?v=16';
+import { clamp, fmtClock, fmtDur, fromKey, isNum } from '../core/util.js?v=16';
+import { date as fmtDate, num, strings } from '../i18n.js?v=16';
+import { stageName } from '../terms.js?v=16';
+import { h } from './motion.js?v=16';
 
 const t = strings({
   en: {

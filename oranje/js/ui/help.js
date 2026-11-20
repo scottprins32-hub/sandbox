@@ -3,8 +3,8 @@
 // the text in the current language. On phones the popover sits above the
 // tab bar, where the thumb is.
 
-import { getLang, strings } from '../i18n.js';
-import { h } from './motion.js?v=15';
+import { getLang, strings } from '../i18n.js?v=16';
+import { h } from './motion.js?v=16';
 
 const ui = strings({
   en: { close: 'Close', label: 'Explain: {title}', tip: 'What does this mean?' },

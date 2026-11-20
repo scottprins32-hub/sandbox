@@ -2,11 +2,11 @@
 // how a day scored, the weekly standings, the weekly challenge, the
 // leaderboards, streaks, medals, and a toast when something new is earned.
 
-import { DAY_MAX } from '../core/game.js';
-import { BOARDS, challengeBoard, leaderboard, pastWinners, weekBoard, winCounts } from '../core/team.js';
-import { addDays, fmtDur, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=15';
-import { date as fmtDate, num, strings } from '../i18n.js';
+import { DAY_MAX } from '../core/game.js?v=16';
+import { BOARDS, challengeBoard, leaderboard, pastWinners, weekBoard, winCounts } from '../core/team.js?v=16';
+import { addDays, fmtDur, fromKey, isNum } from '../core/util.js?v=16';
+import { $, h, polar, reduced, roll } from './motion.js?v=16';
+import { date as fmtDate, num, strings } from '../i18n.js?v=16';
 
 const t = strings({
   en: {

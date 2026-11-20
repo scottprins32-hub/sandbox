@@ -7,8 +7,8 @@
 // Words shown to people are getters that ask js/i18n.js when they are read,
 // so a game computed once follows the language when it changes.
 
-import { addDays, fromKey, isNum } from './util.js';
-import { date, num, strings } from '../i18n.js';
+import { addDays, fromKey, isNum } from './util.js?v=16';
+import { date, num, strings } from '../i18n.js?v=16';
 
 const t = strings({
   en: {

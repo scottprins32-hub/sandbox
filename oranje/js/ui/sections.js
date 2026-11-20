@@ -1,12 +1,12 @@
 // Everything below the hero: where the strain came from, what recovery is
 // made of, how the night went, each vital with its fortnight, and the trend.
 
-import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js';
-import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js';
-import { date, num, signedNum, strings } from '../i18n.js';
-import { bandName, recoveryName, stageName, term, zoneName } from '../terms.js';
-import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=15';
-import { $, h, roll } from './motion.js?v=15';
+import { FLOOR, ZONES, loadFromStrain, minuteLoad, zoneBpm } from '../core/strain.js?v=16';
+import { addDays, clamp, fmtClock, fmtDur, fromKey, isNum, mean } from '../core/util.js?v=16';
+import { date, num, signedNum, strings } from '../i18n.js?v=16';
+import { bandName, recoveryName, stageName, term, zoneName } from '../terms.js?v=16';
+import { STAGE_COLORS, consistency, hypnogram, sparkline, strainCurve, trendChart } from './charts.js?v=16';
+import { $, h, roll } from './motion.js?v=16';
 
 const t = strings({
   en: {

@@ -1,7 +1,7 @@
-import { createRing } from './ui/ring.js?v=15';
-import { $, h } from './ui/motion.js?v=15';
-import { fmtDur } from './core/util.js';
-import { applyPage, date, getLang, num, onLang, setLang, strings } from './i18n.js';
+import { createRing } from './ui/ring.js?v=16';
+import { $, h } from './ui/motion.js?v=16';
+import { fmtDur } from './core/util.js?v=16';
+import { applyPage, date, getLang, num, onLang, setLang, strings } from './i18n.js?v=16';
 
 const t = strings({
   en: {

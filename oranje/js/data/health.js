@@ -20,7 +20,7 @@
 // override what the band measured. Sleep cannot be filtered that way, so
 // nights recorded by a wearable are preferred when choosing a day's sleep.
 
-import { addDays, dateKey, dayStartMs, fromKey, isNum, rangeKeys, todayKey } from '../core/util.js';
+import { addDays, dateKey, dayStartMs, fromKey, isNum, rangeKeys, todayKey } from '../core/util.js?v=16';
 
 const BASE = 'https://health.googleapis.com/v4';
 export const WEARABLES = 'users/me/dataSourceFamilies/google-wearables';

@@ -2,11 +2,11 @@
 // minute was, with last night's sleep and every session marked on it and the
 // strain it added up to drawn over the top. Changing day reshapes the line.
 
-import { ZONES, zoneOf, reserveShare } from '../core/strain.js';
-import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, fromKey, isNum } from '../core/util.js';
-import { date, num, strings } from '../i18n.js';
-import { stageName, zoneName } from '../terms.js';
-import { ease, h, reduced, tween } from './motion.js?v=15';
+import { ZONES, zoneOf, reserveShare } from '../core/strain.js?v=16';
+import { clamp, dayStartMs, fmtDur, fmtMinuteOfDay, fromKey, isNum } from '../core/util.js?v=16';
+import { date, num, strings } from '../i18n.js?v=16';
+import { stageName, zoneName } from '../terms.js?v=16';
+import { ease, h, reduced, tween } from './motion.js?v=16';
 
 const t = strings({
   en: {
