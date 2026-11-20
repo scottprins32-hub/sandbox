@@ -1,0 +1,11 @@
+{
+  // Oranje on Base44: the static site plus five small sign-in functions.
+  // Deploy: npm run deploy (builds dist/, then base44 functions + site deploy).
+  "name": "oranje",
+  "description": "Strain, recovery and sleep for Fitbit Air.",
+  "visibility": "public",
+  "site": {
+    "outputDirectory": "./dist",
+    "buildCommand": "node tools/build-site.mjs"
+  }
+}

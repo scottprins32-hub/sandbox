@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oranje · strain, recovery and sleep for Fitbit Air</title>
+<meta name="description" content="A personal dashboard for Fitbit Air: day strain, recovery, sleep and vitals, worked out in your browser from your own heart rate.">
+<meta name="robots" content="noindex">
+<!-- Google Search Console: proves this address belongs to the app's Google account -->
+<meta name="google-site-verification" content="hrZpIo-20oDDmPcBV2-lM6oGdSVddSEgC8zCuI3LjJc">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; connect-src 'self' https://health.googleapis.com https://accounts.google.com https://oauth2.googleapis.com; frame-src https://accounts.google.com; img-src 'self' data: https://*.googleusercontent.com; font-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#04102B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Oranje">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Oranje">
+<meta property="og:title" content="Oranje">
+<meta property="og:description" content="Strain, recovery en slaap voor je Fitbit Air.">
+<meta property="og:url" content="https://health-oranje.base44.app/">
+<meta property="og:image" content="https://health-oranje.base44.app/brand/oranje-share-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preload" href="fonts/Archivo-100-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/BarlowSemiCondensed-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css?v=16">
+<script src="js/boot.js?v=16"></script>
+<script src="config.js"></script>
+</head>
+<body class="booting">
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<!-- Tabler Icons v3.34.1 (https://github.com/tabler/tabler-icons)
+MIT License
+
+Copyright (c) 2020-2024 Paweł Kuna
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+  <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l3 8l4 -16l3 8h4"/></symbol>
+  <symbol id="icon-mountain" viewBox="0 0 24 24"><path d="M3 20h18l-6.921 -14.612a2.3 2.3 0 0 0 -4.158 0l-6.921 14.612z"/><path d="M7.5 11l2 2.5l2.5 -2.5l2 3l2.5 -2"/></symbol>
+  <symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1 -10 0z"/><path d="M5 9a2 2 0 0 1 0 -4h2"/><path d="M19 9a2 2 0 0 0 0 -4h-2"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
+  <symbol id="icon-battery-charging" viewBox="0 0 24 24"><path d="M16 7h1a2 2 0 0 1 2 2v.5a.5 .5 0 0 0 .5 .5a.5 .5 0 0 1 .5 .5v3a.5 .5 0 0 1 -.5 .5a.5 .5 0 0 0 -.5 .5v.5a2 2 0 0 1 -2 2h-2"/><path d="M8 7h-2a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h1"/><path d="M12 8l-2 4h3l-2 4"/></symbol>
+</svg>
+
+<header class="bar">
+  <a class="brand" href="#today" aria-label="Oranje, today">
+    <svg class="brand-mark" viewBox="71 77 370 370" aria-hidden="true"><defs><linearGradient id="hdr-heat" gradientUnits="userSpaceOnUse" x1="152.8" y1="365.2" x2="374.1" y2="176.2"><stop offset="0" stop-color="#FFB36B"/><stop offset=".55" stop-color="#FF6A00"/><stop offset="1" stop-color="#F0461E"/></linearGradient></defs>
+<path d="M374.12 176.18A146 146 0 0 1 359.24 365.24" fill="none" class="bm-track" stroke-width="62" stroke-linecap="round"/>
+<path d="M152.76 365.24A146 146 0 1 1 374.12 176.18" fill="none" stroke="url(#hdr-heat)" stroke-width="62" stroke-linecap="round"/>
+<circle cx="374.12" cy="176.18" r="48.36" class="bm-gap"/>
+<circle cx="374.12" cy="176.18" r="38.44" class="bm-knob"/></svg>
+    <span class="brand-name">Oranje</span>
+  </a>
+  <div class="daynav" id="daynav" hidden>
+    <button class="arrow" id="day-prev" type="button" aria-label="Previous day" data-i18n-attr="aria-label:aPrev"><svg class="ui-icon chevron-prev" aria-hidden="true"><use href="#icon-chevron-right"/></svg></button>
+    <button class="dayline" id="dayline" type="button" aria-live="polite" title="Jump to today" data-i18n-attr="title:aToday"></button>
+    <button class="arrow" id="day-next" type="button" aria-label="Next day" data-i18n-attr="aria-label:aNext"><svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></button>
+  </div>
+  <div class="bar-end">
+    <button class="status" id="status" type="button" hidden><i class="status-dot"></i><span id="status-text"></span><span class="status-short" aria-hidden="true">Demo</span></button>
+    <button class="lang-btn" id="lang-btn" type="button" lang="nl" aria-label="Nederlands">NL</button>
+    <button class="icon-btn" id="look-btn" type="button" aria-label="Switch to the cream look">
+      <svg class="ui-icon theme-sun" aria-hidden="true"><use href="#icon-sun"/></svg><svg class="ui-icon theme-moon" aria-hidden="true"><use href="#icon-moon"/></svg>
+    </button>
+    <button class="icon-btn" id="open-panel" type="button" aria-label="Account and settings" data-i18n-attr="aria-label:aSettings" aria-haspopup="dialog" hidden>
+      <svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"/></svg>
+    </button>
+  </div>
+</header>
+<nav class="tabs" id="tabs" aria-label="Views" data-i18n-attr="aria-label:aViews" hidden>
+  <a href="#today" data-view="today"><svg class="ui-icon" aria-hidden="true"><use href="#icon-home"/></svg><span data-i18n="tabToday">Today</span></a>
+  <a href="#strain" data-view="strain"><svg class="ui-icon" aria-hidden="true"><use href="#icon-activity"/></svg><span data-i18n="tabStrain">Strain</span></a>
+  <a href="#recovery" data-view="recovery"><svg class="ui-icon" aria-hidden="true"><use href="#icon-battery-charging"/></svg><span data-i18n="tabRecovery">Recovery</span></a>
+  <a href="#sleep" data-view="sleep"><svg class="ui-icon" aria-hidden="true"><use href="#icon-moon"/></svg><span data-i18n="tabSleep">Sleep</span></a>
+  <a href="#team" data-view="team"><svg class="ui-icon" aria-hidden="true"><use href="#icon-trophy"/></svg><span data-i18n="tabTeam">Team</span></a>
+</nav>
+
+<main id="main">
+
+  <!-- ───────────── Welcome: shown until an account or the demo is chosen ───────────── -->
+  <section class="welcome" id="welcome" hidden>
+    <div class="welcome-copy">
+      <p class="eyebrow" data-i18n="wEyebrow">For Fitbit Air</p>
+      <h1 class="welcome-title" data-i18n-html="wTitle"><span>Every beat,</span> <span>in <em>oranje</em>.</span></h1>
+      <p class="welcome-lede" data-i18n="wLede">Day strain, recovery and sleep, worked out from your own heart rate. Sign in once with the Google account your Fitbit Air syncs to, and the rest draws itself.</p>
+      <div class="welcome-cta">
+        <button class="btn primary" id="btn-connect" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.900h5.400a4.600 4.600 0 0 1-2 3v2.500h3.200c1.900-1.700 3-4.300 3-7.400z"/><path fill="#fff" opacity=".85" d="M12 22c2.700 0 5-.9 6.600-2.400l-3.200-2.500c-.9.600-2 1-3.400 1-2.600 0-4.800-1.800-5.600-4.100H3.100v2.600A10 10 0 0 0 12 22z"/><path fill="#fff" opacity=".7" d="M6.400 14a6 6 0 0 1 0-4V7.400H3.100a10 10 0 0 0 0 9.200z"/><path fill="#fff" opacity=".95" d="M12 5.900c1.500 0 2.800.500 3.800 1.500l2.900-2.900A10 10 0 0 0 3.100 7.400L6.400 10c.8-2.300 3-4.100 5.600-4.100z"/></svg>
+          <span data-i18n="wConnect">Connect Google account</span>
+        </button>
+        <a class="btn ghost" style="text-decoration:none" href="whoop.html" data-i18n="wWhoop">WHOOP scores</a>
+        <button class="btn ghost" id="btn-demo" type="button" data-i18n="wDemo">Try the demo</button>
+      </div>
+      <p class="welcome-error" id="welcome-error" role="alert" hidden></p>
+
+      <div class="setup" id="setup" hidden>
+        <h2 data-i18n="sTitle">One-time setup</h2>
+        <p data-i18n="sLede">Google only hands health data to an app you have registered yourself. It takes about five minutes, once.</p>
+        <ol>
+          <li data-i18n-html="s1">In <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud Console</a>, create a project and enable the <a href="https://console.developers.google.com/apis/library/health.googleapis.com" target="_blank" rel="noopener">Google Health API</a>.</li>
+          <li data-i18n-html="s2">Set up the consent screen as <b>External</b>, add yourself under <b>Audience → Test users</b>, and add the Google Health read scopes under <b>Data access</b>.</li>
+          <li><span data-i18n-html="s3">Create an <b>OAuth client ID</b> of type <b>Web application</b> with this page as an authorised JavaScript origin:</span> <code id="setup-origin"></code></li>
+          <li data-i18n="s4">Paste the client ID here.</li>
+        </ol>
+        <form id="setup-form" class="setup-form">
+          <label for="client-id">OAuth client ID</label>
+          <div class="setup-row">
+            <input id="client-id" name="client-id" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="1234567890-abc.apps.googleusercontent.com" required>
+            <button class="btn primary" type="submit" data-i18n="sSave">Save and connect</button>
+          </div>
+          <p class="hint" data-i18n="sHint">A client ID is not a secret. It is kept in this browser only.</p>
+        </form>
+      </div>
+
+      <div class="setup" id="owner-setup" hidden>
+        <h2 data-i18n="oTitle">Not connected to Google yet</h2>
+        <p data-i18n="oLede">This copy of Oranje still needs its Google credentials. If someone sent you this link, ask them to finish the setup. If it is yours:</p>
+        <ol>
+          <li data-i18n-html="o1">In <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud Console</a>, create a project, enable the <a href="https://console.developers.google.com/apis/library/health.googleapis.com" target="_blank" rel="noopener">Google Health API</a> and set up the consent screen as <b>External</b>.</li>
+          <li><span data-i18n-html="o2">Create an <b>OAuth client ID</b> of type <b>Web application</b> with this authorised redirect URI:</span> <code id="owner-redirect"></code></li>
+          <li data-i18n-html="o3">Give the app its Google credentials as the Base44 secrets <b>GOOGLE_CLIENT_ID</b> and <b>GOOGLE_CLIENT_SECRET</b>.</li>
+        </ol>
+        <p data-i18n="oReadme">The README has every step.</p>
+      </div>
+
+      <ul class="welcome-facts">
+        <li data-i18n-html="f1"><b>Strain 0–21</b> from every minute of heart rate, on a published model.</li>
+        <li data-i18n-html="f2"><b>No database.</b> Oranje stores no health data on a server.</li>
+        <li data-i18n-html="f3"><b>Read-only.</b> Oranje can never change what is in Google Health.</li>
+      </ul>
+    </div>
+    <div class="welcome-art" aria-hidden="true">
+      <div class="dial dial-art" id="welcome-dial"><div class="dial-read"><span class="eyebrow" data-i18n="dayStrain">Day strain</span><strong class="dial-num" id="welcome-num">0.0</strong></div></div>
+    </div>
+  </section>
+
+  <!-- ───────────── Dashboard: five views ───────────── -->
+  <div id="dash" hidden>
+
+    <section class="view" id="view-today" data-view="today" aria-labelledby="verdict">
+      <div class="today-top">
+        <h1 class="verdict" id="verdict"></h1>
+        <div class="ribbon" id="ribbon" role="group" aria-label="Recent days: strain bar and recovery dot for each day" data-i18n-attr="aria-label:aRibbon"></div>
+      </div>
+      <div class="cards">
+        <div class="card trio span-7" id="trio">
+          <div class="ring-cell" data-help="strain">
+            <a class="ring" id="ring-strain" href="#strain" data-kind="strain"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong></span></span><span class="ring-label"><span data-i18n="rStrain">Strain</span><svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
+          <div class="ring-cell" data-help="recovery">
+            <a class="ring" id="ring-recovery" href="#recovery" data-kind="recovery"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label"><span data-i18n="rRecovery">Recovery</span><svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
+          <div class="ring-cell" data-help="sleep">
+            <a class="ring" id="ring-sleep" href="#sleep" data-kind="sleep"><span class="ring-face"><span class="ring-read"><strong class="ring-num">–</strong><small>%</small></span></span><span class="ring-label"><span data-i18n="rSleep">Sleep</span><svg class="ui-icon" aria-hidden="true"><use href="#icon-chevron-right"/></svg></span><span class="ring-band"></span></a>
+          </div>
+        </div>
+        <div class="card goal span-5" id="goal">
+          <h3 data-help="target"><span data-i18n="hTarget">Today's target</span></h3>
+          <div id="goal-scale"></div>
+          <p class="goal-text" id="goal-text"></p>
+          <a class="climb-chip" id="climb-chip" href="#team">
+            <svg class="cc-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trophy"/></svg>
+            <span class="cc-alt"><small data-i18n="lvShort">Lv</small> <b id="cc-alt">–</b></span>
+            <span class="cc-mid"><span class="cc-level" id="cc-level"></span><span class="cc-track"><i id="cc-fill"></i></span><span class="cc-next" id="cc-next"></span></span>
+            <span class="cc-streak" id="cc-streak"></span>
+          </a>
+        </div>
+        <figure class="card span-12 river-card">
+          <figcaption>
+            <h3 data-help="day"><span data-i18n="hDay">The day, beat by beat</span></h3>
+            <span class="legend">
+              <span><i class="lg-hr" aria-hidden="true"></i><span data-i18n="lgHr">Heart rate</span></span>
+              <span><i class="lg-build" aria-hidden="true"></i><span data-i18n="lgBuild">Strain building</span></span>
+              <span><i class="lg-sleep" aria-hidden="true"></i><span data-i18n="lgSleep">Asleep</span></span>
+            </span>
+          </figcaption>
+          <div class="river" id="river" tabindex="0"></div>
+        </figure>
+        <section class="card plain span-12" id="vitals" aria-labelledby="h-vitals">
+          <div class="card-head"><h3 id="h-vitals" data-help="vitals"><span data-i18n="hVitals">Vitals</span></h3><button class="link small" id="customise" type="button" data-i18n="customise">Choose what shows</button></div>
+          <div class="tiles" id="tiles"></div>
+        </section>
+        <section class="card span-12" id="trends" aria-labelledby="h-trends">
+          <div class="card-head">
+            <h3 id="h-trends" data-help="trends"><span data-i18n="hTrends">Strain against recovery</span></h3>
+            <div class="seg" role="group" aria-label="Range" data-i18n-attr="aria-label:aRange">
+              <button type="button" data-range="14" aria-pressed="true" data-i18n="w2">2 weeks</button>
+              <button type="button" data-range="28" aria-pressed="false" data-i18n="w4">4 weeks</button>
+            </div>
+          </div>
+          <p class="card-lede" id="trends-lede"></p>
+          <div class="trend" id="trend"></div>
+          <dl class="averages" id="averages"></dl>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-strain" data-view="strain" aria-labelledby="h-strain" hidden>
+      <header class="view-head"><h2 id="h-strain" data-help="strain"><span data-i18n="vStrain">Strain</span></h2><p id="strain-lede"></p></header>
+      <div class="cards">
+        <div class="card dial-card span-5">
+          <div class="dial" id="dial" role="img">
+            <div class="dial-read">
+              <span class="eyebrow" data-i18n="dayStrain">Day strain</span>
+              <strong class="dial-num" id="strain-num">–</strong>
+              <span class="dial-band" id="strain-band"></span>
+              <span class="dial-target" id="strain-target"></span>
+            </div>
+          </div>
+        </div>
+        <div class="card span-7">
+          <h3 data-help="zones"><span data-i18n="hZones">Time in each zone</span></h3>
+          <div class="zones" id="zones"></div>
+          <p class="note" id="zones-note"></p>
+        </div>
+        <div class="card span-6">
+          <h3 data-help="sessions"><span data-i18n="hSessions">Sessions</span></h3>
+          <ol class="sessions" id="sessions"></ol>
+        </div>
+        <figure class="card curve span-6">
+          <h3 data-help="curve"><span data-i18n="hCurve">Why the last points are the hardest</span></h3>
+          <div id="curve"></div>
+          <figcaption id="curve-note"></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="view" id="view-recovery" data-view="recovery" aria-labelledby="h-recovery" hidden>
+      <header class="view-head"><h2 id="h-recovery" data-help="recovery"><span data-i18n="vRecovery">Recovery</span></h2><p id="recovery-lede"></p></header>
+      <div class="cards">
+        <article class="card meter score-card span-4" id="m-recovery">
+          <header><h3 data-i18n="hMorning">This morning</h3><span class="meter-band" id="recovery-band"></span></header>
+          <p class="meter-num"><strong id="recovery-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="recovery-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="recovery-facts"></dl>
+        </article>
+        <div class="card aim span-8">
+          <h3 data-help="aim"><span data-i18n="hAim">What today can take</span></h3>
+          <div id="aim"></div>
+        </div>
+        <div class="card span-12">
+          <h3 data-help="normal"><span data-i18n="hNormal">Against your own normal</span></h3>
+          <div class="devs" id="devs"></div>
+          <p class="note" data-i18n="nNormal">Each bar shows how far this morning sits from your 30-day average. Right of centre helps recovery, left of centre costs it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-sleep" data-view="sleep" aria-labelledby="h-sleep" hidden>
+      <header class="view-head"><h2 id="h-sleep" data-help="sleep"><span data-i18n="vSleep">Sleep</span></h2><p id="sleep-lede"></p></header>
+      <div class="cards">
+        <article class="card meter sleep score-card span-4" id="m-sleep">
+          <header><h3 data-i18n="hLastNight">Last night</h3><span class="meter-band" id="sleep-band"></span></header>
+          <p class="meter-num"><strong id="sleep-num">–</strong><span class="unit">%</span></p>
+          <div class="ticks" id="sleep-ticks" aria-hidden="true"></div>
+          <dl class="facts" id="sleep-facts"></dl>
+        </article>
+        <div class="card span-8">
+          <h3 data-help="stages"><span data-i18n="hStages">Stage by stage</span></h3>
+          <div class="hypno" id="hypno"></div>
+        </div>
+        <div class="card span-4">
+          <h3 data-help="nightsplit"><span data-i18n="hSplit">Where the night went</span></h3>
+          <div class="stages" id="stages"></div>
+        </div>
+        <div class="card span-4">
+          <h3 data-help="need"><span data-i18n="hNeed">Had against needed</span></h3>
+          <div id="need"></div>
+        </div>
+        <div class="card span-4">
+          <h3 data-help="bedtimes"><span data-i18n="hBed">Bed and wake times</span></h3>
+          <div id="consistency"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-team" data-view="team" aria-labelledby="h-team" hidden>
+      <header class="view-head"><h2 id="h-team" data-help="team"><span data-i18n="vTeam">Team</span></h2><p id="team-lede"></p></header>
+      <div class="cards">
+        <div class="card span-5 level-card">
+          <h3 data-help="level"><span data-i18n="hLevel">Your level</span></h3>
+          <div class="lv-top"><b class="lv-n" id="lv-n">1</b><div><p class="lv-name" id="lv-name"></p><p class="lv-xp" id="lv-xp"></p></div></div>
+          <div class="lv-track" aria-hidden="true"><i id="lv-fill"></i></div>
+          <p class="lv-next" id="lv-next"></p>
+          <div class="week-head"><span data-i18n="thisWeek">This week</span><span class="week-pts"><b id="week-pts">0</b> <small id="week-max"></small></span></div>
+          <div class="week-days" id="week-days"></div>
+        </div>
+        <div class="card span-7">
+          <div class="card-head"><h3 data-help="points"><span id="earn-title">Today so far</span></h3><p class="earn-sum" id="earn-sum"><b id="earn-total">+0</b><span id="earn-unit"> pts so far</span></p></div>
+          <ul class="earn" id="earn"></ul>
+        </div>
+        <section class="card span-12 team-card" id="team-card" aria-labelledby="h-board">
+          <div class="card-head"><h3 id="h-board" data-help="weekboard"><span data-i18n="hBoard">This week's standings</span></h3><p class="team-meta" id="board-meta"></p></div>
+          <p class="team-status" id="team-status" hidden></p>
+          <div class="team-join" id="team-join" hidden></div>
+          <ol class="board" id="board" hidden></ol>
+          <p class="note" id="board-last"></p>
+          <div class="panel-actions"><button class="btn ghost small" id="team-leave" type="button" hidden>Leave and erase</button></div>
+        </section>
+        <div class="card span-5" id="challenge-card" hidden>
+          <h3 data-help="challenge"><span data-i18n="hChallenge">Challenge of the week</span></h3>
+          <p class="ch-title" id="ch-title"></p>
+          <p class="ch-text" id="ch-text"></p>
+          <ol class="board" id="ch-board"></ol>
+        </div>
+        <div class="card span-7" id="boards-card" hidden>
+          <h3 data-help="boards"><span data-i18n="hBoards">Leaderboards</span></h3>
+          <div class="chips" id="board-pick" role="group" data-i18n-attr="aria-label:hBoards"></div>
+          <p class="card-lede" id="boards-lede"></p>
+          <ol class="board" id="lb"></ol>
+        </div>
+        <div class="card span-5">
+          <h3 data-help="streaks"><span data-i18n="hStreaks">Streaks</span></h3>
+          <div class="streaks" id="streaks"></div>
+        </div>
+        <div class="card medals span-7">
+          <h3 data-help="medals"><span data-i18n="hMedals">Medals</span> <span id="badge-count"></span></h3>
+          <div class="badges" id="badges"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div>
+        <p class="foot-mark">Oranje</p>
+        <p data-i18n="footNote">Strain, recovery and sleep scores are this app's own estimates, built on published sports science. They are not Fitbit's, Google's or WHOOP's scores, and they are not medical advice.</p>
+      </div>
+      <div>
+        <p id="foot-source"></p>
+        <p id="foot-privacy">Health data is read from Google Health and kept in this browser only.</p>
+        <p class="foot-links"><a href="privacy.html" data-i18n="privacy">Privacy</a> · <a href="terms.html" data-i18n="terms">Terms</a></p>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<!-- ───────────── Account and settings ───────────── -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
+  <header>
+    <h2 id="panel-title" data-i18n="pTitle">Account and settings</h2>
+    <button class="icon-btn" id="close-panel" type="button" aria-label="Close" data-i18n-attr="aria-label:aClose"><svg class="ui-icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+  </header>
+  <div class="panel-body">
+    <section>
+      <h3 data-i18n="pAccount">Account</h3>
+      <p id="acct-line"></p>
+      <div class="panel-actions" id="acct-actions"></div>
+    </section>
+    <section id="device-sec" hidden>
+      <h3 data-i18n="pBand">Band</h3>
+      <p id="device-line"></p>
+    </section>
+    <section>
+      <h3 data-i18n="pLook">Look</h3>
+      <div class="seg" role="group" aria-label="Look" data-i18n-attr="aria-label:aLook">
+        <button type="button" data-look-pick="navy" aria-pressed="true" data-i18n="navy">Navy</button>
+        <button type="button" data-look-pick="cream" aria-pressed="false" data-i18n="cream">Cream</button>
+      </div>
+    </section>
+    <section>
+      <h3 data-i18n="pLang">Language</h3>
+      <div class="seg" role="group" aria-label="Language" data-i18n-attr="aria-label:pLang">
+        <button type="button" data-lang-pick="en" lang="en" aria-pressed="true">English</button>
+        <button type="button" data-lang-pick="nl" lang="nl" aria-pressed="false">Nederlands</button>
+      </div>
+    </section>
+    <section id="install-sec">
+      <h3 data-i18n="pPhone">On your phone</h3>
+      <p data-i18n-html="pPhoneText">Put Oranje on your home screen and it opens like an app. In Safari: <b>Share</b>, then <b>Add to Home Screen</b>. In Chrome: the <b>⋮</b> menu, then <b>Install app</b>.</p>
+      <div class="panel-actions"><button class="btn primary small" id="install-btn" type="button" hidden data-i18n="install">Install Oranje</button></div>
+    </section>
+    <section>
+      <h3 data-i18n="pNumbers">Your numbers</h3>
+      <label class="field" for="set-hrmax"><span data-i18n="hrMax">Max heart rate</span> <span id="hrmax-source"></span></label>
+      <div class="field-row"><input id="set-hrmax" type="number" inputmode="numeric" min="120" max="230" placeholder="auto"><span class="unit">bpm</span></div>
+      <p class="hint" data-i18n="hrMaxHint">Leave empty to let Oranje use the highest rate it has seen, or an estimate from your age.</p>
+      <label class="field" for="set-curve" data-i18n="curve">Heart-rate weighting</label>
+      <select id="set-curve">
+        <option value="a" data-i18n="curveA">Banister A (0.64 · e^1.92x), the default</option>
+        <option value="b" data-i18n="curveB">Banister B (0.86 · e^1.67x), published for women</option>
+      </select>
+      <p class="hint" data-i18n="curveHint">Google Health does not share sex, so pick the curve that fits you.</p>
+    </section>
+    <section>
+      <h3 data-i18n="pVitals">Vitals shown</h3>
+      <div class="toggles" id="toggles"></div>
+    </section>
+    <section>
+      <h3 data-i18n="pHealth">Data health</h3>
+      <ul class="health" id="health"></ul>
+    </section>
+  </div>
+</aside>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<noscript><p class="noscript">Oranje needs JavaScript to read and draw your data.</p></noscript>
+<script type="module" src="js/main.js?v=16"></script>
+</body>
+</html>

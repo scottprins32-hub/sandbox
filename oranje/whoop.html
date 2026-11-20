@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#04102B">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<title>WHOOP scores | Oranje</title>
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/whoop.css?v=16">
+<script src="js/boot.js?v=16"></script>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+<header class="bar">
+  <a class="brand" href="./"><img src="icons/icon.svg" width="28" height="28" alt=""><span class="brand-name">Oranje</span></a>
+  <div class="bar-end"><button class="lang-btn" id="lang-btn" type="button" lang="nl" aria-label="Nederlands">NL</button><a class="btn ghost small whoop-link" href="./" data-i18n="dashboard">Fitbit dashboard</a></div>
+</header>
+<main class="view whoop-view" id="main">
+  <header class="whoop-heading">
+    <h1>WHOOP</h1>
+    <div class="whoop-actions">
+      <a class="btn primary small whoop-link" id="whoop-connect" href="/functions/whoopApi?action=login" hidden data-i18n="connect">Connect WHOOP</a>
+      <button class="btn ghost small" id="whoop-refresh" type="button" hidden data-i18n="refresh">Refresh</button>
+      <button class="btn ghost small" id="whoop-disconnect" type="button" hidden data-i18n="disconnect">Disconnect</button>
+    </div>
+  </header>
+  <p id="whoop-status" class="whoop-status" role="status">Checking your WHOOP connection…</p>
+  <div id="whoop-results" hidden>
+    <div class="whoop-date">
+      <label for="whoop-cycle" data-i18n="day">WHOOP day</label>
+      <select id="whoop-cycle"></select>
+    </div>
+    <div class="trio card whoop-scores" aria-label="Scores reported by WHOOP" data-i18n-attr="aria-label:scores">
+      <article class="ring" data-kind="strain">
+        <div class="ring-face" aria-hidden="true"><div class="ring-read"><strong class="ring-num" id="whoop-strain">–</strong></div></div>
+        <h2 class="ring-label" data-i18n="strain">Strain</h2>
+        <p class="ring-band" data-i18n="outOf21">Out of 21</p>
+      </article>
+      <article class="ring" data-kind="recovery">
+        <div class="ring-face" aria-hidden="true"><div class="ring-read"><strong class="ring-num" id="whoop-recovery">–</strong><small>%</small></div></div>
+        <h2 class="ring-label" data-i18n="recovery">Recovery</h2>
+      </article>
+      <article class="ring" data-kind="sleep">
+        <div class="ring-face" aria-hidden="true"><div class="ring-read"><strong class="ring-num" id="whoop-sleep">–</strong><small>%</small></div></div>
+        <h2 class="ring-label" data-i18n="sleep">Sleep</h2>
+      </article>
+    </div>
+    <p class="sr-only" id="whoop-reading" aria-live="polite"></p>
+    <div class="whoop-detail">
+      <section class="card" aria-labelledby="whoop-vitals-title">
+        <h2 id="whoop-vitals-title" data-i18n="metrics">Daily metrics</h2>
+        <dl class="whoop-vitals">
+          <dt data-i18n="rhr">Resting heart rate</dt><dd id="whoop-resting">–</dd>
+          <dt data-i18n="hrv">Heart rate variability</dt><dd id="whoop-hrv">–</dd>
+          <dt data-i18n="avgHr">Average heart rate</dt><dd id="whoop-average">–</dd>
+          <dt data-i18n="asleep">Time asleep</dt><dd id="whoop-duration">–</dd>
+        </dl>
+      </section>
+      <section class="card" aria-labelledby="whoop-workout-title">
+        <h2 id="whoop-workout-title" data-i18n="workouts">Workouts</h2>
+        <ul class="whoop-workouts" id="whoop-workouts"></ul>
+        <p class="whoop-status" id="whoop-workouts-empty" hidden data-i18n="noWorkouts">No workouts for this WHOOP day.</p>
+      </section>
+    </div>
+    <p class="note" data-i18n="note">Scores come directly from WHOOP. A dash means the score or measurement is unavailable. WHOOP shares average heart rate, so this view has no minute-by-minute chart.</p>
+  </div>
+  <footer class="whoop-foot"><a class="link" href="privacy.html" data-i18n="privacy">Privacy</a></footer>
+</main>
+<noscript><p>Enable JavaScript to load your WHOOP scores.</p></noscript>
+<script type="module" src="js/whoop.js?v=16"></script>
+</body>
+</html>

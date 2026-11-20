@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy · Oranje</title>
+<meta name="description" content="Hoe Oranje omgaat met je Fitbit-, Google- en WHOOP-gegevens.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0A1324">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css?v=16">
+<script src="js/boot.js?v=16"></script>
+<script type="module" src="js/legal.js?v=16"></script>
+</head>
+<body data-page="privacy">
+<main class="doc">
+  <div class="trend-head doc-top">
+    <a class="doc-back" href="./"><img src="icons/icon.svg" alt="" width="28" height="28"> Oranje</a>
+    <div class="seg doc-lang" role="group" aria-label="Taal" data-i18n-attr="aria-label:lang" hidden>
+      <button type="button" lang="nl" data-lang-pick="nl" aria-pressed="true">Nederlands</button>
+      <button type="button" lang="en" data-lang-pick="en" aria-pressed="false">English</button>
+    </div>
+  </div>
+  <h1 data-i18n="h1">Privacy</h1>
+  <p class="doc-meta" data-i18n="meta">Bijgewerkt op 20 november 2026</p>
+
+  <p class="doc-lede" data-i18n="lede">Oranje is een persoonlijke app voor je Fitbit Air en WHOOP. Hij wordt gemaakt en beheerd door een privépersoon voor een kleine kring mensen. Er zit geen bedrijf achter, er zijn geen advertenties en er wordt niets verkocht.</p>
+
+  <h2 data-i18n="hShort">Kort gezegd</h2>
+  <ul>
+    <li data-i18n="short1">Fitbit-gegevens gaan rechtstreeks van Google naar je browser. WHOOP-gegevens gaan via de serverfunctie van Oranje naar je browser.</li>
+    <li data-i18n="short2">Oranje bewaart geen gezondheidsgegevens in een database, tenzij je zelf kiest om mee te doen met het team. Dan bewaart hij je naam en per dag een samenvatting van je scores, en zien de andere teamleden die.</li>
+    <li data-i18n="short3">Oranje kan alleen lezen. Hij kan niets veranderen aan je metingen bij Google, Fitbit of WHOOP.</li>
+    <li data-i18n="short4">Je kunt altijd stoppen met het team, de koppeling verbreken en alles wissen.</li>
+  </ul>
+
+  <h2 data-i18n="hFitbit">Fitbit via Google Health</h2>
+  <p data-i18n="fitbit">Alleen nadat je bij Google toestemming geeft, en alleen-lezen, via de Google Health API:</p>
+  <ul>
+    <li data-i18n-html="fit1"><b>Activiteit en fitness:</b> stappen, afstand, calorieën, zone-minuten, trainingen en cardio-fitness.</li>
+    <li data-i18n-html="fit2"><b>Gezondheidsmetingen:</b> hartslag, rusthartslag, hartslagvariabiliteit (HRV), zuurstof in het bloed, ademhaling en huidtemperatuur.</li>
+    <li data-i18n-html="fit3"><b>Slaap:</b> wanneer je sliep en de slaapfases.</li>
+    <li data-i18n-html="fit4"><b>Profiel en instellingen:</b> je leeftijd, je tijdzone en de status van je band, zoals de batterij.</li>
+    <li data-i18n-html="fit5"><b>Je naam en e-mailadres</b> van je Google-account, om te laten zien wie er is ingelogd. Als je meedoet met het team, gebruikt Oranje ze ook daarvoor (zie <b>Team</b>).</li>
+  </ul>
+
+  <h2 data-i18n="hWhere">Waar je gegevens blijven</h2>
+  <p data-i18n="where1">Je browser haalt de gegevens zelf op bij Google en bewaart ze in de opslag van die browser, zodat de app snel opent. Strain, recovery, slaapscore en je dagpunten worden in je browser berekend. Dagpunten zijn een spel: je verdient er maximaal 10 per dag met gezonde gewoontes, zoals trainen binnen je strain-doel, een slaapscore van 85% of meer, 22 of meer zone-minuten en je band ’s nachts dragen. Met die punten bouw je XP op voor je level, en je verdient reeksen en medailles.</p>
+  <p data-i18n-html="where3">Doe je niet mee met het team, dan wordt er niets naar een server van Oranje gestuurd. Doe je wel mee, dan gaat er per dag een samenvatting naar Base44 (zie <b>Team</b>).</p>
+  <p data-i18n="where2">Om ingelogd te blijven bewaart Oranje de inlogsleutel die Google afgeeft (een zogenaamd refresh token) en je naam en e-mailadres versleuteld (AES-GCM) in een cookie in jouw browser. Scripts op de pagina kunnen die cookie niet lezen (httpOnly). De kleine inlogfuncties van Oranje gebruiken hem alleen om bij Google een toegangscode van een uur op te halen. Ze slaan niets op en zien geen gezondheidsgegevens.</p>
+
+  <h2 data-i18n="hWhoop">WHOOP</h2>
+  <p data-i18n-html="whoop1">Als je WHOOP koppelt, geef je Oranje bij WHOOP toestemming om je dagcycli, recovery, slaap en trainingen te lezen. De serverfunctie op Base44 haalt de laatste 30 dagen op bij WHOOP en stuurt de benodigde scores en metingen door naar jouw browser. Oranje bewaart die gegevens alleen zolang het scherm open is en slaat ze niet op in een database of in browseropslag. Alleen als je meedoet met het team, komen je WHOOP-scores voor strain, recovery en slaap in je dagelijkse samenvatting (zie <b>Team</b>).</p>
+  <p data-i18n-html="whoop2">Oranje bewaart de WHOOP-toegangssleutels versleuteld in een afzonderlijke httpOnly-cookie. De cookie blijft tot 30 dagen geldig en wordt vernieuwd bij het verversen van de toegangssleutel. Met <b>Disconnect</b> op het WHOOP-scherm verwijder je de sessie en vraagt Oranje WHOOP om de toegang in te trekken. Je kunt de toegang ook intrekken via je gekoppelde apps in WHOOP.</p>
+
+  <h2 data-i18n="hTeam">Team (alleen als je meedoet)</h2>
+  <p data-i18n-html="team1">Iedereen die deze Oranje-link gebruikt en inlogt met Google, kan kiezen om mee te doen met één gedeeld team. Dat kies je zelf in de app met <b>Meedoen</b>, en je kunt het altijd terugdraaien met <b>Stoppen en wissen</b>. Doe je niet mee, dan gebeurt er niets van wat hieronder staat en blijft alles zoals hierboven beschreven.</p>
+  <p data-i18n="team2">Als je meedoet, bewaart Oranje bij Base44 (de host, in zijn database):</p>
+  <ul>
+    <li data-i18n-html="teamData1"><b>Je naam:</b> je voornaam, of de naam die je zelf kiest.</li>
+    <li data-i18n-html="teamData2"><b>Je Google-e-mailadres</b>, alleen als interne sleutel. Andere teamleden zien het nooit.</li>
+    <li data-i18n-html="teamData3"><b>Per dag:</b> dagpunten, strain, recovery (%), slaapscore (%), rusthartslag, hartslagvariabiliteit (HRV), slaapduur, zone-minuten, stappen en of je je strain-doel hebt gehaald.</li>
+  </ul>
+  <p data-i18n="team3">Dat zijn samenvattingen per dag, geen hartslag per minuut, slaapfases of trainingen. Komt de strain, recovery of slaapscore van een dag van WHOOP, dan is het die WHOOP-score die gedeeld wordt.</p>
+  <p data-i18n-html="team4"><b>Wie het ziet:</b> alle andere leden van het team op deze Oranje-link, in de weekstand, de weekuitdaging en de ranglijsten. De beheerder van de app kan de database inzien. Verder niemand. Je gegevens worden niet verkocht, niet gebruikt voor advertenties en niet gebruikt om AI-modellen te trainen.</p>
+  <p data-i18n-html="team5"><b>Hoe lang:</b> Oranje bewaart per lid de laatste 120 dagen; oudere dagen worden automatisch gewist. Met <b>Stoppen en wissen</b> verwijder je in één keer je lidmaatschap en al je dagen. Base44 bewaart gewiste gegevens nog een tijd in een prullenbak (Recently deleted) voordat ze echt weg zijn; de beheerder kan die prullenbak legen.</p>
+  <p data-i18n-html="team6"><b>Waarom het mag:</b> omdat je er zelf uitdrukkelijk voor kiest om mee te doen (toestemming). Je trekt die toestemming in door te stoppen met het team.</p>
+  <p data-i18n-html="team7"><b>Let op:</b> <b>Disconnect</b> in de instellingen wist je teamgegevens niet vanzelf. Stop daarom eerst met het team, of vraag de beheerder om ze te wissen.</p>
+
+  <h2 data-i18n="hHosting">Hosting</h2>
+  <p data-i18n-html="hosting">De site en de inlogfuncties draaien bij Base44. Als je meedoet met het team, bewaart Base44 ook je teamgegevens in zijn database (zie <b>Team</b>). Zoals elke webserver kan Base44 technische gegevens verwerken, zoals je IP-adres en het tijdstip van een bezoek, volgens <a href="https://base44.com/about-us/legal/privacy-policy" rel="noopener" target="_blank">het privacybeleid van Base44</a>. Base44 voegt eigen scripts toe aan de pagina. Oranje staat het uitvoeren daarvan niet toe en gebruikt geen statistiek- of advertentiediensten.</p>
+
+  <h2 data-i18n="hShare">Delen</h2>
+  <p data-i18n-html="share">Doe je niet mee met het team, dan deelt Oranje je gegevens met niemand. Doe je wel mee, dan zien de andere teamleden je naam en je scores per dag, en kan de beheerder de database inzien (zie <b>Team</b>). Verder met niemand. Je gegevens worden niet verkocht, niet gebruikt voor advertenties en niet gebruikt om AI-modellen te trainen.</p>
+  <p lang="en">Oranje's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener" target="_blank">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+  <h2 data-i18n="hDelete">Verwijderen</h2>
+  <ul>
+    <li data-i18n-html="deleteTeam">Team: <b>Stoppen en wissen</b>. Dat verwijdert je lidmaatschap en al je dagen uit de database, na een tijd in de prullenbak van Base44. Doe dit vóór Disconnect.</li>
+    <li data-i18n-html="delete1">In de app: <b>Instellingen</b>, dan <b>Disconnect</b>. Dat wist de gegevens in je browser, verwijdert de inlogcookie en trekt de toegang bij Google in. Je teamgegevens blijven dan staan; stop eerst met het team of vraag de beheerder om ze te wissen.</li>
+    <li data-i18n-html="delete2">Bij Google: op <a href="https://myaccount.google.com/connections" rel="noopener" target="_blank">myaccount.google.com/connections</a> kun je Oranje de toegang ontnemen.</li>
+  </ul>
+
+  <h2 data-i18n="hMedical">Geen medisch advies</h2>
+  <p data-i18n="medical">De scores in de Fitbit-weergave zijn schattingen van Oranje. In de WHOOP-weergave staan de scores van WHOOP zelf. De informatie in Oranje is geen medisch advies.</p>
+
+  <h2 data-i18n="hQuestions">Vragen</h2>
+  <p data-i18n="questions">Vragen over je gegevens kun je stellen aan de persoon die je de link naar Oranje heeft gestuurd; dat is de beheerder van deze app.</p>
+
+  <p class="doc-foot" data-i18n-html="foot"><a href="./">Terug naar Oranje</a> · <a href="terms.html">Voorwaarden</a></p>
+</main>
+</body>
+</html>
