@@ -10,16 +10,16 @@ import { makeDemo } from './data/demo.js';
 import { syncGoogle } from './data/health.js';
 import { store } from './data/store.js';
 import { forgetWhoopOwner, loadWhoop } from './data/whoop.js';
-import { createDial, createMeter } from './ui/dial.js?v=10';
-import { announce, renderChip, renderClimb } from './ui/game.js?v=10';
-import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=10';
-import { createRiver } from './ui/river.js?v=10';
-import { initHelp } from './ui/help.js?v=10';
+import { createDial, createMeter } from './ui/dial.js?v=11';
+import { announce, renderChip, renderClimb } from './ui/game.js?v=11';
+import { $, $$, h, reduced, roll, watchReveals } from './ui/motion.js?v=11';
+import { createRiver } from './ui/river.js?v=11';
+import { initHelp } from './ui/help.js?v=11';
 import { applyPage, date, dateTime, getLang, num, onLang, setLang, strings } from './i18n.js';
 import { pageText } from './i18n-page.js';
 import { bandName, recoveryName, sleepName, term } from './terms.js';
-import { createRing } from './ui/ring.js?v=10';
-import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=10';
+import { createRing } from './ui/ring.js?v=11';
+import { VITAL_DEFS, aimParts, renderRecovery, renderSleep, renderStrain, renderTrends, renderVitals } from './ui/sections.js?v=11';
 
 const state = { source: null, data: null, ctx: null, date: null, settings: store.settings(), syncing: false, progress: '', signIn: false, error: null, whoop: null };
 // Who the Google data belongs to: their email when this site signs people in, else Google's user id.
@@ -34,7 +34,7 @@ const rings = {
   recovery: createRing($('#ring-recovery .ring-face')),
   sleep: createRing($('#ring-sleep .ring-face')),
 };
-const WD = { en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], nl: ['Z', 'M', 'D', 'W', 'D', 'V', 'Z'] };
+const WD = { en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], nl: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'] };
 const plural = (n, one, many) => (n === 1 ? one : many);
 const tx = strings({
   en: {

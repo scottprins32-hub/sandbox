@@ -3,7 +3,7 @@
 
 import { LEVELS, levelAt } from '../core/game.js';
 import { clamp, fromKey, isNum } from '../core/util.js';
-import { $, h, polar, reduced, roll } from './motion.js?v=10';
+import { $, h, polar, reduced, roll } from './motion.js?v=11';
 import { date as fmtDate, getLang, num, strings } from '../i18n.js';
 
 const t = strings({

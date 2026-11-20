@@ -224,6 +224,7 @@ strong { font-weight: 700; }
   font-size: clamp(44px, 7vw, 112px); line-height: .88; letter-spacing: -.03em;
 }
 .welcome-title span { display: block; white-space: nowrap; }
+@media (max-width: 380px) { .welcome-title { font-size: 12.4vw; } }
 .welcome-title em { font-style: normal; color: var(--oranje); }
 .welcome-lede { max-width: 46ch; font-size: clamp(17px, 1.35vw, 20px); color: var(--mute); }
 .welcome-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 32px 0 14px; }

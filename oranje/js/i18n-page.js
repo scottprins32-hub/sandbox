@@ -112,7 +112,7 @@ export const pageText = strings({
     "tabSleep": "Slaap",
     "tabClimb": "Klim",
     "wEyebrow": "Voor Fitbit Air",
-    "wTitle": "<span>Elke hartslag,</span> <span>in het <em>oranje</em>.</span>",
+    "wTitle": "<span>Elke slag,</span> <span>in <em>oranje</em>.</span>",
     "wLede": "Strain, herstel en slaap per dag, berekend uit je eigen hartslag. Log één keer in met het Google-account waar je Fitbit Air mee synchroniseert, en de rest tekent zichzelf.",
     "wConnect": "Google-account koppelen",
     "wWhoop": "WHOOP-scores",

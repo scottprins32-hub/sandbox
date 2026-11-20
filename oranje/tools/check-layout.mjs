@@ -2,18 +2,19 @@
 // heading and big number must fit inside its own box and inside the screen,
 // also after the reveal animation has run. Needs Playwright and a running
 // server: npm run serve, then npm run check:layout. Set CHROMIUM_PATH to use a
-// browser other than the one bundled with the installed Playwright.
+// browser other than the one bundled with the installed Playwright. Set
+// ORANJE_LANG=nl to check the Dutch text.
 import { chromium } from 'playwright';
 const BASE = process.argv[2] || 'http://localhost:4173/';
 const WIDTHS = [320, 360, 375, 390, 430, 600, 768, 820, 900, 1000, 1024, 1100, 1280, 1366, 1440, 1680, 1920];
-const PAGES = [['', true], ['#strain', true], ['#recovery', true], ['#sleep', true], ['#climb', true], ['privacy.html', false], ['terms.html', false]];
+const PAGES = [['', false], ['', true], ['#strain', true], ['#recovery', true], ['#sleep', true], ['#climb', true], ['privacy.html', false], ['terms.html', false]];
 (async () => {
   const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   let problems = 0;
   for (const [path, demo] of PAGES) {
     for (const w of WIDTHS) {
       const p = await b.newPage({ viewport: { width: w, height: 900 } });
-      await p.addInitScript(() => { sessionStorage.setItem('oranje.seen', '1'); localStorage.setItem('oranje.game.seen', '{"demo":{"badges":["x"],"level":99}}'); });
+      await p.addInitScript((lang) => { if (lang) localStorage.setItem('oranje.lang', lang); sessionStorage.setItem('oranje.seen', '1'); localStorage.setItem('oranje.game.seen', '{"demo":{"badges":["x"],"level":99}}'); }, process.env.ORANJE_LANG || '');
       await p.goto(BASE + path, { waitUntil: 'load' });
       if (demo) {
         await p.click('#btn-demo'); await p.waitForTimeout(1200);

@@ -4,7 +4,7 @@
 // tab bar, where the thumb is.
 
 import { getLang, strings } from '../i18n.js';
-import { h } from './motion.js?v=10';
+import { h } from './motion.js?v=11';
 
 const ui = strings({
   en: { close: 'Close', label: 'Explain: {title}', tip: 'What does this mean?' },

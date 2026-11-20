@@ -87,6 +87,10 @@ Owner setup for the existing Base44 app:
 
 The Base44 WHOOP functions proxy the API because it does not allow cross-origin browser requests. They use a separate encrypted browser cookie for each WHOOP session and do not persist health records. **Disconnect** clears the browser session and requests revocation at WHOOP. If WHOOP cannot confirm revocation, remove Oranje from Connected Apps in WHOOP.
 
+## Languages
+
+Oranje speaks English and Dutch. A browser set to Dutch starts in Dutch, everyone else in English; the **NL / EN** button in the header and *Language* in settings switch it, and the choice is kept per browser. `js/i18n.js` holds the language, the translators and number formats (Dutch uses a decimal comma); `js/terms.js` the shared words (band, zone and sleep names); each module keeps its own English and Dutch strings next to its code, and `js/i18n-page.js` the page text. The privacy and terms pages are written in Dutch, with an English translation (`js/legal.js`). `ORANJE_LANG=nl npm run check:layout` checks the Dutch layout.
+
 ## Which source leads
 
 What a wearable measured or scored comes first; phone apps and Oranje's own estimates fill gaps (`js/core/sources.js`, `js/data/health.js`).
