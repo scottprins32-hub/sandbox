@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dubbel Radarbord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Modern Pitching Design System: dark only, pure black, one orange, Oswald over Nunito.
+     Layout: the app's top bar, then two Panels side by side, one per group. The last velo fills
+     each Panel; a split stat card and a strip of recent pitches sit under it.
+     With one radar linked the other Panel leaves and the one that stays takes the whole screen:
+     stacked when the iPad stands upright, velo left and numbers right when it lies on its side.
+     Written for Safari 14 (iPadOS 14.3): no flex gap, no inset, no aspect-ratio, no logical properties. */
+  --background:#000000;
+  --foreground:#ffffff;
+  --primary:#ff9900;
+  --zinc-300:#c2c2c8;
+  --zinc-400:#9b9ba3;
+  --zinc-500:#6e6e76;
+  --zinc-500-text:#86868e;
+  --zinc-700:#2c2c31;
+  --zinc-800:#1f1f23;
+  --zinc-900:#111113;
+  --zinc-950:#0a0a0b;
+  --orange-400:#ffb340;
+  --orange-500:#ff9b00;
+  --orange-600:#e07f00;
+  --orange-40:rgba(255,155,0,.4);
+  --orange-tint:rgba(255,155,0,.1);
+  --orange-ring:rgba(255,155,0,.2);
+  --orange-active:rgba(255,155,0,.15);
+  --emerald-400:#4ade80;
+  --emerald-tint:rgba(34,197,94,.1);
+  --emerald-line:rgba(34,197,94,.2);
+  --amber-400:#fbbf24;
+  --amber-tint:rgba(245,158,11,.1);
+  --amber-line:rgba(245,158,11,.2);
+  --red-400:#f87171;
+  --red-500:#ef4444;
+  --red-tint:rgba(239,68,68,.1);
+  --red-line:rgba(239,68,68,.25);
+  --hairline:rgba(255,255,255,.08);
+  --hairline-panel:rgba(255,255,255,.07);
+  --divider:rgba(255,255,255,.06);
+  --chrome-hairline:rgba(255,255,255,.12);
+  --panel-top:rgba(17,17,19,.5);
+  --surface-60:rgba(17,17,19,.6);
+  --seam-dot:rgba(255,255,255,.05);
+  --sheet-close-bg:rgba(255,255,255,.09);
+  --overlay:rgba(0,0,0,.8);
+  --shadow-glow-accent:0 4px 12px -4px rgba(255,155,0,.28);
+  --shadow-focus-ring:0 0 0 2px #000000,0 0 0 4px #ff9900;
+  --shadow-overlay:0 24px 64px rgba(0,0,0,.7);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --font-display:Oswald,"Arial Narrow",sans-serif;
+  --font-sans:Nunito,"Segoe UI",sans-serif;
+  --font-system:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{
+  background:var(--background);color:var(--foreground);
+  font-family:var(--font-sans);font-size:16px;line-height:24px;font-weight:400;
+  font-synthesis:none;-webkit-font-smoothing:antialiased;
+  display:grid;grid-template-rows:auto minmax(0,1fr);
+  overflow:hidden;-webkit-text-size-adjust:100%;touch-action:manipulation;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+::selection{background:var(--orange-500);color:#000}
+
+.label-micro{font-family:var(--font-sans);font-size:11px;line-height:1.5;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.data-numeral{font-family:var(--font-display);font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+
+/* ---------- buttons: one pill, Nunito 700, 44px on touch ---------- */
+.btn{
+  display:inline-block;height:44px;padding:0 20px;border:1px solid transparent;border-radius:9999px;
+  background:transparent;color:#fff;
+  font-size:14px;line-height:20px;font-weight:700;letter-spacing:.005em;white-space:nowrap;
+  transition:transform 120ms var(--ease),background-color 120ms var(--ease),border-color 120ms var(--ease),color 120ms var(--ease);
+}
+.btn:focus{outline:none}
+.btn:focus-visible{box-shadow:var(--shadow-focus-ring)}
+.btn:active{transform:scale(.97)}
+.btn svg{width:16px;height:16px;margin-right:8px;vertical-align:-3px;pointer-events:none}
+.btn--default{background:var(--primary);color:#000;box-shadow:var(--shadow-glow-accent)}
+.btn--default:active{background:var(--orange-600)}
+.btn--outline{border-color:var(--zinc-700)}
+.btn--secondary{background:var(--zinc-800)}
+.btn--secondary[aria-pressed="true"]{background:var(--orange-active);border-color:var(--orange-ring);color:var(--orange-400)}
+.btn--destructive{background:var(--red-tint);color:var(--red-500);border-color:var(--red-line)}
+.btn--sm{padding:0 14px;font-size:13px}
+@media (hover:hover){
+  .btn--default:hover{background:var(--orange-400)}
+  .btn--outline:hover{background:var(--zinc-900);border-color:var(--zinc-500)}
+  .btn--secondary:hover{background:var(--zinc-700)}
+  .btn--destructive:hover{background:rgba(239,68,68,.2)}
+}
+
+/* ---------- top bar ---------- */
+.bar{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+  padding:10px 16px;background:var(--background);
+}
+.brand{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;min-width:0}
+.brand img{display:block;height:32px;width:auto}
+.brand h1{margin:0;font-family:var(--font-display);font-size:18px;line-height:22px;font-weight:600;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap}
+.brand p{margin:0;color:var(--zinc-500-text);white-space:nowrap}
+.brand .demo{color:var(--orange-400)}
+.brand .demo i{
+  display:inline-block;width:6px;height:6px;margin:0 6px 1px 8px;border-radius:50%;background:var(--orange-400);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.tools{display:grid;grid-auto-flow:column;align-items:center;gap:8px}
+.tabs{
+  display:grid;grid-auto-flow:column;align-items:center;height:44px;padding:4px;
+  border:1px solid var(--hairline);border-radius:9999px;background:var(--zinc-950);color:var(--zinc-400);
+}
+.tab{
+  height:34px;padding:0 14px;border:0;border-radius:9999px;background:transparent;color:inherit;
+  font-size:13px;line-height:1.5;font-weight:700;white-space:nowrap;transition:all 120ms var(--ease);
+}
+.tab:focus{outline:none}
+.tab:focus-visible{box-shadow:var(--shadow-focus-ring)}
+.tab[aria-pressed="true"]{background:var(--zinc-800);color:#fff;box-shadow:inset 0 -2px 0 #ff9b00}
+
+/* ---------- the two Panels ---------- */
+.lanes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:4px 16px 16px;min-height:0}
+.lane{
+  position:relative;overflow:hidden;min-width:0;min-height:0;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:12px;
+  padding:16px;border:1px solid var(--hairline-panel);border-radius:16px;
+  background:linear-gradient(to bottom,var(--panel-top),var(--zinc-950));
+}
+.lane::before{ /* the accent bar */
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;
+  background:linear-gradient(to right,var(--orange-500),var(--orange-40),transparent);
+}
+.lane::after{ /* seams, masked in from the right */
+  content:"";position:absolute;top:0;right:0;bottom:0;width:55%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px,var(--seam-dot) 1px,transparent 0);background-size:18px 18px;
+  -webkit-mask-image:linear-gradient(to left,#000,transparent);mask-image:linear-gradient(to left,#000,transparent);
+}
+.lane > *{position:relative;z-index:1}
+
+.head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.gname{
+  width:100%;min-width:0;height:44px;padding:0;border:0;border-bottom:2px solid transparent;border-radius:0;
+  background:transparent;color:#fff;
+  font-family:var(--font-display);font-size:30px;line-height:1;font-weight:600;letter-spacing:.01em;text-transform:uppercase;
+}
+.gname:focus{outline:0;border-bottom-color:var(--orange-500)}
+
+/* radar link: the orange button until a radar is linked, then a status pill with its word */
+.link{max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.link .dot{display:none;width:6px;height:6px;margin:0 8px 2px 0;border-radius:50%;background:currentColor;vertical-align:middle}
+.link[data-state="off"]{background:var(--primary);color:#000;box-shadow:var(--shadow-glow-accent)}
+.link[data-state="busy"]{background:var(--amber-tint);color:var(--amber-400);border-color:var(--amber-line)}
+.link[data-state="on"]{background:var(--emerald-tint);color:var(--emerald-400);border-color:var(--emerald-line)}
+.link[data-state="lost"],.link[data-state="armed"]{background:var(--red-tint);color:var(--red-400);border-color:var(--red-line)}
+.link:not([data-state="off"]) svg{display:none}
+.link:not([data-state="off"]) .dot{display:inline-block}
+.link[data-state="lost"] .dot,.link[data-state="busy"] .dot{animation:pulse 1.2s ease-in-out infinite}
+
+.read{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0}
+.numwrap{display:grid;place-items:center;min-height:0;min-width:0;overflow:hidden}
+.num{font-size:200px;line-height:1;white-space:nowrap;color:#fff;position:relative;top:-.045em}
+.num.idle{color:var(--zinc-700)}
+.meta{text-align:center;color:var(--zinc-500-text);padding-top:4px;min-height:21px}
+.meta b{color:var(--zinc-300);font-weight:800}
+.flag{
+  position:absolute;top:0;right:0;padding:2px 10px;border-radius:9999px;
+  background:var(--primary);color:#000;font-size:12px;line-height:16px;font-weight:700;
+}
+.lane.hit .num{animation:hit 900ms var(--ease)}
+@keyframes hit{0%{color:var(--orange-400);transform:scale(1.04)}50%{color:var(--orange-400)}100%{transform:none}}
+@keyframes pulse{50%{opacity:.25}}
+
+/* split stat card: three numbers in one card, split by divider rules */
+.stats{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;
+  border:1px solid var(--hairline);border-radius:12px;background:var(--surface-60);
+}
+.stat{padding:10px 16px;border-left:1px solid var(--divider);min-width:0}
+.stat:first-child{border-left:0}
+.stat dt{color:var(--zinc-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat dd{margin:4px 0 0;font-size:36px;white-space:nowrap}
+.stat .unit{margin-left:4px;font-size:14px;font-weight:400;color:var(--zinc-500-text)}
+
+/* recent pitches, newest first */
+.tape{
+  display:grid;grid-auto-flow:column;grid-auto-columns:56px;justify-content:start;min-height:58px;
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  border:1px solid var(--hairline);border-radius:12px;background:var(--surface-60);
+}
+.tape::-webkit-scrollbar{display:none}
+.tape:focus{outline:none}
+.tape:focus-visible{box-shadow:var(--shadow-focus-ring)}
+.cell{display:grid;grid-template-rows:auto auto;justify-items:center;align-content:center;padding:6px 0;border-right:1px solid var(--divider)}
+.cell .n{font-size:12px;line-height:16px;color:var(--zinc-500-text)}
+.cell .v{font-size:24px}
+.cell.lbl{position:-webkit-sticky;position:sticky;left:0;z-index:1;justify-items:start;padding-left:12px;background:var(--zinc-900);color:var(--zinc-400)}
+.cell.lbl span{line-height:20px}
+.cell.top{box-shadow:inset 0 -2px 0 #ff9b00}
+.cell.top .v{color:var(--orange-400)}
+.tape .none{align-self:center;padding:0 14px;white-space:nowrap;color:var(--zinc-500-text);font-size:14px;line-height:20px}
+
+.acts{display:grid;grid-auto-flow:column;justify-content:start;gap:8px}
+
+/* ---------- settings: a side sheet from the right ---------- */
+.scrim{position:fixed;top:0;right:0;bottom:0;left:0;z-index:49;background:var(--overlay)}
+.sheet{
+  position:fixed;top:0;right:0;bottom:0;z-index:50;width:400px;max-width:100%;
+  padding:16px 20px 32px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--background);border-left:1px solid var(--zinc-800);box-shadow:var(--shadow-overlay);
+  transform:translateX(100%);visibility:hidden;transition:transform 320ms var(--ease),visibility 0s 320ms;
+}
+.sheet.open{transform:none;visibility:visible;transition:transform 320ms var(--ease)}
+.sheet header{display:grid;grid-template-columns:1fr auto;align-items:center;min-height:44px}
+.sheet h2{margin:0;font-family:var(--font-display);font-size:28px;line-height:1;font-weight:600;letter-spacing:.01em;text-transform:uppercase}
+.sheet h3{
+  margin:24px 0 6px;padding-top:16px;border-top:1px solid var(--divider);
+  font-family:var(--font-display);font-size:15px;line-height:1.25;font-weight:600;letter-spacing:.02em;text-transform:uppercase;
+}
+.sheet p{margin:0 0 12px;font-size:14px;line-height:20px;color:var(--zinc-400)}
+.close{
+  width:44px;height:44px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--zinc-300);
+  display:grid;place-items:center;
+}
+.close span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--sheet-close-bg)}
+.close svg{width:16px;height:16px}
+.close:focus{outline:none}
+.close:focus-visible span{box-shadow:var(--shadow-focus-ring)}
+.field{display:grid;gap:8px;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{font-size:14px;line-height:1.2;font-weight:500}
+.field input,.field select{
+  width:100%;height:44px;padding:0 12px;border:1px solid var(--zinc-800);border-radius:12px;
+  background:var(--zinc-900);color:#fff;font-size:16px;
+}
+.field input::placeholder{color:var(--zinc-400)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--orange-500);box-shadow:0 0 0 1px #ff9900}
+.check{grid-template-columns:auto 1fr;align-items:center;gap:12px}
+.check input{width:20px;height:20px;padding:0;accent-color:var(--orange-500)}
+.log{
+  margin:0;padding:10px 12px;max-height:240px;overflow:auto;-webkit-overflow-scrolling:touch;
+  background:var(--zinc-950);border:1px solid var(--hairline);border-radius:12px;color:var(--zinc-300);
+  font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre;-webkit-user-select:text;user-select:text;
+}
+.log:focus{outline:none;border-color:var(--orange-500)}
+
+/* toast: top centre, in the system font */
+.toast{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;
+  width:356px;max-width:calc(100% - 24px);padding:16px;border-radius:8px;
+  background:hsl(0,0%,0%);border:1px solid hsl(0,0%,20%);color:hsl(0,0%,99%);
+  font:500 13px/1.5 var(--font-system);box-shadow:0 4px 12px rgba(0,0,0,.1);
+}
+.toast.error{background:hsl(358,76%,10%);border-color:hsl(357,89%,16%);color:hsl(358,100%,81%)}
+
+/* ---------- one radar linked: a single Panel ---------- */
+.lanes.solo{grid-template-columns:minmax(0,1fr)}
+.lanes.solo .gname{font-size:34px}
+.lanes.solo .stat dd{font-size:44px}
+@media (orientation:landscape) and (min-width:701px) and (min-height:481px){
+  .lanes.solo .lane{
+    grid-template-columns:minmax(0,1fr) minmax(280px,32%);
+    grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:16px;
+  }
+  .lanes.solo .head{grid-column:1 / -1}
+  .lanes.solo .read{grid-column:1;grid-row:2 / -1}
+  .lanes.solo .stats{grid-column:2;grid-row:2;grid-template-columns:minmax(0,1fr)}
+  .lanes.solo .stat{border-left:0;border-top:1px solid var(--divider)}
+  .lanes.solo .stat:first-child{border-top:0}
+  /* the strip of recent pitches wraps into rows and scrolls down instead of sideways */
+  .lanes.solo .tape{
+    grid-column:2;grid-row:3;align-self:stretch;align-content:start;
+    grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));grid-auto-rows:auto;
+    overflow-x:hidden;overflow-y:auto;
+  }
+  .lanes.solo .cell{border-bottom:1px solid var(--divider)}
+  .lanes.solo .cell.lbl{
+    grid-column:1 / -1;position:static;grid-template-rows:none;grid-auto-flow:column;
+    justify-content:start;column-gap:8px;padding:8px 12px;
+  }
+  .lanes.solo .tape .none{grid-column:1 / -1;padding:12px 14px}
+  .lanes.solo .acts{grid-column:2;grid-row:4}
+}
+
+/* ---------- iPad upright with two Panels: the bar takes two rows, the stat card drops its units ---------- */
+@media (max-width:900px){
+  .bar{grid-template-columns:minmax(0,1fr)}
+  .tools{justify-content:start}
+  .lanes:not(.solo) .stat{padding:10px 12px}
+  .lanes:not(.solo) .stat dd{font-size:32px}
+  .lanes:not(.solo) .stat .unit{display:none}
+  .lanes:not(.solo) .acts .btn{padding:0 12px}
+}
+
+/* ---------- narrow or very low screens: Panels stack and the page scrolls ---------- */
+@media (max-height:480px){
+  body{overflow:auto;display:block}
+  .lane{min-height:430px}
+}
+@media (max-width:700px){
+  body{overflow:auto;display:block}
+  .bar{grid-template-columns:minmax(0,1fr)}
+  .tools{justify-content:start;grid-auto-flow:row;grid-template-columns:repeat(2,auto)}
+  .lanes{grid-template-columns:minmax(0,1fr)}
+  .lane{min-height:470px}
+  .gname{font-size:26px}
+  .stat{padding:10px 12px}
+  .stat dd{font-size:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lane.hit .num,.link .dot,.brand .demo i{animation:none!important}
+  .sheet,.sheet.open{transition:none}
+  .btn{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">
+    <img src="mp-logo.png" width="65" height="32" alt="">
+    <div>
+      <h1>Modern Pitching</h1>
+      <p class="label-micro">Radarbord<span class="demo" id="demoTag" hidden><i></i>Voorbeelddata</span></p>
+    </div>
+  </div>
+  <div class="tools">
+    <div class="tabs" role="group" aria-label="Eenheid">
+      <button type="button" class="tab" id="unitMph" aria-pressed="true">mph</button>
+      <button type="button" class="tab" id="unitKmh" aria-pressed="false">km/h</button>
+    </div>
+    <button type="button" class="btn btn--outline" id="addBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg>Tweede radar koppelen</button>
+    <button type="button" class="btn btn--secondary" id="demoBtn" aria-pressed="false">Demo</button>
+    <button type="button" class="btn btn--outline" id="setBtn">Instellingen</button>
+    <button type="button" class="btn btn--destructive" id="clearAll">Alles wissen</button>
+  </div>
+</header>
+
+<main class="lanes" id="lanes">
+  <section class="lane" id="lane0" aria-label="Groep 1">
+    <div class="head">
+      <input class="gname" id="name0" type="text" maxlength="16" value="Groep 1" aria-label="Naam van groep 1" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn link" id="chip0" data-state="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg><span class="dot"></span><span class="lbl">Radar koppelen</span></button>
+    </div>
+    <div class="read">
+      <div class="numwrap" id="wrap0"><span class="num data-numeral idle" id="num0" aria-live="polite">--</span></div>
+      <div class="meta label-micro" id="meta0">Wacht op de eerste pitch</div>
+      <span class="flag" id="flag0" hidden>Nieuwe top velo</span>
+    </div>
+    <dl class="stats">
+      <div class="stat"><dt class="label-micro">Top velo</dt><dd class="data-numeral"><span id="top0">--</span><span class="unit" data-unit></span></dd></div>
+      <div class="stat"><dt class="label-micro">Gem. velo</dt><dd class="data-numeral"><span id="avg0">--</span><span class="unit" data-unit></span></dd></div>
+      <div class="stat"><dt class="label-micro">Pitches</dt><dd class="data-numeral" id="cnt0">0</dd></div>
+    </dl>
+    <div class="tape" id="tape0" tabindex="0" aria-label="Laatste pitches van groep 1, nieuwste eerst"></div>
+    <div class="acts">
+      <button type="button" class="btn btn--secondary btn--sm" id="undo0">Laatste pitch wissen</button>
+      <button type="button" class="btn btn--destructive btn--sm" id="clear0">Groep wissen</button>
+    </div>
+  </section>
+
+  <section class="lane" id="lane1" aria-label="Groep 2">
+    <div class="head">
+      <input class="gname" id="name1" type="text" maxlength="16" value="Groep 2" aria-label="Naam van groep 2" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn link" id="chip1" data-state="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg><span class="dot"></span><span class="lbl">Radar koppelen</span></button>
+    </div>
+    <div class="read">
+      <div class="numwrap" id="wrap1"><span class="num data-numeral idle" id="num1" aria-live="polite">--</span></div>
+      <div class="meta label-micro" id="meta1">Wacht op de eerste pitch</div>
+      <span class="flag" id="flag1" hidden>Nieuwe top velo</span>
+    </div>
+    <dl class="stats">
+      <div class="stat"><dt class="label-micro">Top velo</dt><dd class="data-numeral"><span id="top1">--</span><span class="unit" data-unit></span></dd></div>
+      <div class="stat"><dt class="label-micro">Gem. velo</dt><dd class="data-numeral"><span id="avg1">--</span><span class="unit" data-unit></span></dd></div>
+      <div class="stat"><dt class="label-micro">Pitches</dt><dd class="data-numeral" id="cnt1">0</dd></div>
+    </dl>
+    <div class="tape" id="tape1" tabindex="0" aria-label="Laatste pitches van groep 2, nieuwste eerst"></div>
+    <div class="acts">
+      <button type="button" class="btn btn--secondary btn--sm" id="undo1">Laatste pitch wissen</button>
+      <button type="button" class="btn btn--destructive btn--sm" id="clear1">Groep wissen</button>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" aria-label="Instellingen" aria-hidden="true">
+  <header>
+    <h2>Instellingen</h2>
+    <button type="button" class="close" id="setClose" aria-label="Sluiten"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
+  </header>
+
+  <h3>Radar via Bluetooth</h3>
+  <p>Neem deze codes over uit nRF Connect. Een wijziging geldt nadat je de radar opnieuw koppelt.</p>
+  <div class="field">
+    <label for="setService">Service UUID</label>
+    <input id="setService" type="text" placeholder="FFE0 of de volledige code" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </div>
+  <div class="field">
+    <label for="setChar">Characteristic UUID (leeg is alle kanalen met meldingen)</label>
+    <input id="setChar" type="text" placeholder="FFE1 of de volledige code" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </div>
+
+  <h3>Velo uitlezen</h3>
+  <p>Zo haalt het bord de velo uit elk bericht van de radar. Controleer het met de ruwe data hieronder.</p>
+  <div class="field">
+    <label for="setMode">Formaat</label>
+    <select id="setMode">
+      <option value="text">Tekst, eerste getal in het bericht</option>
+      <option value="u8">1 byte</option>
+      <option value="u16le">2 bytes, laagste eerst</option>
+      <option value="u16be">2 bytes, hoogste eerst</option>
+    </select>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="setOffset">Positie van de byte</label>
+      <input id="setOffset" type="number" min="0" max="64" step="1" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label for="setDiv">Delen door</label>
+      <input id="setDiv" type="number" min="1" max="1000" step="1" inputmode="numeric">
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="setSrc">Radar meet in</label>
+      <select id="setSrc">
+        <option value="mph">mph</option>
+        <option value="kmh">km/h</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="setMin">Negeer metingen onder</label>
+      <input id="setMin" type="number" min="0" max="200" step="1" inputmode="numeric">
+    </div>
+  </div>
+
+  <h3>Weergave</h3>
+  <div class="field check">
+    <input id="setDec" type="checkbox">
+    <label for="setDec">Toon velo met 1 decimaal</label>
+  </div>
+
+  <h3>Ruwe data van de radars</h3>
+  <p>Elk bericht dat binnenkomt, nieuwste bovenaan: tijd, groep, kanaal, bytes en dezelfde bytes als tekst.</p>
+  <pre class="log" id="log" tabindex="0">Nog niets ontvangen. Koppel een radar en gooi een pitch.</pre>
+  <div class="acts" style="margin-top:12px">
+    <button type="button" class="btn btn--secondary btn--sm" id="logClear">Log wissen</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KMH = 1.609344;
+  var STORE = 'dubbel-radarbord.v1';
+  var BASE_UUID = '-0000-1000-8000-00805f9b34fb';
+  var LOG_EMPTY = 'Nog niets ontvangen. Koppel een radar en gooi een pitch.';
+
+  var cfg = {
+    service: '6e0ffff0-19c8-039b-b046-b395e3a2a3b4', // Smart Coach service, read from SC-339 in nRF Connect
+    char: '',                        // empty: every channel that notifies
+    linked: false,                   // true once a radar has been linked on this device
+    mode: 'text', offset: 0, div: 1, // how to read the velo from a packet
+    src: 'mph', min: 25,             // unit the radar reports in; readings below min are dropped
+    dec: false, unit: 'mph',
+    names: ['Groep 1', 'Groep 2']
+  };
+
+  function lane(i) {
+    return { i: i, throws: [], dev: null, manual: false, state: 'off', retry: null, lastAt: 0, flagT: null, armT: null, upAt: 0, quick: 0 };
+  }
+  var G = [lane(0), lane(1)];
+  var log = [];
+  var demo = { on: false, timers: [null, null] };
+
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- storage ---------- */
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORE);
+      if (!raw) return;
+      var d = JSON.parse(raw);
+      if (d.cfg) Object.keys(cfg).forEach(function (k) {
+        if (d.cfg[k] === undefined) return;
+        if (k === 'service' && !d.cfg[k]) return; // keep the built-in service when none was saved
+        cfg[k] = d.cfg[k];
+      });
+      if (d.throws) [0, 1].forEach(function (i) { if (Array.isArray(d.throws[i])) G[i].throws = d.throws[i]; });
+    } catch (e) { /* nothing stored yet, or storage is unavailable */ }
+  }
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({
+        cfg: cfg,
+        throws: G.map(function (s) { return s.throws.filter(function (t) { return !t.demo; }); })
+      }));
+    } catch (e) { /* storage unavailable: the board still works for this session */ }
+  }
+
+  /* ---------- numbers ---------- */
+  function inUnit(mph) { return cfg.unit === 'kmh' ? mph * KMH : mph; }
+  function fmt(mph) {
+    var v = inUnit(mph);
+    return cfg.dec ? v.toFixed(1).replace('.', ',') : String(Math.round(v));
+  }
+  function unitLabel() { return cfg.unit === 'kmh' ? 'km/h' : 'mph'; }
+  function clock(t) {
+    var d = new Date(t);
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function topOf(list) {
+    var m = -1, at = -1;
+    for (var k = 0; k < list.length; k++) if (list[k].v > m) { m = list[k].v; at = k; }
+    return at;
+  }
+
+  /* ---------- rendering ---------- */
+  // Height of a digit as a share of the font size, measured once the display face is in.
+  var digitH = 0;
+  function digitRatio() {
+    if (digitH) return digitH;
+    var r = 0;
+    try {
+      var c = document.createElement('canvas').getContext('2d');
+      c.font = '600 100px ' + getComputedStyle($('num0')).fontFamily;
+      var m = c.measureText('0');
+      if (m.actualBoundingBoxAscent) r = (m.actualBoundingBoxAscent + (m.actualBoundingBoxDescent || 0)) / 100;
+    } catch (e) { /* fall back below */ }
+    digitH = (r > 0.5 && r < 1) ? r : 0.82;
+    return digitH;
+  }
+  function fit(i) {
+    var wrap = $('wrap' + i), num = $('num' + i);
+    var bw = wrap.clientWidth, bh = wrap.clientHeight;
+    if (!bw || !bh) return;
+    num.style.fontSize = '100px';
+    var w = num.offsetWidth || 1;
+    var size = Math.floor(Math.min(bw * 0.92 / w * 100, bh * 0.9 / digitRatio()));
+    num.style.fontSize = Math.max(48, size) + 'px';
+  }
+  function fitAll() { fit(0); fit(1); }
+
+  function render(i, fx) {
+    var s = G[i], list = s.throws, n = list.length;
+    var num = $('num' + i), meta = $('meta' + i);
+
+    if (n) {
+      var last = list[n - 1];
+      num.textContent = fmt(last.v);
+      num.className = 'num data-numeral';
+      meta.innerHTML = '<b>' + unitLabel() + '</b> &middot; pitch ' + n + ' &middot; ' + clock(last.t);
+    } else {
+      num.textContent = '--';
+      num.className = 'num data-numeral idle';
+      meta.textContent = 'Wacht op de eerste pitch';
+    }
+
+    var ti = topOf(list);
+    $('top' + i).textContent = n ? fmt(list[ti].v) : '--';
+    if (n) {
+      var sum = 0;
+      for (var k = 0; k < n; k++) sum += inUnit(list[k].v);
+      $('avg' + i).textContent = (sum / n).toFixed(1).replace('.', ',');
+    } else {
+      $('avg' + i).textContent = '--';
+    }
+    $('cnt' + i).textContent = String(n);
+    var units = $('lane' + i).querySelectorAll('[data-unit]');
+    for (var u = 0; u < units.length; u++) units[u].textContent = n ? unitLabel() : '';
+
+    var html = '<div class="cell lbl label-micro"><span>pitch</span><span>' + unitLabel() + '</span></div>';
+    if (!n) html += '<span class="none">Nog geen pitches</span>';
+    for (var j = n - 1; j >= 0 && j >= n - 40; j--) {
+      html += '<div class="cell' + (j === ti ? ' top' : '') + '"><span class="n">' + (j + 1) + '</span><span class="v data-numeral">' + fmt(list[j].v) + '</span></div>';
+    }
+    var tape = $('tape' + i);
+    tape.innerHTML = html;
+    tape.scrollLeft = 0;
+
+    fit(i);
+
+    if (fx && fx.hit) {
+      var el = $('lane' + i);
+      el.classList.remove('hit');
+      void el.offsetWidth;
+      el.classList.add('hit');
+    }
+    var flag = $('flag' + i);
+    if (fx && fx.top) {
+      flag.hidden = false;
+      clearTimeout(s.flagT);
+      s.flagT = setTimeout(function () { flag.hidden = true; }, 4000);
+    } else if (fx && fx.hit) {
+      clearTimeout(s.flagT);
+      flag.hidden = true;
+    }
+  }
+  function renderAll() { render(0); render(1); }
+
+  var CHIP = { off: 'Radar koppelen', busy: 'Verbinden…', on: 'Radar gekoppeld', lost: 'Verbinding weg…', armed: 'Ontkoppelen?' };
+  function setState(i, state, label) {
+    var chip = $('chip' + i);
+    G[i].state = state;
+    chip.setAttribute('data-state', state);
+    chip.querySelector('.lbl').textContent = label || CHIP[state];
+    layout();
+  }
+
+  // One radar linked: only its Panel shows. None or both linked: both Panels show.
+  function layout() {
+    var a = !!G[0].dev, b = !!G[1].dev;
+    var solo = a !== b;
+    $('lanes').classList.toggle('solo', solo);
+    $('lane0').hidden = solo && !a;
+    $('lane1').hidden = solo && !b;
+    $('addBtn').hidden = !solo;
+    fitAll();
+  }
+
+  var toastT = null;
+  function toast(msg, kind) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (kind ? ' ' + kind : '');
+    t.hidden = false;
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { t.hidden = true; }, 6000);
+  }
+
+  /* ---------- pitches ---------- */
+  function push(i, mph, isDemo) {
+    var s = G[i], list = s.throws;
+    var ti = topOf(list);
+    var isTop = list.length > 0 && mph > list[ti].v;
+    list.push({ v: mph, t: Date.now(), demo: !!isDemo });
+    if (list.length > 400) list.shift();
+    render(i, { hit: true, top: isTop });
+    if (!isDemo) save();
+  }
+  // A reading from a radar, in the unit the radar reports.
+  function fromRadar(i, raw) {
+    var s = G[i], now = Date.now();
+    if (!(raw >= cfg.min) || raw > 250) return;
+    if (now - s.lastAt < 700) return; // the same pitch reported twice
+    s.lastAt = now;
+    push(i, cfg.src === 'kmh' ? raw / KMH : raw, false);
+  }
+
+  /* ---------- demo ---------- */
+  function gauss(mean, sd) {
+    var u = 0;
+    for (var k = 0; k < 6; k++) u += Math.random();
+    return mean + (u - 3) * sd;
+  }
+  function demoTick(i) {
+    demo.timers[i] = setTimeout(function () {
+      if (!$('lane' + i).hidden) push(i, gauss(i ? 71 : 77, 2.6), true);
+      demoTick(i);
+    }, 2800 + Math.random() * 4200);
+  }
+  function demoStart(seed) {
+    if (demo.on) return;
+    demo.on = true;
+    if (seed) {
+      var sets = [[74, 77, 76, 79, 78, 81, 80], [69, 72, 71, 70, 74, 73]];
+      var now = Date.now();
+      sets.forEach(function (arr, i) {
+        arr.forEach(function (v, k) {
+          G[i].throws.push({ v: v, t: now - (arr.length - k) * 21000 - i * 8000, demo: true });
+        });
+      });
+      renderAll();
+    }
+    demoTick(0); demoTick(1);
+    demoUi();
+  }
+  function demoStop() {
+    if (!demo.on) return;
+    demo.on = false;
+    clearTimeout(demo.timers[0]); clearTimeout(demo.timers[1]);
+    G.forEach(function (s) { s.throws = s.throws.filter(function (t) { return !t.demo; }); });
+    renderAll();
+    demoUi();
+  }
+  function demoUi() {
+    $('demoTag').hidden = !demo.on;
+    $('demoBtn').setAttribute('aria-pressed', demo.on ? 'true' : 'false');
+  }
+
+  /* ---------- Bluetooth ---------- */
+  function uuid(s) {
+    s = String(s || '').trim().toLowerCase().replace(/^0x/, '');
+    if (/^[0-9a-f]{4}$/.test(s)) return '0000' + s + BASE_UUID;
+    if (/^[0-9a-f]{8}$/.test(s)) return s + BASE_UUID;
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(s)) return s;
+    return null;
+  }
+
+  function decode(dv) {
+    var o = cfg.offset | 0, v;
+    if (cfg.mode === 'text') {
+      var txt = '';
+      for (var k = 0; k < dv.byteLength; k++) txt += String.fromCharCode(dv.getUint8(k));
+      var m = txt.match(/\d+(?:[.,]\d+)?/);
+      if (!m) return null;
+      v = parseFloat(m[0].replace(',', '.'));
+    } else if (cfg.mode === 'u8') {
+      if (dv.byteLength < o + 1) return null;
+      v = dv.getUint8(o);
+    } else {
+      if (dv.byteLength < o + 2) return null;
+      v = dv.getUint16(o, cfg.mode === 'u16le');
+    }
+    return v / (Number(cfg.div) || 1);
+  }
+
+  function hexOf(dv) {
+    var hex = [], asc = '';
+    for (var k = 0; k < dv.byteLength; k++) {
+      var b = dv.getUint8(k);
+      hex.push((b < 16 ? '0' : '') + b.toString(16));
+      asc += (b >= 32 && b < 127) ? String.fromCharCode(b) : '.';
+    }
+    return hex.join(' ') + '  |' + asc + '|';
+  }
+  function short(u) { return String(u).slice(0, 8); }
+  // One line in the raw data log: what the radar sent, or what happened to the link.
+  function note(i, text) {
+    log.unshift(clock(Date.now()) + '  G' + (i + 1) + '  ' + text);
+    if (log.length > 120) log.pop();
+    if ($('sheet').classList.contains('open')) renderLog();
+  }
+  function onData(i, chUuid, dv) {
+    note(i, short(chUuid) + '  ' + hexOf(dv));
+    var v = decode(dv);
+    if (v !== null && isFinite(v)) fromRadar(i, v);
+  }
+  function renderLog() {
+    $('log').textContent = log.length ? log.join('\n') : LOG_EMPTY;
+  }
+
+  // Every channel of the radar's service. Where the browser cannot list them, try the numbered ones (…fff1 to …fff6).
+  async function listChars(svc) {
+    var cu = uuid(cfg.char);
+    if (cu) return [await svc.getCharacteristic(cu)];
+    try {
+      var all = await svc.getCharacteristics();
+      if (all && all.length) return all;
+    } catch (e) { /* fall through to the numbered channels */ }
+    var base = uuid(cfg.service), found = [];
+    for (var n = 1; n <= 6; n++) {
+      try { found.push(await svc.getCharacteristic(base.slice(0, 7) + n + base.slice(8))); } catch (e) { /* not there */ }
+    }
+    return found;
+  }
+
+  function propsOf(ch) {
+    var p = ch.properties || {}, out = [];
+    ['read', 'write', 'writeWithoutResponse', 'notify', 'indicate'].forEach(function (k) { if (p[k]) out.push(k); });
+    return out.join(', ') || 'onbekend';
+  }
+
+  // For the log only: what each channel can do and what it holds right now.
+  async function describe(i, chars) {
+    for (var k = 0; k < chars.length; k++) {
+      var ch = chars[k];
+      note(i, short(ch.uuid) + '  kanaal: ' + propsOf(ch));
+      if (ch.properties && ch.properties.read) {
+        try { note(i, short(ch.uuid) + '  leest ' + hexOf(await ch.readValue())); }
+        catch (e) { note(i, short(ch.uuid) + '  lezen lukte niet'); }
+      }
+    }
+  }
+
+  async function link(i, quiet) {
+    var s = G[i];
+    if (!quiet) setState(i, 'busy');
+    var server = await s.dev.gatt.connect();
+    s.upAt = Date.now();
+    note(i, 'verbonden met ' + (s.dev.name || 'radar'));
+    var svc = await server.getPrimaryService(uuid(cfg.service));
+    var chars = await listChars(svc);
+    // Switch the notifications on straight away: the radar drops a link that stays silent.
+    var n = 0;
+    for (var k = 0; k < chars.length; k++) {
+      var ch = chars[k];
+      if (!ch.properties || ch.properties.notify || ch.properties.indicate) {
+        try {
+          (function (c) {
+            c.addEventListener('characteristicvaluechanged', function (ev) { onData(i, c.uuid, ev.target.value); });
+          })(ch);
+          await ch.startNotifications();
+          note(i, short(ch.uuid) + '  meldingen aan');
+          n++;
+        } catch (e) { note(i, short(ch.uuid) + '  meldingen aanzetten lukte niet'); }
+      }
+    }
+    if (!n) throw new Error('Deze service heeft geen kanaal dat meldingen stuurt.');
+    setState(i, 'on', s.dev.name || CHIP.on);
+    describe(i, chars);
+  }
+
+  function onLost(i) {
+    var s = G[i];
+    if (s.manual || !s.dev) return;
+    if (s.upAt) {
+      var secs = Math.round((Date.now() - s.upAt) / 1000);
+      note(i, 'verbinding weg na ' + secs + ' s');
+      s.quick = secs < 60 ? s.quick + 1 : 0;
+      s.upAt = 0;
+      if (s.quick === 2) toast('De radar verbreekt de verbinding steeds na ongeveer ' + secs + ' s. Open Instellingen en maak een screenshot van de ruwe data.', 'error');
+    }
+    setState(i, 'lost');
+    var tries = 0;
+    (function again() {
+      clearTimeout(s.retry);
+      s.retry = setTimeout(function () {
+        if (s.manual || !s.dev) return;
+        link(i, true).catch(function () { tries++; again(); });
+      }, Math.min(5000, 1000 * (tries + 1)));
+    })();
+  }
+
+  async function connect(i) {
+    var s = G[i];
+    if (!navigator.bluetooth) {
+      toast('Deze browser heeft geen Bluetooth. Open de pagina in Bluefy op de iPad.', 'error');
+      return;
+    }
+    if (!uuid(cfg.service)) {
+      openSheet();
+      toast(cfg.service ? 'De Service UUID klopt niet. Gebruik 4 tekens (FFE0) of de volledige code.' : 'De Service UUID ontbreekt. Neem hem over uit nRF Connect.', 'error');
+      $('setService').focus();
+      return;
+    }
+    if (cfg.char && !uuid(cfg.char)) {
+      openSheet();
+      toast('De Characteristic UUID klopt niet. Gebruik 4 tekens of de volledige code.', 'error');
+      return;
+    }
+    try {
+      setState(i, 'busy', 'Zoeken…');
+      // The picker lists Smart Coach radars only: by their name (SC-339) or by the service they advertise.
+      var svcId = uuid(cfg.service);
+      var dev = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'SC-' }, { services: [svcId] }], optionalServices: [svcId] });
+      var other = G[1 - i];
+      if (other.dev && other.dev.id === dev.id) {
+        setState(i, 'off');
+        toast('Deze radar hoort al bij ' + cfg.names[1 - i] + '. Kies de andere radar.', 'error');
+        return;
+      }
+      s.dev = dev;
+      s.manual = false;
+      dev.addEventListener('gattserverdisconnected', function () { if (s.dev === dev) onLost(i); });
+      await link(i);
+      cfg.linked = true;
+      save();
+      demoStop();
+    } catch (e) {
+      var gone = s.dev;
+      s.manual = true;
+      s.dev = null;
+      try { if (gone && gone.gatt.connected) gone.gatt.disconnect(); } catch (e2) { /* already gone */ }
+      setState(i, 'off');
+      if (e && e.name === 'NotFoundError') return; // picker closed without a choice
+      if (e && e.name === 'SecurityError') toast('Bluetooth is hier geblokkeerd. Open de pagina in Bluefy op de iPad.', 'error');
+      else toast('Koppelen lukte niet. Controleer de codes in Instellingen.' + (e && e.message ? ' (' + e.message + ')' : ''), 'error');
+    }
+  }
+
+  function disconnect(i) {
+    var s = G[i];
+    s.manual = true;
+    clearTimeout(s.retry);
+    try { if (s.dev && s.dev.gatt.connected) s.dev.gatt.disconnect(); } catch (e) { /* already gone */ }
+    s.dev = null;
+    setState(i, 'off');
+  }
+
+  function chipTap(i) {
+    var s = G[i];
+    if (s.state === 'off') { connect(i); return; }
+    if (s.state === 'armed') { clearTimeout(s.armT); disconnect(i); return; }
+    if (s.state === 'busy') return;
+    if (s.state === 'lost') { disconnect(i); return; }
+    var name = $('chip' + i).querySelector('.lbl').textContent;
+    setState(i, 'armed');
+    s.armT = setTimeout(function () { if (s.state === 'armed') setState(i, 'on', name); }, 3000);
+  }
+
+  /* ---------- settings sheet ---------- */
+  function openSheet() {
+    renderLog();
+    $('sheet').classList.add('open');
+    $('sheet').setAttribute('aria-hidden', 'false');
+    $('scrim').hidden = false;
+  }
+  function closeSheet() {
+    $('sheet').classList.remove('open');
+    $('sheet').setAttribute('aria-hidden', 'true');
+    $('scrim').hidden = true;
+    $('setBtn').focus();
+  }
+  function bind(id, key, kind) {
+    var el = $(id);
+    if (kind === 'check') el.checked = !!cfg[key]; else el.value = cfg[key];
+    el.addEventListener(kind === 'text' ? 'input' : 'change', function () {
+      if (kind === 'check') cfg[key] = el.checked;
+      else if (kind === 'num') cfg[key] = Math.max(Number(el.min) || 0, Number(el.value) || 0);
+      else cfg[key] = el.value.trim();
+      save();
+      if (key === 'dec') renderAll();
+    });
+  }
+
+  // A destructive button asks for a second tap instead of a browser dialog.
+  function twoTap(btn, fn) {
+    var label = btn.textContent, t = null, armed = false;
+    btn.addEventListener('click', function () {
+      if (armed) { clearTimeout(t); armed = false; btn.textContent = label; fn(); return; }
+      armed = true;
+      btn.textContent = 'Zeker? Tik nog een keer';
+      t = setTimeout(function () { armed = false; btn.textContent = label; }, 3000);
+    });
+  }
+
+  function setUnit(u) {
+    cfg.unit = u;
+    $('unitMph').setAttribute('aria-pressed', u === 'mph' ? 'true' : 'false');
+    $('unitKmh').setAttribute('aria-pressed', u === 'kmh' ? 'true' : 'false');
+    renderAll();
+    save();
+  }
+
+  /* ---------- start ---------- */
+  load();
+
+  [0, 1].forEach(function (i) {
+    var name = $('name' + i);
+    name.value = cfg.names[i];
+    name.addEventListener('input', function () { cfg.names[i] = name.value || ('Groep ' + (i + 1)); save(); });
+    $('chip' + i).addEventListener('click', function () { chipTap(i); });
+    $('undo' + i).addEventListener('click', function () { G[i].throws.pop(); render(i); save(); });
+    twoTap($('clear' + i), function () { G[i].throws = []; render(i); save(); });
+  });
+  twoTap($('clearAll'), function () { G.forEach(function (s) { s.throws = []; }); renderAll(); save(); });
+
+  $('unitMph').addEventListener('click', function () { setUnit('mph'); });
+  $('unitKmh').addEventListener('click', function () { setUnit('kmh'); });
+  $('demoBtn').addEventListener('click', function () { if (demo.on) demoStop(); else demoStart(false); });
+  $('addBtn').addEventListener('click', function () { connect(G[0].dev ? 1 : 0); });
+  $('setBtn').addEventListener('click', openSheet);
+  $('setClose').addEventListener('click', closeSheet);
+  $('scrim').addEventListener('click', closeSheet);
+  $('logClear').addEventListener('click', function () { log = []; renderLog(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('sheet').classList.contains('open')) closeSheet();
+  });
+
+  bind('setService', 'service', 'text');
+  bind('setChar', 'char', 'text');
+  bind('setMode', 'mode', 'select');
+  bind('setOffset', 'offset', 'num');
+  bind('setDiv', 'div', 'num');
+  bind('setSrc', 'src', 'select');
+  bind('setMin', 'min', 'num');
+  bind('setDec', 'dec', 'check');
+
+  setUnit(cfg.unit === 'kmh' ? 'kmh' : 'mph');
+
+  // Until a radar is set up there is nothing to show, so the board opens with marked example pitches.
+  var hasThrows = G[0].throws.length + G[1].throws.length > 0;
+  if (!cfg.linked && !hasThrows) demoStart(true);
+
+  window.addEventListener('resize', fitAll);
+  window.addEventListener('orientationchange', function () { setTimeout(fitAll, 250); });
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(fitAll);
+    ro.observe($('wrap0')); ro.observe($('wrap1'));
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { digitH = 0; fitAll(); });
+  setTimeout(function () { digitH = 0; fitAll(); }, 800);
+})();
+</script>
+</body>
+</html>
