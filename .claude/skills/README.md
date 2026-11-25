@@ -170,5 +170,7 @@ A further set covers nine free repos from a video pitched as making Claude "feel
 
 `visual-qr-art` makes picture QR codes that still scan (after a reel showing a QR-art web tool): a Python generator that corrects only the modules a reader would misjudge and tests every export on ZXing and OpenCV across nine degraded copies, plus a local browser tool with sliders. Both were built and run here; seven unit tests pass. It complements the global `artistic-qr-validation` skill.
 
+A ranked list from skillleaderboard.com ("Top 10 Fastest Growing Claude Skills", Sept 2026) is the next set. `skill-leaderboard-top10` is the router; it points to `ponytail-minimal-code`, `mattpocock-skills-selection`, `adhd-response-style`, `cloudflare-security-audit`, `superpowers-workflow`, `diagram-design-skill`, `humanizer-prose-editing`, `graphify-knowledge-graph` and `impeccable-frontend-audit`, plus the existing `agent-skills-engineering-lifecycle`, and says which packs not to combine. Every repo was read; none was installed or run.
+
 These describe third-party tools that change; re-read the repo README before relying on a version, flag or
 requirement stated here.
