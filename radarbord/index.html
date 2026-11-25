@@ -91,6 +91,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .btn svg{width:16px;height:16px;margin-right:8px;vertical-align:-3px;pointer-events:none}
 .btn--default{background:var(--primary);color:#000;box-shadow:var(--shadow-glow-accent)}
 .btn--default:active{background:var(--orange-600)}
+.btn--default:disabled{background:var(--zinc-800);color:var(--zinc-400);box-shadow:none;cursor:default}
 .btn--outline{border-color:var(--zinc-700)}
 .btn--secondary{background:var(--zinc-800)}
 .btn--secondary[aria-pressed="true"]{background:var(--orange-active);border-color:var(--orange-ring);color:var(--orange-400)}
@@ -396,7 +397,10 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 <div class="scrim" id="scrim" hidden></div>
 <aside class="sheet" id="sheet" aria-label="Instellingen" aria-hidden="true">
   <header>
-    <h2>Instellingen</h2>
+    <div>
+      <h2>Instellingen</h2>
+      <p class="label-micro" style="margin:4px 0 0;color:var(--zinc-500-text)">Radarbord versie 7</p>
+    </div>
     <button type="button" class="close" id="setClose" aria-label="Sluiten"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
   </header>
 
@@ -456,8 +460,13 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   <p>Elk bericht dat binnenkomt, nieuwste bovenaan: tijd, groep, kanaal, bytes en dezelfde bytes als tekst.</p>
   <pre class="log" id="log" tabindex="0">Nog niets ontvangen. Koppel een radar en gooi een pitch.</pre>
   <div class="acts" style="margin-top:12px">
+    <button type="button" class="btn btn--secondary btn--sm" id="logCopy">Log kopiëren</button>
     <button type="button" class="btn btn--secondary btn--sm" id="logClear">Log wissen</button>
   </div>
+
+  <h3>Diagnose</h3>
+  <p>Valt de radar steeds weg? De diagnose koppelt de radar een paar keer opnieuw, elke keer op een andere manier, en schrijft in het log wanneer hij wegvalt. Dat duurt hooguit 3 minuten. Laat de pagina open.</p>
+  <button type="button" class="btn btn--default" id="diagBtn">Diagnose starten</button>
 </aside>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -482,7 +491,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   };
 
   function lane(i) {
-    return { i: i, throws: [], dev: null, manual: false, state: 'off', retry: null, lastAt: 0, flagT: null, armT: null, upAt: 0, quick: 0 };
+    return { i: i, throws: [], dev: null, manual: false, state: 'off', retry: null, lastAt: 0, flagT: null, armT: null, upAt: 0, quick: 0, diag: false };
   }
   var G = [lane(0), lane(1)];
   var log = [];
@@ -743,8 +752,9 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   function short(u) { return String(u).slice(0, 8); }
   // One line in the raw data log: what the radar sent, or what happened to the link.
   function note(i, text) {
-    log.unshift(clock(Date.now()) + '  G' + (i + 1) + '  ' + text);
-    if (log.length > 120) log.pop();
+    var now = Date.now(), up = G[i].upAt;
+    log.unshift(clock(now) + (up ? ' +' + ((now - up) / 1000).toFixed(1) + 's' : '') + '  G' + (i + 1) + '  ' + text);
+    if (log.length > 400) log.pop();
     if ($('sheet').classList.contains('open')) renderLog();
   }
   function onData(i, chUuid, dv) {
@@ -777,16 +787,9 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
     return out.join(', ') || 'onbekend';
   }
 
-  // For the log only: what each channel can do and what it holds right now.
-  async function describe(i, chars) {
-    for (var k = 0; k < chars.length; k++) {
-      var ch = chars[k];
-      note(i, short(ch.uuid) + '  kanaal: ' + propsOf(ch));
-      if (ch.properties && ch.properties.read) {
-        try { note(i, short(ch.uuid) + '  leest ' + hexOf(await ch.readValue())); }
-        catch (e) { note(i, short(ch.uuid) + '  lezen lukte niet'); }
-      }
-    }
+  // For the log only: what each channel can do. The board itself only listens; it reads and writes nothing.
+  function describe(i, chars) {
+    for (var k = 0; k < chars.length; k++) note(i, short(chars[k].uuid) + '  kanaal: ' + propsOf(chars[k]));
   }
 
   async function link(i, quiet) {
@@ -819,7 +822,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
   function onLost(i) {
     var s = G[i];
-    if (s.manual || !s.dev) return;
+    if (s.manual || !s.dev || s.diag) return;
     if (s.upAt) {
       var secs = Math.round((Date.now() - s.upAt) / 1000);
       note(i, 'verbinding weg na ' + secs + ' s');
@@ -836,6 +839,101 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
         link(i, true).catch(function () { tries++; again(); });
       }, Math.min(5000, 1000 * (tries + 1)));
     })();
+  }
+
+  /* ---------- diagnose: why does the radar drop the link? ---------- */
+  var DIAG_HOLD = 25000; // a link that lasts this long counts as stable
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  // One fresh link, handled in one particular way, timed until the radar drops it.
+  async function trial(i, label, want, found) {
+    var s = G[i], dev = s.dev, t0 = 0, dropped = 0, result;
+    function onDrop() { dropped = Date.now(); }
+    try { if (dev.gatt.connected) dev.gatt.disconnect(); } catch (e) { /* already gone */ }
+    s.upAt = 0;
+    await wait(2500);
+    dev.addEventListener('gattserverdisconnected', onDrop);
+    try {
+      var server = await dev.gatt.connect();
+      t0 = s.upAt = Date.now();
+      note(i, 'TEST ' + label + ': verbonden');
+      var svc = await server.getPrimaryService(uuid(cfg.service));
+      var chars = await listChars(svc);
+      note(i, chars.length + ' kanalen gevonden');
+      for (var k = 0; k < chars.length; k++) {
+        var ch = chars[k], p = ch.properties || {};
+        if (found) found.push({ uuid: ch.uuid, notify: !!(p.notify || p.indicate), read: !!p.read, props: propsOf(ch) });
+        if ((p.notify || p.indicate) && want.sub && (want.sub === true || want.sub === ch.uuid)) {
+          try {
+            (function (c) {
+              c.addEventListener('characteristicvaluechanged', function (ev) { onData(i, c.uuid, ev.target.value); });
+            })(ch);
+            await ch.startNotifications();
+            note(i, short(ch.uuid) + '  meldingen aan');
+          } catch (e) { note(i, short(ch.uuid) + '  meldingen aanzetten lukte niet: ' + (e && e.message)); }
+        }
+        if (p.read && want.read) {
+          try { note(i, short(ch.uuid) + '  leest ' + hexOf(await ch.readValue())); }
+          catch (e) { note(i, short(ch.uuid) + '  lezen lukte niet: ' + (e && e.message)); }
+        }
+      }
+      while (!dropped && Date.now() - t0 < DIAG_HOLD) await wait(250);
+      result = dropped ? 'weg na ' + ((dropped - t0) / 1000).toFixed(1) + ' s' : 'bleef ' + (DIAG_HOLD / 1000) + ' s verbonden';
+    } catch (e) {
+      result = 'fout: ' + (e && e.message ? e.message : e);
+    }
+    dev.removeEventListener('gattserverdisconnected', onDrop);
+    note(i, 'UITSLAG ' + label + ': ' + result);
+    return label + ': ' + result;
+  }
+
+  async function diagnose() {
+    var i = G[0].dev ? 0 : (G[1].dev ? 1 : -1);
+    if (i < 0) { toast('Koppel eerst een radar. Tik daarna opnieuw op Diagnose starten.', 'error'); return; }
+    var s = G[i], btn = $('diagBtn');
+    if (s.diag) return;
+    s.diag = true;
+    clearTimeout(s.retry);
+    btn.disabled = true;
+    setState(i, 'busy', 'Diagnose…');
+    var found = [], out = [], step = 0;
+    function say() { step++; btn.textContent = 'Diagnose loopt, test ' + step + '…'; }
+    try {
+      say(); out.push(await trial(i, 'A alleen verbinden', {}, found));
+      for (var k = 0; k < found.length; k++) note(i, short(found[k].uuid) + '  kanaal: ' + found[k].props);
+      var subs = found.filter(function (c) { return c.notify; });
+      for (var n = 0; n < subs.length && n < 3; n++) {
+        say(); out.push(await trial(i, 'B meldingen op ' + short(subs[n].uuid), { sub: subs[n].uuid }));
+      }
+      if (subs.length > 1) { say(); out.push(await trial(i, 'C alle meldingen', { sub: true })); }
+      if (found.some(function (c) { return c.read; })) { say(); out.push(await trial(i, 'D alleen lezen', { read: true })); }
+    } catch (e) {
+      out.push('diagnose afgebroken: ' + (e && e.message ? e.message : e));
+    }
+    s.upAt = 0;
+    for (var j = out.length - 1; j >= 0; j--) note(i, 'SAMENVATTING ' + out[j]);
+    s.diag = false;
+    btn.disabled = false;
+    btn.textContent = 'Diagnose starten';
+    toast('Diagnose klaar. Tik op Log kopiëren en plak het log in de chat.');
+    link(i, true).catch(function () { onLost(i); });
+  }
+
+  function copyLog() {
+    var text = 'Dubbel Radarbord versie 7, log, oudste regel eerst\n' + navigator.userAgent + '\n' + log.slice().reverse().join('\n');
+    function done() { toast('Log gekopieerd. Plak het in de chat.'); }
+    function byHand() {
+      var ta = document.createElement('textarea'), ok = false;
+      ta.value = text; ta.readOnly = true;
+      ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0'; ta.style.fontSize = '16px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+      try { ok = document.execCommand('copy'); } catch (e) { /* not allowed here */ }
+      document.body.removeChild(ta);
+      if (ok) done(); else toast('Kopiëren lukte niet. Maak een screenshot van het log.', 'error');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, byHand);
+    else byHand();
   }
 
   async function connect(i) {
@@ -970,6 +1068,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   $('setClose').addEventListener('click', closeSheet);
   $('scrim').addEventListener('click', closeSheet);
   $('logClear').addEventListener('click', function () { log = []; renderLog(); });
+  $('logCopy').addEventListener('click', copyLog);
+  $('diagBtn').addEventListener('click', diagnose);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && $('sheet').classList.contains('open')) closeSheet();
   });
