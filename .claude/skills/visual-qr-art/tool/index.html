@@ -155,7 +155,15 @@ function draw(){var b=build(12),v=$('view');v.width=b.canvas.width;v.height=b.ca
   var r=check(b),badge=$('badge');badge.className='badge '+(r.all?'ok':'no');badge.textContent=!r.all?'Scans in '+r.ok.filter(Boolean).length+' of 3 checks: raise scan safety or dot size':S.margin<SAFE-1e-6?'Scans here, but scan safety is below '+SAFE+': strict readers may fail':'Scans in 3 of 3 checks, scan safety '+S.margin.toFixed(2);if(r.all&&S.margin<SAFE-1e-6)badge.className='badge no';}
 $('auto').addEventListener('click',function(){for(var m=SAFE;m<=.4;m+=.03){S.margin=+m.toFixed(2);for(var d=.3;d<=.54;d+=.06){S.dot=+d.toFixed(2);if(check(build(12)).all){sync();draw();return;}}}sync();draw();});
 function sync(){SL.forEach(function(s){var el=$('s_'+s[0]);el.value=S[s[0]];el.nextElementSibling.textContent=(+S[s[0]]).toFixed(2);});}
-$('dl').addEventListener('click',function(){var b=build(24*S.scale),a=document.createElement('a');a.download='picture-qr-'+b.canvas.width+'px.png';a.href=b.canvas.toDataURL('image/png');a.click();});
+// Download: inside a claude.ai artifact the page asks the viewer through the downloads capability; opened from
+// disk it falls back to an ordinary link.
+var DL=null;if(window.claude&&typeof window.claude.use==='function'){window.claude.use('downloads').then(function(d){DL=d;}).catch(function(){});}
+$('dl').addEventListener('click',function(){var b=build(24*S.scale),name='picture-qr-'+b.canvas.width+'px.png',btn=$('dl');
+  if(window.claude&&typeof window.claude.use==='function'){
+    if(!DL){btn.textContent='Download not available here';return;}
+    b.canvas.toBlob(function(blob){DL.save({filename:name,data:blob}).then(function(){btn.textContent='Saved';setTimeout(function(){btn.textContent='Download PNG';},1600);})
+      .catch(function(e){var c=e&&e.code;btn.textContent=c==='declined'?'Download PNG':c==='rate_limited'?'Busy, try again':c==='host_unavailable'?'Open in a browser to save':'Download not available here';});},'image/png');return;}
+  var a=document.createElement('a');a.download=name;a.href=b.canvas.toDataURL('image/png');a.click();});
 draw();
 </script>
 </body>
