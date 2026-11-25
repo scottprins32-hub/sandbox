@@ -1,0 +1,152 @@
+{
+ "payload": "https://example.com/pitch-score",
+ "version": 4,
+ "modules": 33,
+ "ec": "H",
+ "settings": {
+  "dot": 0.3,
+  "margin": 0.22,
+  "spread": 0.6,
+  "bias": 0.0,
+  "shape": "circle",
+  "zoom": 1.0,
+  "ox": 0.0,
+  "oy": 0.0,
+  "brightness": 0.0,
+  "contrast": 1.0,
+  "saturation": 1.0,
+  "frame": "stamp",
+  "module": 24,
+  "scale": 1
+ },
+ "image": {
+  "path": "sand3d-stamp.png",
+  "size": [
+   1128,
+   1204
+  ],
+  "sha256": "3dcf332a55da9e4ef05aa86a2a05e8f9931d25690c4a487221c5da56dcae030c"
+ },
+ "verify": {
+  "file": {
+   "case": "file (full size)",
+   "zxing": true,
+   "opencv": true
+  },
+  "original_both": true,
+  "all_cases_both": true,
+  "passed": 9,
+  "cases": 9,
+  "rows": [
+   {
+    "case": "width:1080",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "width:640",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "width:320",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "width:200",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "blur:1.2",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "jpeg:45",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "rotate:12",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "tilt:0.08",
+    "zxing": true,
+    "opencv": true
+   },
+   {
+    "case": "dim:1.8",
+    "zxing": true,
+    "opencv": true
+   }
+  ],
+  "rule": "The full-size file must decode with ZXing; every degraded copy (1080 px and smaller) must decode with ZXing and OpenCV. OpenCV on the full-size file is reported but not required: at very high resolution it sees the picture inside each module, which a phone camera does not."
+ },
+ "auto_tried": [
+  {
+   "dot": 0.3,
+   "margin": 0.1,
+   "passed": 0,
+   "cases": 9
+  },
+  {
+   "dot": 0.36,
+   "margin": 0.1,
+   "passed": 0,
+   "cases": 9
+  },
+  {
+   "dot": 0.42,
+   "margin": 0.1,
+   "passed": 2,
+   "cases": 9
+  },
+  {
+   "dot": 0.3,
+   "margin": 0.14,
+   "passed": 4,
+   "cases": 9
+  },
+  {
+   "dot": 0.36,
+   "margin": 0.14,
+   "passed": 5,
+   "cases": 9
+  },
+  {
+   "dot": 0.42,
+   "margin": 0.14,
+   "passed": 5,
+   "cases": 9
+  },
+  {
+   "dot": 0.3,
+   "margin": 0.18,
+   "passed": 8,
+   "cases": 9
+  },
+  {
+   "dot": 0.36,
+   "margin": 0.18,
+   "passed": 7,
+   "cases": 9
+  },
+  {
+   "dot": 0.42,
+   "margin": 0.18,
+   "passed": 7,
+   "cases": 9
+  },
+  {
+   "dot": 0.3,
+   "margin": 0.22,
+   "passed": 9,
+   "cases": 9
+  }
+ ],
+ "note": "Software decode of the exported file and degraded copies with ZXing and OpenCV. Not a test with phone cameras or prints."
+}

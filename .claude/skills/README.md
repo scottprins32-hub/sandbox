@@ -168,5 +168,7 @@ A motion-and-3D set grew from a survey of new repos in biomechanics, voice, 3D c
 
 A further set covers nine free repos from a video pitched as making Claude "feel like cheating" (Jack Roberts, 20 Nov 2026). `claude-repo-boosters` is the router; it points to `free-llm-api-router`, `agent-desktop-control`, `firecrawl-web-extraction`, `lemo-opuscar-film-styles`, `agent-skills-engineering-lifecycle`, `everything-claude-code-selection`, `slop-monster-copy-cleanup`, `astryx-design-system` and `power-design-skill`, and to the existing `claude-code-game-studios`. Heretic (removing safety refusals from models) was left out on purpose. Every repo was read; none was installed or run.
 
+`visual-qr-art` makes picture QR codes that still scan (after a reel showing a QR-art web tool): a Python generator that corrects only the modules a reader would misjudge and tests every export on ZXing and OpenCV across nine degraded copies, plus a local browser tool with sliders. Both were built and run here; seven unit tests pass. It complements the global `artistic-qr-validation` skill.
+
 These describe third-party tools that change; re-read the repo README before relying on a version, flag or
 requirement stated here.

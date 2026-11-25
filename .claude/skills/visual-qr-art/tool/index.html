@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picture QR</title>
+<style>
+:root{--bg:#f4f2ee;--surface:#fff;--ink:#1b1b1a;--muted:#6b6a66;--line:#e2dfd8;--accent:#2f6f4f;--warn:#b5651d;--bad:#b3261e;--good:#2f6f4f;--radius:14px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151513;--surface:#1f1f1c;--ink:#efede8;--muted:#a3a19a;--line:#34332f;--accent:#7cc29c;--warn:#e0a060;--bad:#f2867c;--good:#7cc29c}}
+:root[data-theme="dark"]{--bg:#151513;--surface:#1f1f1c;--ink:#efede8;--muted:#a3a19a;--line:#34332f;--accent:#7cc29c;--warn:#e0a060;--bad:#f2867c;--good:#7cc29c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 48px;display:grid;grid-template-columns:340px 1fr;gap:20px}
+@media (max-width:820px){main{grid-template-columns:1fr}}
+h1{grid-column:1/-1;margin:0;font-size:22px;letter-spacing:-.01em}
+.sub{grid-column:1/-1;margin:-12px 0 0;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+input[type=text]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:flex;align-items:center;gap:8px}
+.row input[type=range]{flex:1;accent-color:var(--accent)}
+.row output{min-width:44px;text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:8px 6px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;cursor:pointer;min-height:36px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.over{border-color:var(--accent)}
+.hint{font-size:12px;color:var(--muted)}
+.warn{color:var(--warn)}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+canvas#view{max-width:100%;height:auto;border-radius:10px;background:repeating-conic-gradient(var(--line) 0 25%,transparent 0 50%) 0 0/16px 16px}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:13px}
+.badge.ok{color:var(--good);border-color:var(--good)}.badge.no{color:var(--bad);border-color:var(--bad)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn{padding:9px 14px;border-radius:10px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);font:inherit;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.note{font-size:12px;color:var(--muted);max-width:560px;text-align:center}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Picture QR</h1>
+<p class="sub">Your picture fills the code; a small dot in each module carries the data. Runs in this page only.</p>
+
+<section class="panel" aria-label="Settings">
+  <label for="link">Link</label>
+  <input id="link" type="text" value="https://example.com/pitch-score" spellcheck="false">
+  <div class="hint" id="size"></div>
+
+  <label>Picture</label>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a picture">Drop a picture or click to browse<br><span class="hint">PNG, JPG, SVG. Without one, a sample pattern is used.</span></div>
+  <input id="file" type="file" accept="image/*" hidden>
+
+  <div id="sliders"></div>
+
+  <label>Dot shape</label>
+  <div class="seg" data-key="shape"><button aria-pressed="true" data-v="square">Square</button><button aria-pressed="false" data-v="circle">Circle</button></div>
+  <label>Frame</label>
+  <div class="seg" data-key="frame"><button aria-pressed="true" data-v="card">Card</button><button aria-pressed="false" data-v="stamp">Stamp</button><button aria-pressed="false" data-v="none">None</button></div>
+  <label>Error correction</label>
+  <div class="seg" data-key="ec"><button aria-pressed="false" data-v="M">M</button><button aria-pressed="false" data-v="Q">Q</button><button aria-pressed="true" data-v="H">H</button></div>
+  <label class="row"><input id="cap" type="checkbox" checked> Show the link under the code</label>
+</section>
+
+<section class="stage" aria-label="Preview">
+  <canvas id="view" width="10" height="10" aria-label="QR code preview"></canvas>
+  <span class="badge" id="badge" role="status">Checking…</span>
+  <div class="actions">
+    <button class="btn ghost" id="auto">Make it scan</button>
+    <div class="seg" data-key="scale" style="min-width:220px"><button aria-pressed="true" data-v="1">1×</button><button aria-pressed="false" data-v="2">2×</button><button aria-pressed="false" data-v="4">4×</button><button aria-pressed="false" data-v="8">8×</button></div>
+    <button class="btn" id="dl">Download PNG</button>
+  </div>
+  <p class="note">The badge decodes this preview with jsQR at full size, at 320 px and blurred. That is a software check, not a phone test: before printing, run <code>halftone_qr.py</code> (two more readers, nine degraded copies) and scan the print with an iPhone and an Android phone at the real size and distance.</p>
+</section>
+</main>
+
+<script src="vendor/qrcode-generator-1.4.4.js"></script>
+<script src="vendor/jsQR-1.4.0.js"></script>
+<script>
+'use strict';
+var S={zoom:1,ox:0,oy:0,brightness:0,contrast:1,saturation:1,dot:.3,margin:.24,spread:.6,shape:'square',frame:'card',ec:'H',scale:1};
+var SL=[['zoom','Zoom',1,3,.01],['ox','Move left/right',-1,1,.01],['oy','Move up/down',-1,1,.01],['brightness','Brightness',-.5,.5,.01],['contrast','Contrast',.5,2,.01],['saturation','Colour',0,2,.01],
+        ['dot','Data dot size',.2,.6,.01],['margin','Scan safety',0,.35,.01],['spread','Correction spread',.3,1,.01]];
+var src=null,LUM=[.2126,.7152,.0722],QUIET=4,SAFE=.24; // SAFE: margin at which every test picture passed ZXing and OpenCV in halftone_qr.py
+var $=function(id){return document.getElementById(id);};
+
+// ---------- controls ----------
+SL.forEach(function(s){var id='s_'+s[0];$('sliders').insertAdjacentHTML('beforeend','<label for="'+id+'">'+s[1]+'</label><div class="row"><input id="'+id+'" type="range" min="'+s[2]+'" max="'+s[3]+'" step="'+s[4]+'" value="'+S[s[0]]+'"><output for="'+id+'"></output></div>');
+  var el=$(id);el.addEventListener('input',function(){S[s[0]]=+el.value;el.nextElementSibling.textContent=(+el.value).toFixed(2);schedule();});el.nextElementSibling.textContent=(+S[s[0]]).toFixed(2);});
+document.querySelectorAll('.seg').forEach(function(g){g.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});
+  var k=g.dataset.key;S[k]=k==='scale'?+b.dataset.v:b.dataset.v;if(k!=='scale')schedule();});});
+$('link').addEventListener('input',schedule);$('cap').addEventListener('change',schedule);
+var drop=$('drop');drop.addEventListener('click',function(){$('file').click();});drop.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}});
+$('file').addEventListener('change',function(){if(this.files[0])load(this.files[0]);});
+['dragover','dragenter'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over');});});
+['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over');});});
+drop.addEventListener('drop',function(e){if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);});
+function load(f){var url=URL.createObjectURL(f),im=new Image();im.onload=function(){src=im;drop.innerHTML=f.name+'<br><span class="hint">'+Math.round(f.size/1024)+' KB · '+im.naturalWidth+'×'+im.naturalHeight+'</span>';schedule();};im.src=url;}
+
+// ---------- QR ----------
+function makeQR(text,ec){qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8'];var q=qrcode(0,ec);q.addData(text,'Byte');q.make();
+  var n=q.getModuleCount(),m=[];for(var r=0;r<n;r++){m.push([]);for(var c=0;c<n;c++)m[r].push(q.isDark(r,c));}return {m:m,n:n,version:(n-17)/4};}
+function alignCentres(v,n){if(v===1)return[];var k=Math.floor(v/7)+2,step=v===32?26:Math.floor((v*4+k*2+1)/(k*2-2))*2,p=[6];for(var i=0;i<k-1;i++)p.push(n-7-i*step);p.sort(function(a,b){return a-b;});
+  var o=[];p.forEach(function(r){p.forEach(function(c){if((r<9&&c<9)||(r<9&&c>n-10)||(r>n-10&&c<9))return;o.push([r,c]);});});return o;}
+function solidMask(v,n){var s=[];for(var r=0;r<n;r++){s.push([]);for(var c=0;c<n;c++)s[r].push(false);}
+  function box(r0,c0,h,w){for(var r=r0;r<r0+h;r++)for(var c=c0;c<c0+w;c++)if(r>=0&&c>=0&&r<n&&c<n)s[r][c]=true;}
+  box(0,0,8,8);box(0,n-8,8,8);box(n-8,0,8,8);alignCentres(v,n).forEach(function(p){box(p[0]-2,p[1]-2,5,5);});
+  for(var i=0;i<n;i++){s[6][i]=true;s[i][6]=true;}box(8,0,1,9);box(0,8,9,1);box(8,n-8,1,8);box(n-8,8,8,1);if(v>=7){box(0,n-11,6,3);box(n-11,0,3,6);}return s;}
+
+// ---------- picture ----------
+function sample(side){var c=document.createElement('canvas');c.width=c.height=side;var x=c.getContext('2d');var g=x.createLinearGradient(0,0,side,side);g.addColorStop(0,'#f2b880');g.addColorStop(.5,'#c86b5b');g.addColorStop(1,'#3d5a80');x.fillStyle=g;x.fillRect(0,0,side,side);
+  for(var i=0;i<14;i++){x.beginPath();x.arc(side*(.15+.7*((i*37)%100)/100),side*(.15+.7*((i*61)%100)/100),side*(.05+.04*(i%4)),0,7);x.fillStyle=['#fff3d6','#2b2d42','#8d99ae','#ef233c'][i%4];x.globalAlpha=.85;x.fill();}return c;}
+function picture(side){var c=document.createElement('canvas');c.width=c.height=side;var x=c.getContext('2d');var im=src||sample(512),w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
+  var s=Math.min(w,h)/S.zoom,cx=w/2+S.ox*(w-s)/2,cy=h/2+S.oy*(h-s)/2;x.imageSmoothingQuality='high';x.drawImage(im,cx-s/2,cy-s/2,s,s,0,0,side,side);
+  var d=x.getImageData(0,0,side,side).data,f=new Float32Array(side*side*3);
+  for(var i=0,j=0;i<d.length;i+=4,j+=3){var r=d[i],g=d[i+1],b=d[i+2],l=LUM[0]*r+LUM[1]*g+LUM[2]*b;
+    r=l+(r-l)*S.saturation;g=l+(g-l)*S.saturation;b=l+(b-l)*S.saturation;r=128+(r-128)*S.contrast;g=128+(g-128)*S.contrast;b=128+(b-128)*S.contrast;
+    var k=1+S.brightness;f[j]=r*k;f[j+1]=g*k;f[j+2]=b*k;}return f;}
+
+// ---------- render (same rules as halftone_qr.py) ----------
+function renderCode(q,M){var n=q.n,side=n*M,img=picture(side),DK=[17,17,17],LT=[255,255,255],tl=new Float32Array(side*side);
+  for(var y=0;y<side;y++)for(var x=0;x<side;x++)tl[y*side+x]=q.m[(y/M)|0][(x/M)|0]?17:255;
+  if(S.margin>0){var w=new Float32Array(M*M);for(var yy=0;yy<M;yy++)for(var xx=0;xx<M;xx++){var r=Math.hypot(yy+.5-M/2,xx+.5-M/2)/(M/2);w[yy*M+xx]=S.spread>=1?1:Math.max(0,Math.min(1,1.2-r/S.spread));}
+    for(var pass=0;pass<2;pass++){for(var mr=0;mr<n;mr++)for(var mc=0;mc<n;mc++){var dark=q.m[mr][mc],goal=255*(dark?.5-S.margin:.5+S.margin),sum=0,gain=0;
+        for(yy=0;yy<M;yy++)for(xx=0;xx<M;xx++){var p=((mr*M+yy)*side+mc*M+xx),o=p*3,L=LUM[0]*img[o]+LUM[1]*img[o+1]+LUM[2]*img[o+2],wt=pass?1:w[yy*M+xx];sum+=L;gain+=(tl[p]-L)*wt;}
+        var mean=sum/(M*M);gain/=M*M;if(dark?mean<=goal:mean>=goal)continue;var a=Math.max(0,Math.min(1,(goal-mean)/(Math.abs(gain)<1e-3?1e-3:gain)));
+        var T=dark?DK:LT;for(yy=0;yy<M;yy++)for(xx=0;xx<M;xx++){o=((mr*M+yy)*side+mc*M+xx)*3;var A=a*(pass?1:w[yy*M+xx]);img[o]+=(T[0]-img[o])*A;img[o+1]+=(T[1]-img[o+1])*A;img[o+2]+=(T[2]-img[o+2])*A;}}}}
+  var solid=solidMask(q.version,n),d=Math.max(3,Math.round(S.dot*M)),a0=Math.floor((M-d)/2),c=document.createElement('canvas');c.width=c.height=side;var ctx=c.getContext('2d'),id=ctx.createImageData(side,side),D=id.data;
+  for(y=0;y<side;y++)for(x=0;x<side;x++){var mr2=(y/M)|0,mc2=(x/M)|0,yy2=y-mr2*M,xx2=x-mc2*M,o2=(y*side+x)*3,q4=(y*side+x)*4,dk=q.m[mr2][mc2],inDot;
+    if(S.shape==='circle'){var dy=yy2+.5-M/2,dx=xx2+.5-M/2;inDot=dy*dy+dx*dx<=d*d/4;}else inDot=yy2>=a0&&yy2<a0+d&&xx2>=a0&&xx2<a0+d;
+    var v=solid[mr2][mc2]||inDot?(dk?DK:LT):[img[o2],img[o2+1],img[o2+2]];D[q4]=Math.max(0,Math.min(255,v[0]));D[q4+1]=Math.max(0,Math.min(255,v[1]));D[q4+2]=Math.max(0,Math.min(255,v[2]));D[q4+3]=255;}
+  ctx.putImageData(id,0,0);return c;}
+function frame(code,M,caption){var q=QUIET*M,side=code.width+2*q;
+  if(S.frame==='none'){var c0=document.createElement('canvas');c0.width=c0.height=side;var x0=c0.getContext('2d');x0.fillStyle='#fff';x0.fillRect(0,0,side,side);x0.drawImage(code,q,q);return c0;}
+  var pad=M*(S.frame==='card'?2:3),capH=caption?Math.round(M*3.2):0,W=side+2*pad,H=side+2*pad+capH,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.fillStyle='#fff';
+  if(S.frame==='card'){var r=M*1.6;x.beginPath();x.roundRect(0,0,W,H,r);x.fill();}
+  else{x.fillRect(0,0,W,H);x.globalCompositeOperation='destination-out';var rr=Math.max(2,Math.round(M*.55)),st=2*rr+Math.max(2,Math.round(M*.5));
+    for(var i=st/2;i<W;i+=st){x.beginPath();x.arc(i,0,rr,0,7);x.arc(i,H,rr,0,7);x.fill();}for(i=st/2;i<H;i+=st){x.beginPath();x.arc(0,i,rr,0,7);x.arc(W,i,rr,0,7);x.fill();}
+    x.globalCompositeOperation='source-over';var e=M*1.6;x.strokeStyle='rgba(40,40,40,.35)';x.lineWidth=Math.max(1,M/10);x.strokeRect(e,e,W-2*e,H-2*e);}
+  x.drawImage(code,pad+q,pad+q);
+  if(caption){x.fillStyle='#282828';x.font=Math.max(10,Math.round(M*1.25))+'px system-ui,sans-serif';x.textAlign='center';x.textBaseline='top';x.fillText(caption,W/2,pad+side-q/2+M*.2);}
+  return c;}
+function build(M){var text=$('link').value.trim()||' ',q=makeQR(text,S.ec),cap=$('cap').checked?text.replace(/^[a-z]+:\/\//i,'').replace(/\/$/,''):null;return {q:q,canvas:frame(renderCode(q,M),M,cap),text:text};}
+
+// ---------- scan check ----------
+function decodes(c,text,width,blur){var w=width||c.width,h=Math.round(c.height*w/c.width),t=document.createElement('canvas');t.width=w;t.height=h;var x=t.getContext('2d');x.fillStyle='#ebebe6';x.fillRect(0,0,w,h);
+  if(blur)x.filter='blur('+blur+'px)';x.drawImage(c,0,0,w,h);var d=x.getImageData(0,0,w,h),r=jsQR(d.data,w,h,{inversionAttempts:'dontInvert'});return !!(r&&r.data===text);}
+function check(b){var cases=[[0,0],[320,0],[320,.8]],ok=cases.map(function(k){return decodes(b.canvas,b.text,k[0],k[1]);});return {ok:ok,all:ok.every(Boolean)};}
+
+// ---------- loop ----------
+var pending=0;function schedule(){cancelAnimationFrame(pending);pending=requestAnimationFrame(draw);}
+function draw(){var b=build(12),v=$('view');v.width=b.canvas.width;v.height=b.canvas.height;v.getContext('2d').drawImage(b.canvas,0,0);
+  var n=b.q.n;$('size').innerHTML=n+'×'+n+' modules (version '+b.q.version+')'+(b.q.version>5?' · <span class="warn">long link: shorten it for a bigger picture per module</span>':'');
+  var r=check(b),badge=$('badge');badge.className='badge '+(r.all?'ok':'no');badge.textContent=!r.all?'Scans in '+r.ok.filter(Boolean).length+' of 3 checks: raise scan safety or dot size':S.margin<SAFE-1e-6?'Scans here, but scan safety is below '+SAFE+': strict readers may fail':'Scans in 3 of 3 checks, scan safety '+S.margin.toFixed(2);if(r.all&&S.margin<SAFE-1e-6)badge.className='badge no';}
+$('auto').addEventListener('click',function(){for(var m=SAFE;m<=.4;m+=.03){S.margin=+m.toFixed(2);for(var d=.3;d<=.54;d+=.06){S.dot=+d.toFixed(2);if(check(build(12)).all){sync();draw();return;}}}sync();draw();});
+function sync(){SL.forEach(function(s){var el=$('s_'+s[0]);el.value=S[s[0]];el.nextElementSibling.textContent=(+S[s[0]]).toFixed(2);});}
+$('dl').addEventListener('click',function(){var b=build(24*S.scale),a=document.createElement('a');a.download='picture-qr-'+b.canvas.width+'px.png';a.href=b.canvas.toDataURL('image/png');a.click();});
+draw();
+</script>
+</body>
+</html>
